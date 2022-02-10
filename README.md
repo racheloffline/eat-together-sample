@@ -1,10 +1,4 @@
-# Template Bottom tabs with auth flow
-
-Test pull request!!!
-
-# Preview
-
-![../media/authflow.png](../media/authflow.png)
+# About the base template ✨✨✨
 
 # Installation
 
@@ -59,8 +53,6 @@ There are 3 screens included inside `./src/screens/auth` and one more thing its 
 - Register screen `./src/screens/auth/register.tsx`
 - Forget password screen `./src/screens/auth/forget.tsx`
 
-I personally use these screens on my project [TiktTeng](https://github.com/codingki/TikTeng) in early stages before the redesign, feel free to use these screens ❤️
-
 ### React Navigation Auth Flow
 
 The checking logged users process is inside `./src/provider/AuthProvider` I use React Context, you can add more functions like get the data of the user and store it to the context (better static data, ex: uid)
@@ -88,8 +80,6 @@ export default () => {
 
 # Rapi UI
 
-![../media/hero.png](../media/hero.png)
-
 These UI components are provided by [Rapi UI](https://rapi-ui.kikiding.space/).
 Check the [documentation](https://rapi-ui.kikiding.space/docs/) for usage and more components.
 
@@ -104,6 +94,7 @@ These are the folders and the functionality
 /src/provider -> for React Context
 /src/screens -> for Screens
 ```
+Original Author:
 
 if you find these useful don't forget to give it a star ⭐ and share it to your friends ❤️
 
