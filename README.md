@@ -1,9 +1,5 @@
 # About the base template ✨✨✨
 
-# Preview
-
-![../media/authflow.png](../media/authflow.png)
-
 # Installation
 
 1. Install [node.js](https://nodejs.org/en/)
