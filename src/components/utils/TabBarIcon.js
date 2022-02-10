@@ -1,3 +1,5 @@
+//Controls style of icons in bottom navigation bar
+
 import React from "react";
 import { themeColor, useTheme } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
@@ -19,3 +21,4 @@ export default (props) => {
     />
   );
 };
+

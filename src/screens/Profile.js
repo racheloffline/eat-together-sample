@@ -1,3 +1,5 @@
+//Edit user profile
+
 import React from 'react';
 import { View } from 'react-native';
 import { Layout, Text } from 'react-native-rapi-ui';

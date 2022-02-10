@@ -1,3 +1,5 @@
+//Users go here if they forget their password
+
 import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import {

@@ -1,5 +1,7 @@
+//Display potential friends to share meals with
+
 import React from "react";
-import { View, Linking } from "react-native";
+import {View, Linking, Image, SafeAreaView, ImageBackground} from "react-native";
 import * as firebase from "firebase";
 import {
   Layout,
@@ -10,7 +12,6 @@ import {
   SectionContent,
   useTheme,
 } from "react-native-rapi-ui";
-
 export default function ({ navigation }) {
   const { isDarkmode, setTheme } = useTheme();
   return (

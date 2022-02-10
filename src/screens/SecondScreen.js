@@ -1,3 +1,5 @@
+//Functionality TDB, most likely to be used to implement ice-breaker games
+
 import React from "react";
 import { View } from "react-native";
 import {

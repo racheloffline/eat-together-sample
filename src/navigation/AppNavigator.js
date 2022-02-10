@@ -1,3 +1,6 @@
+//Controls navigation functionality which includes everything that involves switching screens
+//Sets up login permissions
+
 import React, { useContext } from "react";
 import firebase from "firebase/app";
 import { NavigationContainer } from "@react-navigation/native";
@@ -13,13 +16,14 @@ import SecondScreen from "../screens/SecondScreen";
 import Chat from "../screens/Chat";
 import Profile from "../screens/Profile";
 import Loading from "../screens/utils/Loading";
-// Auth screens
+//Auth screens
 import Login from "../screens/auth/Login";
 import Register from "../screens/auth/Register";
 import ForgetPassword from "../screens/auth/ForgetPassword";
 import { AuthContext } from "../provider/AuthProvider";
 
-// Better put your these secret keys in .env file
+//Better put your these secret keys in .env file
+//Connect to firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDYuhOpbDxlVHBKxVz6gW45eyutD26AsGg",
   authDomain: "eat-together-303ec.firebaseapp.com",
@@ -34,6 +38,7 @@ if (firebase.apps.length === 0) {
   firebase.initializeApp(firebaseConfig);
 }
 
+//The experience of users not logged in
 const AuthStack = createStackNavigator();
 const Auth = () => {
   return (
@@ -49,6 +54,7 @@ const Auth = () => {
   );
 };
 
+//The experience of logged in user!!
 const MainStack = createStackNavigator();
 const Main = () => {
   return (
@@ -63,6 +69,7 @@ const Main = () => {
   );
 };
 
+//Controls the screens connected to the bottom navigation bar
 const Tabs = createBottomTabNavigator();
 const MainTabs = () => {
   const { isDarkmode } = useTheme();

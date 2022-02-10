@@ -1,3 +1,5 @@
+//Chat with users you have already connected with
+
 import React from 'react';
 import { View } from 'react-native';
 import { Layout, Text } from 'react-native-rapi-ui';
@@ -8,11 +10,12 @@ export default function ({ navigation }) {
 			<View
 				style={{
 					flex: 1,
+					backgroundColor: "pink",
 					alignItems: 'center',
 					justifyContent: 'center',
 				}}
 			>
-				<Text>Chat page</Text>
+				<Text>Our chat goes here!</Text>
 			</View>
 		</Layout>
 	);
