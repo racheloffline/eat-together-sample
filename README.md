@@ -26,9 +26,8 @@
 
 ### Firebase Setup
 
-- Set up a new firebase project
-- Go to Authentication and under Sign-in Method enable Email/Password
 - Fill this firebase config to your config inside `./src/navigation/AppNavigator.js`
+- Check out the Eat Together Google Drive for how to fill this out!
 
 ```jsx
 // Better put your these secret keys in .env file
@@ -46,8 +45,6 @@ const firebaseConfig = {
 and you good to go!
 
 ### Prebuilt UI Screens
-
-There are 3 screens included inside `./src/screens/auth` and one more thing its included with the firebase auth function, so you don't need to create the function. The ilustrations I use [undraw](https://undraw.co/)
 
 - Login screen `./src/screens/auth/login.tsx`
 - Register screen `./src/screens/auth/register.tsx`
