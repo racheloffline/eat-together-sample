@@ -3,6 +3,7 @@
 import React from "react";
 import {View, Linking, Image, SafeAreaView, ImageBackground} from "react-native";
 import * as firebase from "firebase";
+import Card from '../components/Card'
 import {
   Layout,
   Button,
@@ -72,5 +73,7 @@ export default function ({ navigation }) {
         </Section>
       </View>
     </Layout>
+      // @TODO Uncomment the line below and fill it in with your custom card component, then wrap it in the right element!
+      //<Card />
   );
 }
