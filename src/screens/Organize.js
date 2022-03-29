@@ -16,7 +16,7 @@ export default function ({ navigation }) {
   return (
     <Layout>
       <TopNav
-        middleContent="Second Screen"
+        middleContent="Create an invitation here!"
         leftContent={
           <Ionicons
             name="chevron-back"
@@ -34,7 +34,7 @@ export default function ({ navigation }) {
         }}
       >
         {/* This text using ubuntu font */}
-        <Text fontWeight="bold">This is the second screen</Text>
+        <Text fontWeight="bold">Create an invitation here!</Text>
       </View>
     </Layout>
   );

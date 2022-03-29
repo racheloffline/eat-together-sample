@@ -3,6 +3,7 @@
 import React from "react";
 import {View, Linking, Image, SafeAreaView, ImageBackground} from "react-native";
 import * as firebase from "firebase";
+import Invite from "../screens/Invite";
 import Card from '../components/Card'
 import {
   Layout,
@@ -20,26 +21,17 @@ export default function ({ navigation }) {
       <View
         style={{
           flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
+          alignItems: "flex-end",
+          justifyContent: "flex-start",
           marginHorizontal: 20,
         }}
       >
         <Section>
           <SectionContent>
-            <Text fontWeight="bold" style={{ textAlign: "center" }}>
-              These UI components provided by Rapi UI
-            </Text>
             <Button
-              style={{ marginTop: 10 }}
-              text="Rapi UI Documentation"
-              status="info"
-              onPress={() => Linking.openURL("https://rapi-ui.kikiding.space/")}
-            />
-            <Button
-              text="Go to second screen"
+              text="Check Invites"
               onPress={() => {
-                navigation.navigate("SecondScreen");
+                navigation.navigate('Invite');
               }}
               style={{
                 marginTop: 10,
@@ -55,25 +47,19 @@ export default function ({ navigation }) {
                 marginTop: 10,
               }}
             />
-            <Button
-              text={isDarkmode ? "Light Mode" : "Dark Mode"}
-              status={isDarkmode ? "success" : "warning"}
-              onPress={() => {
-                if (isDarkmode) {
-                  setTheme("light");
-                } else {
-                  setTheme("dark");
-                }
-              }}
-              style={{
-                marginTop: 10,
-              }}
-            />
           </SectionContent>
         </Section>
       </View>
+    <View
+        style={{
+            flex: 10,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginHorizontal: 20,
+        }}
+    >
+        <Text>Events and other cool things going on will be displayed here!</Text>
+    </View>
     </Layout>
-      // @TODO Uncomment the line below and fill it in with your custom card component, then wrap it in the right element!
-      //<Card />
   );
 }

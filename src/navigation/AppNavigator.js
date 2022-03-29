@@ -11,10 +11,11 @@ import { useTheme, themeColor } from "react-native-rapi-ui";
 import TabBarIcon from "../components/utils/TabBarIcon";
 import TabBarText from "../components/utils/TabBarText";
 //Screens (Make sure to import if ever adding new screen!)
-import Home from "../screens/Home";
-import SecondScreen from "../screens/SecondScreen";
-import Chat from "../screens/Chat";
-import Profile from "../screens/Profile";
+import Organize from "../screens/Organize";
+import People from "../screens/People";
+import Invite from "../screens/Invite"
+import Me from "../screens/Me";
+import Explore from "../screens/Explore";
 import Loading from "../screens/utils/Loading";
 //Auth screens
 import Login from "../screens/auth/Login";
@@ -64,7 +65,8 @@ const Main = () => {
       }}
     >
       <MainStack.Screen name="MainTabs" component={MainTabs} />
-      <MainStack.Screen name="SecondScreen" component={SecondScreen} />
+        <MainStack.Screen name="Invite" component={Invite} />
+
     </MainStack.Navigator>
   );
 };
@@ -72,24 +74,21 @@ const Main = () => {
 //Controls the screens connected to the bottom navigation bar
 const Tabs = createBottomTabNavigator();
 const MainTabs = () => {
-  const { isDarkmode } = useTheme();
   return (
     <Tabs.Navigator
       tabBarOptions={{
         style: {
           borderTopWidth: 1,
-          borderTopColor: isDarkmode ? themeColor.dark100 : "#c0c0c0",
-          backgroundColor: isDarkmode ? themeColor.dark200 : "#ffffff",
+          backgroundColor: "#ffffff",
         },
       }}
     >
-      {/* these icons using Ionicons */}
       <Tabs.Screen
-        name="Home"
-        component={Home}
+        name="Explore"
+        component={Explore}
         options={{
           tabBarLabel: ({ focused }) => (
-            <TabBarText focused={focused} title="Home" />
+            <TabBarText focused={focused} title="Explore" />
           ),
           tabBarIcon: ({ focused }) => (
             <TabBarIcon focused={focused} icon={"md-home"} />
@@ -97,29 +96,41 @@ const MainTabs = () => {
         }}
       />
       <Tabs.Screen
-        name="Profile"
-        component={Profile}
+        name="Organize"
+        component={Organize}
         options={{
           tabBarLabel: ({ focused }) => (
-            <TabBarText focused={focused} title="Profile" />
+            <TabBarText focused={focused} title="Organize" />
           ),
           tabBarIcon: ({ focused }) => (
-            <TabBarIcon focused={focused} icon={"person"} />
+            <TabBarIcon focused={focused} icon={"md-home"} />
           ),
         }}
       />
       <Tabs.Screen
-        name="Chat"
-        component={Chat}
+        name="People"
+        component={People}
         options={{
           tabBarLabel: ({ focused }) => (
-            <TabBarText focused={focused} title="Chat" />
+            <TabBarText focused={focused} title="People" />
           ),
           tabBarIcon: ({ focused }) => (
-            <TabBarIcon focused={focused} icon={"ios-information-circle"} />
+            <TabBarIcon focused={focused} icon={"md-home"} />
           ),
         }}
       />
+        <Tabs.Screen
+            name="Me"
+            component={Me}
+            options={{
+                tabBarLabel: ({ focused }) => (
+                    <TabBarText focused={focused} title="Profile" />
+                ),
+                tabBarIcon: ({ focused }) => (
+                    <TabBarIcon focused={focused} icon={"md-home"} />
+                ),
+            }}
+        />
     </Tabs.Navigator>
   );
 };

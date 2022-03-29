@@ -14,7 +14,7 @@ export default function ({ navigation }) {
 					justifyContent: 'center',
 				}}
 			>
-				<Text>This is the Profile tab</Text>
+				<Text>Meet interesting people here!</Text>
 			</View>
 		</Layout>
 	);
