@@ -91,7 +91,7 @@ const MainTabs = () => {
             <TabBarText focused={focused} title="Explore" />
           ),
           tabBarIcon: ({ focused }) => (
-            <TabBarIcon focused={focused} icon={"md-home"} />
+            <TabBarIcon focused={focused} icon={"compass-outline"} />
           ),
         }}
       />
@@ -103,7 +103,8 @@ const MainTabs = () => {
             <TabBarText focused={focused} title="Organize" />
           ),
           tabBarIcon: ({ focused }) => (
-            <TabBarIcon focused={focused} icon={"md-home"} />
+              //The ionic library was imported, so we can use all kinds of default icons like "md-home"! Just search on https://ionic.io/
+            <TabBarIcon focused={focused} icon={"create-outline"} />
           ),
         }}
       />
@@ -115,7 +116,7 @@ const MainTabs = () => {
             <TabBarText focused={focused} title="People" />
           ),
           tabBarIcon: ({ focused }) => (
-            <TabBarIcon focused={focused} icon={"md-home"} />
+            <TabBarIcon focused={focused} icon={"people-outline"} />
           ),
         }}
       />
@@ -127,7 +128,7 @@ const MainTabs = () => {
                     <TabBarText focused={focused} title="Profile" />
                 ),
                 tabBarIcon: ({ focused }) => (
-                    <TabBarIcon focused={focused} icon={"md-home"} />
+                    <TabBarIcon focused={focused} icon={"happy-outline"} />
                 ),
             }}
         />

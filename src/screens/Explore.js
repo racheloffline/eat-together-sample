@@ -18,44 +18,12 @@ export default function ({ navigation }) {
   const { isDarkmode, setTheme } = useTheme();
   return (
     <Layout>
-      <View
-        style={{
-          flex: 1,
-          alignItems: "flex-end",
-          justifyContent: "flex-start",
-          marginHorizontal: 20,
-        }}
-      >
-        <Section>
-          <SectionContent>
-            <Button
-              text="Check Invites"
-              onPress={() => {
-                navigation.navigate('Invite');
-              }}
-              style={{
-                marginTop: 10,
-              }}
-            />
-            <Button
-              status="danger"
-              text="Logout"
-              onPress={() => {
-                firebase.auth().signOut();
-              }}
-              style={{
-                marginTop: 10,
-              }}
-            />
-          </SectionContent>
-        </Section>
-      </View>
     <View
         style={{
-            flex: 10,
+            flex: 1,
             alignItems: 'center',
             justifyContent: 'center',
-            marginHorizontal: 20,
+            marginHorizontal: 50
         }}
     >
         <Text>Events and other cool things going on will be displayed here!</Text>
