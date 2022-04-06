@@ -1,21 +1,33 @@
 //Display potential friends to share meals with
 
-import React from "react";
-import {View, Linking, Image, SafeAreaView, ImageBackground} from "react-native";
-import * as firebase from "firebase";
-import Invite from "../screens/Invite";
-import Card from '../components/Card'
+import React, {useEffect, useState} from "react";
+import {View} from "react-native";
+import {db} from "../navigation/AppNavigator";
 import {
   Layout,
-  Button,
   Text,
-  TopNav,
-  Section,
-  SectionContent,
   useTheme,
 } from "react-native-rapi-ui";
+
+
 export default function ({ navigation }) {
-  const { isDarkmode, setTheme } = useTheme();
+    const [events, setEvents] = useState([]); // initial state, function used for updating initial state
+    const getEvents = async () => {
+        try {
+            let list = [];
+            let snapshot = await db.collection("Public Events").get();
+            snapshot.forEach((doc)=> {
+                list.push(doc.data());
+            })
+            setEvents(list);
+        } catch (e) {
+            alert(e);
+        }
+    };
+
+    useEffect(()=> {
+        getEvents(); // updates stuff right after React makes changes to the DOM
+    }, []);
   return (
     <Layout>
     <View
@@ -26,7 +38,9 @@ export default function ({ navigation }) {
             marginHorizontal: 50
         }}
     >
-        <Text>Events and other cool things going on will be displayed here!</Text>
+        {events.map((event) => (
+            <Text>{event.title}</Text>
+        ))}
     </View>
     </Layout>
   );
