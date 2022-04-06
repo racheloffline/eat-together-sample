@@ -3,8 +3,8 @@
 import React, {useState} from "react";
 import {Button, Layout, Section, SectionImage, Text} from "react-native-rapi-ui";
 import { TextInput } from 'react-native-rapi-ui';
-import {View} from "react-native";
 import {Ionicons} from "@expo/vector-icons";
+import {db} from "../navigation/AppNavigator";
 
 export default function ({ navigation }) {
     const [title, setTitle] = React.useState('');
@@ -16,7 +16,6 @@ export default function ({ navigation }) {
         <Layout>
             <Section>
                 <SectionImage source={require('../../assets/food.jpg')} />
-            <View>
                 <TextInput
                     placeholder="Title"
                     value={title}
@@ -25,48 +24,49 @@ export default function ({ navigation }) {
                         <Ionicons name="chatbubble-outline" size={20} />
                     }
                 />
-            </View>
-            <View>
+                <TextInput
+                    placeholder="Location"
+                    value={location}
+                    onChangeText={(val) => setLocation(val)}
+                    leftContent={
+                    <Ionicons name="location-outline" size={20}/>
+                    }
+                />
+                <TextInput
+                    placeholder="Date"
+                    value={date}
+                    onChangeText={(val) => setDate(val)}
+                    leftContent={
+                    <Ionicons name="calendar-outline" size={20}/>
+                    }
+                />
+                <TextInput
+                    placeholder="Time"
+                    value={time}
+                    onChangeText={(val) => setTime(val)}
+                    leftContent={
+                    <Ionicons name="time-outline" size={20}/>
+                    }
+                />
                 <TextInput
                     placeholder="Description"
                     value={description}
                     onChangeText={(val) => setDescription(val)}
                     leftContent={
-                        <Ionicons name="document-text-outline" size={20}/>
+                    <Ionicons name="document-text-outline" size={20}/>
                     }
                 />
-            </View>
-                <View>
-                    <TextInput
-                        placeholder="Date"
-                        value={date}
-                        onChangeText={(val) => setDate(val)}
-                        leftContent={
-                            <Ionicons name="calendar-outline" size={20}/>
-                        }
-                    />
-                </View>
-                <View>
-                    <TextInput
-                        placeholder="Time"
-                        value={time}
-                        onChangeText={(val) => setTime(val)}
-                        leftContent={
-                            <Ionicons name="time-outline" size={20}/>
-                        }
-                    />
-                </View>
-                <View>
-                    <TextInput
-                        placeholder="Location"
-                        value={location}
-                        onChangeText={(val) => setLocation(val)}
-                        leftContent={
-                            <Ionicons name="location-outline" size={20}/>
-                        }
-                    />
-                </View>
-                <Button text="Post" status="success" />
+                <Button text="Post" status="success" onPress={function () {
+                    db.collection("Public Events").add({
+                        title: title,
+                        location: location,
+                        date: date,
+                        time: time,
+                        description: description
+                    }).then(r => {
+                        alert("POST SUCCESSFUL");
+                    })
+                }}/>
             </Section>
         </Layout>
     );

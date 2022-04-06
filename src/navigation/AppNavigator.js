@@ -3,10 +3,11 @@
 
 import React, { useContext } from "react";
 import firebase from "firebase/app";
+import "firebase/firestore"
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-
+import {firebaseConfig} from "../provider/Firebase";
 import { useTheme, themeColor } from "react-native-rapi-ui";
 import TabBarIcon from "../components/utils/TabBarIcon";
 import TabBarText from "../components/utils/TabBarText";
@@ -25,19 +26,12 @@ import { AuthContext } from "../provider/AuthProvider";
 
 //Better put your these secret keys in .env file
 //Connect to firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyDYuhOpbDxlVHBKxVz6gW45eyutD26AsGg",
-  authDomain: "eat-together-303ec.firebaseapp.com",
-  databaseURL: "https://eat-together-303ec.firebaseio.com",
-  projectId: "eat-together-303ec",
-  storageBucket: "eat-together-303ec.appspot.com",
-  messagingSenderId: "856869460838",
-  appId: "1:856869460838:web:01e0197a0abc9fffb686a7",
-};
 
 if (firebase.apps.length === 0) {
   firebase.initializeApp(firebaseConfig);
 }
+
+export const db = firebase.firestore();
 
 //The experience of users not logged in
 const AuthStack = createStackNavigator();
