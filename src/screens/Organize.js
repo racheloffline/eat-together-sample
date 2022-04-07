@@ -6,6 +6,7 @@ import { TextInput } from 'react-native-rapi-ui';
 import {Ionicons} from "@expo/vector-icons";
 import {db} from "../navigation/AppNavigator";
 import {posts} from "./Explore";
+import {View} from "react-native";
 
 export default function ({ navigation }) {
     const [title, setTitle] = React.useState('');
@@ -33,26 +34,27 @@ export default function ({ navigation }) {
                     <Ionicons name="location-outline" size={20}/>
                     }
                 />
-                <TextInput
-                    placeholder="Date"
-                    value={date}
-                    onChangeText={(val) => setDate(val)}
-                    leftContent={
-                    <Ionicons name="calendar-outline" size={20}/>
-                    }
-                />
-                <TextInput
-                    placeholder="Time"
-                    value={time}
-                    onChangeText={(val) => setTime(val)}
-                    leftContent={
-                    <Ionicons name="time-outline" size={20}/>
-                    }
-                />
+                    <TextInput
+                        placeholder="Date"
+                        value={date}
+                        onChangeText={(val) => setDate(val)}
+                        leftContent={
+                            <Ionicons name="calendar-outline" size={20}/>
+                        }
+                    />
+                    <TextInput
+                        placeholder="Time"
+                        value={time}
+                        onChangeText={(val) => setTime(val)}
+                        leftContent={
+                            <Ionicons name="time-outline" size={20}/>
+                        }
+                    />
                 <TextInput
                     placeholder="Description"
                     value={description}
                     onChangeText={(val) => setDescription(val)}
+                    containerStyle={{padding:40}}
                     leftContent={
                     <Ionicons name="document-text-outline" size={20}/>
                     }
