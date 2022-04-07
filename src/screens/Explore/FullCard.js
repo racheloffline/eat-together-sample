@@ -30,7 +30,7 @@ const FullCard = ({ route, navigation }) => {
         <Text size="h3">Hosted by: {route.params.event.host.name}</Text>
         <View style={styles.details}>
             <Image style={styles.image}
-            source={{uri: route.params.event.image}}/>
+              source={{uri: route.params.event.image}}/>
 
             <View style={{flexDirection: "column"}}>
                 <Text size="h3">{route.params.event.date}</Text>
@@ -62,18 +62,11 @@ const styles = StyleSheet.create({
     },
 
     image: {
+        marginRight: 20,
         width: 150,
         height: 150,
         borderRadius: 30,
-        marginRight: 20,
-        shadowColor: "#000000",
-        shadowOpacity: 0.25,
-        shadowOffset: {
-            width: 0, 
-            height: 4
-        },
-        elevation: 20,
     },
-})
+});
 
 export default FullCard;

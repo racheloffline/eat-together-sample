@@ -1,7 +1,7 @@
 //Display upcoming events to join
 
 import React from "react";
-import { View, StyleSheet, Image } from "react-native";
+import { View, StyleSheet, FlatList, Dimensions } from "react-native";
 import * as firebase from "firebase";
 
 import EventCard from '../../components/EventCard';
@@ -55,13 +55,14 @@ export default class Explore extends React.PureComponent {
         <View style={styles.header}>
           <Text size="h1">Explore</Text>
         </View>
-        <View style={styles.cards}>
-          {this.state.events.map(event => <EventCard event={event} key={event.id} click={() => {
+
+        <FlatList contentContainerStyle={styles.cards} data={this.state.events} renderItem={({item}) =>
+          <EventCard event={item} keyExtractor={event => event.id} click={() => {
             this.props.navigation.navigate("FullCard", {
-              event: event
+              event: item
             });
-          }}/>)}
-        </View>
+          }}/>
+        }/>
       </Layout>
     );
   }
@@ -75,6 +76,7 @@ const styles = StyleSheet.create({
   },
 
   cards: {
-    alignItems: "center"
+    alignItems: "center",
+    height: Dimensions.get('window').height/1.2
   },
-})
+});
