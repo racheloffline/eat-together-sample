@@ -9,24 +9,17 @@ import {
   useTheme,
 } from "react-native-rapi-ui";
 
-
 export default function ({ navigation }) {
     const [events, setEvents] = useState([]); // initial state, function used for updating initial state
-    const getEvents = async () => {
-        try {
-            let list = [];
-            let snapshot = await db.collection("Public Events").get();
-            snapshot.forEach((doc)=> {
+    useEffect(()=> { // updates stuff right after React makes changes to the DOM
+        const ref = db.collection("Public Events");
+        ref.onSnapshot((query) => {
+            const list = [];
+            query.forEach((doc) => {
                 list.push(doc.data());
-            })
+            });
             setEvents(list);
-        } catch (e) {
-            alert(e);
-        }
-    };
-
-    useEffect(()=> {
-        getEvents(); // updates stuff right after React makes changes to the DOM
+        });
     }, []);
   return (
     <Layout>
