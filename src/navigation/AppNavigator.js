@@ -13,10 +13,10 @@ import TabBarIcon from "../components/utils/TabBarIcon";
 import TabBarText from "../components/utils/TabBarText";
 //Screens (Make sure to import if ever adding new screen!)
 import Organize from "../screens/Organize";
-import People from "../screens/People";
+import PeopleMain from "../screens/People/PeopleMain";
 import Invite from "../screens/Invite"
 import Me from "../screens/Me";
-import Explore from "../screens/Explore";
+import ExploreMain from "../screens/Explore/ExploreMain";
 import Loading from "../screens/utils/Loading";
 //Auth screens
 import Login from "../screens/auth/Login";
@@ -79,7 +79,7 @@ const MainTabs = () => {
     >
       <Tabs.Screen
         name="Explore"
-        component={Explore}
+        component={ExploreMain}
         options={{
           tabBarLabel: ({ focused }) => (
             <TabBarText focused={focused} title="Explore" />
@@ -104,7 +104,7 @@ const MainTabs = () => {
       />
       <Tabs.Screen
         name="People"
-        component={People}
+        component={PeopleMain}
         options={{
           tabBarLabel: ({ focused }) => (
             <TabBarText focused={focused} title="People" />
