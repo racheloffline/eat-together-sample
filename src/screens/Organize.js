@@ -5,8 +5,6 @@ import {Button, Layout, Section, SectionImage, Text} from "react-native-rapi-ui"
 import { TextInput } from 'react-native-rapi-ui';
 import {Ionicons} from "@expo/vector-icons";
 import {db} from "../navigation/AppNavigator";
-import {posts} from "./Explore";
-import {View} from "react-native";
 
 export default function ({ navigation }) {
     const [title, setTitle] = React.useState('');
@@ -68,7 +66,7 @@ export default function ({ navigation }) {
                         description: description
                     }).then(r => {
                         alert("POST SUCCESSFUL");
-                        navigation.navigate('Explore')
+                        navigation.navigate('ExploreMain')
                     })
                 }}/>
             </Section>
