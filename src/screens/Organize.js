@@ -4,7 +4,7 @@ import React, {useState} from "react";
 import {Button, Layout, Section, SectionImage, Text} from "react-native-rapi-ui";
 import { TextInput } from 'react-native-rapi-ui';
 import {Ionicons} from "@expo/vector-icons";
-import {db} from "../navigation/AppNavigator";
+import {db} from "../provider/Firebase";
 
 export default function ({ navigation }) {
     const [title, setTitle] = React.useState('');
@@ -66,7 +66,7 @@ export default function ({ navigation }) {
                         description: description
                     }).then(r => {
                         alert("POST SUCCESSFUL");
-                        navigation.navigate('ExploreMain')
+                        navigation.navigate("Explore")
                     })
                 }}/>
             </Section>

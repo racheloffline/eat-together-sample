@@ -24,15 +24,6 @@ import Register from "../screens/auth/Register";
 import ForgetPassword from "../screens/auth/ForgetPassword";
 import { AuthContext } from "../provider/AuthProvider";
 
-//Better put your these secret keys in .env file
-//Connect to firebase
-
-if (firebase.apps.length === 0) {
-  firebase.initializeApp(firebaseConfig);
-}
-
-export const db = firebase.firestore();
-
 //The experience of users not logged in
 const AuthStack = createStackNavigator();
 const Auth = () => {
