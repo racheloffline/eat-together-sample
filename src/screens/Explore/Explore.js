@@ -11,6 +11,8 @@ import {
   Text,
 } from "react-native-rapi-ui";
 import {db} from "../../provider/Firebase";
+import {ActivityIndicator} from "react-native";
+
 
 export default function({ navigation }) {
     const [events, setEvents] = useState([]); // initial state, function used for updating initial state
@@ -38,19 +40,18 @@ export default function({ navigation }) {
       });
     }, []);
     return (
-      <Layout>
+      <View style={{flex:1}}>
         <View style={styles.header}>
           <Text size="h1">Explore</Text>
         </View>
-
-        <FlatList contentContainerStyle={styles.cards} data={events} renderItem={({item}) =>
-          <EventCard event={item} keyExtractor={event => event.id} click={() => {
-            navigation.navigate("FullCard", {
-              event: item
-            });
-          }}/>
-        }/>
-      </Layout>
+            <FlatList contentContainerStyle={styles.cards} data={events} renderItem={({item}) =>
+                <EventCard event={item} keyExtractor={event => event.id} click={() => {
+                navigation.navigate("FullCard", {
+                  event: item
+                });
+                }}/>
+            } />
+      </View>
     );
 }
 
@@ -62,7 +63,6 @@ const styles = StyleSheet.create({
   },
 
   cards: {
-    alignItems: "center",
-    height: Dimensions.get('window').height/1.2
+      alignItems: "center",
   },
 });
