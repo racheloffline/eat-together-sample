@@ -48,24 +48,24 @@ const FullCard = ({ route, navigation }) => {
 
 const styles = StyleSheet.create({
     page: {
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-        paddingHorizontal: 10
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: 10
     },
 
     details: {
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        marginVertical: 40
+      display: "flex",
+      flexDirection: "row",
+      alignItems: "center",
+      marginVertical: 40
     },
 
     image: {
-        marginRight: 20,
-        width: 150,
-        height: 150,
-        borderRadius: 30,
+      marginRight: 20,
+      width: 150,
+      height: 150,
+      borderRadius: 30,
     },
 });
 
