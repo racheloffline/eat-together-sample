@@ -4,7 +4,6 @@ import React, {useEffect, useState} from "react";
 import { View, StyleSheet, FlatList, Dimensions } from "react-native";
 
 import EventCard from '../../components/EventCard';
-import FullCard from "./FullCard";
 
 import {
   Layout,
@@ -13,10 +12,10 @@ import {
 import {db} from "../../provider/Firebase";
 import {ActivityIndicator} from "react-native";
 
-
 export default function({ navigation }) {
     const [events, setEvents] = useState([]); // initial state, function used for updating initial state
-    useEffect(()=> { // updates stuff right after React makes changes to the DOM
+  
+    useEffect(() => { // updates stuff right after React makes changes to the DOM
       const ref = db.collection("Public Events");
       ref.onSnapshot((query) => {
         const list = [];
@@ -39,18 +38,21 @@ export default function({ navigation }) {
         setEvents(list);
       });
     }, []);
+  
     return (
       <View style={{flex:1}}>
         <View style={styles.header}>
           <Text size="h1">Explore</Text>
         </View>
-            <FlatList contentContainerStyle={styles.cards} data={events} renderItem={({item}) =>
-                <EventCard event={item} keyExtractor={event => event.id} click={() => {
-                navigation.navigate("FullCard", {
-                  event: item
-                });
-                }}/>
-            } />
+
+        <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
+        data={events} renderItem={({item}) =>
+          <EventCard event={item} click={() => {
+            navigation.navigate("FullCard", {
+              event: item
+            });
+          }}/>
+        }/>
       </View>
     );
 }
@@ -63,6 +65,6 @@ const styles = StyleSheet.create({
   },
 
   cards: {
-      alignItems: "center",
+    alignItems: "center"
   },
 });
