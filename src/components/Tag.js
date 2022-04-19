@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Text } from 'react-native-rapi-ui';
+import { View, StyleSheet, Text } from 'react-native';
+import SmallText from "./SmallText";
 
 const Tag = props => {
     return (
-        <View style={styles.tag} borderRadius={10}>
-            <Text style={styles.text}>{props.text}</Text>
+        <View style={styles.tag} borderRadius={20}>
+            <SmallText color="white">{props.text}</SmallText>
         </View>
     );
 }
@@ -14,14 +14,9 @@ const styles = StyleSheet.create({
     tag: {
         marginLeft: 2,
         marginTop: 2,
-        padding: 5,
-        borderRadius: 10,
+        paddingVertical: 5,
+        paddingHorizontal: 8,
         backgroundColor: "black"
-    },
-
-    text: {
-        color: "white",
-        fontSize: 10
     },
 })
 

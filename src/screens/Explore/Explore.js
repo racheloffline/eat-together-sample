@@ -4,13 +4,9 @@ import React, {useEffect, useState} from "react";
 import { View, StyleSheet, FlatList, Dimensions } from "react-native";
 
 import EventCard from '../../components/EventCard';
+import Header from "../../components/Header";
 
-import {
-  Layout,
-  Text,
-} from "react-native-rapi-ui";
 import {db} from "../../provider/Firebase";
-import {ActivityIndicator} from "react-native";
 
 export default function({ navigation }) {
     const [events, setEvents] = useState([]); // initial state, function used for updating initial state
@@ -41,9 +37,7 @@ export default function({ navigation }) {
   
     return (
       <View style={{flex:1}}>
-        <View style={styles.header}>
-          <Text size="h1">Explore</Text>
-        </View>
+        <Header name="Explore"/>
 
         <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
         data={events} renderItem={({item}) =>
@@ -58,12 +52,6 @@ export default function({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    padding: 10,
-    display: "flex",
-    marginBottom: 10
-  },
-
   cards: {
     alignItems: "center"
   },

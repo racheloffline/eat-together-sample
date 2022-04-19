@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, StyleSheet, Image, Dimensions, TouchableOpacity } from 'react-native';
-import { Section, Text, SectionContent, SectionImage } from 'react-native-rapi-ui';
+import { Section, SectionContent, SectionImage } from 'react-native-rapi-ui';
+import MediumText from './MediumText';
+import NormalText from './NormalText';
 
 const EventCard = props => {
     return (
@@ -13,8 +15,8 @@ const EventCard = props => {
                         {props.event.host.image ? <Image style={styles.profile} source={{uri: props.event.host.image}}/> : 
                             <View style={styles.profile}/>}
                         <View style={{flexDirection: "column"}}>
-                            <Text size="h3">{props.event.name}</Text>
-                            <Text size="sm">{props.event.location} | {props.event.date} | {props.event.time}</Text>
+                            <MediumText>{props.event.name}</MediumText>
+                            <NormalText>{props.event.location} | {props.event.date} | {props.event.time}</NormalText>
                         </View>
                     </View>
                 </SectionContent>
