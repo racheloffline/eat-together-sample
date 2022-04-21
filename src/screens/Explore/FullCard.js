@@ -10,6 +10,9 @@ import {
   useTheme,
   Button
 } from "react-native-rapi-ui";
+import LargeText from "../../components/LargeText";
+import MediumText from "../../components/MediumText";
+import NormalText from "../../components/NormalText";
 import { Ionicons } from "@expo/vector-icons";
 
 const FullCard = ({ route, navigation }) => {
@@ -26,16 +29,16 @@ const FullCard = ({ route, navigation }) => {
         leftAction={() => navigation.goBack()}
       />
       <View style={styles.page}>
-        <Text size="h1">{route.params.event.name}</Text>
-        <Text size="h3">Hosted by: {route.params.event.host.name}</Text>
+        <LargeText>{route.params.event.name}</LargeText>
+        <MediumText>Hosted by: {route.params.event.host.name}</MediumText>
         <View style={styles.details}>
             <Image style={styles.image}
               source={{uri: route.params.event.image}}/>
 
             <View style={{flexDirection: "column"}}>
-                <Text size="h3">{route.params.event.date}</Text>
-                <Text size="h3">{route.params.event.time}</Text>
-                <Text size="h3">{route.params.event.location}</Text>
+                <NormalText>{route.params.event.date}</NormalText>
+                <NormalText>{route.params.event.time}</NormalText>
+                <NormalText>{route.params.event.location}</NormalText>
             </View>
         </View>
 

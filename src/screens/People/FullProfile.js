@@ -1,7 +1,7 @@
 //Functionality TDB, most likely to be used to implement ice-breaker games
 
 import React from "react";
-import { View, StyleSheet, Image, Dimensions } from "react-native";
+import { View, ScrollView, StyleSheet, Image, Dimensions } from "react-native";
 import {
   Layout,
   TopNav,
@@ -13,6 +13,9 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 
 import Tag from "../../components/Tag";
+import LargeText from "../../components/LargeText";
+import MediumText from "../../components/MediumText";
+import NormalText from "../../components/NormalText";
 
 const FullProfile = ({ route, navigation }) => {
   return (
@@ -31,12 +34,15 @@ const FullProfile = ({ route, navigation }) => {
         <View style={styles.background}/>
         <Image style={styles.image}
           source={{uri: route.params.person.image}}/>
-        <Text size="h1" style={styles.name}>{route.params.person.name}</Text>
-
-        <View style={styles.tags}>
-          {route.params.person.tags.map(tag => <Tag text={tag} key={tag}/>)}
+        <View style={styles.name}>
+          <LargeText>{route.params.person.name}</LargeText>
         </View>
-        <Text size="h3">"{route.params.person.quote}"</Text>
+
+        <ScrollView horizontal={true} style={styles.tags}>
+          {route.params.person.tags.map(tag => <Tag text={tag} key={tag}/>)}
+        </ScrollView>
+
+        <MediumText>"{route.params.person.quote}"</MediumText>
       </View>
     </Layout>
   );
