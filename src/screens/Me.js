@@ -21,6 +21,12 @@ export default function ({ navigation }) {
                     title="Log Out"
                     color="#841584"
                 />
+                <Button
+                    onPress={()=>{
+                        navigation.navigate("Schedule");
+                    }}
+                    title="Schedule"
+                    />
             </View>
         </Layout>
     );

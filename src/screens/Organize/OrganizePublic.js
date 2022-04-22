@@ -4,12 +4,13 @@ import { Button, Layout, Section, SectionImage  } from "react-native-rapi-ui";
 import { TextInput } from 'react-native-rapi-ui';
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import {db} from "../provider/Firebase";
+import {db} from "../../provider/Firebase";
 
-import Header from "../components/Header";
-import getDate from "../getDate";
-import getTime from "../getTime";
-import NormalText from "../components/NormalText";
+import Header from "../../components/Header";
+import getDate from "../../getDate";
+import getTime from "../../getTime";
+import HorizontalSwitch from "../../components/HorizontalSwitch";
+import {NavigationContainer} from "@react-navigation/native";
 
 export default function ({ navigation }) {
     // State variables for the inputs
@@ -43,7 +44,8 @@ export default function ({ navigation }) {
         <Layout>
             <Section>
                 <Header name="Organize"/>
-                <SectionImage source={require('../../assets/food.jpg')} />
+                <HorizontalSwitch left="Private" right="Public" current="right" press={(val) => navigation.navigate("Organize")}/>
+                <SectionImage source={require('../../../assets/food.jpg')} />
                 <TextInput
                     placeholder="Title"
                     value={title}
