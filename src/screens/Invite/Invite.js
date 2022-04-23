@@ -40,6 +40,7 @@ export default function ({ navigation }) {
 								<Text style = {styles.listSubText}>Is inviting you to:</Text>
 							</View>
 					}
+					//Do something on click (go to the full invite)
 				/>
 			</View>
 		</View>
