@@ -1,7 +1,7 @@
 //Chat with users you have already connected with
 
 import React from 'react';
-import {FlatList, View} from 'react-native';
+import {FlatList, View, StyleSheet} from 'react-native';
 import { Layout, Text } from 'react-native-rapi-ui';
 
 export default function ({ navigation }) {
