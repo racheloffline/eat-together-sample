@@ -8,26 +8,38 @@ export default function ({ navigation }) {
 	//Get a list of current chats from Firebase up here
 
 	//Fill this in later
-	const data = [];
+	const data = [
+		{key: 'Devin'},
+		{key: 'Dan'},
+		{key: 'Dominic'},
+		{key: 'Jackson'},
+		{key: 'James'},
+		{key: 'Joel'},
+		{key: 'John'},
+		{key: 'Jillian'},
+		{key: 'Jimmy'},
+		{key: 'Julie'},
+	];
 
-	//The actual UI
 	return (
 		<View style = {{flex:1}}>
 
-			//Heading view
 			<View style = {styles.header}>
 
-				//Heading text: invites page
-				<Text size = "h1">Invites</Text>
+				<Text style = {styles.headingText}>Invites</Text>
 			</View>
 
-			//List view
-			<View style = {styles.list}>
+			<View style = {styles.listView}>
 
-				//List of invites
 				<FlatList
-					data = {data} //Data for list should be the list of invites we get from firebase
-					renderItem={({item}) => <Text style={styles.item}>{item.key}</Text>}
+					data = {data}
+					renderItem={
+						({item}) =>
+							<View>
+								<Text style = {styles.listMainText}>{item.key}</Text>
+								<Text style = {styles.listSubText}>Is inviting you to:</Text>
+							</View>
+					}
 				/>
 			</View>
 		</View>
@@ -36,14 +48,28 @@ export default function ({ navigation }) {
 
 const styles = StyleSheet.create({
 	header:	{
-		padding: 10,
+		padding: 40,
 		display: "flex",
-		marginBottom: 10
+		marginBottom: -20
 	},
-	list: {
-		padding: 5,
+	headingText: {
+		fontSize: 50
+	},
+	listView: {
+		marginLeft: 25
+	},
+	listMainText: {
+		padding: 20,
 		display: "flex",
 		fontWeight: 'bold',
-		textAlign: 'center'
+		textAlign: 'left',
+		fontSize: 24
+	},
+	listSubText: {
+		marginLeft: 20,
+		marginTop: -20,
+		display: "flex",
+		textAlign: 'left',
+		fontSize: 18
 	}
 });
