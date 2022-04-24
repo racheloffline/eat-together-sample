@@ -50,7 +50,6 @@ const Main = () => {
       }}
     >
       <MainStack.Screen name="MainTabs" component={MainTabs} />
-        <MainStack.Screen name="Invite" component={Invite} />
 
     </MainStack.Navigator>
   );

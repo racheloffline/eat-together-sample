@@ -2,19 +2,11 @@
 
 import React from "react";
 import { View, StyleSheet, FlatList, Dimensions } from "react-native";
+import { Layout } from "react-native-rapi-ui";
 import * as firebase from "firebase";
 
 import ProfileBubble from "../../components/ProfileBubble";
-
-import {
-  Layout,
-  Button,
-  Text,
-  TopNav,
-  Section,
-  SectionContent,
-  useTheme,
-} from "react-native-rapi-ui";
+import Header from "../../components/Header";
 
 export default class People extends React.PureComponent {
 	state = {
@@ -26,7 +18,12 @@ export default class People extends React.PureComponent {
 				quote: "There is no sunrise so beautiful that it is worth waking me up to see it.",
 				tags: [
 					"Not here to date",
-					"Brawl Stars"
+					"Brawl Stars",
+					"Rock music",
+					"Lover of Mexican food",
+					"Memes",
+					"Extroverted",
+					"Outgoing"
 				]
 			},
 			{
@@ -36,7 +33,11 @@ export default class People extends React.PureComponent {
 				quote: "It's not a bug, it's a feature",
 				tags: [
 					"Computer science",
-					"Introverted"
+					"Introverted",
+					"Music",
+					"Lover of hot pot",
+					"Hater of broccoli",
+					"Memes"
 				]
 			},
 			{
@@ -47,7 +48,8 @@ export default class People extends React.PureComponent {
 				tags: [
 					"Arts",
 					"Jazz music",
-					"Hater of broccoli"
+					"Hater of broccoli",
+					"Hater of CS"
 				]
 			},
 		]
@@ -56,9 +58,7 @@ export default class People extends React.PureComponent {
 	render() {
 		return (
 			<Layout>
-				<View style={styles.header}>
-					<Text size="h1">People</Text>
-				</View>
+				<Header name="People"/>
 
 				<FlatList contentContainerStyle={styles.body} keyExtractor={item => item.id}
 					data={this.state.people} renderItem={({item}) =>
@@ -74,12 +74,6 @@ export default class People extends React.PureComponent {
 }
 
 const styles = StyleSheet.create({
-	header: {
-	  padding: 10,
-	  display: "flex",
-	  marginBottom: 10
-	},
-
 	body: {
 		alignItems: "center",
 		backgroundColor: "black"

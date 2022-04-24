@@ -4,13 +4,9 @@ import React, {useEffect, useState} from "react";
 import { View, StyleSheet, FlatList, Dimensions } from "react-native";
 
 import EventCard from '../../components/EventCard';
+import Header from "../../components/Header";
 
-import {
-  Layout,
-  Text,
-} from "react-native-rapi-ui";
 import {db} from "../../provider/Firebase";
-import {ActivityIndicator} from "react-native";
 
 export default function({ navigation }) {
     const [events, setEvents] = useState([]); // initial state, function used for updating initial state
@@ -23,14 +19,14 @@ export default function({ navigation }) {
           let data = doc.data();
           list.push({
             id: doc.id,
-            name: data.title,
+            name: data.name,
             image: "https://static.onecms.io/wp-content/uploads/sites/9/2020/04/24/ppp-why-wont-anyone-rescue-restaurants-FT-BLOG0420.jpg",
             location: data.location,
-            date: data.date,
-            time: data.time,
             details: data.description,
+              date: data.date,
+              time: data.time,
             host: {
-              name: "Rachelle Hua",
+              name: data.hostID,
               image: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211",
             },
           });
@@ -41,9 +37,7 @@ export default function({ navigation }) {
   
     return (
       <View style={{flex:1}}>
-        <View style={styles.header}>
-          <Text size="h1">Explore</Text>
-        </View>
+        <Header name="Explore"/>
 
         <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
         data={events} renderItem={({item}) =>
@@ -58,12 +52,6 @@ export default function({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    padding: 10,
-    display: "flex",
-    marginBottom: 10
-  },
-
   cards: {
     alignItems: "center"
   },

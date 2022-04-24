@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, StyleSheet, Image, Dimensions, TouchableOpacity } from 'react-native';
-import { Text } from 'react-native-rapi-ui';
+import { View, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import MediumText from "./MediumText";
+import NormalText from './NormalText';
 
 import Tag from "./Tag";
 
@@ -15,12 +16,12 @@ const ProfileBubble = props => {
     return (
         <View style={[styles.card, {backgroundColor: generateColor()}]}>
             <TouchableOpacity onPress={props.click}>
-                <Text size="h3" style={styles.white}>"{props.person.quote}"</Text>
+                <MediumText color="white">"{props.person.quote}"</MediumText>
                 <View style={styles.row}>
-                    <Text size="xl" style={styles.white}>- {props.person.name}</Text>
+                    <NormalText color="white">- {props.person.name}</NormalText>
 
                     <View style={styles.tags}>
-                        {props.person.tags.map(tag => <Tag text={tag} key={tag}/>)}
+                        {props.person.tags.slice(0, 4).map(tag => <Tag text={tag} key={tag}/>)}
                     </View>
                 </View>
             </TouchableOpacity>
@@ -39,16 +40,14 @@ const styles = StyleSheet.create({
     row: {
         display: "flex",
         flexDirection: "row",
+        alignItems: "center",
         maxWidth: Dimensions.get('screen').width/1.55
     },
 
     tags: {
         flexDirection: "row",
-        marginLeft: 15
-    },
-
-    white: {
-        color: "white"
+        marginLeft: 15,
+        flexWrap: "wrap"
     },
 })
 
