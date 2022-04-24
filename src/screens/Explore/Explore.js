@@ -19,12 +19,14 @@ export default function({ navigation }) {
           let data = doc.data();
           list.push({
             id: doc.id,
-            name: data.title,
+            name: data.name,
             image: "https://static.onecms.io/wp-content/uploads/sites/9/2020/04/24/ppp-why-wont-anyone-rescue-restaurants-FT-BLOG0420.jpg",
             location: data.location,
             details: data.description,
+              date: data.date,
+              time: data.time,
             host: {
-              name: "Rachelle Hua",
+              name: data.hostID,
               image: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211",
             },
           });

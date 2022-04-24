@@ -112,11 +112,11 @@ export default function ({ navigation }) {
                 <Button disabled={disabled} text="Post"
                     status="success" onPress={function () {
                         db.collection("Public Events").add({
-                            title: title,
+                            name: title,
                             location: location,
                             date: date,
                             time: time,
-                            description: description
+                            details: description
                         }).then(r => {
                             alert("POST SUCCESSFUL");
                             navigation.navigate("Explore")
