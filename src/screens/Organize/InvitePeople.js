@@ -1,13 +1,13 @@
 //Display upcoming events to join
 
 import React, {useEffect, useState} from "react";
-import {View, StyleSheet, FlatList, Dimensions, Button} from "react-native";
+import {View, StyleSheet, FlatList} from "react-native";
 
 import EventCard from '../../components/EventCard';
 import Header from "../../components/Header";
 
 import {db} from "../../provider/Firebase";
-import {TopNav} from "react-native-rapi-ui";
+import {TopNav, Button} from "react-native-rapi-ui";
 import {Ionicons} from "@expo/vector-icons";
 import InvitePerson from "../../components/InvitePerson";
 
@@ -18,7 +18,20 @@ const generateColor = () => {
     return `#${randomColor}`;
 };
 
-export default function({ navigation }) {
+const sendInvites = (invite, navigation) => {
+    db.collection("Private Events").add({
+        name: invite.name,
+        location: invite.location,
+        date: invite.date,
+        time: invite.time,
+        additionalInfo: invite.additionalInfo
+    }).then(r => {
+        alert("INVITATION SUCCESSFUL");
+        navigation.navigate("Explore")
+    })
+};
+
+export default function({ route, navigation }) {
     const [users, setUsers] = useState([]); // initial state, function used for updating initial state
 
     useEffect(() => { // updates stuff right after React makes changes to the DOM
@@ -54,7 +67,7 @@ export default function({ navigation }) {
                       data={users} renderItem={({item}) =>
                 <InvitePerson person={item} color={generateColor()}/>
             }/>
-            <Button title="Send Invites" style={styles.submit} color="#5db075"/>
+            <Button text="Send Invites" status="success" size="lg" onPress={() => sendInvites(route.params, navigation)}/>
         </View>
     );
 }

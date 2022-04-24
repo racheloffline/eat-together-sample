@@ -14,10 +14,10 @@ import {NavigationContainer} from "@react-navigation/native";
 
 export default function ({ navigation }) {
     // State variables for the inputs
-    const [title, setTitle] = useState("");    
+    const [name, setName] = useState("");
     const [location, setLocation] = useState("");
     const [date, setDate] = useState(new Date());
-    const [description, setDescription] = useState("");
+    const [additionalInfo, setAdditionalInfo] = useState("");
 
     // Other variables
     const [showDate, setShowDate] = useState(false);
@@ -26,12 +26,12 @@ export default function ({ navigation }) {
 
     // Checks whether we should disable the Post button or not
     useEffect(() => {
-        if (title === "" || location == "") {
+        if (name === "" || location == "") {
             setDisabled(true);
         } else {
             setDisabled(false);
         }
-    }, [title, location]);
+    }, [name, location]);
 
     // For selecting a date and time
     const changeDate = (selectedDate) => {
@@ -47,10 +47,10 @@ export default function ({ navigation }) {
                 <HorizontalSwitch left="Private" right="Public" current="right" press={(val) => navigation.navigate("Organize")}/>
                 <SectionImage source={require('../../../assets/food.jpg')} />
                 <TextInput
-                    placeholder="Title"
-                    value={title}
+                    placeholder="Event Name"
+                    value={name}
                     onChangeText={(val) => {
-                        setTitle(val);
+                        setName(val);
                     }}
                     leftContent={
                         <Ionicons name="chatbubble-outline" size={20} />
@@ -102,9 +102,9 @@ export default function ({ navigation }) {
                     mode={mode} onConfirm={changeDate} onCancel={() => setShowDate(false)}/>
 
                 <TextInput
-                    placeholder="Description"
-                    value={description}
-                    onChangeText={(val) => setDescription(val)}
+                    placeholder="Additional Info"
+                    value={additionalInfo}
+                    onChangeText={(val) => setAdditionalInfo(val)}
                     containerStyle={{paddingBottom:40}}
                     multiline={true}
                     leftContent={
@@ -114,11 +114,11 @@ export default function ({ navigation }) {
                 <Button disabled={disabled} text="Post"
                     status="success" onPress={function () {
                         db.collection("Public Events").add({
-                            title: title,
+                            name: name,
                             location: location,
-                            date: date,
-                            time: time,
-                            description: description
+                            date: date.toLocaleDateString(),
+                            time: date.toLocaleTimeString(),
+                            additionalInfo: additionalInfo
                         }).then(r => {
                             alert("POST SUCCESSFUL");
                             navigation.navigate("Explore")
