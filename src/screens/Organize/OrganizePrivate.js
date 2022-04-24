@@ -10,8 +10,11 @@ import Header from "../../components/Header";
 import getDate from "../../getDate";
 import getTime from "../../getTime";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
+import firebase from "firebase";
 
 export default function ({ navigation }) {
+    const user = firebase.auth().currentUser;
+
     // State variables for the inputs
     const [name, setName] = useState("");
     const [location, setLocation] = useState("");
@@ -117,7 +120,8 @@ export default function ({ navigation }) {
                            location: location,
                            date: date.toLocaleDateString(),
                            time: date.toLocaleTimeString(),
-                           additionalInfo: additionalInfo
+                           additionalInfo: additionalInfo,
+                           attendees: [user.email]
                        })
                     }}/>
             </Section>

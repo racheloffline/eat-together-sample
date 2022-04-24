@@ -18,13 +18,14 @@ const generateColor = () => {
     return `#${randomColor}`;
 };
 
-const sendInvites = (invite, navigation) => {
+const sendInvites = (attendees, invite, navigation) => {
     db.collection("Private Events").add({
         name: invite.name,
         location: invite.location,
         date: invite.date,
         time: invite.time,
-        additionalInfo: invite.additionalInfo
+        additionalInfo: invite.additionalInfo,
+        attendees: attendees
     }).then(r => {
         alert("INVITATION SUCCESSFUL");
         navigation.navigate("Explore")
@@ -33,6 +34,7 @@ const sendInvites = (invite, navigation) => {
 
 export default function({ route, navigation }) {
     const [users, setUsers] = useState([]); // initial state, function used for updating initial state
+    const [attendees] = useState(route.params.attendees);
 
     useEffect(() => { // updates stuff right after React makes changes to the DOM
         const ref = db.collection("Users");
@@ -67,7 +69,7 @@ export default function({ route, navigation }) {
                       data={users} renderItem={({item}) =>
                 <InvitePerson person={item} color={generateColor()}/>
             }/>
-            <Button text="Send Invites" status="success" size="lg" onPress={() => sendInvites(route.params, navigation)}/>
+            <Button text="Send Invites" status="success" size="lg" onPress={() => sendInvites(attendees, route.params, navigation)}/>
         </View>
     );
 }
