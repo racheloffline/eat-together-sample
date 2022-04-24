@@ -4,6 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 import Explore from './Explore';
 import FullCard from './FullCard';
+import ExploreYourEvents from "./ExploreYourEvents";
 import {View} from "react-native";
 
 const Stack = createStackNavigator();
@@ -13,6 +14,7 @@ export default function ({ navigation }) {
             <NavigationContainer independent={true}>
                 <Stack.Navigator initialRouteName="Explore">
                     <Stack.Screen name="Explore" options={{headerShown: false}} component={Explore}/>
+                    <Stack.Screen name="ExploreYourEvents" options={{headerShown: false}} component={ExploreYourEvents}/>
                     <Stack.Screen name="FullCard" options={{headerShown: false}} component={FullCard}/>
                 </Stack.Navigator>
             </NavigationContainer>

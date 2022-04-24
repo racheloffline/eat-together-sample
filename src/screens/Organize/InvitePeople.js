@@ -19,29 +19,22 @@ const generateColor = () => {
 };
 
 export default function({ navigation }) {
-    const [events, setEvents] = useState([]); // initial state, function used for updating initial state
+    const [users, setUsers] = useState([]); // initial state, function used for updating initial state
 
     useEffect(() => { // updates stuff right after React makes changes to the DOM
-        const ref = db.collection("Public Events");
+        const ref = db.collection("Users");
         ref.onSnapshot((query) => {
             const list = [];
             query.forEach((doc) => {
                 let data = doc.data();
                 list.push({
                     id: doc.id,
-                    name: data.title,
-                    image: "https://static.onecms.io/wp-content/uploads/sites/9/2020/04/24/ppp-why-wont-anyone-rescue-restaurants-FT-BLOG0420.jpg",
-                    location: data.location,
-                    date: data.date,
-                    time: data.time,
-                    details: data.description,
-                    host: {
-                        name: "Rachelle Hua",
-                        image: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211",
-                    },
+                    name: data.name,
+                    quote: data.quote,
+                    profile: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211"
                 });
             });
-            setEvents(list);
+            setUsers(list);
         });
     }, []);
 
@@ -58,8 +51,8 @@ export default function({ navigation }) {
                 leftAction={() => navigation.goBack()}
             />
             <FlatList contentContainerStyle={styles.invites} keyExtractor={item => item.id}
-                      data={events} renderItem={({item}) =>
-                <InvitePerson color={generateColor()}/>
+                      data={users} renderItem={({item}) =>
+                <InvitePerson person={item} color={generateColor()}/>
             }/>
             <Button title="Send Invites" style={styles.submit} color="#5db075"/>
         </View>
