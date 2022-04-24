@@ -22,8 +22,6 @@ export default function({ navigation }) {
             name: data.title,
             image: "https://static.onecms.io/wp-content/uploads/sites/9/2020/04/24/ppp-why-wont-anyone-rescue-restaurants-FT-BLOG0420.jpg",
             location: data.location,
-            date: data.date,
-            time: data.time,
             details: data.description,
             host: {
               name: "Rachelle Hua",
