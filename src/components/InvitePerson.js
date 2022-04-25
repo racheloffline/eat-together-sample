@@ -36,7 +36,6 @@ const InvitePerson = props => {
             </View>
             <View style={[styles.body, {backgroundColor: props.color}]}>
                 <MediumText>"{props.person.quote}"</MediumText>
-                <MediumText>{props.attendees}</MediumText>
             </View>
         </View>
     );
