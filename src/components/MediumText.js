@@ -17,11 +17,11 @@ const MediumText = props => {
         );
     }
     return (
-        <Text style={{
+        <Text style={[{
             fontSize: props.size ? props.size : 20,
             fontFamily: 'Inter_600SemiBold',
             color: props.color ? props.color : "black"
-        }}>
+        }, props.style]}>
             {props.children}
         </Text>
     );

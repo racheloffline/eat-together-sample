@@ -4,19 +4,22 @@ import { Button, Layout, Section, SectionImage  } from "react-native-rapi-ui";
 import { TextInput } from 'react-native-rapi-ui';
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import {db} from "../provider/Firebase";
+import {db} from "../../provider/Firebase";
 
-import Header from "../components/Header";
-import getDate from "../getDate";
-import getTime from "../getTime";
-import NormalText from "../components/NormalText";
+import Header from "../../components/Header";
+import getDate from "../../getDate";
+import getTime from "../../getTime";
+import HorizontalSwitch from "../../components/HorizontalSwitch";
+import firebase from "firebase";
 
 export default function ({ navigation }) {
+    const user = firebase.auth().currentUser;
+
     // State variables for the inputs
-    const [title, setTitle] = useState("");    
+    const [name, setName] = useState("");
     const [location, setLocation] = useState("");
     const [date, setDate] = useState(new Date());
-    const [description, setDescription] = useState("");
+    const [additionalInfo, setAdditionalInfo] = useState("");
 
     // Other variables
     const [showDate, setShowDate] = useState(false);
@@ -25,12 +28,12 @@ export default function ({ navigation }) {
 
     // Checks whether we should disable the Post button or not
     useEffect(() => {
-        if (title === "" || location == "") {
+        if (name === "" || location == "") {
             setDisabled(true);
         } else {
             setDisabled(false);
         }
-    }, [title, location]);
+    }, [name, location]);
 
     // For selecting a date and time
     const changeDate = (selectedDate) => {
@@ -43,12 +46,13 @@ export default function ({ navigation }) {
         <Layout>
             <Section>
                 <Header name="Organize"/>
-                <SectionImage source={require('../../assets/food.jpg')} />
+                <HorizontalSwitch left="Private" right="Public" current="left" press={(val) => navigation.navigate("OrganizePublic")}/>
+                <SectionImage source={require('../../../assets/food.jpg')} />
                 <TextInput
-                    placeholder="Title"
-                    value={title}
+                    placeholder="Event Name"
+                    value={name}
                     onChangeText={(val) => {
-                        setTitle(val);
+                        setName(val);
                     }}
                     leftContent={
                         <Ionicons name="chatbubble-outline" size={20} />
@@ -100,27 +104,25 @@ export default function ({ navigation }) {
                     mode={mode} onConfirm={changeDate} onCancel={() => setShowDate(false)}/>
 
                 <TextInput
-                    placeholder="Description"
-                    value={description}
-                    onChangeText={(val) => setDescription(val)}
+                    placeholder="Additional Info"
+                    value={additionalInfo}
+                    onChangeText={(val) => setAdditionalInfo(val)}
                     containerStyle={{paddingBottom:40}}
                     multiline={true}
                     leftContent={
                         <Ionicons name="document-text-outline" size={20}/>
                     }
                 />
-                <Button disabled={disabled} text="Post"
+                <Button disabled={disabled} text="See people available!"
                     status="success" onPress={function () {
-                        db.collection("Public Events").add({
-                            name: title,
-                            location: location,
-                            date: date,
-                            time: time,
-                            details: description
-                        }).then(r => {
-                            alert("POST SUCCESSFUL");
-                            navigation.navigate("Explore")
-                        })
+                       navigation.navigate("InvitePeople", {
+                            name: name,
+                           location: location,
+                           date: date.toLocaleDateString(),
+                           time: date.toLocaleTimeString(),
+                           additionalInfo: additionalInfo,
+                           attendees: [user.email]
+                       })
                     }}/>
             </Section>
         </Layout>
