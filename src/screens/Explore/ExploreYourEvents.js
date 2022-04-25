@@ -28,7 +28,8 @@ export default function({ navigation }) {
                         location: data.location,
                         date: data.date,
                         time: data.time,
-                        details: data.description,
+                        additionalInfo: data.additionalInfo,
+                        attendees: data.attendees,
                         hostID: "Rachelle Hua",
                         hostImage: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211",
                     });
@@ -45,7 +46,7 @@ export default function({ navigation }) {
             <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
                       data={events} renderItem={({item}) =>
                 <EventCard event={item} click={() => {
-                    navigation.navigate("FullCard", {
+                    navigation.navigate("FullCardPrivate", {
                         event: item
                     });
                 }}/>

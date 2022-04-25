@@ -4,21 +4,39 @@ import {CheckBox} from 'react-native-rapi-ui';
 import LargeText from "./LargeText";
 import MediumText from "./MediumText";
 
-const HorizontalSwitch = props => {
+const InvitePerson = props => {
+    const [attendees, setAttendees] = React.useState(props.attendees);
     const [checkBox, setCheckbox] = React.useState(false);
     return (
         <View style={styles.outline}>
             <View style={styles.head}>
                 <View style={styles.headleft}>
                 <Image style={styles.image} source={{uri: props.person.profile}}/>
-                <LargeText>{props.person.name}</LargeText>
+                <MediumText>{props.person.name}</MediumText>
                 </View>
                 <View style={styles.checkbox}>
-                    <CheckBox value={checkBox} onValueChange={(val) => setCheckbox(val)} />
+                    <CheckBox value={checkBox} onValueChange={(val) => {
+                        setCheckbox(val);
+                        const curr = attendees;
+                        const isName = (elem) => elem == props.person.name;
+                        if (val) {
+                            let index = curr.findIndex(isName);
+                            if (index == -1) {
+                                curr.push(props.person.name.toString());
+                            }
+                        } else {
+                            let index = curr.findIndex(isName);
+                            if (index != -1) {
+                                curr.splice(index, 1);
+                            }
+                        }
+                        setAttendees(curr);
+                    }} />
                 </View>
             </View>
             <View style={[styles.body, {backgroundColor: props.color}]}>
                 <MediumText>"{props.person.quote}"</MediumText>
+                <MediumText>{props.attendees}</MediumText>
             </View>
         </View>
     );
@@ -67,4 +85,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default HorizontalSwitch;
+export default InvitePerson;

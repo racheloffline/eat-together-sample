@@ -34,7 +34,7 @@ const sendInvites = (attendees, invite, navigation) => {
 
 export default function({ route, navigation }) {
     const [users, setUsers] = useState([]); // initial state, function used for updating initial state
-    const [attendees] = useState(route.params.attendees);
+    const attendees = route.params.attendees;
 
     useEffect(() => { // updates stuff right after React makes changes to the DOM
         const ref = db.collection("Users");
@@ -46,7 +46,8 @@ export default function({ route, navigation }) {
                     id: doc.id,
                     name: data.name,
                     quote: data.quote,
-                    profile: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211"
+                    profile: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211",
+                    attendees: data.attendees
                 });
             });
             setUsers(list);
@@ -67,7 +68,7 @@ export default function({ route, navigation }) {
             />
             <FlatList contentContainerStyle={styles.invites} keyExtractor={item => item.id}
                       data={users} renderItem={({item}) =>
-                <InvitePerson person={item} color={generateColor()}/>
+                <InvitePerson person={item} attendees={attendees} color={generateColor()}/>
             }/>
             <Button text="Send Invites" status="success" size="lg" onPress={() => sendInvites(attendees, route.params, navigation)}/>
         </View>
