@@ -12,7 +12,7 @@ const EventCard = props => {
 
                 <SectionContent>
                     <View style={styles.details}>
-                        {props.event.host.image ? <Image style={styles.profile} source={{uri: props.event.host.image}}/> : 
+                        {props.event.hostImage ? <Image style={styles.profile} source={{uri: props.event.hostImage}}/> :
                             <View style={styles.profile}/>}
                         <View style={{flexDirection: "column"}}>
                             <MediumText>{props.event.name}</MediumText>

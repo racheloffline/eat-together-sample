@@ -16,6 +16,12 @@ import NormalText from "../../components/NormalText";
 import { Ionicons } from "@expo/vector-icons";
 
 const FullCard = ({ route, navigation }) => {
+    let attendees = ""
+    route.params.event.attendees.forEach(person => {
+        if (person != route.params.hostID) {
+            attendees += person + " ";
+        }
+    });
   return (
     <Layout>
       <TopNav
@@ -31,6 +37,7 @@ const FullCard = ({ route, navigation }) => {
       <View style={styles.page}>
         <LargeText>{route.params.event.name}</LargeText>
         <MediumText>Hosted by: {route.params.event.hostID}</MediumText>
+          <MediumText>Attendees: {attendees}</MediumText>
         <View style={styles.details}>
             <Image style={styles.image}
               source={{uri: route.params.event.image}}/>
@@ -43,7 +50,6 @@ const FullCard = ({ route, navigation }) => {
         </View>
 
         <Text size="h4">{route.params.event.details}</Text>
-        <Button text="Attend!" status="success" style={{marginTop: 40}}/>
       </View>
     </Layout>
   );
