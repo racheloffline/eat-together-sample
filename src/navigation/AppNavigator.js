@@ -58,6 +58,7 @@ const Main = () => {
         <MainStack.Screen name="Schedule" component={Schedule} />
         <MainStack.Screen name="OrganizePublic" component={OrganizePublic} />
         <MainStack.Screen name="InvitePeople" component={InvitePeople} />
+        <MainStack.Screen name="Invite" component={Invite} />
 
     </MainStack.Navigator>
   );

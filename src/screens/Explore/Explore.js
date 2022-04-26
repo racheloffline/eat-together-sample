@@ -36,7 +36,7 @@ export default function({ navigation }) {
 
     return (
       <View>
-        <Header name="Explore"/>
+          <Header name="Explore" navigation = {navigation}/>
           <HorizontalSwitch left="Your Events" right="Public" current="right" press={(val) => navigation.navigate("ExploreYourEvents")}/>
         <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
         data={events} renderItem={({item}) =>
