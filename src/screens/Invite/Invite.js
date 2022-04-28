@@ -1,49 +1,82 @@
 //Chat with users you have already connected with
 
-import React from 'react';
-import {FlatList, View, StyleSheet} from 'react-native';
-import { Layout, Text } from 'react-native-rapi-ui';
+import React, {useEffect, useState} from 'react';
+import {FlatList, View, StyleSheet, Image, ScrollView, TouchableOpacity} from 'react-native';
+import {Layout, Text, TopNav} from 'react-native-rapi-ui';
+import LargeText from "../../components/LargeText";
+import NormalText from "../../components/NormalText";
+import SmallText from "../../components/SmallText";
+import {Ionicons} from "@expo/vector-icons";
+import Tag from "../../components/Tag";
+import MediumText from "../../components/MediumText";
+import {db} from "../../provider/Firebase";
+import {AuthContext, AuthProvider} from "../../provider/AuthProvider";
+import firebase from "firebase";
 
 export default function ({ navigation }) {
-	//Get a list of current chats from Firebase up here
+	//Get a list of current invites from Firebase up here
+	const user = firebase.auth().currentUser;
+	const [invites, setInvites] = useState([]); // initial state, function used for updating initial state
 
-	//Fill this in later
-	const data = [
-		{key: 'Devin'},
-		{key: 'Dan'},
-		{key: 'Dominic'},
-		{key: 'Jackson'},
-		{key: 'James'},
-		{key: 'Joel'},
-		{key: 'John'},
-		{key: 'Jillian'},
-		{key: 'Jimmy'},
-		{key: 'Julie'},
-	];
+	useEffect(() => { // updates stuff right after React makes changes to the DOM
+		const ref = db.collection("User Invites").doc(user.email).collection("Invites");
+		console.log(ref.path)
+		ref.onSnapshot((query) => {
+			const list = [];
+			query.forEach((doc) => {
+				let data = doc.data();
+				list.push({
+					id: doc.id,
+					name: data.name,
+					image: data.image,
+					location: data.location,
+					date: data.date,
+					time: data.time,
+					details: data.description,
+					hostID: data.hostID,
+					hostImage: data.hostID,
+				});
+			});
+			setInvites(list);
+		});
+
+	}, []);
 
 	return (
-		<View style = {{flex:1}}>
-
-			<View style = {styles.header}>
-
-				<Text style = {styles.headingText}>Invites</Text>
-			</View>
-
+		<Layout>
+			<TopNav
+				middleContent="Invites"
+				leftContent={
+					<Ionicons
+						name="chevron-back"
+						size={20}
+					/>
+				}
+				leftAction={() => navigation.goBack()}
+			/>
 			<View style = {styles.listView}>
-
 				<FlatList
-					data = {data}
+					data = {invites}
 					renderItem={
 						({item}) =>
 							<View>
-								<Text style = {styles.listMainText}>{item.key}</Text>
-								<Text style = {styles.listSubText}>Is inviting you to:</Text>
+								<TouchableOpacity onPress={() => {
+									console.log(item)
+									navigation.navigate("InviteFull", {
+										invite: item
+									})
+								}}>
+									<MediumText style = {styles.listMainText}>{item.hostID}</MediumText>
+									<NormalText style = {styles.listSubText}>Is inviting you to: {item.name}</NormalText>
+								</TouchableOpacity>
 							</View>
 					}
 					//Do something on click (go to the full invite)
 				/>
 			</View>
-		</View>
+
+		</Layout>
+
 	);
 }
 

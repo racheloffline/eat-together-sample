@@ -8,6 +8,7 @@ import Header from "../../components/Header";
 
 import {db} from "../../provider/Firebase";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
+import {Layout} from "react-native-rapi-ui";
 
 export default function({ navigation }) {
     const [events, setEvents] = useState([]); // initial state, function used for updating initial state
@@ -35,7 +36,7 @@ export default function({ navigation }) {
     }, []);
 
     return (
-      <View>
+      <Layout>
           <Header name="Explore" navigation = {navigation}/>
           <HorizontalSwitch left="Your Events" right="Public" current="right" press={(val) => navigation.navigate("ExploreYourEvents")}/>
         <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
@@ -46,7 +47,7 @@ export default function({ navigation }) {
             });
           }}/>
         }/>
-      </View>
+      </Layout>
     );
 }
 

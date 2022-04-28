@@ -27,6 +27,7 @@ import Register from "../screens/auth/Register";
 import ForgetPassword from "../screens/auth/ForgetPassword";
 import { AuthContext } from "../provider/AuthProvider";
 import schedule from "../screens/Profile/Schedule";
+import InviteFull from "../screens/Invite/InviteFull";
 
 //The experience of users not logged in
 const AuthStack = createStackNavigator();
@@ -59,6 +60,7 @@ const Main = () => {
         <MainStack.Screen name="OrganizePublic" component={OrganizePublic} />
         <MainStack.Screen name="InvitePeople" component={InvitePeople} />
         <MainStack.Screen name="Invite" component={Invite} />
+        <MainStack.Screen name="InviteFull" component={InviteFull} />
 
     </MainStack.Navigator>
   );

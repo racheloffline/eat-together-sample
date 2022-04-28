@@ -3,8 +3,10 @@ import {View, StyleSheet, Image, Dimensions} from "react-native";
 import {Layout, Text, TopNav} from "react-native-rapi-ui";
 import {Ionicons} from "@expo/vector-icons";
 import Tag from "../../components/Tag";
+import NormalText from "../../components/NormalText";
 
 export default function ({ navigation, invite}) {
+    console.log(invite)
     return (
         <Layout>
             <TopNav
@@ -21,8 +23,8 @@ export default function ({ navigation, invite}) {
                 <View style={styles.background}/>
                 <Image style={styles.image}
                        source={{uri: invite.image}}/>
-                <Text style={styles.text}>{invite.host.name} is inviting you to an event!</Text>
-                <Text style={styles.text}>Location: {invite.location}</Text>
+                <NormalText style={styles.text}>{invite.host.name} is inviting you to an event!</NormalText>
+                <NormalText style={styles.text}>Location: {invite.location}</NormalText>
                 <Text style={styles.text}>Date: {invite.date}</Text>
                 <Text style={styles.text}>Time: {invite.time}</Text>
                 <Text style={styles.text}>Details: {invite.location}</Text>
