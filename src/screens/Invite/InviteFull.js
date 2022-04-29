@@ -4,9 +4,9 @@ import {Layout, Text, TopNav} from "react-native-rapi-ui";
 import {Ionicons} from "@expo/vector-icons";
 import Tag from "../../components/Tag";
 import NormalText from "../../components/NormalText";
+import MediumText from "../../components/MediumText";
 
-export default function ({ navigation, invite}) {
-    console.log(invite)
+export default function ({ route, navigation}) {
     return (
         <Layout>
             <TopNav
@@ -22,12 +22,13 @@ export default function ({ navigation, invite}) {
             <View style={styles.page}>
                 <View style={styles.background}/>
                 <Image style={styles.image}
-                       source={{uri: invite.image}}/>
-                <NormalText style={styles.text}>{invite.host.name} is inviting you to an event!</NormalText>
-                <NormalText style={styles.text}>Location: {invite.location}</NormalText>
-                <Text style={styles.text}>Date: {invite.date}</Text>
-                <Text style={styles.text}>Time: {invite.time}</Text>
-                <Text style={styles.text}>Details: {invite.location}</Text>
+                       source={{uri: route.params.invite.image}}/>
+                <MediumText style={styles.text}>{route.params.invite.hostID} is inviting you to an event!</MediumText>
+                <MediumText style={styles.text}>Event name: {route.params.invite.name}</MediumText>
+                <MediumText style={styles.text}>Location: {route.params.invite.location}</MediumText>
+                <MediumText style={styles.text}>Date: {route.params.invite.date}</MediumText>
+                <MediumText style={styles.text}>Time: {route.params.invite.time}</MediumText>
+                <MediumText style={styles.text}>Details: {route.params.invite.details}</MediumText>
             </View>
         </Layout>
     );

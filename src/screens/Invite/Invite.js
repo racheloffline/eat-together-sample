@@ -20,7 +20,6 @@ export default function ({ navigation }) {
 
 	useEffect(() => { // updates stuff right after React makes changes to the DOM
 		const ref = db.collection("User Invites").doc(user.email).collection("Invites");
-		console.log(ref.path)
 		ref.onSnapshot((query) => {
 			const list = [];
 			query.forEach((doc) => {
@@ -61,7 +60,6 @@ export default function ({ navigation }) {
 						({item}) =>
 							<View>
 								<TouchableOpacity onPress={() => {
-									console.log(item)
 									navigation.navigate("InviteFull", {
 										invite: item
 									})
