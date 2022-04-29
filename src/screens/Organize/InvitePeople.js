@@ -31,19 +31,41 @@ const sendInvites = (attendees, invite, navigation) => {
         attendees: attendees
     }).then(r => {
         attendees.forEach((attendee) => {
-            db.collection("User Invites").doc(attendee).collection("Invites").add({
-                date: invite.date,
-                description: invite.additionalInfo,
-                hostID: user.email,
-                hostImage: "",
-                image: "",
-                location: invite.location,
-                name: invite.name,
-                time: invite.time
-            }).then(r => {
-                alert("INVITATION SUCCESSFUL");
-                navigation.navigate("Explore")
+            const ref = db.collection("User Invites").doc(attendee);
+            ref.get().then((snapshot) => {
+                if(snapshot.exists) {
+                    ref.collection("Invites").add({
+                        date: invite.date,
+                        description: invite.additionalInfo,
+                        hostID: user.email,
+                        hostImage: "",
+                        image: "",
+                        location: invite.location,
+                        name: invite.name,
+                        time: invite.time
+                    }).then(r => {
+                        alert("INVITATION SUCCESSFUL");
+                        navigation.navigate("Explore")
+                    })
+                } else {
+                    ref.set(({})).then(r => {
+                        ref.collection("Invites").add({
+                            date: invite.date,
+                            description: invite.additionalInfo,
+                            hostID: user.email,
+                            hostImage: "",
+                            image: "",
+                            location: invite.location,
+                            name: invite.name,
+                            time: invite.time
+                        }).then(r => {
+                            alert("INVITATION SUCCESSFUL");
+                            navigation.navigate("Explore")
+                        })
+                    });
+                }
             })
+
         })
 
     })
