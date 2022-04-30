@@ -18,6 +18,19 @@ export default function ({ navigation }) {
 	const user = firebase.auth().currentUser;
 	const [invites, setInvites] = useState([]); // initial state, function used for updating initial state
 
+	//check to see which text to display for accepted status
+	function checkAccepted(item) {
+		if(item.accepted == null) {
+			return ""
+		} else if(item.accepted === "accepted") {
+			return "You have accepted this invite!"
+		} else if(item.accepted === "declined") {
+			return "You have declined this invite."
+		} else {
+			return "ERROR";
+		}
+	}
+
 	useEffect(() => { // updates stuff right after React makes changes to the DOM
 		const ref = db.collection("User Invites").doc(user.email).collection("Invites");
 		ref.onSnapshot((query) => {
@@ -34,6 +47,7 @@ export default function ({ navigation }) {
 					details: data.description,
 					hostID: data.hostID,
 					hostImage: data.hostID,
+					accepted: data.accepted
 				});
 			});
 			setInvites(list);
@@ -66,6 +80,7 @@ export default function ({ navigation }) {
 								}}>
 									<MediumText style = {styles.listMainText}>{item.hostID}</MediumText>
 									<NormalText style = {styles.listSubText}>Is inviting you to: {item.name}</NormalText>
+									<NormalText style = {styles.listSubText}>{checkAccepted(item)}</NormalText>
 								</TouchableOpacity>
 							</View>
 					}
@@ -91,7 +106,7 @@ const styles = StyleSheet.create({
 		marginLeft: 25
 	},
 	listMainText: {
-		padding: 20,
+		marginLeft: 20,
 		display: "flex",
 		fontWeight: 'bold',
 		textAlign: 'left',
@@ -99,7 +114,6 @@ const styles = StyleSheet.create({
 	},
 	listSubText: {
 		marginLeft: 20,
-		marginTop: -20,
 		display: "flex",
 		textAlign: 'left',
 		fontSize: 18
