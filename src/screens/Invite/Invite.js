@@ -84,7 +84,6 @@ export default function ({ navigation }) {
 								</TouchableOpacity>
 							</View>
 					}
-					//Do something on click (go to the full invite)
 				/>
 			</View>
 
@@ -106,9 +105,9 @@ const styles = StyleSheet.create({
 		marginLeft: 25
 	},
 	listMainText: {
-		marginLeft: 20,
+		padding: 12,
+		marginLeft: -12,
 		display: "flex",
-		fontWeight: 'bold',
 		textAlign: 'left',
 		fontSize: 24
 	},
