@@ -129,7 +129,7 @@ export default function ({ navigation }) {
               <Text size="md">Don't have an account?</Text>
               <TouchableOpacity
                 onPress={() => {
-                  navigation.navigate("Register");
+                  navigation.navigate("Name");
                 }}
               >
                 <Text

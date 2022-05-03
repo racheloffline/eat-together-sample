@@ -10,7 +10,8 @@ const MediumText = props => {
             <Text style={{
                 fontSize: props.size ? props.size : 20,
                 fontFamily: 'sans-serif',
-                color: props.color ? props.color : "black"
+                color: props.color ? props.color : "black",
+                textAlign: props.center ? "center" : "auto"
             }}>
                 {props.children}
             </Text>
@@ -20,7 +21,8 @@ const MediumText = props => {
         <Text style={{
             fontSize: props.size ? props.size : 20,
             fontFamily: 'Inter_600SemiBold',
-            color: props.color ? props.color : "black"
+            color: props.color ? props.color : "black",
+            textAlign: props.center ? "center" : "auto"
         }}>
             {props.children}
         </Text>

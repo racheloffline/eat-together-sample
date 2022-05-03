@@ -11,6 +11,7 @@ import {firebaseConfig} from "../provider/Firebase";
 import { useTheme, themeColor } from "react-native-rapi-ui";
 import TabBarIcon from "../components/utils/TabBarIcon";
 import TabBarText from "../components/utils/TabBarText";
+
 //Screens (Make sure to import if ever adding new screen!)
 import Organize from "../screens/Organize";
 import PeopleMain from "../screens/People/PeopleMain";
@@ -18,27 +19,11 @@ import Invite from "../screens/Invite"
 import Me from "../screens/Me";
 import ExploreMain from "../screens/Explore/ExploreMain";
 import Loading from "../screens/utils/Loading";
-//Auth screens
-import Login from "../screens/auth/Login";
-import Register from "../screens/auth/Register";
-import ForgetPassword from "../screens/auth/ForgetPassword";
-import { AuthContext } from "../provider/AuthProvider";
 
-//The experience of users not logged in
-const AuthStack = createStackNavigator();
-const Auth = () => {
-  return (
-    <AuthStack.Navigator
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      <AuthStack.Screen name="Login" component={Login} />
-      <AuthStack.Screen name="Register" component={Register} />
-      <AuthStack.Screen name="ForgetPassword" component={ForgetPassword} />
-    </AuthStack.Navigator>
-  );
-};
+//Auth screens
+import Auth from "./Auth";
+
+import { AuthContext } from "../provider/AuthProvider";
 
 //The experience of logged in user!!
 const MainStack = createStackNavigator();

@@ -4,17 +4,16 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 import Explore from './Explore';
 import FullCard from './FullCard';
-import {View} from "react-native";
 
 const Stack = createStackNavigator();
 
 export default function ({ navigation }) {
     return (
-            <NavigationContainer independent={true}>
-                <Stack.Navigator initialRouteName="Explore">
-                    <Stack.Screen name="Explore" options={{headerShown: false}} component={Explore}/>
-                    <Stack.Screen name="FullCard" options={{headerShown: false}} component={FullCard}/>
-                </Stack.Navigator>
-            </NavigationContainer>
-        );
+        <NavigationContainer independent={true}>
+            <Stack.Navigator initialRouteName="Explore">
+                <Stack.Screen name="Explore" options={{headerShown: false}} component={Explore}/>
+                <Stack.Screen name="FullCard" options={{headerShown: false}} component={FullCard}/>
+            </Stack.Navigator>
+        </NavigationContainer>
+    );
 }
