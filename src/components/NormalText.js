@@ -10,7 +10,8 @@ const NormalText = props => {
             <Text style={{
                 fontSize: props.size ? props.size : 14,
                 fontFamily: 'sans-serif',
-                color: props.color ? props.color : "black"
+                color: props.color ? props.color : "black",
+                textAlign: props.center ? "center" : "auto"
             }}>
                 {props.children}
             </Text>
@@ -20,7 +21,8 @@ const NormalText = props => {
         <Text style={{
             fontSize: props.size ? props.size : 14,
             fontFamily: 'Inter_400Regular',
-            color: props.color ? props.color : "black"
+            color: props.color ? props.color : "black",
+            textAlign: props.center ? "center" : "auto"
         }}>
             {props.children}
         </Text>

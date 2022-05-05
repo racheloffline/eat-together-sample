@@ -12,10 +12,10 @@ import {
 } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 
-import Tag from "../../components/Tag";
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
-import NormalText from "../../components/NormalText";
+import Tag from "../../components/Tag";
+import TagsList from "../../components/TagsList";
 
 const FullProfile = ({ route, navigation }) => {
   return (
@@ -38,9 +38,7 @@ const FullProfile = ({ route, navigation }) => {
           <LargeText>{route.params.person.name}</LargeText>
         </View>
 
-        <ScrollView horizontal={true} style={styles.tags}>
-          {route.params.person.tags.map(tag => <Tag text={tag} key={tag}/>)}
-        </ScrollView>
+        <TagsList tags={route.params.person.tags}/>
 
         <MediumText>"{route.params.person.quote}"</MediumText>
       </View>
@@ -73,14 +71,6 @@ const styles = StyleSheet.create({
   name: {
     marginVertical: 20
   },
-
-  tags: {
-    display: "flex",
-    flexDirection: "row",
-    marginBottom: 10
-  },
-
-  
 });
 
 export default FullProfile;

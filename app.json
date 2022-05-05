@@ -20,6 +20,14 @@
 		"web": {
 			"favicon": "./assets/favicon.png"
 		},
-		"userInterfaceStyle": "automatic"
+		"userInterfaceStyle": "automatic",
+		"plugins": [
+			[
+			  "expo-image-picker",
+			  {
+				"photosPermission": "The app accesses your photos to let you pick a profile image."
+			  }
+			]
+		  ]
 	}
 }

@@ -10,7 +10,8 @@ const SmallText = props => {
             <Text style={{
                 fontSize: props.size ? props.size : 10,
                 fontFamily: 'sans-serif',
-                color: props.color ? props.color : "black"
+                color: props.color ? props.color : "black",
+                textAlign: props.center ? "center" : "auto"
             }}>
                 {props.children}
             </Text>
@@ -20,7 +21,8 @@ const SmallText = props => {
         <Text style={{
             fontSize: props.size ? props.size : 10,
             fontFamily: 'Inter_200ExtraLight',
-            color: props.color ? props.color : "black"
+            color: props.color ? props.color : "black",
+            textAlign: props.center ? "center" : "auto"
         }}>
             {props.children}
         </Text>
