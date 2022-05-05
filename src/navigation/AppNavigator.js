@@ -27,8 +27,6 @@ import Auth from "./Auth";
 import Schedule from "../screens/Profile/Schedule";
 import { AuthContext } from "../provider/AuthProvider";
 
-import { AuthContext } from "../provider/AuthProvider";
-
 //The experience of logged in user!!
 const MainStack = createStackNavigator();
 const Main = () => {
