@@ -12,6 +12,14 @@ export default function ({ route, navigation}) {
     const user = firebase.auth().currentUser;
     const ref = db.collection("User Invites").doc(user.email).collection("Invites").doc(route.params.invite.id);
 
+    function displayImage(image) {
+        if(image == null || image === "") {
+            return "https://static.onecms.io/wp-content/uploads/sites/9/2020/04/24/ppp-why-wont-anyone-rescue-restaurants-FT-BLOG0420.jpg"
+        } else {
+            return image
+        }
+    }
+
     return (
         <Layout>
             <TopNav
@@ -27,33 +35,52 @@ export default function ({ route, navigation}) {
             <View style={styles.page}>
                 <View style={styles.background}/>
                 <Image style={styles.image}
-                       source={{uri: route.params.invite.image}}/>
-                <MediumText style={styles.text}>{route.params.invite.hostID} is inviting you to an event!</MediumText>
-                <MediumText style={styles.text}>Event name: {route.params.invite.name}</MediumText>
-                <MediumText style={styles.text}>Location: {route.params.invite.location}</MediumText>
-                <MediumText style={styles.text}>Date: {route.params.invite.date}</MediumText>
-                <MediumText style={styles.text}>Time: {route.params.invite.time}</MediumText>
-                <MediumText style={styles.text}>Details: {route.params.invite.details}</MediumText>
-                <TouchableOpacity onPress = {() => {
-                    ref.set({
-                        accepted: "accepted"
-                    }, {merge: true}).then(() => {
-                        alert("Invite Accepted!");
-                        navigation.goBack();
-                    })
-                }}>
-                    <NormalText>Accept Invite</NormalText>
-                </TouchableOpacity>
-                <TouchableOpacity onPress = {() => {
-                    ref.set({
-                        accepted: "declined"
-                    }, {merge: true}).then(() => {
-                        alert("Invite Declined");
-                        navigation.goBack();
-                    })
-                }}>
-                    <NormalText>Decline Invite</NormalText>
-                </TouchableOpacity>
+                       source={{uri: displayImage(route.params.invite.image)}}/>
+                <MediumText style={styles.text}>{route.params.invite.hostID} is inviting you to {route.params.invite.name}!</MediumText>
+                <View style = {styles.icons}>
+                    <Ionicons name="location-outline" size={24}/>
+                    <Text>  </Text>
+                    <NormalText size = {20}>{route.params.invite.location}</NormalText>
+                </View>
+                <View style = {styles.icons}>
+                    <Ionicons name="calendar-outline" size={24}/>
+                    <Text>  </Text>
+                    <NormalText size = {20}>{route.params.invite.date}</NormalText>
+                </View>
+                <View style = {styles.icons}>
+                    <Ionicons name="time-outline" size={24}/>
+                    <Text>  </Text>
+                    <NormalText size = {20}>{route.params.invite.time}</NormalText>
+                </View>
+                <View style = {styles.text}>
+                    <NormalText size = {20}>Details: {route.params.invite.details}</NormalText>
+                </View>
+
+                <View style = {styles.buttonView}>
+                    <TouchableOpacity onPress = {() => {
+                        ref.set({
+                            accepted: "accepted"
+                        }, {merge: true}).then(() => {
+                            alert("Invite Accepted!");
+                            navigation.goBack();
+                        })
+                    }}>
+                        <NormalText size = {18} color = {"green"}>Accept Invite</NormalText>
+                    </TouchableOpacity>
+                    <TouchableOpacity style = {{paddingVertical: 10}}onPress = {() => {
+                        ref.set({
+                            accepted: "declined"
+                        }, {merge: true}).then(() => {
+                            alert("Invite Declined");
+                            navigation.goBack();
+                        })
+                    }}>
+                        <NormalText size = {18} color = {"red"}>Decline Invite</NormalText>
+                    </TouchableOpacity>
+                </View>
+
+
+
             </View>
         </Layout>
     );
@@ -74,16 +101,29 @@ const styles = StyleSheet.create({
     },
 
     image: {
-        width: 100,
-        height: 100,
-        borderColor: "white",
-        borderWidth: 3,
-        borderRadius: 50
+        width: Dimensions.get('screen').width - 20,
+        height: 200,
+        borderRadius: 10
     },
 
     text: {
-        marginVertical: 20,
-        fontSize: 24
+        alignItems: "flex-start",
+        flexDirection: "row",
+        width: Dimensions.get('screen').width - 40,
+        paddingVertical: 25
+    },
+
+    icons: {
+        alignItems: "flex-start",
+        flexDirection: "row",
+        width: Dimensions.get('screen').width - 40,
+        paddingVertical: 5
+    },
+
+    buttonView: {
+        display: "flex",
+        alignSelf: "center",
+        paddingVertical: 15
     }
 
 });
