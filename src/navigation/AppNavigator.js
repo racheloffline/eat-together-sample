@@ -17,7 +17,7 @@ import Organize from "../screens/Organize/OrganizePrivate";
 import OrganizePublic from "../screens/Organize/OrganizePublic";
 import InvitePeople from "../screens/Organize/InvitePeople";
 import PeopleMain from "../screens/People/PeopleMain";
-import Invite from "../screens/Invite/Invite"
+import Invite from "../screens/Invite/Invite";
 import Me from "../screens/Me";
 import ExploreMain from "../screens/Explore/ExploreMain";
 import Loading from "../screens/utils/Loading";
@@ -27,8 +27,6 @@ import Auth from "./Auth";
 import Schedule from "../screens/Profile/Schedule";
 import { AuthContext } from "../provider/AuthProvider";
 import InviteFull from "../screens/Invite/InviteFull";
-
-import { AuthContext } from "../provider/AuthProvider";
 
 //The experience of logged in user!!
 const MainStack = createStackNavigator();
