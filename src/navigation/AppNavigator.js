@@ -11,6 +11,7 @@ import {firebaseConfig} from "../provider/Firebase";
 import { useTheme, themeColor } from "react-native-rapi-ui";
 import TabBarIcon from "../components/utils/TabBarIcon";
 import TabBarText from "../components/utils/TabBarText";
+
 //Screens (Make sure to import if ever adding new screen!)
 import Organize from "../screens/Organize/OrganizePrivate";
 import OrganizePublic from "../screens/Organize/OrganizePublic";
@@ -20,30 +21,14 @@ import Invite from "../screens/Invite/Invite"
 import Me from "../screens/Me";
 import ExploreMain from "../screens/Explore/ExploreMain";
 import Loading from "../screens/utils/Loading";
-import Schedule from "../screens/Profile/Schedule";
+
 //Auth screens
-import Login from "../screens/auth/Login";
-import Register from "../screens/auth/Register";
-import ForgetPassword from "../screens/auth/ForgetPassword";
+import Auth from "./Auth";
+import Schedule from "../screens/Profile/Schedule";
 import { AuthContext } from "../provider/AuthProvider";
-import schedule from "../screens/Profile/Schedule";
 import InviteFull from "../screens/Invite/InviteFull";
 
-//The experience of users not logged in
-const AuthStack = createStackNavigator();
-const Auth = () => {
-  return (
-    <AuthStack.Navigator
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      <AuthStack.Screen name="Login" component={Login} />
-      <AuthStack.Screen name="Register" component={Register} />
-      <AuthStack.Screen name="ForgetPassword" component={ForgetPassword} />
-    </AuthStack.Navigator>
-  );
-};
+import { AuthContext } from "../provider/AuthProvider";
 
 //The experience of logged in user!!
 const MainStack = createStackNavigator();
@@ -56,11 +41,11 @@ const Main = () => {
       }}
     >
       <MainStack.Screen name="MainTabs" component={MainTabs} />
-        <MainStack.Screen name="Schedule" component={Schedule} />
-        <MainStack.Screen name="OrganizePublic" component={OrganizePublic} />
-        <MainStack.Screen name="InvitePeople" component={InvitePeople} />
-        <MainStack.Screen name="Invite" component={Invite} />
-        <MainStack.Screen name="InviteFull" component={InviteFull} />
+      <MainStack.Screen name="Schedule" component={Schedule} />
+      <MainStack.Screen name="OrganizePublic" component={OrganizePublic} />
+      <MainStack.Screen name="InvitePeople" component={InvitePeople} />
+      <MainStack.Screen name="Invite" component={Invite} />
+      <MainStack.Screen name="InviteFull" component={InviteFull} />
 
     </MainStack.Navigator>
   );

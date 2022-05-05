@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, TouchableOpacity, Dimensions } from "react-native";
-import { Button, Layout, Section, SectionImage  } from "react-native-rapi-ui";
+import { Button, Layout, Section, SectionImage } from "react-native-rapi-ui";
 import { TextInput } from 'react-native-rapi-ui';
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";

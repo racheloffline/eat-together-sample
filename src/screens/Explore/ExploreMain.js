@@ -5,7 +5,6 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Explore from './Explore';
 import FullCard from './FullCard';
 import ExploreYourEvents from "./ExploreYourEvents";
-import {View} from "react-native";
 import FullCardPrivate from "./FullCardPrivate";
 import Invite from "../Invite/Invite";
 import InviteFull from "../Invite/InviteFull";
