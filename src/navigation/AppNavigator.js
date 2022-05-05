@@ -13,7 +13,9 @@ import TabBarIcon from "../components/utils/TabBarIcon";
 import TabBarText from "../components/utils/TabBarText";
 
 //Screens (Make sure to import if ever adding new screen!)
-import Organize from "../screens/Organize";
+import Organize from "../screens/Organize/OrganizePrivate";
+import OrganizePublic from "../screens/Organize/OrganizePublic";
+import InvitePeople from "../screens/Organize/InvitePeople";
 import PeopleMain from "../screens/People/PeopleMain";
 import Invite from "../screens/Invite"
 import Me from "../screens/Me";
@@ -22,6 +24,8 @@ import Loading from "../screens/utils/Loading";
 
 //Auth screens
 import Auth from "./Auth";
+import Schedule from "../screens/Profile/Schedule";
+import { AuthContext } from "../provider/AuthProvider";
 
 import { AuthContext } from "../provider/AuthProvider";
 
@@ -32,10 +36,13 @@ const Main = () => {
     <MainStack.Navigator
       screenOptions={{
         headerShown: false,
+          animationEnabled: false
       }}
     >
       <MainStack.Screen name="MainTabs" component={MainTabs} />
-        <MainStack.Screen name="Invite" component={Invite} />
+      <MainStack.Screen name="Schedule" component={Schedule} />
+      <MainStack.Screen name="OrganizePublic" component={OrganizePublic} />
+      <MainStack.Screen name="InvitePeople" component={InvitePeople} />
 
     </MainStack.Navigator>
   );

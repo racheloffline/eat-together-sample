@@ -18,12 +18,12 @@ const LargeText = props => {
         );
     }
     return (
-        <Text style={{
+        <Text style={[{
             fontSize: props.size ? props.size : 30,
             fontFamily: 'Inter_800ExtraBold',
             color: props.color ? props.color : "black",
             textAlign: props.center ? "center" : "auto"
-        }}>
+        }, props.style]}>
             {props.children}
         </Text>
     );
