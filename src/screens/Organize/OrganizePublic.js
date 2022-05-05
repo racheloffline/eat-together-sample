@@ -43,7 +43,7 @@ export default function ({ navigation }) {
     return (
         <Layout>
             <Section>
-                <Header name="Organize"/>
+                <Header name="Organize" navigation = {navigation}/>
                 <HorizontalSwitch left="Private" right="Public" current="right" press={(val) => navigation.navigate("Organize")}/>
                 <SectionImage source={require('../../../assets/food.jpg')} />
                 <TextInput

@@ -10,6 +10,7 @@ import {db} from "../../provider/Firebase";
 import {TopNav, Button} from "react-native-rapi-ui";
 import {Ionicons} from "@expo/vector-icons";
 import InvitePerson from "../../components/InvitePerson";
+import firebase from "firebase";
 
 const generateColor = () => {
     const randomColor = Math.floor(Math.random() * 16777215)
@@ -19,6 +20,8 @@ const generateColor = () => {
 };
 
 const sendInvites = (attendees, invite, navigation) => {
+    const user = firebase.auth().currentUser;
+
     db.collection("Private Events").add({
         name: invite.name,
         location: invite.location,
@@ -27,8 +30,44 @@ const sendInvites = (attendees, invite, navigation) => {
         additionalInfo: invite.additionalInfo,
         attendees: attendees
     }).then(r => {
-        alert("INVITATION SUCCESSFUL");
-        navigation.navigate("Explore")
+        attendees.forEach((attendee) => {
+            const ref = db.collection("User Invites").doc(attendee);
+            ref.get().then((snapshot) => {
+                if(snapshot.exists) {
+                    ref.collection("Invites").add({
+                        date: invite.date,
+                        description: invite.additionalInfo,
+                        hostID: user.email,
+                        hostImage: "",
+                        image: "",
+                        location: invite.location,
+                        name: invite.name,
+                        time: invite.time
+                    }).then(r => {
+                        alert("INVITATION SUCCESSFUL");
+                        navigation.navigate("Explore")
+                    })
+                } else {
+                    ref.set(({})).then(r => {
+                        ref.collection("Invites").add({
+                            date: invite.date,
+                            description: invite.additionalInfo,
+                            hostID: user.email,
+                            hostImage: "",
+                            image: "",
+                            location: invite.location,
+                            name: invite.name,
+                            time: invite.time
+                        }).then(r => {
+                            alert("INVITATION SUCCESSFUL");
+                            navigation.navigate("Explore")
+                        })
+                    });
+                }
+            })
+
+        })
+
     })
 };
 

@@ -8,7 +8,9 @@ const Header = props => {
     return (
         <View style={styles.header}>
 			<LargeText>{props.name}</LargeText>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => {
+                props.navigation.navigate("Invite")
+            }}>
                 <Feather name="mail" size={36} color="black" style={{marginRight: 10}}/>
             </TouchableOpacity>
 		</View>

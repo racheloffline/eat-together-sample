@@ -58,7 +58,7 @@ export default class People extends React.PureComponent {
 	render() {
 		return (
 			<Layout>
-				<Header name="People"/>
+				<Header name="People" navigation = {this.props.navigation}/>
 
 				<FlatList contentContainerStyle={styles.body} keyExtractor={item => item.id}
 					data={this.state.people} renderItem={({item}) =>

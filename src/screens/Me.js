@@ -16,7 +16,7 @@ export default function ({ navigation }) {
                 <Text>This is your profile!</Text>
                 <Button
                     onPress={() => {
-                        firebase.auth().signOut();
+                        firebase.auth().signOut().then(r => {});
                     }}
                     title="Log Out"
                     color="#841584"
