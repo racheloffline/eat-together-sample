@@ -28,8 +28,6 @@ import Schedule from "../screens/Profile/Schedule";
 import { AuthContext } from "../provider/AuthProvider";
 import InviteFull from "../screens/Invite/InviteFull";
 
-import { AuthContext } from "../provider/AuthProvider";
-
 //The experience of logged in user!!
 const MainStack = createStackNavigator();
 const Main = () => {
