@@ -13,9 +13,7 @@ import TabBarIcon from "../components/utils/TabBarIcon";
 import TabBarText from "../components/utils/TabBarText";
 
 //Screens (Make sure to import if ever adding new screen!)
-import Organize from "../screens/Organize/OrganizePrivate";
-import OrganizePublic from "../screens/Organize/OrganizePublic";
-import InvitePeople from "../screens/Organize/InvitePeople";
+import OrganizeMain from "../screens/Organize/OrganizeMain";
 import PeopleMain from "../screens/People/PeopleMain";
 import Invite from "../screens/Invite"
 import Me from "../screens/Me";
@@ -39,8 +37,7 @@ const Main = () => {
     >
       <MainStack.Screen name="MainTabs" component={MainTabs} />
       <MainStack.Screen name="Schedule" component={Schedule} />
-      <MainStack.Screen name="OrganizePublic" component={OrganizePublic} />
-      <MainStack.Screen name="InvitePeople" component={InvitePeople} />
+      <MainStack.Screen name="OrganizeMain" component={OrganizeMain}/>
 
     </MainStack.Navigator>
   );
@@ -72,7 +69,7 @@ const MainTabs = () => {
       />
       <Tabs.Screen
         name="Organize"
-        component={Organize}
+        component={OrganizeMain}
         options={{
           tabBarLabel: ({ focused }) => (
             <TabBarText focused={focused} title="Organize" />

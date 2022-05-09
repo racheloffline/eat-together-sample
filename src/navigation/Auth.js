@@ -106,7 +106,6 @@ const Auth = () => {
                     }
                     
                     db.collection("Users").doc(`${uid}`).set(userData);
-                    db.collection("Usernames").doc(`${username}`).set({});
     
                     if (image !== "") {
                         storeImage(image, uid);

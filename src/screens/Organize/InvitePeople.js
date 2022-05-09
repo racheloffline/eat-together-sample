@@ -27,9 +27,10 @@ const sendInvites = (attendees, invite, navigation) => {
         additionalInfo: invite.additionalInfo,
         attendees: attendees
     }).then(r => {
-        alert("INVITATION SUCCESSFUL");
-        navigation.navigate("Explore")
-    })
+        alert("Invitations sent!");
+        invite.clearAll();
+        navigation.navigate("OrganizePrivate");
+    });
 };
 
 export default function({ route, navigation }) {

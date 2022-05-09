@@ -1,7 +1,8 @@
 //Display upcoming events to join
 
 import React, {useEffect, useState} from "react";
-import { View, StyleSheet, FlatList, Dimensions } from "react-native";
+import { StyleSheet, FlatList } from "react-native";
+import { Layout } from "react-native-rapi-ui";
 
 import EventCard from '../../components/EventCard';
 import Header from "../../components/Header";
@@ -35,9 +36,9 @@ export default function({ navigation }) {
     }, []);
   
     return (
-      <View>
+      <Layout>
         <Header name="Explore"/>
-          <HorizontalSwitch left="Your Events" right="Public" current="right" press={(val) => navigation.navigate("ExploreYourEvents")}/>
+        <HorizontalSwitch left="Your Events" right="Public" current="right" press={(val) => navigation.navigate("ExploreYourEvents")}/>
         <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
         data={events} renderItem={({item}) =>
           <EventCard event={item} click={() => {
@@ -46,7 +47,7 @@ export default function({ navigation }) {
             });
           }}/>
         }/>
-      </View>
+      </Layout>
     );
 }
 

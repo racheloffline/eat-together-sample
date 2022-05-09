@@ -29,8 +29,8 @@ const FullCard = ({ route, navigation }) => {
         leftAction={() => navigation.goBack()}
       />
       <View style={styles.page}>
-        <LargeText>{route.params.event.name}</LargeText>
-        <MediumText>Hosted by: {route.params.event.hostID}</MediumText>
+        <LargeText center>{route.params.event.name}</LargeText>
+        <MediumText center>Hosted by: {route.params.event.hostID}</MediumText>
         <View style={styles.details}>
             <Image style={styles.image}
               source={{uri: route.params.event.image}}/>
