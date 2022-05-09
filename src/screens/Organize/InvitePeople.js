@@ -28,8 +28,8 @@ const sendInvites = (attendees, invite, navigation) => {
         date: invite.date,
         time: invite.time,
         additionalInfo: invite.additionalInfo,
-        attendees: attendees
-    }).then(r => {
+        attendees: [user.email] //ONLY start by putting the current user as an attendee
+    }).then(docRef => {
         attendees.forEach((attendee) => {
             const ref = db.collection("User Invites").doc(attendee);
             ref.get().then((snapshot) => {
@@ -42,7 +42,8 @@ const sendInvites = (attendees, invite, navigation) => {
                         image: "",
                         location: invite.location,
                         name: invite.name,
-                        time: invite.time
+                        time: invite.time,
+                        inviteID: docRef.id
                     }).then(r => {
                         alert("INVITATION SUCCESSFUL");
                         navigation.navigate("Explore")
@@ -57,7 +58,8 @@ const sendInvites = (attendees, invite, navigation) => {
                             image: "",
                             location: invite.location,
                             name: invite.name,
-                            time: invite.time
+                            time: invite.time,
+                            inviteID: docRef.id
                         }).then(r => {
                             alert("INVITATION SUCCESSFUL");
                             navigation.navigate("Explore")

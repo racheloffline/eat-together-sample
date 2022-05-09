@@ -6,6 +6,8 @@ import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
 import firebase from "firebase";
 import {db} from "../../provider/Firebase";
+import invite from "./Invite";
+import doc from "react-native/Libraries/Blob/Blob";
 
 export default function ({ route, navigation}) {
     //Get the current user and firebase ref path
@@ -61,8 +63,18 @@ export default function ({ route, navigation}) {
                         ref.set({
                             accepted: "accepted"
                         }, {merge: true}).then(() => {
-                            alert("Invite Accepted!");
-                            navigation.goBack();
+                            const inviteRef = db.collection("Private Events").doc(route.params.invite.inviteID)
+                            inviteRef.get().then((doc) => {
+                                let data = doc.data()
+                                let currentAttendees = data.attendees
+                                currentAttendees.push(user.email)
+                                inviteRef.set({
+                                    attendees: currentAttendees
+                                }, {merge: true}).then(() => {
+                                    alert("Invite Accepted!");
+                                    navigation.goBack();
+                                })
+                            })
                         })
                     }}>
                         <NormalText size = {18} color = {"green"}>Accept Invite</NormalText>

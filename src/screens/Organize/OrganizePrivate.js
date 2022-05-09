@@ -121,7 +121,7 @@ export default function ({ navigation }) {
                            date: date.toLocaleDateString(),
                            time: date.toLocaleTimeString(),
                            additionalInfo: additionalInfo,
-                           attendees: [user.email]
+                           attendees: []
                        })
                     }}/>
             </Section>

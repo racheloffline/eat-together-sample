@@ -46,8 +46,9 @@ export default function ({ navigation }) {
 					time: data.time,
 					details: data.description,
 					hostID: data.hostID,
-					hostImage: data.hostID,
-					accepted: data.accepted
+					hostImage: data.hostImage,
+					accepted: data.accepted,
+					inviteID: data.inviteID
 				});
 			});
 			setInvites(list);
