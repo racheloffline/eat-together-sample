@@ -58,7 +58,9 @@ export default function({ route, navigation }) {
     return (
         <View style={{flex:1}}>
             <TopNav
-                middleContent="Suggested People"
+                middleContent={
+                    <MediumText center>Suggested People</MediumText>
+                  }
                 leftContent={
                     <Ionicons
                         name="chevron-back"

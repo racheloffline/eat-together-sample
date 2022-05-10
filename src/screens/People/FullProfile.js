@@ -5,23 +5,20 @@ import { View, ScrollView, StyleSheet, Image, Dimensions } from "react-native";
 import {
   Layout,
   TopNav,
-  Text,
-  themeColor,
-  useTheme,
-  Button
 } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
-import Tag from "../../components/Tag";
 import TagsList from "../../components/TagsList";
 
 const FullProfile = ({ route, navigation }) => {
   return (
     <Layout>
       <TopNav
-        middleContent="View Profile"
+        middleContent={
+          <MediumText center>View Event</MediumText>
+        }
         leftContent={
           <Ionicons
             name="chevron-back"

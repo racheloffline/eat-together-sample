@@ -19,7 +19,9 @@ const FullCard = ({ route, navigation }) => {
   return (
     <Layout>
       <TopNav
-        middleContent="View Event"
+        middleContent={
+          <MediumText center>View Event</MediumText>
+        }
         leftContent={
           <Ionicons
             name="chevron-back"

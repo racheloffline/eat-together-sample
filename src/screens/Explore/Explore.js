@@ -53,6 +53,8 @@ export default function({ navigation }) {
 
 const styles = StyleSheet.create({
   cards: {
-    alignItems: "center"
+    alignItems: "center",
+    paddingTop: 20,
+    paddingBottom: 40
   },
 });
