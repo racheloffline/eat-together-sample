@@ -18,6 +18,9 @@ export default function ({ navigation }) {
 	const user = firebase.auth().currentUser;
 	const [invites, setInvites] = useState([]); // initial state, function used for updating initial state
 
+	//Give the correct email/name to the inviteFull screen
+	let refToGive;
+
 	//check to see which text to display for accepted status
 	function checkAccepted(item) {
 		if(item.accepted == null) {
@@ -31,8 +34,8 @@ export default function ({ navigation }) {
 		}
 	}
 
-	useEffect(() => { // updates stuff right after React makes changes to the DOM
-		const ref = db.collection("User Invites").doc(user.email).collection("Invites");
+	//get the list of invites from firebase
+	function getInvitesFromFirebase(ref) {
 		ref.onSnapshot((query) => {
 			const list = [];
 			query.forEach((doc) => {
@@ -48,11 +51,31 @@ export default function ({ navigation }) {
 					hostID: data.hostID,
 					hostImage: data.hostImage,
 					accepted: data.accepted,
-					inviteID: data.inviteID
+					inviteID: data.inviteID,
+					ref: refToGive
 				});
 			});
 			setInvites(list);
 		});
+	}
+
+	useEffect(() => { // updates stuff right after React makes changes to the DOM
+		let ref = db.collection("User Invites").doc(user.email);
+		ref.get().then((doc) => {
+			if(doc.exists) {
+				ref = ref.collection("Invites")
+				refToGive = user.email
+				getInvitesFromFirebase(ref)
+			} else {
+				db.collection("Users").doc(user.uid).get().then((doc) => {
+					ref = db.collection("User Invites").doc(doc.data().name).collection("Invites")
+					refToGive = doc.data().name
+					getInvitesFromFirebase(ref)
+				})
+			}
+		})
+
+
 
 	}, []);
 

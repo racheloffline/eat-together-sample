@@ -6,13 +6,11 @@ import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
 import firebase from "firebase";
 import {db} from "../../provider/Firebase";
-import invite from "./Invite";
-import doc from "react-native/Libraries/Blob/Blob";
 
 export default function ({ route, navigation}) {
     //Get the current user and firebase ref path
     const user = firebase.auth().currentUser;
-    const ref = db.collection("User Invites").doc(user.email).collection("Invites").doc(route.params.invite.id);
+    const ref = db.collection("User Invites").doc(route.params.invite.ref).collection("Invites").doc(route.params.invite.id);
 
     function displayImage(image) {
         if(image == null || image === "") {
@@ -67,13 +65,18 @@ export default function ({ route, navigation}) {
                             inviteRef.get().then((doc) => {
                                 let data = doc.data()
                                 let currentAttendees = data.attendees
-                                currentAttendees.push(user.email)
-                                inviteRef.set({
-                                    attendees: currentAttendees
-                                }, {merge: true}).then(() => {
-                                    alert("Invite Accepted!");
-                                    navigation.goBack();
-                                })
+                                if(!currentAttendees.includes(user.email)) {
+                                    currentAttendees.push(user.email)
+                                    inviteRef.set({
+                                        attendees: currentAttendees
+                                    }, {merge: true}).then(() => {
+                                        alert("Invite Accepted!");
+                                        navigation.goBack();
+                                    })
+                                } else {
+                                    alert("Invite already accepted.");
+                                }
+
                             })
                         })
                     }}>
