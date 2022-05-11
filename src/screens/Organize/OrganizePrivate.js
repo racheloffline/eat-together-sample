@@ -125,8 +125,7 @@ export default function ({ navigation }) {
                     navigation.navigate("InvitePeople", {
                         name,
                         location,
-                        date: date.toLocaleDateString(),
-                        time: date.toLocaleTimeString(),
+                        date,
                         additionalInfo: additionalInfo,
                         attendees: [user.email],
                         clearAll

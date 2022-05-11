@@ -6,7 +6,7 @@ import {View, StyleSheet, FlatList} from "react-native";
 import EventCard from '../../components/EventCard';
 import Header from "../../components/Header";
 
-import {db} from "../../provider/Firebase";
+import { db, auth } from "../../provider/Firebase";
 import {TopNav, Button} from "react-native-rapi-ui";
 import {Ionicons} from "@expo/vector-icons";
 import InvitePerson from "../../components/InvitePerson";
@@ -19,13 +19,17 @@ const generateColor = () => {
 };
 
 const sendInvites = (attendees, invite, navigation) => {
-    db.collection("Private Events").add({
+    const user = auth.currentUser;
+    const id = Date.now() + user.uid;
+
+    db.collection("Private Events").doc(id).set({
+        id,
         name: invite.name,
         location: invite.location,
         date: invite.date,
-        time: invite.time,
         additionalInfo: invite.additionalInfo,
-        attendees: attendees
+        attendees: attendees,
+        hasImage: false
     }).then(r => {
         alert("Invitations sent!");
         invite.clearAll();

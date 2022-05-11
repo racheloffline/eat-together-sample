@@ -7,7 +7,7 @@ import { Layout } from "react-native-rapi-ui";
 import EventCard from '../../components/EventCard';
 import Header from "../../components/Header";
 
-import {db} from "../../provider/Firebase";
+import { db, storage } from "../../provider/Firebase";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
 
 export default function({ navigation }) {
@@ -16,22 +16,12 @@ export default function({ navigation }) {
     useEffect(() => { // updates stuff right after React makes changes to the DOM
       const ref = db.collection("Public Events");
       ref.onSnapshot((query) => {
-        const list = [];
+        let newEvents = [];
         query.forEach((doc) => {
-          let data = doc.data();
-          list.push({
-            id: doc.id,
-            name: data.name,
-            image: "https://static.onecms.io/wp-content/uploads/sites/9/2020/04/24/ppp-why-wont-anyone-rescue-restaurants-FT-BLOG0420.jpg",
-            location: data.location,
-            date: data.date,
-            time: data.time,
-            details: data.description,
-              hostID: "Rachelle Hua",
-              hostImage: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211",
-          });
+          newEvents.push(doc.data());
         });
-        setEvents(list);
+
+        setEvents(newEvents);
       });
     }, []);
   
@@ -43,7 +33,8 @@ export default function({ navigation }) {
         data={events} renderItem={({item}) =>
           <EventCard event={item} click={() => {
             navigation.navigate("FullCard", {
-              event: item
+              event: item,
+              public: true
             });
           }}/>
         }/>

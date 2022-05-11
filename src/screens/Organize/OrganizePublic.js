@@ -113,14 +113,16 @@ export default function ({ navigation }) {
                 />
                 <Button disabled={disabled} text="Post"
                     status="success" onPress={function () {
-                        db.collection("Public Events").add({
-                            id: new Date(),
+                        const id = Date.now() + user.uid;
+                        db.collection("Public Events").doc(id).set({
+                            id,
                             hostID: user.uid,
                             name: name,
                             location: location,
-                            date: date.toLocaleDateString(),
+                            date: date,
                             additionalInfo: additionalInfo,
-                            attendees: []
+                            attendees: [],
+                            hasImage: false
                         }).then(r => {
                             alert("Success!");
                             setName("");

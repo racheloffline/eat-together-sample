@@ -85,7 +85,7 @@ const Auth = () => {
                         name,
                         username,
                         email,
-                        image,
+                        hasImage: image !== "",
                         tags,
                         quote,
                         hostedEventIDs: [],

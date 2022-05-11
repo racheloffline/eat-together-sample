@@ -18,7 +18,8 @@ const Attendance = props => {
 const styles = StyleSheet.create({
     outline: {
         padding: 15,
-        width: Dimensions.get('screen').width/1.5,
+        paddingRight: 40,
+        width: Dimensions.get('screen').width/1.4,
         marginVertical: 5,
         borderWidth: 5,
         borderRadius: 10,

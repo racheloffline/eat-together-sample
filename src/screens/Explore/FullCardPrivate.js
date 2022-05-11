@@ -1,6 +1,6 @@
 //Functionality TDB, most likely to be used to implement ice-breaker games
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   ScrollView,
@@ -22,16 +22,27 @@ import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
 
+import { db, storage } from "../../provider/Firebase";
+
 const FullCard = ({ route, navigation }) => {
   const [attendees, setAttendees] = useState(new Array(route.params.event.attendees.length).fill(false));
   const [attendance, setAttendance] = useState(false);
   const [questions, setQuestions] = useState(false);
+  const [image, setImage] = useState("");
 
   const markAttendee = index => {
     let newAttendees = [...attendees];
     newAttendees[index] = !newAttendees[index];
     setAttendees(newAttendees);
   }
+
+  useEffect(() => {
+    if (route.params.event.hasImage) {
+      storage.ref("eventPictures" + route.params.event.id).getDownloadURL().then(uri => {
+        setImage(uri);
+      });
+    }
+  })
 
   return (
     <Layout>
@@ -48,7 +59,8 @@ const FullCard = ({ route, navigation }) => {
         leftAction={() => navigation.goBack()}
       />
       <ScrollView contentContainerStyle={styles.page}>
-        <ImageBackground source={{uri: route.params.event.image}} style={styles.imageBackground} resizeMode="cover">
+        <ImageBackground source={image ? {uri: image} : require("../../../assets/foodBackground.png")}
+          style={styles.imageBackground} resizeMode="cover">
         <DarkContainer>
             <LargeText color="white">Attendance</LargeText>
             {attendance && <View>
