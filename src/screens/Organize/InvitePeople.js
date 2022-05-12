@@ -21,9 +21,17 @@ const generateColor = () => {
     return `#${randomColor}`;
 };
 
-const sendInvites = (attendees, invite, navigation) => {
+async function sendInvites (attendees, invite, navigation) {
+    console.log(attendees)
+    console.log(invite)
     const user = auth.currentUser;
     const id = Date.now() + user.uid;
+
+    let hostName;
+
+    await db.collection("Users").doc(user.uid).get().then((snapshot) => {
+        hostName = snapshot.data().name
+    })
 
     db.collection("Private Events").doc(id).set({
         id,
@@ -42,6 +50,7 @@ const sendInvites = (attendees, invite, navigation) => {
                         date: invite.date,
                         description: invite.additionalInfo,
                         hostID: user.uid,
+                        hostName: hostName,
                         hasImage: false,
                         image: "",
                         location: invite.location,
@@ -57,8 +66,9 @@ const sendInvites = (attendees, invite, navigation) => {
                         ref.collection("Invites").add({
                             date: invite.date,
                             description: invite.additionalInfo,
-                            hostID: user.email,
-                            hostImage: "",
+                            hostID: user.uid,
+                            hostName: hostName,
+                            hasImage: false,
                             image: "",
                             location: invite.location,
                             name: invite.name,
@@ -89,6 +99,7 @@ export default function({ route, navigation }) {
                 let data = doc.data();
                 list.push({
                     id: doc.id,
+                    hostID: data.id,
                     name: data.name,
                     quote: data.quote,
                     profile: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211",

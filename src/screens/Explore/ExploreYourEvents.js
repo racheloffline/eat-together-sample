@@ -20,7 +20,7 @@ export default function({ navigation }) {
         ref.onSnapshot((query) => {
             let list = [];
             query.forEach(doc => {
-                if (doc.data().hostID === user.uid) {
+                if (doc.data().hostID === user.uid || doc.data().attendees.includes(user.uid)) {
                     list.push(doc.data());
                 }
             });

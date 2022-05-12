@@ -34,8 +34,49 @@ export default function ({ navigation }) {
 		}
 	}
 
-	//get the list of invites from firebase
-	function getInvitesFromFirebase(ref) {
+	// //get the list of invites from firebase
+	// function getInvitesFromFirebase(ref) {
+	// 	ref.onSnapshot((query) => {
+	// 		const list = [];
+	// 		query.forEach((doc) => {
+	// 			let data = doc.data();
+	// 			list.push({
+	// 				id: doc.id,
+	// 				name: data.name,
+	// 				image: data.image,
+	// 				hasImage: data.hasImage,
+	// 				location: data.location,
+	// 				date: data.date,
+	// 				details: data.description,
+	// 				hostID: data.hostID,
+	// 				hostName: data.hostName,
+	// 				hostImage: data.hostImage,
+	// 				accepted: data.accepted,
+	// 				inviteID: data.inviteID,
+	// 				ref: refToGive
+	// 			});
+	// 		});
+	// 		setInvites(list);
+	// 	});
+	// }
+
+	useEffect(() => { // updates stuff right after React makes changes to the DOM
+		// let ref = db.collection("User Invites").doc(user.email);
+		// ref.get().then((doc) => {
+		// 	if(doc.exists) {
+		// 		ref = ref.collection("Invites")
+		// 		refToGive = user.email
+		// 		getInvitesFromFirebase(ref)
+		// 	} else {
+		// 		db.collection("Users").doc(user.uid).get().then((doc) => {
+		// 			ref = db.collection("User Invites").doc(doc.data().name).collection("Invites")
+		// 			refToGive = doc.data().name
+		// 			getInvitesFromFirebase(ref)
+		// 		})
+		// 	}
+		// })
+
+		let ref = db.collection("User Invites").doc(user.uid).collection("Invites");
 		ref.onSnapshot((query) => {
 			const list = [];
 			query.forEach((doc) => {
@@ -44,36 +85,19 @@ export default function ({ navigation }) {
 					id: doc.id,
 					name: data.name,
 					image: data.image,
+					hasImage: data.hasImage,
 					location: data.location,
-					date: data.date,
-					time: data.time,
+					date: data.date.toString(), // Fix this, add time back?
 					details: data.description,
 					hostID: data.hostID,
+					hostName: data.hostName,
 					hostImage: data.hostImage,
 					accepted: data.accepted,
-					inviteID: data.inviteID,
-					ref: refToGive
+					inviteID: data.inviteID
 				});
 			});
 			setInvites(list);
 		});
-	}
-
-	useEffect(() => { // updates stuff right after React makes changes to the DOM
-		let ref = db.collection("User Invites").doc(user.email);
-		ref.get().then((doc) => {
-			if(doc.exists) {
-				ref = ref.collection("Invites")
-				refToGive = user.email
-				getInvitesFromFirebase(ref)
-			} else {
-				db.collection("Users").doc(user.uid).get().then((doc) => {
-					ref = db.collection("User Invites").doc(doc.data().name).collection("Invites")
-					refToGive = doc.data().name
-					getInvitesFromFirebase(ref)
-				})
-			}
-		})
 
 
 
@@ -102,7 +126,7 @@ export default function ({ navigation }) {
 										invite: item
 									})
 								}}>
-									<MediumText style = {styles.listMainText}>{item.hostID}</MediumText>
+									<MediumText style = {styles.listMainText}>{item.hostName}</MediumText>
 									<NormalText style = {styles.listSubText}>Is inviting you to: {item.name}</NormalText>
 									<NormalText style = {styles.listSubText}>{checkAccepted(item)}</NormalText>
 								</TouchableOpacity>
