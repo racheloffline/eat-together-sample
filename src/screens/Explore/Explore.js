@@ -9,10 +9,11 @@ import Header from "../../components/Header";
 
 import { db, storage } from "../../provider/Firebase";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
+import {Layout} from "react-native-rapi-ui";
 
 export default function({ navigation }) {
     const [events, setEvents] = useState([]); // initial state, function used for updating initial state
-  
+
     useEffect(() => { // updates stuff right after React makes changes to the DOM
       const ref = db.collection("Public Events");
       ref.onSnapshot((query) => {
@@ -24,10 +25,10 @@ export default function({ navigation }) {
         setEvents(newEvents);
       });
     }, []);
-  
+
     return (
       <Layout>
-        <Header name="Explore"/>
+        <Header name="Explore" navigation = {navigation}/>
         <HorizontalSwitch left="Your Events" right="Public" current="right" press={(val) => navigation.navigate("ExploreYourEvents")}/>
         <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
         data={events} renderItem={({item}) =>

@@ -10,6 +10,7 @@ import { db, auth } from "../../provider/Firebase";
 import {TopNav, Button} from "react-native-rapi-ui";
 import {Ionicons} from "@expo/vector-icons";
 import InvitePerson from "../../components/InvitePerson";
+import firebase from "firebase";
 
 const generateColor = () => {
     const randomColor = Math.floor(Math.random() * 16777215)

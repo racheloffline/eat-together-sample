@@ -15,7 +15,7 @@ import TabBarText from "../components/utils/TabBarText";
 //Screens (Make sure to import if ever adding new screen!)
 import OrganizeMain from "../screens/Organize/OrganizeMain";
 import PeopleMain from "../screens/People/PeopleMain";
-import Invite from "../screens/Invite"
+import Invite from "../screens/Invite/Invite";
 import Me from "../screens/Me";
 import ExploreMain from "../screens/Explore/ExploreMain";
 import Loading from "../screens/utils/Loading";
@@ -38,7 +38,6 @@ const Main = () => {
       <MainStack.Screen name="MainTabs" component={MainTabs} />
       <MainStack.Screen name="Schedule" component={Schedule} />
       <MainStack.Screen name="OrganizeMain" component={OrganizeMain}/>
-
     </MainStack.Navigator>
   );
 };

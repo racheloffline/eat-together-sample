@@ -4,6 +4,8 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 import People from './People';
 import FullProfile from "./FullProfile";
+import Invite from "../Invite/Invite";
+import InviteFull from "../Invite/InviteFull";
 
 const Stack = createStackNavigator();
 
@@ -18,6 +20,8 @@ export default class PeopleMain extends React.PureComponent {
                     <Stack.Screen name="FullProfile" options={{headerShown: false}}>
                         {props => <FullProfile {...props}/>}
                     </Stack.Screen>
+                    <Stack.Screen name="Invite" component={Invite} options={{headerShown: false}}/>
+                    <Stack.Screen name="InviteFull" component={InviteFull} options={{headerShown: false}}/>
                 </Stack.Navigator>
             </NavigationContainer>
         );
