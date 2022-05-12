@@ -11,13 +11,7 @@ import {TopNav, Button} from "react-native-rapi-ui";
 import {Ionicons} from "@expo/vector-icons";
 import InvitePerson from "../../components/InvitePerson";
 import firebase from "firebase";
-
-const generateColor = () => {
-    const randomColor = Math.floor(Math.random() * 16777215)
-        .toString(16)
-        .padStart(6, '0');
-    return `#${randomColor}`;
-};
+import {generateColor} from "../../methods";
 
 const sendInvites = (attendees, invite, navigation) => {
     const user = firebase.auth().currentUser;

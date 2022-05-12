@@ -19,12 +19,14 @@ import InvitePeople from "../screens/Organize/InvitePeople";
 import PeopleMain from "../screens/People/PeopleMain";
 import Invite from "../screens/Invite/Invite";
 import Me from "../screens/Me";
+import Schedule from "../screens/Profile/Schedule";
+import Connections from "../screens/Profile/Connections";
+import Requests from "../screens/Profile/Requests"
 import ExploreMain from "../screens/Explore/ExploreMain";
 import Loading from "../screens/utils/Loading";
 
 //Auth screens
 import Auth from "./Auth";
-import Schedule from "../screens/Profile/Schedule";
 import { AuthContext } from "../provider/AuthProvider";
 import InviteFull from "../screens/Invite/InviteFull";
 
@@ -40,6 +42,8 @@ const Main = () => {
     >
       <MainStack.Screen name="MainTabs" component={MainTabs} />
       <MainStack.Screen name="Schedule" component={Schedule} />
+        <MainStack.Screen name="Connections" component={Connections} />
+        <MainStack.Screen name="Requests" component={Requests} />
       <MainStack.Screen name="OrganizePublic" component={OrganizePublic} />
       <MainStack.Screen name="InvitePeople" component={InvitePeople} />
       <MainStack.Screen name="Invite" component={Invite} />

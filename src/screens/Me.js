@@ -27,6 +27,12 @@ export default function ({ navigation }) {
                     }}
                     title="Schedule"
                     />
+                <Button
+                    onPress={()=>{
+                        navigation.navigate("Connections");
+                    }}
+                    title="Connections"
+                />
             </View>
         </Layout>
     );
