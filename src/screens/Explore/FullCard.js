@@ -14,6 +14,7 @@ import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
 import { Ionicons } from "@expo/vector-icons";
+import getDate from "../../getDate";
 
 const FullCard = ({ route, navigation }) => {
   return (
@@ -38,7 +39,7 @@ const FullCard = ({ route, navigation }) => {
               source={{uri: route.params.event.image}}/>
 
             <View style={{flexDirection: "column"}}>
-                <NormalText>{route.params.event.date}</NormalText>
+                <NormalText>{getDate(route.params.event.date.toDate())}</NormalText>
                 <NormalText>{route.params.event.time}</NormalText>
                 <NormalText>{route.params.event.location}</NormalText>
             </View>
