@@ -12,6 +12,8 @@ import {Ionicons} from "@expo/vector-icons";
 import InvitePerson from "../../components/InvitePerson";
 import firebase from "firebase";
 
+import MediumText from "../../components/MediumText";
+
 const generateColor = () => {
     const randomColor = Math.floor(Math.random() * 16777215)
         .toString(16)
@@ -29,22 +31,21 @@ const sendInvites = (attendees, invite, navigation) => {
         location: invite.location,
         date: invite.date,
         additionalInfo: invite.additionalInfo,
-        attendees: [user.email] //ONLY start by putting the current user as an attendee
+        attendees: [user.uid], //ONLY start by putting the current user as an attendee
         hasImage: false
     }).then(docRef => {
         attendees.forEach((attendee) => {
             const ref = db.collection("User Invites").doc(attendee);
-            ref.get().then((snapshot) => {
-                if(snapshot.exists) {
+            ref.get().then((docRef) => {
+                if(docRef.exists) {
                     ref.collection("Invites").add({
                         date: invite.date,
                         description: invite.additionalInfo,
-                        hostID: user.email,
-                        hostImage: "",
+                        hostID: user.uid,
+                        hasImage: false,
                         image: "",
                         location: invite.location,
                         name: invite.name,
-                        time: invite.time,
                         inviteID: docRef.id
                     }).then(r => {
                       alert("Invitations sent!");
@@ -61,7 +62,6 @@ const sendInvites = (attendees, invite, navigation) => {
                             image: "",
                             location: invite.location,
                             name: invite.name,
-                            time: invite.time,
                             inviteID: docRef.id
                         }).then(r => {
                           alert("Invitations sent!");

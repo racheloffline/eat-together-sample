@@ -9,7 +9,6 @@ import Header from "../../components/Header";
 
 import { db, storage } from "../../provider/Firebase";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
-import {Layout} from "react-native-rapi-ui";
 
 export default function({ navigation }) {
     const [events, setEvents] = useState([]); // initial state, function used for updating initial state
