@@ -26,6 +26,7 @@ import { db, storage } from "../../provider/Firebase";
 
 const FullCard = ({ route, navigation }) => {
   const [attendees, setAttendees] = useState(new Array(route.params.event.attendees.length).fill(false));
+  const [people, setPeople] = useState([]);
   const [attendance, setAttendance] = useState(false);
   const [questions, setQuestions] = useState(false);
   const [image, setImage] = useState("");
@@ -40,9 +41,24 @@ const FullCard = ({ route, navigation }) => {
     if (route.params.event.hasImage) {
       storage.ref("eventPictures" + route.params.event.id).getDownloadURL().then(uri => {
         setImage(uri);
-      });
+      }).then(() => getAttendees());
+    } else {
+      getAttendees();
     }
-  })
+  });
+
+  const getAttendees = () => {
+    let newPeople = [];
+
+    route.params.event.attendees.forEach(attendee => {
+      db.collection("Users").doc(attendee).get().then(doc => {
+        const data = doc.data();
+        newPeople.push(data);
+      });
+    });
+
+    setPeople(newPeople);
+  }
 
   return (
     <Layout>

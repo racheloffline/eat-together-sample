@@ -7,7 +7,6 @@ import NormalText from './NormalText';
 import getDate from "../getDate";
 import getTime from "../getTime";
 import { db, storage } from '../provider/Firebase';
-import { property } from 'lodash';
 
 const EventCard = props => {
     // Stores image URLs
@@ -57,7 +56,7 @@ const styles = StyleSheet.create({
         shadowColor: "#000000",
         shadowOpacity: 0.25,
         shadowOffset: {
-            width: 0, 
+            width: 0,
             height: 4
         },
         elevation: 20,
