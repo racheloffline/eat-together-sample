@@ -12,6 +12,7 @@ import {Ionicons} from "@expo/vector-icons";
 import InvitePerson from "../../components/InvitePerson";
 import firebase from "firebase";
 import {generateColor} from "../../methods";
+import MediumText from "../../components/MediumText";
 
 const sendInvites = (attendees, invite, navigation) => {
     const user = auth.currentUser;
