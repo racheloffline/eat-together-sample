@@ -25,7 +25,6 @@ import Loading from "../screens/utils/Loading";
 
 //Auth screens
 import Auth from "./Auth";
-import Schedule from "../screens/Profile/Schedule";
 import { AuthContext } from "../provider/AuthProvider";
 import InviteFull from "../screens/Invite/InviteFull";
 
@@ -44,8 +43,6 @@ const Main = () => {
       <MainStack.Screen name="OrganizeMain" component={OrganizeMain}/>
         <MainStack.Screen name="Connections" component={Connections} />
         <MainStack.Screen name="Requests" component={Requests} />
-      <MainStack.Screen name="OrganizePublic" component={OrganizePublic} />
-      <MainStack.Screen name="InvitePeople" component={InvitePeople} />
       <MainStack.Screen name="Invite" component={Invite} />
       <MainStack.Screen name="InviteFull" component={InviteFull} />
 

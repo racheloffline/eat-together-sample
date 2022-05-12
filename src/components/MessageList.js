@@ -15,27 +15,8 @@ const MessageList = props => {
                     <MediumText>{props.person.name}</MediumText>
                 </View>
                 <View style={styles.checkbox}>
-                    <CheckBox value={checkBox} onValueChange={(val) => {
-                        setCheckbox(val);
-                        const curr = attendees;
-                        const isName = (elem) => elem == props.person.name;
-                        if (val) {
-                            let index = curr.findIndex(isName);
-                            if (index == -1) {
-                                curr.push(props.person.name.toString());
-                            }
-                        } else {
-                            let index = curr.findIndex(isName);
-                            if (index != -1) {
-                                curr.splice(index, 1);
-                            }
-                        }
-                        setAttendees(curr);
-                    }} />
+                    <CheckBox value={checkBox} onValueChange={(val)=>{alert("CHECKED")}} />
                 </View>
-            </View>
-            <View style={[styles.body, {backgroundColor: props.color}]}>
-                <MediumText>"{props.person.quote}"</MediumText>
             </View>
         </View>
     );
@@ -49,19 +30,10 @@ const styles = StyleSheet.create({
         width: 370,
         height: 80,
         backgroundColor: "grey",
-        borderTopLeftRadius: 15,
-        borderTopRightRadius: 15,
+        borderRadius: 15,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between"
-    },
-    body: {
-        width: 370,
-        height: 100,
-        backgroundColor: "red",
-        borderBottomLeftRadius: 15,
-        borderBottomRightRadius: 15,
-        padding: 30,
     },
     headleft: {
         flexDirection: "row",
