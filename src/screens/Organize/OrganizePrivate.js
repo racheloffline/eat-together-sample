@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { View, TouchableOpacity, Dimensions } from "react-native";
+import { View, TouchableOpacity, Dimensions, KeyboardAvoidingView } from "react-native";
 import { Button, Layout, Section, SectionImage  } from "react-native-rapi-ui";
 import { TextInput } from 'react-native-rapi-ui';
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import {db} from "../../provider/Firebase";
 
 import Header from "../../components/Header";
 import getDate from "../../getDate";
@@ -42,10 +41,17 @@ export default function ({ navigation }) {
         setShowDate(false); // Exit the date/time picker modal
     }
 
+    const clearAll = () => {
+        setName("");
+        setLocation("");
+        setDate(new Date());
+        setAdditionalInfo("");
+    }
+
     return (
         <Layout>
-            <Section>
-                <Header name="Organize" navigation = {navigation}/>
+            <KeyboardAvoidingView behavior="position" style={{flex: 1}} navigation={navigation}>
+                <Header name="Organize" navigation={navigation}/>
                 <HorizontalSwitch left="Private" right="Public" current="left" press={(val) => navigation.navigate("OrganizePublic")}/>
                 <SectionImage source={require('../../../assets/food.jpg')} />
                 <TextInput
@@ -107,24 +113,25 @@ export default function ({ navigation }) {
                     placeholder="Additional Info"
                     value={additionalInfo}
                     onChangeText={(val) => setAdditionalInfo(val)}
-                    containerStyle={{paddingBottom:40}}
+                    containerStyle={{paddingBottom: 60}}
                     multiline={true}
                     leftContent={
                         <Ionicons name="document-text-outline" size={20}/>
                     }
                 />
+
                 <Button disabled={disabled} text="See people available!"
                     status="success" onPress={function () {
-                       navigation.navigate("InvitePeople", {
-                            name: name,
-                           location: location,
-                           date: date.toLocaleDateString(),
-                           time: date.toLocaleTimeString(),
-                           additionalInfo: additionalInfo,
-                           attendees: [user.email]
-                       })
-                    }}/>
-            </Section>
+                    navigation.navigate("InvitePeople", {
+                        name,
+                        location,
+                        date,
+                        additionalInfo: additionalInfo,
+                        attendees: [user.email],
+                        clearAll
+                    })
+                }}/>
+            </KeyboardAvoidingView>
         </Layout>
     );
 }

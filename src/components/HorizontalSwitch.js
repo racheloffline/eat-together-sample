@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
-import {Layout, Section, SectionContent, Text} from 'react-native-rapi-ui';
+import {Section, SectionContent, Text} from 'react-native-rapi-ui';
 
 const HorizontalSwitch = props => {
     let style_left = null;
@@ -19,14 +19,14 @@ const HorizontalSwitch = props => {
         action_right = (val) => console.log("pressed");
     }
     return (
-        <Layout style={styles.container}>
+        <View style={styles.container}>
             <TouchableOpacity style={style_left} onPress={action_left}>
                 <Text style={styles.buttonText}>{props.left}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={style_right} onPress={action_right}>
                 <Text style={styles.buttonText}>{props.right}</Text>
             </TouchableOpacity>
-        </Layout>
+        </View>
     );
 }
 
@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         paddingTop: 10,
         paddingHorizontal: 60,
-        paddingBottom: 70
+        paddingBottom: 30,
     },
    leftCurrent : {
        height: 40,
