@@ -1,22 +1,49 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Image, Dimensions, TouchableOpacity } from 'react-native';
 import { Section, SectionContent, SectionImage } from 'react-native-rapi-ui';
 import MediumText from './MediumText';
 import NormalText from './NormalText';
 
+import getDate from "../getDate";
+import getTime from "../getTime";
+import { db, storage } from '../provider/Firebase';
+import { property } from 'lodash';
+
 const EventCard = props => {
+    // Stores image URLs
+    const [hostImage, setHostImage] = useState("");
+    const [image, setImage] = useState("");
+
+    useEffect(() => {
+        if (props.event.hasImage) {
+            storage.ref("eventPictures/" + props.event.id).getDownloadURL().then(uri => {
+                setImage(uri);
+            });
+        }
+
+        db.collection("Users").doc(props.event.hostID).get().then(doc => {
+            if (doc.data().hasImage) {
+                storage.ref("profilePictures/" + props.event.hostID).getDownloadURL().then(uri => {
+                    setHostImage(uri);
+                });
+            }
+        });
+    }, []);
+    
     return (
         <Section style={styles.card} borderRadius={30}>
             <TouchableOpacity onPress={props.click}>
-                <SectionImage source={{uri: props.event.image}}/>
+                <SectionImage source={image ? {uri: image} : require("../../assets/logo.png")}/>
 
                 <SectionContent>
                     <View style={styles.details}>
-                        {props.event.hostImage ? <Image style={styles.profile} source={{uri: props.event.hostImage}}/> :
-                            <View style={styles.profile}/>}
+                        <Image style={styles.profile} source={hostImage ? {uri: hostImage}
+                            : require("../../assets/logo.png")}/>
                         <View style={{flexDirection: "column"}}>
                             <MediumText>{props.event.name}</MediumText>
-                            <NormalText>{props.event.location} | {props.event.date} | {props.event.time}</NormalText>
+                            <NormalText>
+                                {props.event.location} | {getDate(props.event.date.toDate())} | {getTime(props.event.date.toDate())}
+                            </NormalText>
                         </View>
                     </View>
                 </SectionContent>

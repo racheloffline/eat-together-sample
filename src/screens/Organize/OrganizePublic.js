@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { View, TouchableOpacity, Dimensions } from "react-native";
+import { View, TouchableOpacity, Dimensions, KeyboardAvoidingView } from "react-native";
 import { Button, Layout, Section, SectionImage } from "react-native-rapi-ui";
 import { TextInput } from 'react-native-rapi-ui';
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import {db} from "../../provider/Firebase";
+import {db, auth} from "../../provider/Firebase";
 
 import Header from "../../components/Header";
 import getDate from "../../getDate";
 import getTime from "../../getTime";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
-import {NavigationContainer} from "@react-navigation/native";
 
 export default function ({ navigation }) {
+    const user = auth.currentUser;
     // State variables for the inputs
     const [name, setName] = useState("");
     const [location, setLocation] = useState("");
@@ -42,9 +42,9 @@ export default function ({ navigation }) {
 
     return (
         <Layout>
-            <Section>
-                <Header name="Organize" navigation = {navigation}/>
-                <HorizontalSwitch left="Private" right="Public" current="right" press={(val) => navigation.navigate("Organize")}/>
+            <KeyboardAvoidingView behavior="position" style={{flex: 1}}>
+                <Header name="Organize"/>
+                <HorizontalSwitch left="Private" right="Public" current="right" press={(val) => navigation.navigate("OrganizePrivate")}/>
                 <SectionImage source={require('../../../assets/food.jpg')} />
                 <TextInput
                     placeholder="Event Name"
@@ -105,7 +105,7 @@ export default function ({ navigation }) {
                     placeholder="Additional Info"
                     value={additionalInfo}
                     onChangeText={(val) => setAdditionalInfo(val)}
-                    containerStyle={{paddingBottom:40}}
+                    containerStyle={{paddingBottom: 60}}
                     multiline={true}
                     leftContent={
                         <Ionicons name="document-text-outline" size={20}/>
@@ -113,18 +113,25 @@ export default function ({ navigation }) {
                 />
                 <Button disabled={disabled} text="Post"
                     status="success" onPress={function () {
-                        db.collection("Public Events").add({
+                        const id = Date.now() + user.uid;
+                        db.collection("Public Events").doc(id).set({
+                            id,
+                            hostID: user.uid,
                             name: name,
                             location: location,
-                            date: date.toLocaleDateString(),
-                            time: date.toLocaleTimeString(),
-                            additionalInfo: additionalInfo
+                            date: date,
+                            additionalInfo: additionalInfo,
+                            attendees: [],
+                            hasImage: false
                         }).then(r => {
-                            alert("POST SUCCESSFUL");
-                            navigation.navigate("Explore")
-                        })
+                            alert("Success!");
+                            setName("");
+                            setLocation("");
+                            setDate(new Date());
+                            setAdditionalInfo("");
+                        });
                     }}/>
-            </Section>
+            </KeyboardAvoidingView>
         </Layout>
     );
 }

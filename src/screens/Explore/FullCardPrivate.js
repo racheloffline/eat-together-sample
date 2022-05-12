@@ -1,31 +1,55 @@
 //Functionality TDB, most likely to be used to implement ice-breaker games
 
-import React from "react";
-import { View, StyleSheet, Image } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  ScrollView,
+  StyleSheet,
+  ImageBackground,
+  Dimensions,
+  TouchableOpacity
+} from "react-native";
 import {
   Layout,
-  TopNav,
-  Text,
-  themeColor,
-  useTheme,
-  Button
+  TopNav
 } from "react-native-rapi-ui";
+import { Ionicons, Feather } from "@expo/vector-icons";
+
+import DarkContainer from "../../components/DarkContainer";
+import Attendance from "../../components/Attendance";
+
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
-import { Ionicons } from "@expo/vector-icons";
+
+import { db, storage } from "../../provider/Firebase";
 
 const FullCard = ({ route, navigation }) => {
-    let attendees = ""
-    route.params.event.attendees.forEach(person => {
-        if (person != route.params.hostID) {
-            attendees += person + " ";
-        }
-    });
+  const [attendees, setAttendees] = useState(new Array(route.params.event.attendees.length).fill(false));
+  const [attendance, setAttendance] = useState(false);
+  const [questions, setQuestions] = useState(false);
+  const [image, setImage] = useState("");
+
+  const markAttendee = index => {
+    let newAttendees = [...attendees];
+    newAttendees[index] = !newAttendees[index];
+    setAttendees(newAttendees);
+  }
+
+  useEffect(() => {
+    if (route.params.event.hasImage) {
+      storage.ref("eventPictures" + route.params.event.id).getDownloadURL().then(uri => {
+        setImage(uri);
+      });
+    }
+  })
+
   return (
     <Layout>
       <TopNav
-        middleContent="View Event"
+        middleContent={
+          <MediumText center>{route.params.event.name}</MediumText>
+        }
         leftContent={
           <Ionicons
             name="chevron-back"
@@ -34,23 +58,34 @@ const FullCard = ({ route, navigation }) => {
         }
         leftAction={() => navigation.goBack()}
       />
-      <View style={styles.page}>
-        <LargeText>{route.params.event.name}</LargeText>
-        <MediumText>Hosted by: {route.params.event.hostID}</MediumText>
-          <MediumText>Attendees: {attendees}</MediumText>
-        <View style={styles.details}>
-            <Image style={styles.image}
-              source={{uri: route.params.event.image}}/>
+      <ScrollView contentContainerStyle={styles.page}>
+        <ImageBackground source={image ? {uri: image} : require("../../../assets/foodBackground.png")}
+          style={styles.imageBackground} resizeMode="cover">
+        <DarkContainer>
+            <LargeText color="white">Attendance</LargeText>
+            {attendance && <View>
+              {route.params.event.attendees.map((attendee, index) => 
+                <Attendance person={attendee} key={attendee}
+                  attending={attendees[index]} onPress={() => markAttendee(index)}/>)}
+            </View>}
 
-            <View style={{flexDirection: "column"}}>
-                <NormalText>{route.params.event.date}</NormalText>
-                <NormalText>{route.params.event.time}</NormalText>
-                <NormalText>{route.params.event.location}</NormalText>
-            </View>
-        </View>
+            <TouchableOpacity onPress={() => 
+              setAttendance(!attendance)}>
+              <Feather name={!attendance ? "chevrons-down" : "chevrons-up"} size={50} color="white"/>
+            </TouchableOpacity>
+          </DarkContainer>
 
-        <Text size="h4">{route.params.event.details}</Text>
-      </View>
+          <DarkContainer>
+            <LargeText color="white">Icebreakers</LargeText>
+            {questions && <MediumText>Hi</MediumText>}
+
+            <TouchableOpacity onPress={() => 
+              setQuestions(!questions)}>
+              <Feather name={!questions ? "chevrons-down" : "chevrons-up"} size={50} color="white"/>
+            </TouchableOpacity>
+          </DarkContainer>
+        </ImageBackground>
+      </ScrollView>
     </Layout>
   );
 }
@@ -63,18 +98,10 @@ const styles = StyleSheet.create({
       paddingHorizontal: 10
     },
 
-    details: {
-      display: "flex",
-      flexDirection: "row",
+    imageBackground: {
+      width: Dimensions.get('screen').width,
+      height: "100%",
       alignItems: "center",
-      marginVertical: 40
-    },
-
-    image: {
-      marginRight: 20,
-      width: 150,
-      height: 150,
-      borderRadius: 30,
     },
 });
 

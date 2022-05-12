@@ -6,7 +6,7 @@ import {View, StyleSheet, FlatList} from "react-native";
 import EventCard from '../../components/EventCard';
 import Header from "../../components/Header";
 
-import {db} from "../../provider/Firebase";
+import { db, auth } from "../../provider/Firebase";
 import {TopNav, Button} from "react-native-rapi-ui";
 import {Ionicons} from "@expo/vector-icons";
 import InvitePerson from "../../components/InvitePerson";
@@ -20,15 +20,17 @@ const generateColor = () => {
 };
 
 const sendInvites = (attendees, invite, navigation) => {
-    const user = firebase.auth().currentUser;
+    const user = auth.currentUser;
+    const id = Date.now() + user.uid;
 
-    db.collection("Private Events").add({
+    db.collection("Private Events").doc(id).set({
+        id,
         name: invite.name,
         location: invite.location,
         date: invite.date,
-        time: invite.time,
         additionalInfo: invite.additionalInfo,
         attendees: [user.email] //ONLY start by putting the current user as an attendee
+        hasImage: false
     }).then(docRef => {
         attendees.forEach((attendee) => {
             const ref = db.collection("User Invites").doc(attendee);
@@ -45,8 +47,9 @@ const sendInvites = (attendees, invite, navigation) => {
                         time: invite.time,
                         inviteID: docRef.id
                     }).then(r => {
-                        alert("INVITATION SUCCESSFUL");
-                        navigation.navigate("Explore")
+                      alert("Invitations sent!");
+                      invite.clearAll();
+                      navigation.navigate("OrganizePrivate");
                     })
                 } else {
                     ref.set(({})).then(r => {
@@ -61,8 +64,9 @@ const sendInvites = (attendees, invite, navigation) => {
                             time: invite.time,
                             inviteID: docRef.id
                         }).then(r => {
-                            alert("INVITATION SUCCESSFUL");
-                            navigation.navigate("Explore")
+                          alert("Invitations sent!");
+                          invite.clearAll();
+                          navigation.navigate("OrganizePrivate");
                         })
                     });
                 }
@@ -98,7 +102,9 @@ export default function({ route, navigation }) {
     return (
         <View style={{flex:1}}>
             <TopNav
-                middleContent="Suggested People"
+                middleContent={
+                    <MediumText center>Suggested People</MediumText>
+                  }
                 leftContent={
                     <Ionicons
                         name="chevron-back"
