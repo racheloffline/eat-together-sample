@@ -6,7 +6,6 @@ import { Layout, TextInput } from "react-native-rapi-ui";
 import { Feather, FontAwesome } from '@expo/vector-icons';
 
 import * as ImagePicker from 'expo-image-picker';
-import Filter from "bad-words";
 
 import LargeText from "../../../components/LargeText";
 import MediumText from "../../../components/MediumText";
@@ -15,22 +14,44 @@ import Button from "../../../components/Button";
 import TagsList from "../../../components/TagsList";
 import Link from "../../../components/Link";
 
+import profaneWords from "./profaneWords";
+import { clone, cloneDeep } from "lodash";
+
 const Name = props => {
+  // Input fields
   const [name, setName] = useState(props.name);
   const [quote, setQuote] = useState(props.quote);
   const [image, setImage] = useState(props.image);
-  const [currentTag, setCurrentTag] = useState("");
   const [tags, setTags] = useState(props.tags);
 
+  const [currentTag, setCurrentTag] = useState(""); // Current tag the user typed out
+  const badWords = cloneDeep(profaneWords); // List of profane words
+
   const addTag = () => {
-    let filter = new Filter();
-    if (filter.isProfane(currentTag)) {
+    if (checkProfanity(currentTag)) {
       alert("Inappropriate tag >:(");
     } else {
       setTags([...tags, currentTag]);
     }
   
     setCurrentTag("");
+  }
+
+  const checkProfanity = word => {
+    const profane = badWords.some(w => word.toLowerCase().includes(w));
+    return profane;
+  }
+
+  const goNext = () => {
+    if (checkProfanity(name) || checkProfanity(quote)) {
+      alert("Inappropriate words used >:(");
+    } else {
+      props.setName(name);
+      props.setQuote(quote);
+      props.setImage(image);
+      props.setTags(tags);
+      props.navigation.navigate("Email");
+    }
   }
 
   const pickImage = async () => {
@@ -87,13 +108,7 @@ const Name = props => {
           <Button onPress={() => props.navigation.goBack()}
             marginHorizontal={10}>Back</Button>
           <Button disabled={name === "" || quote === "" || tags.length < 3}
-            onPress={() => {
-              props.setName(name);
-              props.setQuote(quote);
-              props.setImage(image);
-              props.setTags(tags);
-              props.navigation.navigate("Email");
-            }}
+            onPress={goNext}
             marginHorizontal={10}>Next</Button>
         </View>
         
