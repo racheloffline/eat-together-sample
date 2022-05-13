@@ -8,7 +8,9 @@ const Attendance = props => {
         <TouchableOpacity style={[styles.outline, {
             borderColor: props.attending ? "#5DB075" : "grey"
         }]} onPress={props.onPress}>
-            <NormalText color="white">{props.person}</NormalText>
+            <Image source={props.person.image ? {uri: props.person.image}
+                : require("../../assets/logo.png")} style={styles.image}/>
+            <NormalText color="white">{props.person.name}</NormalText>
             <Foundation name="check" size={24} color={props.attending ? "#5DB075" : "grey"}
                 style={styles.checkMark}/>
         </TouchableOpacity>
@@ -24,7 +26,15 @@ const styles = StyleSheet.create({
         borderWidth: 5,
         borderRadius: 10,
         display: "flex",
-        flexDirection: "row"
+        flexDirection: "row",
+        alignItems: "center"
+    },
+
+    image: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        marginRight: 10
     },
 
     checkMark: {

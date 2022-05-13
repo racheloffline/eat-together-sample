@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Image, Dimensions, TouchableOpacity } from 'react-native';
 import { Section, SectionContent, SectionImage } from 'react-native-rapi-ui';
 import MediumText from './MediumText';
-import NormalText from './NormalText';
+import SmallText from './SmallText';
 
 import getDate from "../getDate";
 import getTime from "../getTime";
@@ -38,11 +38,12 @@ const EventCard = props => {
                     <View style={styles.details}>
                         <Image style={styles.profile} source={hostImage ? {uri: hostImage}
                             : require("../../assets/logo.png")}/>
-                        <View style={{flexDirection: "column"}}>
+                            
+                        <View style={styles.text}>
                             <MediumText>{props.event.name}</MediumText>
-                            <NormalText>
+                            <SmallText size={12}>
                                 {props.event.location} | {getDate(props.event.date.toDate())} | {getTime(props.event.date.toDate())}
-                            </NormalText>
+                            </SmallText>
                         </View>
                     </View>
                 </SectionContent>
@@ -61,7 +62,7 @@ const styles = StyleSheet.create({
         },
         elevation: 20,
         width: Dimensions.get('window').width - 50,
-        marginBottom: 10
+        marginBottom: 10,
     },
 
     image: {
@@ -85,6 +86,11 @@ const styles = StyleSheet.create({
         height: 60,
         borderRadius: 30,
         marginRight: 10
+    },
+
+    text: {
+        flexDirection: "column",
+        maxWidth: Dimensions.get('window').width - 150
     }
 })
 

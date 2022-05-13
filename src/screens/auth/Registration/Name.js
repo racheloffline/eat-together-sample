@@ -6,6 +6,7 @@ import { Layout, TextInput } from "react-native-rapi-ui";
 import { Feather, FontAwesome } from '@expo/vector-icons';
 
 import * as ImagePicker from 'expo-image-picker';
+import Filter from "bad-words";
 
 import LargeText from "../../../components/LargeText";
 import MediumText from "../../../components/MediumText";
@@ -21,8 +22,14 @@ const Name = props => {
   const [currentTag, setCurrentTag] = useState("");
   const [tags, setTags] = useState(props.tags);
 
-  const addTag = e => {
-    setTags([...tags, currentTag]);
+  const addTag = () => {
+    let filter = new Filter();
+    if (filter.isProfane(currentTag)) {
+      alert("Inappropriate tag >:(");
+    } else {
+      setTags([...tags, currentTag]);
+    }
+  
     setCurrentTag("");
   }
 

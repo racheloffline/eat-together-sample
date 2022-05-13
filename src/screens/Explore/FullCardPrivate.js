@@ -17,19 +17,25 @@ import { Ionicons, Feather } from "@expo/vector-icons";
 
 import DarkContainer from "../../components/DarkContainer";
 import Attendance from "../../components/Attendance";
+import Icebreaker from "../../components/Icebreaker";
 
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
-import NormalText from "../../components/NormalText";
 
 import { db, storage } from "../../provider/Firebase";
 
 const FullCard = ({ route, navigation }) => {
+  // Data for the attendees
   const [attendees, setAttendees] = useState(new Array(route.params.event.attendees.length).fill(false));
   const [people, setPeople] = useState([]);
-  const [attendance, setAttendance] = useState(false);
-  const [questions, setQuestions] = useState(false);
-  const [image, setImage] = useState("");
+
+  // For tracking opening and closing
+  const [openAttendance, setOpenAttendance] = useState(false);
+  const [openIcebreakers, setOpenIcebreakers] = useState(false);
+  const [image, setImage] = useState(""); // Background image
+
+  // List of icebreaker questions
+  const [icebreakers, setIcebreakers] = useState([]);
 
   const markAttendee = index => {
     let newAttendees = [...attendees];
@@ -38,14 +44,22 @@ const FullCard = ({ route, navigation }) => {
   }
 
   useEffect(() => {
+    fetchIcebreakers();
+
     if (route.params.event.hasImage) {
-      storage.ref("eventPictures" + route.params.event.id).getDownloadURL().then(uri => {
+      storage.ref("eventPictures/" + route.params.event.id).getDownloadURL().then(uri => {
         setImage(uri);
       }).then(() => getAttendees());
     } else {
       getAttendees();
     }
-  });
+  }, []);
+
+  const fetchIcebreakers = () => {
+    db.collection("Icebreakers").doc("icebreakers").get().then(doc => {
+      setIcebreakers(doc.data().icebreakers);
+    });
+  }
 
   const getAttendees = () => {
     let newPeople = [];
@@ -53,7 +67,14 @@ const FullCard = ({ route, navigation }) => {
     route.params.event.attendees.forEach(attendee => {
       db.collection("Users").doc(attendee).get().then(doc => {
         const data = doc.data();
-        newPeople.push(data);
+
+        if (data.hasImage) {
+          storage.ref("profilePictures/" + data.id).getDownloadURL().then(uri => {
+            data.image = uri;
+          }).then(() => newPeople.push(data));
+        } else {
+          newPeople.push(data);
+        }
       });
     });
 
@@ -79,25 +100,29 @@ const FullCard = ({ route, navigation }) => {
           style={styles.imageBackground} resizeMode="cover">
         <DarkContainer>
             <LargeText color="white">Attendance</LargeText>
-            {attendance && <View>
-              {route.params.event.attendees.map((attendee, index) => 
-                <Attendance person={attendee} key={attendee}
+            {openAttendance && <View>
+              {people.map((person, index) => 
+                <Attendance person={person} key={person.id}
                   attending={attendees[index]} onPress={() => markAttendee(index)}/>)}
             </View>}
 
             <TouchableOpacity onPress={() => 
-              setAttendance(!attendance)}>
-              <Feather name={!attendance ? "chevrons-down" : "chevrons-up"} size={50} color="white"/>
+              setOpenAttendance(!openAttendance)}>
+              <Feather name={!openAttendance ? "chevrons-down" : "chevrons-up"} size={50} color="white"/>
             </TouchableOpacity>
           </DarkContainer>
 
           <DarkContainer>
             <LargeText color="white">Icebreakers</LargeText>
-            {questions && <MediumText>Hi</MediumText>}
 
+            <View style={styles.icebreakers}>
+              {openIcebreakers && icebreakers.map((ice, index) => 
+                <Icebreaker number={index+1} icebreaker={ice} key={index}/>)}
+            </View>
+            
             <TouchableOpacity onPress={() => 
-              setQuestions(!questions)}>
-              <Feather name={!questions ? "chevrons-down" : "chevrons-up"} size={50} color="white"/>
+              setOpenIcebreakers(!openIcebreakers)}>
+              <Feather name={!openIcebreakers ? "chevrons-down" : "chevrons-up"} size={50} color="white"/>
             </TouchableOpacity>
           </DarkContainer>
         </ImageBackground>
@@ -119,6 +144,10 @@ const styles = StyleSheet.create({
       height: "100%",
       alignItems: "center",
     },
+
+    icebreakers: {
+      textAlign: "left"
+    }
 });
 
 export default FullCard;
