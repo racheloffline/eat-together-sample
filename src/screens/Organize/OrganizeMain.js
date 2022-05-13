@@ -6,6 +6,8 @@ import OrganizePrivate from './OrganizePrivate';
 import OrganizePublic from "./OrganizePublic";
 import InvitePeople from "./InvitePeople";
 import ExploreMain from '../Explore/ExploreMain';
+import Invite from "../Invite/Invite";
+import InviteFull from "../Invite/InviteFull";
 
 const Stack = createStackNavigator();
 
@@ -16,6 +18,8 @@ export default function ({ navigation }) {
                 <Stack.Screen name="OrganizePublic" options={{headerShown: false,  animationEnabled: false}} component={OrganizePublic}/>
                 <Stack.Screen name="OrganizePrivate" options={{headerShown: false, animationEnabled: false}} component={OrganizePrivate}/>
                 <Stack.Screen name="InvitePeople" options={{headerShown: false}} component={InvitePeople}/>
+                <Stack.Screen name="Invite" component={Invite} options={{headerShown: false}}/>
+                <Stack.Screen name="InviteFull" component={InviteFull} options={{headerShown: false}}/>
             </Stack.Navigator>
         </NavigationContainer>
     );

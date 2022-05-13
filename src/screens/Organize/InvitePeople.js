@@ -21,9 +21,29 @@ const generateColor = () => {
     return `#${randomColor}`;
 };
 
+
+
 async function sendInvites (attendees, invite, navigation) {
     const user = auth.currentUser;
     const id = Date.now() + user.uid;
+
+    //Send invites to each of the selected users
+    async function sendInvitations(ref) {
+        ref.collection("Invites").add({
+            date: invite.date,
+            description: invite.additionalInfo,
+            hostID: user.uid,
+            hostName: hostName,
+            hasImage: false,
+            image: "",
+            location: invite.location,
+            name: invite.name,
+            inviteID: id
+        }).then(r => {
+            invite.clearAll();
+            navigation.navigate("OrganizePrivate");
+        })
+    }
 
     let hostName;
 
@@ -39,48 +59,21 @@ async function sendInvites (attendees, invite, navigation) {
         additionalInfo: invite.additionalInfo,
         attendees: [user.uid], //ONLY start by putting the current user as an attendee
         hasImage: false
-    }).then(docRef => {
-        attendees.forEach((attendee) => {
+    }).then(async docRef => {
+        await attendees.forEach((attendee) => {
             const ref = db.collection("User Invites").doc(attendee);
             ref.get().then((docRef) => {
-                if(docRef.exists) {
-                    ref.collection("Invites").add({
-                        date: invite.date,
-                        description: invite.additionalInfo,
-                        hostID: user.uid,
-                        hostName: hostName,
-                        hasImage: false,
-                        image: "",
-                        location: invite.location,
-                        name: invite.name,
-                        inviteID: id
-                    }).then(r => {
-                      alert("Invitations sent!");
-                      invite.clearAll();
-                      navigation.navigate("OrganizePrivate");
-                    })
+                if (docRef.exists) {
+                    sendInvitations(ref)
                 } else {
                     ref.set(({})).then(r => {
-                        ref.collection("Invites").add({
-                            date: invite.date,
-                            description: invite.additionalInfo,
-                            hostID: user.uid,
-                            hostName: hostName,
-                            hasImage: false,
-                            image: "",
-                            location: invite.location,
-                            name: invite.name,
-                            inviteID: id
-                        }).then(r => {
-                          alert("Invitations sent!");
-                          invite.clearAll();
-                          navigation.navigate("OrganizePrivate");
-                        })
+                        sendInvitations(ref)
                     });
                 }
             })
 
         })
+        alert("Invitations sent!");
 
     })
 };

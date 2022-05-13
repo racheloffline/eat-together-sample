@@ -86,7 +86,6 @@ export default function ({ route, navigation}) {
                             const inviteRef = db.collection("Private Events").doc(invite.inviteID)
                             inviteRef.get().then((doc) => {
                                 let data = doc.data()
-                                console.log(data)
                                 let currentAttendees = data.attendees
                                 if(!currentAttendees.includes(user.uid)) {
                                     currentAttendees.push(user.uid)
