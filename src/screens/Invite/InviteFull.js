@@ -33,6 +33,15 @@ export default function ({ route, navigation}) {
         }
     }
 
+    //Check to see if there's any details to display
+    function displayDetails() {
+        if(invite.details == null || invite.details === "") {
+            return "None provided."
+        } else {
+            return invite.details
+        }
+    }
+
     return (
         <Layout>
             <TopNav
@@ -60,13 +69,13 @@ export default function ({ route, navigation}) {
                     <Text>  </Text>
                     <NormalText size = {20}>{invite.date}</NormalText>
                 </View>
-                {/*<View style = {styles.icons}>*/}
-                {/*    <Ionicons name="time-outline" size={24}/>*/}
-                {/*    <Text>  </Text>*/}
-                {/*    <NormalText size = {20}>{invite.time}</NormalText>*/}
-                {/*</View>*/}
+                <View style = {styles.icons}>
+                    <Ionicons name="time-outline" size={24}/>
+                    <Text>  </Text>
+                    <NormalText size = {20}>{invite.time}</NormalText>
+                </View>
                 <View style = {styles.text}>
-                    <NormalText size = {20}>Details: {invite.details}</NormalText>
+                    <NormalText size = {20}>Details: {displayDetails()}</NormalText>
                 </View>
 
                 <View style = {styles.buttonView}>
@@ -77,6 +86,7 @@ export default function ({ route, navigation}) {
                             const inviteRef = db.collection("Private Events").doc(invite.inviteID)
                             inviteRef.get().then((doc) => {
                                 let data = doc.data()
+                                console.log(data)
                                 let currentAttendees = data.attendees
                                 if(!currentAttendees.includes(user.uid)) {
                                     currentAttendees.push(user.uid)

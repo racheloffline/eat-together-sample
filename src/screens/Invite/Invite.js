@@ -12,14 +12,15 @@ import MediumText from "../../components/MediumText";
 import {db} from "../../provider/Firebase";
 import {AuthContext, AuthProvider} from "../../provider/AuthProvider";
 import firebase from "firebase";
+import DateTimeConverter from "../../components/utils/DateTimeConverter";
 
 export default function ({ navigation }) {
 	//Get a list of current invites from Firebase up here
 	const user = firebase.auth().currentUser;
 	const [invites, setInvites] = useState([]); // initial state, function used for updating initial state
 
-	//Give the correct email/name to the inviteFull screen
-	let refToGive;
+	////Give the correct email/name to the inviteFull screen
+	//let refToGive;
 
 	//check to see which text to display for accepted status
 	function checkAccepted(item) {
@@ -87,7 +88,9 @@ export default function ({ navigation }) {
 					image: data.image,
 					hasImage: data.hasImage,
 					location: data.location,
-					date: data.date.toString(), // Fix this, add time back?
+					//date: DateTimeConverter.getDate(DateTimeConverter.toDate(data.date)), // Fix this, add time back?
+					date: data.date.toDate().toDateString(),
+					time: data.date.toDate().toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'}),
 					details: data.description,
 					hostID: data.hostID,
 					hostName: data.hostName,

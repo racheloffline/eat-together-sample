@@ -22,8 +22,6 @@ const generateColor = () => {
 };
 
 async function sendInvites (attendees, invite, navigation) {
-    console.log(attendees)
-    console.log(invite)
     const user = auth.currentUser;
     const id = Date.now() + user.uid;
 
@@ -55,7 +53,7 @@ async function sendInvites (attendees, invite, navigation) {
                         image: "",
                         location: invite.location,
                         name: invite.name,
-                        inviteID: docRef.id
+                        inviteID: id
                     }).then(r => {
                       alert("Invitations sent!");
                       invite.clearAll();
@@ -72,7 +70,7 @@ async function sendInvites (attendees, invite, navigation) {
                             image: "",
                             location: invite.location,
                             name: invite.name,
-                            inviteID: docRef.id
+                            inviteID: id
                         }).then(r => {
                           alert("Invitations sent!");
                           invite.clearAll();
