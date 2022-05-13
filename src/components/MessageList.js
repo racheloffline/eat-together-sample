@@ -5,7 +5,6 @@ import LargeText from "./LargeText";
 import MediumText from "./MediumText";
 
 const MessageList = props => {
-    const [attendees, setAttendees] = React.useState(props.attendees);
     const [checkBox, setCheckbox] = React.useState(false);
     return (
         <View style={styles.outline}>
@@ -15,7 +14,7 @@ const MessageList = props => {
                     <MediumText>{props.person.name}</MediumText>
                 </View>
                 <View style={styles.checkbox}>
-                    <CheckBox value={checkBox} onValueChange={(val)=>{alert("CHECKED")}} />
+                    <CheckBox value={checkBox} onValueChange={(val)=> setCheckbox(val)} />
                 </View>
             </View>
         </View>

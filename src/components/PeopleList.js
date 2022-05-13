@@ -1,17 +1,19 @@
 import React from 'react';
 import { View, StyleSheet, Image} from 'react-native';
 import MediumText from "./MediumText";
+import {TouchableOpacity} from "react-native";
 
 const PeopleList = props => {
     return (
         <View style={styles.outline}>
-            <View style={[styles.head, {backgroundColor: props.color}]}>
-                <View style={styles.headleft}>
-                    <Image style={styles.image} source={{uri: props.person.profile}}/>
-                    <MediumText style={{color: 'white'}}>{props.person.name}</MediumText>
+            <TouchableOpacity onPress={props.click}>
+                <View style={[styles.head, {backgroundColor: props.color}]}>
+                    <View style={styles.headleft}>
+                        <Image style={styles.image} source={{uri: props.person.profile}}/>
+                        <MediumText style={{color: 'white'}}>{props.person.name}</MediumText>
+                    </View>
                 </View>
-            </View>
-
+            </TouchableOpacity>
         </View>
     );
 }

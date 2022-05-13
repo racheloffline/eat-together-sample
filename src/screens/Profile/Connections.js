@@ -38,12 +38,30 @@ export default function ({ navigation }) {
                         size={20}
                     />
                 }
-                leftAction={() => navigation.goBack()}
+                leftAction={() => navigation.navigate("Me")}
             />
             <HorizontalSwitch left="Connections" right="Requests" current="left" press={(val) => navigation.navigate("Requests")}/>
             <FlatList contentContainerStyle={styles.invites} keyExtractor={item => item.id}
                       data={users} renderItem={({item}) =>
-                <PeopleList person={item} color={generateColor()}/>
+                <PeopleList person={item} color={generateColor()} click={() => {
+                    navigation.navigate("FullProfile", {
+                        person: {
+                            id: item.id,
+                            name: item.name,
+                            image: item.profile,
+                            quote: "There is no sunrise so beautiful that it is worth waking me up to see it.",
+                            tags: [
+                                "Not here to date",
+                                "Brawl Stars",
+                                "Rock music",
+                                "Lover of Mexican food",
+                                "Memes",
+                                "Extroverted",
+                                "Outgoing"
+                            ]
+                        }
+                    });
+                }}/>
             }/>
         </Layout>
 
