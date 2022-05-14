@@ -17,7 +17,10 @@ import OrganizeMain from "../screens/Organize/OrganizeMain";
 import PeopleMain from "../screens/People/PeopleMain";
 import FullProfile from "../screens/People/FullProfile";
 import Invite from "../screens/Invite/Invite";
-import Me from "../screens/Me";
+import Me from "../screens/Profile/Me";
+import Settings from "../screens/Profile/Settings";
+import ProfileMain from "../screens/Profile/ProfileMain";
+
 import Schedule from "../screens/Profile/Schedule";
 import Connections from "../screens/Profile/Connections";
 import Requests from "../screens/Profile/Requests"
@@ -103,7 +106,7 @@ const MainTabs = () => {
       />
         <Tabs.Screen
             name="Me"
-            component={Me}
+            component={ProfileMain}
             options={{
                 tabBarLabel: ({ focused }) => (
                     <TabBarText focused={focused} title="Profile" />
