@@ -3,18 +3,23 @@ import { View, StyleSheet, Image} from 'react-native';
 import {CheckBox} from 'react-native-rapi-ui';
 import LargeText from "./LargeText";
 import MediumText from "./MediumText";
+import {Ionicons} from "@expo/vector-icons";
+import {TouchableOpacity} from "react-native";
 
 const MessageList = props => {
     const [checkBox, setCheckbox] = React.useState(false);
     return (
         <View style={styles.outline}>
             <View style={styles.head}>
-                <View style={styles.headleft}>
-                    <Image style={styles.image} source={{uri: props.person.profile}}/>
-                    <MediumText>{props.person.name}</MediumText>
-                </View>
-                <View style={styles.checkbox}>
-                    <CheckBox value={checkBox} onValueChange={(val)=> setCheckbox(val)} />
+                <TouchableOpacity onPress={props.click}>
+                    <View style={styles.headleft}>
+                        <Image style={styles.image} source={{uri: props.person.profile}}/>
+                        <MediumText>{props.person.name}</MediumText>
+                    </View>
+                </TouchableOpacity>
+                <View style={styles.response}>
+                    <Ionicons name={"close-circle-outline"} color={"white"} size={40}/>
+                    <Ionicons name={"checkmark-circle-outline"} color={"white"} size={40}/>
                 </View>
             </View>
         </View>
@@ -50,8 +55,9 @@ const styles = StyleSheet.create({
     name: {
         marginRight: 20,
     },
-    checkbox: {
-        marginRight: 25
+    response: {
+        marginRight: 25,
+        flexDirection: "row"
     }
 })
 

@@ -1,6 +1,6 @@
 //Functionality TDB, most likely to be used to implement ice-breaker games
 
-import React from "react";
+import React, {useState} from "react";
 import { View, ScrollView, StyleSheet, Image, Dimensions } from "react-native";
 import {
   Layout,
@@ -13,13 +13,18 @@ import MediumText from "../../components/MediumText";
 import TagsList from "../../components/TagsList";
 import SmallText from "../../components/SmallText";
 import {TouchableOpacity} from "react-native";
+import {db} from "../../provider/Firebase";
+import firebase from "firebase";
 
 const FullProfile = ({ route, navigation }) => {
+  const [status, setStatus] = useState("Add Taste Bud");
+  const [disabled, setDisabled] = useState(false);
+  const [color, setColor] = useState("#5DB075")
   return (
     <Layout>
       <TopNav
         middleContent={
-          <MediumText center>View Event</MediumText>
+          <MediumText center>User Profile</MediumText>
         }
         leftContent={
           <Ionicons
@@ -35,13 +40,26 @@ const FullProfile = ({ route, navigation }) => {
           source={{uri: route.params.person.image}}/>
         <View style={styles.name}>
           <LargeText>{route.params.person.name}</LargeText>
+
           <TouchableOpacity onPress={() => {
-            alert("P");
-          }}>
-            <View style={styles.connect}>
-              <SmallText color={"white"} size={15}>Connect</SmallText>
+            const user = firebase.auth().currentUser;
+            let requestedUser = db.collection("Usernames").doc(route.params.person.username);
+            requestedUser.get().then((doc) => {
+              let data = doc.data();
+              db.collection("Users").doc(user.uid).get().then((curUser) => {
+                let userData = curUser.data();
+                db.collection("User Invites").doc(data.id).collection("Connections").doc(user.uid).set({
+                  name: userData.name,
+                  username: userData.username
+                }).then(r => alert("Request Sent!"));
+              });
+            });
+          }} disabled={disabled}>
+            <View style={[styles.connect, {backgroundColor: color}]}>
+              <SmallText color={"white"} size={15}>{status}</SmallText>
             </View>
           </TouchableOpacity>
+
         </View>
 
         <TagsList tags={route.params.person.tags}/>
@@ -75,10 +93,9 @@ const styles = StyleSheet.create({
   },
 
   connect: {
-    width: 80,
+    width: 150,
     height: 25,
-    backgroundColor: "#5DB075",
-    borderRadius: 20,
+    borderRadius: 25,
     alignItems: "center"
   },
 

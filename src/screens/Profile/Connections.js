@@ -20,6 +20,7 @@ export default function ({ navigation }) {
                 let data = doc.data();
                 list.push({
                     id: doc.id,
+                    username: data.username,
                     name: data.name,
                     profile: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211",
                 });
@@ -47,6 +48,7 @@ export default function ({ navigation }) {
                     navigation.navigate("FullProfile", {
                         person: {
                             id: item.id,
+                            username: item.username,
                             name: item.name,
                             image: item.profile,
                             quote: "There is no sunrise so beautiful that it is worth waking me up to see it.",

@@ -47,7 +47,26 @@ export default function ({ navigation }) {
             <HorizontalSwitch left="Connections" right="Requests" current="right" press={(val) => navigation.navigate("Connections")}/>
             <FlatList contentContainerStyle={styles.invites} keyExtractor={item => item.id}
                       data={requests} renderItem={({item}) =>
-                <MessageList person={item} color={generateColor()}/>
+                <MessageList person={item} color={generateColor()} click={() => {
+                    navigation.navigate("FullProfile", {
+                        person: {
+                            id: item.id,
+                            name: item.name,
+                            image: item.profile,
+                            quote: "There is no sunrise so beautiful that it is worth waking me up to see it.",
+                            tags: [
+                                "Not here to date",
+                                "Brawl Stars",
+                                "Rock music",
+                                "Lover of Mexican food",
+                                "Memes",
+                                "Extroverted",
+                                "Outgoing"
+                            ]
+                        }
+                    })
+                }
+                }/>
             }/>
         </Layout>
 
