@@ -7,6 +7,7 @@ const AuthContext = createContext();
 const AuthProvider = (props) => {
 	// user null = loading
 	const [user, setUser] = useState(null);
+	const [currUser, setCurrUser] = useState({});
 
 	useEffect(() => {
 		checkLogin();
@@ -16,9 +17,11 @@ const AuthProvider = (props) => {
 		firebase.auth().onAuthStateChanged(function (u) {
 			if (u) {
 				setUser(true);
+				setCurrUser(u);
 				// getUserData();
 			} else {
 				setUser(false);
+				setCurrUser(u);
 				// setUserData(null);
 			}
 		});
@@ -28,6 +31,7 @@ const AuthProvider = (props) => {
 		<AuthContext.Provider
 			value={{
 				user,
+				currUser
 			}}
 		>
 			{props.children}

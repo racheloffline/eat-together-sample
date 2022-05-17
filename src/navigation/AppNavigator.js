@@ -25,6 +25,9 @@ import Auth from "./Auth";
 import Schedule from "../screens/Profile/Schedule";
 import { AuthContext } from "../provider/AuthProvider";
 
+//Screen for if the user hasn't verified their email
+import VerifyEmail from "../screens/VerifyEmail";
+
 //The experience of logged in user!!
 const MainStack = createStackNavigator();
 const Main = () => {
@@ -110,11 +113,13 @@ const MainTabs = () => {
 export default () => {
   const auth = useContext(AuthContext);
   const user = auth.user;
+  const currUser = auth.currUser;
+  
   return (
     <NavigationContainer>
       {user == null && <Loading />}
       {user == false && <Auth />}
-      {user == true && <Main />}
+      {(user == true && !currUser.emailVerified) ? <VerifyEmail/> : user == true && <Main />}
     </NavigationContainer>
   );
 };

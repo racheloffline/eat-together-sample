@@ -102,7 +102,10 @@ const Auth = () => {
                         },
                         settings: {
                             notifications: true
-                        }
+                        },
+                        eventsSignedUp: 0,
+                        eventsAttended: 0,
+                        verified: false
                     }
                     
                     db.collection("Users").doc(`${uid}`).set(userData);
@@ -110,6 +113,8 @@ const Auth = () => {
                     if (image !== "") {
                         storeImage(image, uid);
                     }
+
+                    response.user.sendEmailVerification();
                 }
             } catch (error) {
                 alert(error.message);
