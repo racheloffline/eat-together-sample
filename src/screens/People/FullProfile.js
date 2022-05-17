@@ -11,6 +11,8 @@ import { Ionicons } from "@expo/vector-icons";
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
 import TagsList from "../../components/TagsList";
+import SmallText from "../../components/SmallText";
+import {TouchableOpacity} from "react-native";
 
 const FullProfile = ({ route, navigation }) => {
   return (
@@ -33,6 +35,13 @@ const FullProfile = ({ route, navigation }) => {
           source={{uri: route.params.person.image}}/>
         <View style={styles.name}>
           <LargeText>{route.params.person.name}</LargeText>
+          <TouchableOpacity onPress={() => {
+            alert("P");
+          }}>
+            <View style={styles.connect}>
+              <SmallText color={"white"} size={15}>Connect</SmallText>
+            </View>
+          </TouchableOpacity>
         </View>
 
         <TagsList tags={route.params.person.tags}/>
@@ -65,7 +74,16 @@ const styles = StyleSheet.create({
     borderRadius: 50
   },
 
+  connect: {
+    width: 80,
+    height: 25,
+    backgroundColor: "#5DB075",
+    borderRadius: 20,
+    alignItems: "center"
+  },
+
   name: {
+    alignItems: "center",
     marginVertical: 20
   },
 });

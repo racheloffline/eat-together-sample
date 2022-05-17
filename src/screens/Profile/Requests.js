@@ -16,13 +16,15 @@ export default function ({ navigation }) {
     const [requests, setRequests] = useState([]); // initial state, function used for updating initial state
 
     useEffect(() => { // updates stuff right after React makes changes to the DOM
-        const ref = db.collection("Connection Requests").doc(user.email).collection("Invites");
+        const ref = db.collection("User Invites").doc(user.uid).collection("Connections");
         ref.onSnapshot((query) => {
             const list = [];
             query.forEach((doc) => {
                 let data = doc.data();
                 list.push({
-                    name: data.username,
+                    id: doc.id,
+                    name: data.name,
+                    username: data.username,
                     profile: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211"
                 });
             });
@@ -40,7 +42,7 @@ export default function ({ navigation }) {
                         size={20}
                     />
                 }
-                leftAction={() => navigation.navigate("Me")}
+                leftAction={() => navigation.navigate("Explore")}
             />
             <HorizontalSwitch left="Connections" right="Requests" current="right" press={(val) => navigation.navigate("Connections")}/>
             <FlatList contentContainerStyle={styles.invites} keyExtractor={item => item.id}

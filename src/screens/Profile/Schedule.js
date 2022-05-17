@@ -1,4 +1,4 @@
-Schedule
+
 // Specify availabilities for days of the week
 
 import React from "react";

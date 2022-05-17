@@ -65,7 +65,14 @@ export default function ({ navigation }) {
 						size={20}
 					/>
 				}
+				rightContent={
+					<Ionicons
+						name="person-add"
+						size={20}
+					/>
+				}
 				leftAction={() => navigation.goBack()}
+				rightAction={() => navigation.navigate("Connections")}
 			/>
 			<View style = {styles.listView}>
 				<FlatList

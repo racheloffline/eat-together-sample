@@ -8,6 +8,9 @@ import ExploreYourEvents from "./ExploreYourEvents";
 import FullCardPrivate from "./FullCardPrivate";
 import Invite from "../Invite/Invite";
 import InviteFull from "../Invite/InviteFull";
+import Connections from "../Profile/Connections";
+import Requests from "../Profile/Requests";
+import FullProfile from "../People/FullProfile";
 
 const Stack = createStackNavigator();
 
@@ -21,6 +24,10 @@ export default function ({ navigation }) {
                     <Stack.Screen name="FullCardPrivate" options={{headerShown: false}} component={FullCardPrivate}/>
                     <Stack.Screen name="Invite" component={Invite} options={{headerShown: false}}/>
                     <Stack.Screen name="InviteFull" component={InviteFull} options={{headerShown: false}}/>
+                    <Stack.Screen name="Connections" component={Connections} options={{headerShown: false}}/>
+                    <Stack.Screen name="Requests" component={Requests} options={{headerShown: false}}/>
+                    <Stack.Screen name="FullProfile" component={FullProfile} options={{headerShown: false}}/>
+
                 </Stack.Navigator>
             </NavigationContainer>
         );
