@@ -33,14 +33,6 @@ export default function ({ navigation }) {
                     }
                 />
                 <TextInput
-                    placeholder="Username"
-                    value={username}
-                    onChangeText={(val) => setUsername(val)}
-                    leftContent={
-                    <Ionicons name="person-circle-outline" size={20} />
-                    }
-                    />
-                <TextInput
                     placeholder="Quote"
                     value={quote}
                     onChangeText={(val) => setQuote(val)}
@@ -52,7 +44,6 @@ export default function ({ navigation }) {
                 <Button text="Update" status="success" onPress={function () {
                     db.collection("Users").doc(user.uid).set({
                         name: name,
-                        username: username,
                         quote: quote
                     }).then(r => {
                         alert("Profile Updated");

@@ -1,6 +1,6 @@
 //Functionality TDB, most likely to be used to implement ice-breaker games
 
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import { View, ScrollView, StyleSheet, Image, Dimensions } from "react-native";
 import {
   Layout,
@@ -19,7 +19,46 @@ import firebase from "firebase";
 const FullProfile = ({ route, navigation }) => {
   const [status, setStatus] = useState("Add Taste Bud");
   const [disabled, setDisabled] = useState(false);
-  const [color, setColor] = useState("#5DB075")
+  const [color, setColor] = useState("#5DB075");
+
+  useEffect(() => { // updates stuff right after React makes changes to the DOM
+    const user = firebase.auth().currentUser;
+    // STEP 1: Check if user is on your connections list.
+    let thisUser = db.collection("Users").doc(user.uid);
+    thisUser.get().then((doc) => {
+      let thisData = doc.data();
+      if (thisData.friendIDs.includes(route.params.person.username)) {
+        setDisabled(true);
+        setStatus("Taste Buds");
+        setColor("gold")
+      } else {
+        let requestedUser = db.collection("Usernames").doc(route.params.person.username);
+        // STEP 2: Check if you have already requested to connect with user.
+        requestedUser.get().then((doc) => {
+          let data = doc.data();
+          const ref = db.collection("User Invites").doc(data.id).collection("Connections").doc(user.uid);
+          ref.get().then((doc) => {
+            if (doc.exists) {
+              setDisabled(true);
+              setStatus("Request Sent");
+              setColor("grey");
+            } else {
+              // STEP 3: Check if user has already requested to follow you.
+              const otherRef = db.collection("User Invites").doc(user.uid).collection("Connections").doc(data.id);
+              otherRef.get().then((doc) => {
+                if (doc.exists) {
+                  setDisabled(true);
+                  setStatus("Check Requests");
+                  setColor("orange")
+                }
+              });
+            }
+          });
+        });
+      }
+    });
+  }, []);
+
   return (
     <Layout>
       <TopNav
@@ -41,7 +80,7 @@ const FullProfile = ({ route, navigation }) => {
         <View style={styles.name}>
           <LargeText>{route.params.person.name}</LargeText>
 
-          <TouchableOpacity onPress={() => {
+          <TouchableOpacity disabled={disabled} onPress={() => {
             const user = firebase.auth().currentUser;
             let requestedUser = db.collection("Usernames").doc(route.params.person.username);
             requestedUser.get().then((doc) => {
@@ -51,10 +90,15 @@ const FullProfile = ({ route, navigation }) => {
                 db.collection("User Invites").doc(data.id).collection("Connections").doc(user.uid).set({
                   name: userData.name,
                   username: userData.username
-                }).then(r => alert("Request Sent!"));
+                }).then(() => {
+                  setStatus("Request Sent");
+                  setDisabled(true);
+                  setColor("grey");
+                }
+                );
               });
             });
-          }} disabled={disabled}>
+          }}>
             <View style={[styles.connect, {backgroundColor: color}]}>
               <SmallText color={"white"} size={15}>{status}</SmallText>
             </View>
