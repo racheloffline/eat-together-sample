@@ -8,24 +8,30 @@ import {db} from "../../provider/Firebase";
 import {FlatList, StyleSheet} from "react-native";
 import PeopleList from "../../components/PeopleList";
 import {generateColor} from "../../methods";
+import firebase from "firebase";
 
 export default function ({ navigation }) {
     const [users, setUsers] = useState([]); // initial state, function used for updating initial state
 
     useEffect(() => { // updates stuff right after React makes changes to the DOM
-        const ref = db.collection("Users");
-        ref.onSnapshot((query) => {
-            const list = [];
-            query.forEach((doc) => {
-                let data = doc.data();
-                list.push({
-                    id: doc.id,
-                    username: data.username,
-                    name: data.name,
-                    profile: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211",
+        const user = firebase.auth().currentUser;
+        const ref = db.collection("Users").doc(user.uid);
+        ref.onSnapshot((doc) => {
+            const friends = doc.data().friendIDs;
+            let list = [];
+            friends.forEach((uid) => {
+                db.collection("Users").doc(uid).get().then((doc) => {
+                    let data = doc.data()
+                    list.push({
+                        id: data.id,
+                        username: data.username,
+                        name: data.name,
+                        profile: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211",
+                    })
+                }).then(() => {
+                    setUsers(list);
                 });
             });
-            setUsers(list);
         });
     }, []);
 
