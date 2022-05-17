@@ -17,9 +17,9 @@ import {db} from "../../provider/Firebase";
 import firebase from "firebase";
 
 const FullProfile = ({ route, navigation }) => {
-  const [status, setStatus] = useState("Add Taste Bud");
-  const [disabled, setDisabled] = useState(false);
-  const [color, setColor] = useState("#5DB075");
+  const [status, setStatus] = useState("Loading");
+  const [disabled, setDisabled] = useState(true);
+  const [color, setColor] = useState("grey");
 
   useEffect(() => { // updates stuff right after React makes changes to the DOM
     const user = firebase.auth().currentUser;
@@ -27,15 +27,15 @@ const FullProfile = ({ route, navigation }) => {
     let thisUser = db.collection("Users").doc(user.uid);
     thisUser.get().then((doc) => {
       let thisData = doc.data();
-      if (thisData.friendIDs.includes(route.params.person.username)) {
-        setDisabled(true);
-        setStatus("Taste Buds");
-        setColor("gold")
-      } else {
-        let requestedUser = db.collection("Usernames").doc(route.params.person.username);
-        // STEP 2: Check if you have already requested to connect with user.
-        requestedUser.get().then((doc) => {
-          let data = doc.data();
+      let requestedUser = db.collection("Usernames").doc(route.params.person.username);
+      requestedUser.get().then((doc) => {
+        let data = doc.data();
+        if (thisData.friendIDs.includes(data.id)) {
+          setDisabled(true);
+          setStatus("Taste Buds");
+          setColor("gold")
+        } else {
+          // STEP 2: Check if you have already requested to connect with user.
           const ref = db.collection("User Invites").doc(data.id).collection("Connections").doc(user.uid);
           ref.get().then((doc) => {
             if (doc.exists) {
@@ -50,14 +50,19 @@ const FullProfile = ({ route, navigation }) => {
                   setDisabled(true);
                   setStatus("Check Requests");
                   setColor("orange")
+                } else {
+                  // STEP 4: Set to default
+                  setDisabled(false);
+                  setStatus("Add Taste Bud");
+                  setColor("#5DB075")
                 }
               });
-            }
-          });
+              }
+            });
+          }
         });
-      }
-    });
-  }, []);
+      });
+    }, []);
 
   return (
     <Layout>

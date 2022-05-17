@@ -5,6 +5,8 @@ import LargeText from "./LargeText";
 import MediumText from "./MediumText";
 import {Ionicons} from "@expo/vector-icons";
 import {TouchableOpacity} from "react-native";
+import firebase from "firebase";
+import {db} from "../provider/Firebase";
 
 const MessageList = props => {
     const [checkBox, setCheckbox] = React.useState(false);
@@ -18,8 +20,38 @@ const MessageList = props => {
                     </View>
                 </TouchableOpacity>
                 <View style={styles.response}>
-                    <Ionicons name={"close-circle-outline"} color={"white"} size={40}/>
-                    <Ionicons name={"checkmark-circle-outline"} color={"white"} size={40}/>
+                    <TouchableOpacity onPress={() => {
+                        const user = firebase.auth().currentUser;
+                        let requestedUser = db.collection("Usernames").doc(props.person.username);
+                        requestedUser.get().then((doc) => {
+                            db.collection("User Invites").doc(user.uid).collection("Connections").doc(doc.data().id).delete().then(() => {
+                                alert("Request Declined");
+                            });
+                        });
+                    }}>
+                        <Ionicons name={"close-circle-outline"} color={"white"} size={40}/>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => {
+                        const user = firebase.auth().currentUser;
+                        db.collection("Usernames").doc(props.person.username).get().then((doc) => {
+                            // STEP 1: Add friend to current user's data
+                            db.collection("Users").doc(user.uid).update({
+                                friendIDs: firebase.firestore.FieldValue.arrayUnion(doc.data().id)
+                            }).then(() => {
+                                // STEP 2: Add current user as friend to other user's data
+                                db.collection("Users").doc(doc.data().id).update({
+                                    friendIDs: firebase.firestore.FieldValue.arrayUnion(user.uid)
+                                }).then(() => {
+                                    // STEP 3: Delete invite
+                                    db.collection("User Invites").doc(user.uid).collection("Connections").doc(doc.data().id).delete().then(() => {
+                                        alert("Taste Bud Added");
+                                    });
+                                })
+                            })
+                        })
+                    }}>
+                        <Ionicons name={"checkmark-circle-outline"} color={"white"} size={40}/>
+                    </TouchableOpacity>
                 </View>
             </View>
         </View>
