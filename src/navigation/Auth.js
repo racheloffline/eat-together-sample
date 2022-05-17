@@ -104,8 +104,7 @@ const Auth = () => {
                             notifications: true
                         },
                         eventsSignedUp: 0,
-                        eventsAttended: 0,
-                        verified: false
+                        eventsAttended: 0
                     }
                     
                     db.collection("Users").doc(`${uid}`).set(userData);

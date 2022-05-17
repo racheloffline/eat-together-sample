@@ -1,16 +1,12 @@
-//Display upcoming events to join
+// Invite specific people to a private event
 
 import React, {useEffect, useState} from "react";
 import {View, StyleSheet, FlatList} from "react-native";
-
-import EventCard from '../../components/EventCard';
-import Header from "../../components/Header";
 
 import { db, auth } from "../../provider/Firebase";
 import {TopNav, Button} from "react-native-rapi-ui";
 import {Ionicons} from "@expo/vector-icons";
 import InvitePerson from "../../components/InvitePerson";
-import firebase from "firebase";
 
 const generateColor = () => {
     const randomColor = Math.floor(Math.random() * 16777215)

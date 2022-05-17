@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, TouchableOpacity, Dimensions, KeyboardAvoidingView } from "react-native";
-import { Button, Layout, Section, SectionImage  } from "react-native-rapi-ui";
+import { Layout, SectionImage  } from "react-native-rapi-ui";
 import { TextInput } from 'react-native-rapi-ui';
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -9,10 +9,12 @@ import Header from "../../components/Header";
 import getDate from "../../getDate";
 import getTime from "../../getTime";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
-import firebase from "firebase";
+import Button from "../../components/Button";
+
+import { auth } from "../../provider/Firebase";
 
 export default function ({ navigation }) {
-    const user = firebase.auth().currentUser;
+    const user = auth.currentUser;
 
     // State variables for the inputs
     const [name, setName] = useState("");
@@ -120,8 +122,7 @@ export default function ({ navigation }) {
                     }
                 />
 
-                <Button disabled={disabled} text="See people available!"
-                    status="success" onPress={function () {
+                <Button disabled={disabled} onPress={function () {
                     navigation.navigate("InvitePeople", {
                         name,
                         location,
@@ -129,8 +130,8 @@ export default function ({ navigation }) {
                         additionalInfo: additionalInfo,
                         attendees: [user.email],
                         clearAll
-                    })
-                }}/>
+                    });
+                }} marginVertical={20}>See people available!</Button>
             </KeyboardAvoidingView>
         </Layout>
     );
