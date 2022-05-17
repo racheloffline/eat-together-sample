@@ -90,6 +90,7 @@ const Auth = () => {
                         quote,
                         hostedEventIDs: [],
                         attendingEventIDs: [],
+                        attendedEventIDs: [],
                         friendIDs: [],
                         availabilites: {
                             monday,
@@ -102,9 +103,7 @@ const Auth = () => {
                         },
                         settings: {
                             notifications: true
-                        },
-                        eventsSignedUp: 0,
-                        eventsAttended: 0
+                        }
                     }
                     
                     db.collection("Users").doc(`${uid}`).set(userData);

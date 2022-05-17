@@ -128,7 +128,7 @@ export default function ({ navigation }) {
                         location,
                         date,
                         additionalInfo: additionalInfo,
-                        attendees: [user.email],
+                        attendees: [],
                         clearAll
                     });
                 }} marginVertical={20}>See people available!</Button>

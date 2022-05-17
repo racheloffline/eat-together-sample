@@ -8,6 +8,8 @@ import {TopNav, Button} from "react-native-rapi-ui";
 import {Ionicons} from "@expo/vector-icons";
 import InvitePerson from "../../components/InvitePerson";
 
+import * as firebase from "firebase";
+
 const generateColor = () => {
     const randomColor = Math.floor(Math.random() * 16777215)
         .toString(16)
@@ -22,15 +24,27 @@ const sendInvites = (attendees, invite, navigation) => {
     db.collection("Private Events").doc(id).set({
         id,
         name: invite.name,
+        hostID: user.uid,
         location: invite.location,
         date: invite.date,
         additionalInfo: invite.additionalInfo,
         attendees: attendees,
         hasImage: false
-    }).then(r => {
-        alert("Invitations sent!");
-        invite.clearAll();
-        navigation.navigate("OrganizePrivate");
+    }).then(() => {
+        const storeID = {
+            type: "private",
+            id
+        };
+
+        db.collection("Users").doc(user.uid).update({
+            hostedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
+            attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
+            attendedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)
+        }).then(() => {
+            invite.clearAll();
+            navigation.navigate("OrganizePrivate");
+            alert("Invitations sent!");
+        });
     });
 };
 

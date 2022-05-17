@@ -15,7 +15,7 @@ import TagsList from "../../../components/TagsList";
 import Link from "../../../components/Link";
 
 import profaneWords from "./profaneWords";
-import { clone, cloneDeep } from "lodash";
+import { cloneDeep } from "lodash";
 
 const Name = props => {
   // Input fields

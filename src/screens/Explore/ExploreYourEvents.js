@@ -7,25 +7,30 @@ import { Layout } from "react-native-rapi-ui";
 import EventCard from '../../components/EventCard';
 import Header from "../../components/Header";
 
-import {db} from "../../provider/Firebase";
+import { db, auth } from "../../provider/Firebase";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
-import firebase from "firebase";
 
 export default function({ navigation }) {
     const [events, setEvents] = useState([]); // initial state, function used for updating initial state
-    const user = firebase.auth().currentUser;
+    const user = auth.currentUser;
 
     useEffect(() => { // updates stuff right after React makes changes to the DOM
-        const ref = db.collection("Private Events");
-        ref.onSnapshot((query) => {
-            let list = [];
-            query.forEach(doc => {
-                if (doc.data().hostID === user.uid) {
-                    list.push(doc.data());
+        db.collection("Users").doc(user.uid).get().then(doc => {
+            doc.data().attendingEventIDs.forEach(e => {
+                if (e.type === "public") {
+                    db.collection("Public Events").doc(e.id).get().then(event => {
+                        let data = event.data();
+                        data.type = e.type;
+                        setEvents(events => ([...events, data]));
+                    });
+                } else {
+                    db.collection("Private Events").doc(e.id).get().then(event => {
+                        let data = event.data();
+                        data.type = e.type;
+                        setEvents(events => ([...events, data]));
+                    });
                 }
             });
-            
-            setEvents(list);
         });
     }, []);
 
@@ -37,8 +42,7 @@ export default function({ navigation }) {
                       data={events} renderItem={({item}) =>
                 <EventCard event={item} click={() => {
                     navigation.navigate("FullCardPrivate", {
-                        event: item,
-                        public: false
+                        event: item
                     });
                 }}/>
             }/>

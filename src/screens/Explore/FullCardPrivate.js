@@ -22,7 +22,8 @@ import Icebreaker from "../../components/Icebreaker";
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
 
-import { db, storage } from "../../provider/Firebase";
+import { db, storage, auth } from "../../provider/Firebase";
+import * as firebase from "firebase";
 
 const FullCard = ({ route, navigation }) => {
   // Data for the attendees
@@ -37,11 +38,7 @@ const FullCard = ({ route, navigation }) => {
   // List of icebreaker questions
   const [icebreakers, setIcebreakers] = useState([]);
 
-  const markAttendee = index => {
-    let newAttendees = [...attendees];
-    newAttendees[index] = !newAttendees[index];
-    setAttendees(newAttendees);
-  }
+  const user = auth.currentUser;
 
   useEffect(() => {
     fetchIcebreakers();
@@ -49,11 +46,31 @@ const FullCard = ({ route, navigation }) => {
     if (route.params.event.hasImage) {
       storage.ref("eventPictures/" + route.params.event.id).getDownloadURL().then(uri => {
         setImage(uri);
-      }).then(() => getAttendees());
-    } else {
+      }).then(() => {
+        if (route.params.event.hostID === user.uid) {
+          getAttendees();
+        }
+      });
+    } else if (route.params.event.hostID === user.uid) {
       getAttendees();
     }
   }, []);
+
+  const markAttendee = index => {
+    let newAttendees = [...attendees];
+    newAttendees[index] = !newAttendees[index];
+    setAttendees(newAttendees);
+
+    const storeID = {
+      type: route.params.event.type,
+      id: route.params.event.id
+    };
+
+    db.collection("Users").doc(people[index].id).update({
+      attendedEventIDs: newAttendees[index] ? firebase.firestore.FieldValue.arrayUnion(storeID)
+        : firebase.firestore.FieldValue.arrayRemove(storeID)
+    });
+  }
 
   const fetchIcebreakers = () => {
     db.collection("Icebreakers").doc("icebreakers").get().then(doc => {
@@ -64,21 +81,25 @@ const FullCard = ({ route, navigation }) => {
   const getAttendees = () => {
     let newPeople = [];
 
-    route.params.event.attendees.forEach(attendee => {
+    route.params.event.attendees.forEach((attendee, index) => {
       db.collection("Users").doc(attendee).get().then(doc => {
         const data = doc.data();
+
+        if (data.attendedEventIDs.includes(route.params.event.id)) {
+          let newAttendees = attendees;
+          newAttendees[index] = true;
+          setAttendees(newAttendees);
+        }
 
         if (data.hasImage) {
           storage.ref("profilePictures/" + data.id).getDownloadURL().then(uri => {
             data.image = uri;
-          }).then(() => newPeople.push(data));
+          }).then(() => setPeople(people => ([...people, data])));
         } else {
-          newPeople.push(data);
+          setPeople(people => ([...people, data]));
         }
       });
     });
-
-    setPeople(newPeople);
   }
 
   return (
@@ -98,7 +119,8 @@ const FullCard = ({ route, navigation }) => {
       <ScrollView contentContainerStyle={styles.page}>
         <ImageBackground source={image ? {uri: image} : require("../../../assets/foodBackground.png")}
           style={styles.imageBackground} resizeMode="cover">
-        <DarkContainer>
+
+        {route.params.event.hostID === user.uid && <DarkContainer>
             <LargeText color="white">Attendance</LargeText>
             {openAttendance && <View>
               {people.map((person, index) => 
@@ -110,7 +132,7 @@ const FullCard = ({ route, navigation }) => {
               setOpenAttendance(!openAttendance)}>
               <Feather name={!openAttendance ? "chevrons-down" : "chevrons-up"} size={50} color="white"/>
             </TouchableOpacity>
-          </DarkContainer>
+          </DarkContainer>}
 
           <DarkContainer>
             <LargeText color="white">Icebreakers</LargeText>

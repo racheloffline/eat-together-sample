@@ -30,20 +30,30 @@ const FullCard = ({ route, navigation }) => {
     });
 
     db.collection("Users").doc(user.uid).get().then(doc => {
-      if (doc.data().attendingEventIDs.includes(route.params.event.id)) {
+      const events = doc.data().attendingEventIDs.map(e => e.id);
+
+      if (events.includes(route.params.event.id)) {
         setAttending(true);
       }
     })
   }, []);
 
   const attend = () => {
-    db.collection("Users").doc(user.uid).update({
-      attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(route.params.event.id),
-      eventsSignedUp: firebase.firestore.FieldValue.increment(1)
-    });
+    const storeID = {
+      type: "public",
+      id: route.params.event.id
+    };
 
-    navigation.goBack();
-    alert("You are signed up :)");
+    db.collection("Users").doc(user.uid).update({
+      attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)
+    }).then(() => {
+      db.collection("Public Events").doc(route.params.event.id).update({
+        attendees: firebase.firestore.FieldValue.arrayUnion(user.uid)
+      }).then(() => {
+        navigation.goBack();
+        alert("You are signed up :)");
+      });
+    });
   }
 
   return (
@@ -75,8 +85,8 @@ const FullCard = ({ route, navigation }) => {
         </View>
 
         <Text size="h4">{route.params.event.additionalInfo}</Text>
-        <Button onPress={attend} disabled={attending} marginVertical={40}>
-          {attending ? "Signed Up!" : "Attend!"}
+        <Button onPress={attend} disabled={attending || route.params.event.hostID === user.uid} marginVertical={40}>
+          {attending || route.params.event.hostID === user.uid ? "Signed Up!" : "Attend!"}
         </Button>
       </View>
     </Layout>
