@@ -2,20 +2,16 @@
 //Sets up login permissions
 
 import React, { useContext } from "react";
-import firebase from "firebase/app";
 import "firebase/firestore"
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import {firebaseConfig} from "../provider/Firebase";
-import { useTheme, themeColor } from "react-native-rapi-ui";
 import TabBarIcon from "../components/utils/TabBarIcon";
 import TabBarText from "../components/utils/TabBarText";
 
 //Screens (Make sure to import if ever adding new screen!)
 import OrganizeMain from "../screens/Organize/OrganizeMain";
 import PeopleMain from "../screens/People/PeopleMain";
-import Invite from "../screens/Invite/Invite";
 import Me from "../screens/Me";
 import ExploreMain from "../screens/Explore/ExploreMain";
 import Loading from "../screens/utils/Loading";
@@ -117,9 +113,10 @@ export default () => {
   
   return (
     <NavigationContainer>
-      {user == null && <Loading />}
-      {user == false && <Auth />}
-      {(user == true && !currUser.emailVerified) ? <VerifyEmail/> : user == true && <Main />}
+      {user === null && <Loading/>}
+      {user === false && <Auth/>}
+      {(user === true && currUser && !currUser.emailVerified) ? <VerifyEmail/>
+        : user === true && <Main/>}
     </NavigationContainer>
   );
 };
