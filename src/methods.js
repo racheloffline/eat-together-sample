@@ -18,7 +18,11 @@ Gets a list of the top 5 profiles suggestions based on the current user and tags
 Returns: A list of usernames of the top 5 user suggestions.
  */
 export const getProfileRecs = () => {
-    const user = firebase.auth().currentUser;
-    const allUsers = db.collection("Users");
+    const user = firebase.auth().currentUser; // You can access properties from this variable
+    const allUsers = db.collection("Users").get().then(snapshot => {
+        snapshot.docs.forEach(doc => { // Gets every doc with data for each user
+            // Do something with the doc data here!
 
+        })
+    })
 }
