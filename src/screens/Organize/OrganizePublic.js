@@ -46,7 +46,7 @@ export default function ({ navigation }) {
     return (
         <Layout>
             <KeyboardAvoidingView behavior="position" style={{flex: 1}}>
-                <Header name="Organize"/>
+                <Header name="Organize" navigation={navigation}/>
                 <HorizontalSwitch left="Private" right="Public" current="right" press={(val) => navigation.navigate("OrganizePrivate")}/>
                 <SectionImage source={require('../../../assets/food.jpg')} />
                 <TextInput

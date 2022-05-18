@@ -79,13 +79,12 @@ const FullCard = ({ route, navigation }) => {
   }
 
   const getAttendees = () => {
-    let newPeople = [];
-
     route.params.event.attendees.forEach((attendee, index) => {
       db.collection("Users").doc(attendee).get().then(doc => {
         const data = doc.data();
 
-        if (data.attendedEventIDs.includes(route.params.event.id)) {
+        const ids = data.attendedEventIDs.map(e => e.id);
+        if (ids.includes(route.params.event.id)) {
           let newAttendees = attendees;
           newAttendees[index] = true;
           setAttendees(newAttendees);
