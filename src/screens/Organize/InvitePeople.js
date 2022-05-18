@@ -3,9 +3,6 @@
 import React, {useEffect, useState} from "react";
 import {View, StyleSheet, FlatList, Dimensions} from "react-native";
 
-import EventCard from '../../components/EventCard';
-import Header from "../../components/Header";
-
 import { db, auth } from "../../provider/Firebase";
 import {TopNav, Button, TextInput} from "react-native-rapi-ui";
 import {FontAwesome, Ionicons} from "@expo/vector-icons";
@@ -27,9 +24,6 @@ const sendInvites = (attendees, invite) => {
         additionalInfo: invite.additionalInfo,
         attendees: attendees,
         hasImage: false
-    }).then(r => {
-        alert("Invitations sent!");
-        invite.clearAll();
     }).then(() => {
         const storeID = {
             type: "private",
@@ -54,6 +48,7 @@ export default function({ route, navigation }) {
 
     useEffect(() => { // updates stuff right after React makes changes to the DOM
         const ref = db.collection("Users");
+        const user = auth.currentUser;
         ref.onSnapshot((query) => {
             const list = [];
             query.forEach((doc) => {
@@ -62,6 +57,7 @@ export default function({ route, navigation }) {
                     id: doc.id,
                     name: data.name,
                     quote: data.quote,
+                    hostID: user.uid,
                     profile: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211",
                     attendees: data.attendees
                 });
@@ -89,6 +85,7 @@ export default function({ route, navigation }) {
                            containerStyle={styles.input} onChangeText={val => setCurSearch(val)}
                            leftContent={<FontAwesome name="search" size={18}/>}/>
                 <Button text="Go" color="#5DB075" onPress={()=> {
+                    const user = auth.currentUser;
                     db.collection("Users").limit(1).where("username", "==", curSearch).get().then((snapshot) => {
                         if (!snapshot.empty) {
                             const doc = snapshot.docs[0];
@@ -97,6 +94,7 @@ export default function({ route, navigation }) {
                                 id: doc.id,
                                 name: data.name,
                                 quote: data.quote,
+                                hostID: user.uid,
                                 profile: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211"
                             }]);
                         } else {
