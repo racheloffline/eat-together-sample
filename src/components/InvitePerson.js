@@ -18,11 +18,11 @@ const InvitePerson = props => {
                     <CheckBox value={checkBox} onValueChange={(val) => {
                         setCheckbox(val);
                         const curr = attendees;
-                        const isName = (elem) => elem == props.person.name;
+                        const isName = (elem) => elem == props.person.hostID;
                         if (val) {
                             let index = curr.findIndex(isName);
                             if (index == -1) {
-                                curr.push(props.person.name.toString());
+                                curr.push(props.person.hostID.toString());
                             }
                         } else {
                             let index = curr.findIndex(isName);
