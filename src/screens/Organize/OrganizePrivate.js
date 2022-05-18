@@ -74,7 +74,7 @@ export default function ({ navigation }) {
                         <Ionicons name="location-outline" size={20}/>
                     }
                 />
-                
+
                 <View style={{display: "flex", flexDirection: "row"}}>
                     <TouchableOpacity onPress={() => {
                         setShowDate(true);
@@ -104,7 +104,7 @@ export default function ({ navigation }) {
                         />
                     </TouchableOpacity>
                 </View>
-                
+
 
                 <DateTimePickerModal isVisible={showDate} date={date}
                     mode={mode} onConfirm={changeDate} onCancel={() => setShowDate(false)}/>
@@ -127,7 +127,7 @@ export default function ({ navigation }) {
                         location,
                         date,
                         additionalInfo: additionalInfo,
-                        attendees: [user.email],
+                        attendees: [],
                         clearAll
                     })
                 }}/>

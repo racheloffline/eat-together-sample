@@ -14,9 +14,42 @@ import firebase from "firebase";
 import {generateColor} from "../../methods";
 import MediumText from "../../components/MediumText";
 
-const sendInvites = (attendees, invite) => {
+const generateColor = () => {
+    const randomColor = Math.floor(Math.random() * 16777215)
+        .toString(16)
+        .padStart(6, '0');
+    return `#${randomColor}`;
+};
+
+
+
+async function sendInvites (attendees, invite, navigation) {
     const user = auth.currentUser;
     const id = Date.now() + user.uid;
+
+    //Send invites to each of the selected users
+    async function sendInvitations(ref) {
+        ref.collection("Invites").add({
+            date: invite.date,
+            description: invite.additionalInfo,
+            hostID: user.uid,
+            hostName: hostName,
+            hasImage: false,
+            image: "",
+            location: invite.location,
+            name: invite.name,
+            inviteID: id
+        }).then(r => {
+            invite.clearAll();
+            navigation.navigate("OrganizePrivate");
+        })
+    }
+
+    let hostName;
+
+    await db.collection("Users").doc(user.uid).get().then((snapshot) => {
+        hostName = snapshot.data().name
+    })
 
     db.collection("Private Events").doc(id).set({
         id,
@@ -24,12 +57,25 @@ const sendInvites = (attendees, invite) => {
         location: invite.location,
         date: invite.date,
         additionalInfo: invite.additionalInfo,
-        attendees: attendees,
+        attendees: [user.uid], //ONLY start by putting the current user as an attendee
         hasImage: false
-    }).then(r => {
+    }).then(async docRef => {
+        await attendees.forEach((attendee) => {
+            const ref = db.collection("User Invites").doc(attendee);
+            ref.get().then((docRef) => {
+                if (docRef.exists) {
+                    sendInvitations(ref)
+                } else {
+                    ref.set(({})).then(r => {
+                        sendInvitations(ref)
+                    });
+                }
+            })
+
+        })
         alert("Invitations sent!");
-        invite.clearAll();
-    });
+
+    })
 };
 
 export default function({ route, navigation }) {
@@ -45,6 +91,7 @@ export default function({ route, navigation }) {
                 let data = doc.data();
                 list.push({
                     id: doc.id,
+                    hostID: data.id,
                     name: data.name,
                     quote: data.quote,
                     profile: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211",
