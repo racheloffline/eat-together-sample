@@ -1,4 +1,4 @@
-//Display upcoming events to join
+// Invite specific people to a private event
 
 import React, {useEffect, useState} from "react";
 import {View, StyleSheet, FlatList, Dimensions} from "react-native";
@@ -21,6 +21,7 @@ const sendInvites = (attendees, invite) => {
     db.collection("Private Events").doc(id).set({
         id,
         name: invite.name,
+        hostID: user.uid,
         location: invite.location,
         date: invite.date,
         additionalInfo: invite.additionalInfo,
@@ -29,6 +30,20 @@ const sendInvites = (attendees, invite) => {
     }).then(r => {
         alert("Invitations sent!");
         invite.clearAll();
+    }).then(() => {
+        const storeID = {
+            type: "private",
+            id
+        };
+
+        db.collection("Users").doc(user.uid).update({
+            hostedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
+            attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
+            attendedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)
+        }).then(() => {
+            invite.clearAll();
+            alert("Invitations sent!");
+        });
     });
 };
 
@@ -48,6 +63,7 @@ export default function({ route, navigation }) {
                     name: data.name,
                     quote: data.quote,
                     profile: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211",
+                    attendees: data.attendees
                 });
             });
             setUsers(list);

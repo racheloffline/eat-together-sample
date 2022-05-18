@@ -46,7 +46,7 @@ const Email = props => {
 
         <Button disabled={!checkEmail(email)} onPress={verifyEmail} marginVertical={15}>Verify</Button>
         {verified !== null &&
-        <NormalText color={verified ? "green" : "red"}>
+        <NormalText color={verified ? "#5DB075" : "red"}>
           {verified ? "Verified!" : "Not verified"}
         </NormalText>}
 

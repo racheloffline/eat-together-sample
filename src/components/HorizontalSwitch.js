@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
-import {Section, SectionContent, Text} from 'react-native-rapi-ui';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import MediumText from './MediumText';
 
 const HorizontalSwitch = props => {
     let style_left = null;
@@ -21,10 +21,10 @@ const HorizontalSwitch = props => {
     return (
         <View style={styles.container}>
             <TouchableOpacity style={style_left} onPress={action_left}>
-                <Text style={styles.buttonText}>{props.left}</Text>
+                <MediumText center color="white" size={16}>{props.left}</MediumText>
             </TouchableOpacity>
             <TouchableOpacity style={style_right} onPress={action_right}>
-                <Text style={styles.buttonText}>{props.right}</Text>
+                <MediumText center color="white" size={16}>{props.right}</MediumText>
             </TouchableOpacity>
         </View>
     );
@@ -36,41 +36,54 @@ const styles = StyleSheet.create({
         paddingTop: 10,
         paddingHorizontal: 60,
         paddingBottom: 30,
+        alignItems: "center",
+        justifyContent: "center"
     },
-   leftCurrent : {
-       height: 40,
-       flex: 1,
-       borderBottomLeftRadius: 30,
-       borderTopLeftRadius: 30,
-       backgroundColor: "#5db075"
-   },
-    rightCurrent : {
+
+    leftCurrent: {
+        height: 40,
+        flex: 1,
+        borderBottomLeftRadius: 30,
+        borderTopLeftRadius: 30,
+        backgroundColor: "#5db075",
+        alignItems: "center",
+        justifyContent: "center"
+    },
+
+    rightCurrent: {
         height: 40,
         flex: 1,
         borderBottomRightRadius: 30,
         borderTopRightRadius: 30,
-        backgroundColor: "#5db075"
-
+        backgroundColor: "#5db075",
+        alignItems: "center",
+        justifyContent: "center"
     },
+
     leftOther: {
         height: 40,
         flex: 1,
         borderBottomLeftRadius: 30,
         borderTopLeftRadius: 30,
-        backgroundColor: "#C0C0C0"
+        backgroundColor: "#C0C0C0",
+        alignItems: "center",
+        justifyContent: "center"
     },
+
     rightOther: {
         height: 40,
         flex: 1,
         borderBottomRightRadius: 30,
         borderTopRightRadius: 30,
-        backgroundColor: "#C0C0C0"
+        backgroundColor: "#C0C0C0",
+        alignItems: "center",
+        justifyContent: "center"
     },
+
     buttonText: {
         textAlign: "center",
-        marginTop: 10,
         color: "white"
     }
-})
+});
 
 export default HorizontalSwitch;

@@ -1,7 +1,6 @@
 //Users go here to log in
 
 import React, { useState } from "react";
-import { StatusBar } from "expo-status-bar";
 import {
   ScrollView,
   TouchableOpacity,
@@ -13,15 +12,15 @@ import * as firebase from "firebase";
 
 import {
   Layout,
-  Text,
-  TextInput,
-  Button,
-  useTheme,
-  themeColor,
+  TextInput
 } from "react-native-rapi-ui";
+import { Ionicons, Entypo } from "@expo/vector-icons";
+
+import Button from "../../components/Button";
+import LargeText from "../../components/LargeText";
+import NormalText from "../../components/NormalText";
 
 export default function ({ navigation }) {
-  const { isDarkmode, setTheme } = useTheme();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -54,16 +53,16 @@ export default function ({ navigation }) {
               flex: 1,
               justifyContent: "center",
               alignItems: "center",
-              backgroundColor: isDarkmode ? "#17171E" : themeColor.white100,
+              backgroundColor: "white",
             }}
           >
             <Image
               resizeMode="contain"
               style={{
-                height: 220,
-                width: 220,
+                height: 250,
+                width: 250,
               }}
-              source={require("../../../assets/login.png")}
+              source={require("../../../assets/welcome.png")}
             />
           </View>
           <View
@@ -71,22 +70,14 @@ export default function ({ navigation }) {
               flex: 3,
               paddingHorizontal: 20,
               paddingBottom: 20,
-              backgroundColor: isDarkmode ? themeColor.dark : themeColor.white,
+              backgroundColor: "white",
             }}
           >
-            <Text
-              fontWeight="bold"
-              style={{
-                alignSelf: "center",
-                padding: 30,
-              }}
-              size="h3"
-            >
-              Login
-            </Text>
-            <Text>Email</Text>
+            <LargeText center>Welcome!</LargeText>
+
             <TextInput
-              containerStyle={{ marginTop: 15 }}
+              leftContent={<Ionicons name="mail" size={18}/>}
+              containerStyle={{ marginTop: 30 }}
               placeholder="Enter your email"
               value={email}
               autoCapitalize="none"
@@ -96,9 +87,9 @@ export default function ({ navigation }) {
               onChangeText={(text) => setEmail(text)}
             />
 
-            <Text style={{ marginTop: 15 }}>Password</Text>
             <TextInput
-              containerStyle={{ marginTop: 15 }}
+              leftContent={<Entypo name="lock" size={18}/>}
+              containerStyle={{ marginVertical: 15 }}
               placeholder="Enter your password"
               value={password}
               autoCapitalize="none"
@@ -107,16 +98,9 @@ export default function ({ navigation }) {
               secureTextEntry={true}
               onChangeText={(text) => setPassword(text)}
             />
-            <Button
-              text={loading ? "Loading" : "Continue"}
-              onPress={() => {
-                login();
-              }}
-              style={{
-                marginTop: 20,
-              }}
-              disabled={loading}
-            />
+            <Button onPress={login} marginVertical={10} disabled={loading}>
+              {loading ? "Loading" : "Login"}
+            </Button>
 
             <View
               style={{
@@ -126,21 +110,13 @@ export default function ({ navigation }) {
                 justifyContent: "center",
               }}
             >
-              <Text size="md">Don't have an account?</Text>
+              <NormalText>Don't have an account? </NormalText>
               <TouchableOpacity
                 onPress={() => {
                   navigation.navigate("Name");
                 }}
               >
-                <Text
-                  size="md"
-                  fontWeight="bold"
-                  style={{
-                    marginLeft: 5,
-                  }}
-                >
-                  Register here
-                </Text>
+                <NormalText color="#5DB075">Register here</NormalText>
               </TouchableOpacity>
             </View>
             <View
@@ -156,33 +132,7 @@ export default function ({ navigation }) {
                   navigation.navigate("ForgetPassword");
                 }}
               >
-                <Text size="md" fontWeight="bold">
-                  Forget password
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginTop: 30,
-                justifyContent: "center",
-              }}
-            >
-              <TouchableOpacity
-                onPress={() => {
-                  isDarkmode ? setTheme("light") : setTheme("dark");
-                }}
-              >
-                <Text
-                  size="md"
-                  fontWeight="bold"
-                  style={{
-                    marginLeft: 5,
-                  }}
-                >
-                  {isDarkmode ? "☀️ light theme" : "🌑 dark theme"}
-                </Text>
+                <NormalText color="#5DB075">Forgot password</NormalText>
               </TouchableOpacity>
             </View>
           </View>

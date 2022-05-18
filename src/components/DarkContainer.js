@@ -8,6 +8,7 @@ const DarkContainer = props => {
             marginVertical: props.marginVertical ? props.marginVertical : 20,
             width: Dimensions.get('screen').width - 40,
             paddingVertical: 20,
+            paddingHorizontal: 10,
             alignItems: "center"
         }}>
             {props.children}

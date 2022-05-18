@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, TouchableOpacity, Dimensions, KeyboardAvoidingView } from "react-native";
-import { Button, Layout, Section, SectionImage } from "react-native-rapi-ui";
+import { Layout, SectionImage } from "react-native-rapi-ui";
 import { TextInput } from 'react-native-rapi-ui';
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -10,6 +10,9 @@ import Header from "../../components/Header";
 import getDate from "../../getDate";
 import getTime from "../../getTime";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
+import Button from "../../components/Button";
+
+import * as firebase from "firebase";
 
 export default function ({ navigation }) {
     const user = auth.currentUser;
@@ -111,26 +114,36 @@ export default function ({ navigation }) {
                         <Ionicons name="document-text-outline" size={20}/>
                     }
                 />
-                <Button disabled={disabled} text="Post"
-                    status="success" onPress={function () {
+                <Button disabled={disabled} onPress={function () {
                         const id = Date.now() + user.uid;
                         db.collection("Public Events").doc(id).set({
                             id,
                             hostID: user.uid,
-                            name: name,
-                            location: location,
-                            date: date,
-                            additionalInfo: additionalInfo,
+                            name,
+                            location,
+                            date,
+                            additionalInfo,
                             attendees: [],
                             hasImage: false
-                        }).then(r => {
-                            alert("Success!");
-                            setName("");
-                            setLocation("");
-                            setDate(new Date());
-                            setAdditionalInfo("");
+                        }).then(() => {
+                            const storeID = {
+                                type: "public",
+                                id
+                            };
+
+                            db.collection("Users").doc(user.uid).update({
+                                hostedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
+                                attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
+                                attendedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)
+                            }).then(() => {
+                                setName("");
+                                setLocation("");
+                                setDate(new Date());
+                                setAdditionalInfo("");
+                                alert("Success!");
+                            });
                         });
-                    }}/>
+                    }} marginVertical={20}>Post</Button>
             </KeyboardAvoidingView>
         </Layout>
     );

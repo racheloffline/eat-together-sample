@@ -15,22 +15,17 @@ import TabBarText from "../components/utils/TabBarText";
 //Screens (Make sure to import if ever adding new screen!)
 import OrganizeMain from "../screens/Organize/OrganizeMain";
 import PeopleMain from "../screens/People/PeopleMain";
-import FullProfile from "../screens/People/FullProfile";
-import Invite from "../screens/Invite/Invite";
 import Me from "../screens/Profile/Me";
-import Settings from "../screens/Profile/Settings";
-import ProfileMain from "../screens/Profile/ProfileMain";
-
-import Schedule from "../screens/Profile/Schedule";
-import Connections from "../screens/Profile/Connections";
-import Requests from "../screens/Profile/Requests"
 import ExploreMain from "../screens/Explore/ExploreMain";
 import Loading from "../screens/utils/Loading";
 
 //Auth screens
 import Auth from "./Auth";
+import Schedule from "../screens/Profile/Schedule";
 import { AuthContext } from "../provider/AuthProvider";
-import InviteFull from "../screens/Invite/InviteFull";
+
+//Screen for if the user hasn't verified their email
+import VerifyEmail from "../screens/VerifyEmail";
 
 //The experience of logged in user!!
 const MainStack = createStackNavigator();
@@ -45,12 +40,6 @@ const Main = () => {
       <MainStack.Screen name="MainTabs" component={MainTabs} />
       <MainStack.Screen name="Schedule" component={Schedule} />
       <MainStack.Screen name="OrganizeMain" component={OrganizeMain}/>
-        <MainStack.Screen name="Connections" component={Connections} />
-        <MainStack.Screen name="Requests" component={Requests} />
-      <MainStack.Screen name="Invite" component={Invite} />
-      <MainStack.Screen name="InviteFull" component={InviteFull} />
-        <MainStack.Screen name="FullProfile" component={FullProfile} />
-
     </MainStack.Navigator>
   );
 };
@@ -123,11 +112,14 @@ const MainTabs = () => {
 export default () => {
   const auth = useContext(AuthContext);
   const user = auth.user;
+  const currUser = auth.currUser;
+
   return (
     <NavigationContainer>
-      {user == null && <Loading />}
-      {user == false && <Auth />}
-      {user == true && <Main />}
+      {user === null && <Loading/>}
+      {user === false && <Auth/>}
+      {(user === true && currUser && !currUser.emailVerified) ? <VerifyEmail/>
+        : user === true && <Main/>}
     </NavigationContainer>
   );
 };

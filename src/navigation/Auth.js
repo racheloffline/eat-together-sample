@@ -90,6 +90,7 @@ const Auth = () => {
                         quote,
                         hostedEventIDs: [],
                         attendingEventIDs: [],
+                        attendedEventIDs: [],
                         friendIDs: [],
                         availabilites: {
                             monday,
@@ -113,6 +114,8 @@ const Auth = () => {
                     if (image !== "") {
                         storeImage(image, uid);
                     }
+
+                    response.user.sendEmailVerification();
                 }
             } catch (error) {
                 alert(error.message);

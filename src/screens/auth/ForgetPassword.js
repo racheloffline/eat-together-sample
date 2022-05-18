@@ -14,14 +14,15 @@ import * as firebase from "firebase";
 import {
   Layout,
   Text,
-  TextInput,
-  Button,
-  useTheme,
-  themeColor,
+  TextInput
 } from "react-native-rapi-ui";
+import { Ionicons } from "@expo/vector-icons";
+
+import Button from "../../components/Button";
+import LargeText from "../../components/LargeText";
+import NormalText from "../../components/NormalText";
 
 export default function ({ navigation }) {
-  const { isDarkmode, setTheme } = useTheme();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -53,7 +54,7 @@ export default function ({ navigation }) {
               flex: 1,
               justifyContent: "center",
               alignItems: "center",
-              backgroundColor: isDarkmode ? "#17171E" : themeColor.white100,
+              backgroundColor: "white",
             }}
           >
             <Image
@@ -62,7 +63,7 @@ export default function ({ navigation }) {
                 height: 220,
                 width: 220,
               }}
-              source={require("../../../assets/forget.png")}
+              source={require("../../../assets/gathering.png")}
             />
           </View>
           <View
@@ -70,21 +71,12 @@ export default function ({ navigation }) {
               flex: 3,
               paddingHorizontal: 20,
               paddingBottom: 20,
-              backgroundColor: isDarkmode ? themeColor.dark : themeColor.white,
+              backgroundColor: "white",
             }}
           >
-            <Text
-              size="h3"
-              fontWeight="bold"
-              style={{
-                alignSelf: "center",
-                padding: 30,
-              }}
-            >
-              Forget Password
-            </Text>
-            <Text>Email</Text>
+            <LargeText center>Reset Password</LargeText>
             <TextInput
+              leftContent={<Ionicons name="mail" size={18}/>}
               containerStyle={{ marginTop: 15 }}
               placeholder="Enter your email"
               value={email}
@@ -94,16 +86,9 @@ export default function ({ navigation }) {
               keyboardType="email-address"
               onChangeText={(text) => setEmail(text)}
             />
-            <Button
-              text={loading ? "Loading" : "Send email"}
-              onPress={() => {
-                forget();
-              }}
-              style={{
-                marginTop: 20,
-              }}
-              disabled={loading}
-            />
+            <Button onPress={forget} disabled={loading} marginVertical={10}>
+              {loading ? "Loading" : "Send email"}
+            </Button>
 
             <View
               style={{
@@ -113,45 +98,13 @@ export default function ({ navigation }) {
                 justifyContent: "center",
               }}
             >
-              <Text size="md">Already have an account?</Text>
+              <NormalText>Already have an account? </NormalText>
               <TouchableOpacity
                 onPress={() => {
                   navigation.navigate("Login");
                 }}
               >
-                <Text
-                  size="md"
-                  fontWeight="bold"
-                  style={{
-                    marginLeft: 5,
-                  }}
-                >
-                  Login here
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginTop: 30,
-                justifyContent: "center",
-              }}
-            >
-              <TouchableOpacity
-                onPress={() => {
-                  isDarkmode ? setTheme("light") : setTheme("dark");
-                }}
-              >
-                <Text
-                  size="md"
-                  fontWeight="bold"
-                  style={{
-                    marginLeft: 5,
-                  }}
-                >
-                  {isDarkmode ? "☀️ light theme" : "🌑 dark theme"}
-                </Text>
+                <NormalText center color="#5DB075">Login here</NormalText>
               </TouchableOpacity>
             </View>
           </View>

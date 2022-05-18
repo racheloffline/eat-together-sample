@@ -14,16 +14,44 @@ import Button from "../../../components/Button";
 import TagsList from "../../../components/TagsList";
 import Link from "../../../components/Link";
 
+import profaneWords from "./profaneWords";
+import { cloneDeep } from "lodash";
+
 const Name = props => {
+  // Input fields
   const [name, setName] = useState(props.name);
   const [quote, setQuote] = useState(props.quote);
   const [image, setImage] = useState(props.image);
-  const [currentTag, setCurrentTag] = useState("");
   const [tags, setTags] = useState(props.tags);
 
-  const addTag = e => {
-    setTags([...tags, currentTag]);
+  const [currentTag, setCurrentTag] = useState(""); // Current tag the user typed out
+  const badWords = cloneDeep(profaneWords); // List of profane words
+
+  const addTag = () => {
+    if (checkProfanity(currentTag)) {
+      alert("Inappropriate tag >:(");
+    } else {
+      setTags([...tags, currentTag]);
+    }
+  
     setCurrentTag("");
+  }
+
+  const checkProfanity = word => {
+    const profane = badWords.some(w => word.toLowerCase().includes(w));
+    return profane;
+  }
+
+  const goNext = () => {
+    if (checkProfanity(name) || checkProfanity(quote)) {
+      alert("Inappropriate words used >:(");
+    } else {
+      props.setName(name);
+      props.setQuote(quote);
+      props.setImage(image);
+      props.setTags(tags);
+      props.navigation.navigate("Email");
+    }
   }
 
   const pickImage = async () => {
@@ -80,13 +108,7 @@ const Name = props => {
           <Button onPress={() => props.navigation.goBack()}
             marginHorizontal={10}>Back</Button>
           <Button disabled={name === "" || quote === "" || tags.length < 3}
-            onPress={() => {
-              props.setName(name);
-              props.setQuote(quote);
-              props.setImage(image);
-              props.setTags(tags);
-              props.navigation.navigate("Email");
-            }}
+            onPress={goNext}
             marginHorizontal={10}>Next</Button>
         </View>
         
