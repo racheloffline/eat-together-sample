@@ -6,6 +6,9 @@ import People from './People';
 import FullProfile from "./FullProfile";
 import Invite from "../Invite/Invite";
 import InviteFull from "../Invite/InviteFull";
+import Connections from "../Profile/Connections";
+import Requests from "../Profile/Requests";
+import Report from "./Report";
 
 const Stack = createStackNavigator();
 
@@ -22,6 +25,9 @@ export default class PeopleMain extends React.PureComponent {
                     </Stack.Screen>
                     <Stack.Screen name="Invite" component={Invite} options={{headerShown: false}}/>
                     <Stack.Screen name="InviteFull" component={InviteFull} options={{headerShown: false}}/>
+                    <Stack.Screen name="Connections" component={Connections} options={{headerShown: false}}/>
+                    <Stack.Screen name="Requests" component={Requests} options={{headerShown: false}}/>
+                    <Stack.Screen name="Report" component={Report} options={{headerShown: false}}/>
                 </Stack.Navigator>
             </NavigationContainer>
         );

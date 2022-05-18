@@ -45,7 +45,7 @@ export default function ({ navigation }) {
                         size={20}
                     />
                 }
-                leftAction={() => navigation.navigate("Explore")}
+                leftAction={() => navigation.navigate("Invite")}
             />
             <HorizontalSwitch left="Connections" right="Requests" current="left" press={(val) => navigation.navigate("Requests")}/>
             <FlatList contentContainerStyle={styles.invites} keyExtractor={item => item.id}

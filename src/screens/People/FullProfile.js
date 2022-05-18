@@ -1,7 +1,7 @@
 //Functionality TDB, most likely to be used to implement ice-breaker games
 
 import React, {useEffect, useState} from "react";
-import { View, ScrollView, StyleSheet, Image, Dimensions } from "react-native";
+import {View, ScrollView, StyleSheet, Image, Dimensions, TouchableOpacityComponent} from "react-native";
 import {
   Layout,
   TopNav,
@@ -84,7 +84,7 @@ const FullProfile = ({ route, navigation }) => {
           source={{uri: route.params.person.image}}/>
         <View style={styles.name}>
           <LargeText>{route.params.person.name}</LargeText>
-
+          <View style={{flexDirection: "row"}}>
           <TouchableOpacity disabled={disabled} onPress={() => {
             const user = firebase.auth().currentUser;
             let requestedUser = db.collection("Usernames").doc(route.params.person.username);
@@ -108,12 +108,22 @@ const FullProfile = ({ route, navigation }) => {
               <SmallText color={"white"} size={15}>{status}</SmallText>
             </View>
           </TouchableOpacity>
-
+            <TouchableOpacity onPress={() => {
+              navigation.navigate("Report", {
+                user: route.params.person
+              });
+            }}>
+              <View style={styles.report}>
+                <SmallText color={"white"} size={15}>Report</SmallText>
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
 
         <TagsList tags={route.params.person.tags}/>
 
         <MediumText>"{route.params.person.quote}"</MediumText>
+
       </View>
     </Layout>
   );
@@ -123,7 +133,7 @@ const styles = StyleSheet.create({
   page: {
     paddingTop: 30,
     alignItems: "center",
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
   },
 
   background: {
@@ -152,6 +162,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginVertical: 20
   },
+  report: {
+    backgroundColor: "red",
+    borderRadius: 25,
+    alignItems: "center",
+    height: 25,
+    width: 70,
+  }
 });
 
 export default FullProfile;
