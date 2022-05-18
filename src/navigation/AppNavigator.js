@@ -23,6 +23,7 @@ import { AuthContext } from "../provider/AuthProvider";
 
 //Screen for if the user hasn't verified their email
 import VerifyEmail from "../screens/VerifyEmail";
+import ProfileMain from "../screens/Profile/ProfileMain";
 
 //The experience of logged in user!!
 const MainStack = createStackNavigator();
