@@ -31,7 +31,6 @@ export default function({ navigation }) {
                     });
                 }
             });
-            setEvents(list);
         });
     }, []);
 
