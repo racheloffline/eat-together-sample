@@ -13,6 +13,7 @@ import {db} from "../../provider/Firebase";
 import {AuthContext, AuthProvider} from "../../provider/AuthProvider";
 import firebase from "firebase";
 import DateTimeConverter from "../../components/utils/DateTimeConverter";
+import HorizontalSwitch from "../../components/HorizontalSwitch";
 
 export default function ({ navigation }) {
 	//Get a list of current invites from Firebase up here
@@ -126,6 +127,7 @@ export default function ({ navigation }) {
 				rightAction={() => navigation.navigate("Connections")}
 			/>
 			<View style = {styles.listView}>
+				<HorizontalSwitch left="Invites" right="Chats" current="left" press={(val) => navigation.navigate("Chats")}/>
 				<FlatList
 					data = {invites}
 					renderItem={
