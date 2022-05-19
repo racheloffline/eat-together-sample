@@ -5,7 +5,6 @@ import { createStackNavigator } from "@react-navigation/stack";
 import OrganizePrivate from './OrganizePrivate';
 import OrganizePublic from "./OrganizePublic";
 import InvitePeople from "./InvitePeople";
-import ExploreMain from '../Explore/ExploreMain';
 import Invite from "../Invite/Invite";
 import InviteFull from "../Invite/InviteFull";
 import Connections from "../Profile/Connections";

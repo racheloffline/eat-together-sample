@@ -23,6 +23,7 @@ import { AuthContext } from "../provider/AuthProvider";
 //Screen for if the user hasn't verified their email
 import VerifyEmail from "../screens/VerifyEmail";
 import ProfileMain from "../screens/Profile/ProfileMain";
+import InviteMain from "../screens/Invite/InviteMain";
 
 //The experience of logged in user!!
 const MainStack = createStackNavigator();
@@ -37,6 +38,7 @@ const Main = () => {
       <MainStack.Screen name="MainTabs" component={MainTabs} />
       <MainStack.Screen name="Schedule" component={Schedule} />
       <MainStack.Screen name="OrganizeMain" component={OrganizeMain}/>
+        <MainStack.Screen name="InviteMain" component={InviteMain}/>
     </MainStack.Navigator>
   );
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import {View, StyleSheet, TouchableOpacity, Dimensions} from 'react-native';
 import MediumText from './MediumText';
 
 const HorizontalSwitch = props => {
@@ -11,12 +11,10 @@ const HorizontalSwitch = props => {
         style_left = styles.leftCurrent;
         style_right = styles.rightOther;
         action_right = props.press;
-        action_left = (val) => console.log("pressed");
     } else {
         style_left = styles.leftOther;
         style_right = styles.rightCurrent;
         action_left = props.press;
-        action_right = (val) => console.log("pressed");
     }
     return (
         <View style={styles.container}>

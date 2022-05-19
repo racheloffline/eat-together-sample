@@ -1,7 +1,7 @@
 //Chat with users you have already connected with
 
 import React, {useEffect, useState} from 'react';
-import {FlatList, View, StyleSheet, Image, ScrollView, TouchableOpacity} from 'react-native';
+import {FlatList, View, StyleSheet, Image, ScrollView, TouchableOpacity, Dimensions} from 'react-native';
 import {Layout, Text, TopNav} from 'react-native-rapi-ui';
 import LargeText from "../../components/LargeText";
 import NormalText from "../../components/NormalText";
@@ -33,6 +33,15 @@ export default function ({ navigation }) {
 			return "You have declined this invite."
 		} else {
 			return "ERROR";
+		}
+	}
+
+	//Check to see if we should display the "No Invites" placeholder text
+	function shouldDisplayPlaceholder(list) {
+		if(list == null ||list.length === 0) {
+			return "No invites as of yet. Explore some public events! :)"
+		} else {
+			return ""
 		}
 	}
 
@@ -126,8 +135,13 @@ export default function ({ navigation }) {
 				leftAction={() => navigation.goBack()}
 				rightAction={() => navigation.navigate("Connections")}
 			/>
-			<View style = {styles.listView}>
+			<View style = {styles.switchView}>
 				<HorizontalSwitch left="Invites" right="Chats" current="left" press={(val) => navigation.navigate("Chats")}/>
+			</View>
+			<View style = {styles.noInvitesView}>
+				<NormalText center={"center"}>{shouldDisplayPlaceholder(invites)}</NormalText>
+			</View>
+			<View style = {styles.listView}>
 				<FlatList
 					data = {invites}
 					renderItem={
@@ -160,6 +174,12 @@ const styles = StyleSheet.create({
 	},
 	headingText: {
 		fontSize: 50
+	},
+	switchView: {
+		marginVertical: 25
+	},
+	noInvitesView: {
+		marginVertical: -15,
 	},
 	listView: {
 		marginLeft: 25

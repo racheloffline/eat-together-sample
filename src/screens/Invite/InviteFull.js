@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet, Image, Dimensions, TouchableOpacity} from "react-native";
+import {View, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView} from "react-native";
 import {Layout, Text, TopNav} from "react-native-rapi-ui";
 import {Ionicons} from "@expo/vector-icons";
 import MediumText from "../../components/MediumText";
@@ -54,7 +54,7 @@ export default function ({ route, navigation}) {
                 }
                 leftAction={() => navigation.goBack()}
             />
-            <View style={styles.page}>
+            <ScrollView contentContainerStyle={styles.page}>
                 <View style={styles.background}/>
                 <Image style={styles.image}
                        source={{uri: displayImage()}}/>
@@ -92,8 +92,17 @@ export default function ({ route, navigation}) {
                                     inviteRef.set({
                                         attendees: currentAttendees
                                     }, {merge: true}).then(() => {
-                                        alert("Invite Accepted!");
-                                        navigation.goBack();
+                                        const storeID = {
+                                            type: "private",
+                                            id: invite.inviteID
+                                        };
+
+                                        db.collection("Users").doc(user.uid).update({
+                                            attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)
+                                        }).then(() => {
+                                            alert("Invite Accepted!");
+                                            navigation.goBack();
+                                        });
                                     })
                                 } else {
                                     alert("Invite already accepted.");
@@ -104,12 +113,25 @@ export default function ({ route, navigation}) {
                     }}>
                         <NormalText size = {18} color = {"green"}>Accept Invite</NormalText>
                     </TouchableOpacity>
-                    <TouchableOpacity style = {{paddingVertical: 10}}onPress = {() => {
+                    <TouchableOpacity style = {{paddingVertical: 10}} onPress = {() => {
                         ref.set({
                             accepted: "declined"
                         }, {merge: true}).then(() => {
-                            alert("Invite Declined");
-                            navigation.goBack();
+                            const storeID = {
+                                type: "private",
+                                id: invite.inviteID
+                            };
+
+                            db.collection("Users").doc(user.uid).update({
+                                attendingEventIDs: firebase.firestore.FieldValue.arrayRemove(storeID)
+                            }).then(() => {
+                                db.collection("Private Events").doc(invite.inviteID).update({
+                                    attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)
+                                }).then(() => {
+                                    alert("Invite Declined");
+                                    navigation.goBack();
+                                })
+                            });
                         })
                     }}>
                         <NormalText size = {18} color = {"red"}>Decline Invite</NormalText>
@@ -118,7 +140,7 @@ export default function ({ route, navigation}) {
 
 
 
-            </View>
+            </ScrollView>
         </Layout>
     );
 }
