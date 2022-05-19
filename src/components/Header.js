@@ -1,7 +1,6 @@
 import React from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { Feather } from '@expo/vector-icons';
-import InviteMain from "../screens/Invite/InviteMain";
 
 import LargeText from "./LargeText";
 
@@ -10,7 +9,7 @@ const Header = props => {
         <View style={styles.header}>
 			<LargeText>{props.name}</LargeText>
             <TouchableOpacity onPress={() => {
-                props.navigation.navigate("Invite")
+                props.navigation.navigate("InviteMain")
             }}>
                 <Feather name="mail" size={36} color="black" style={{marginRight: 10}}/>
             </TouchableOpacity>

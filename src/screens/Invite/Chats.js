@@ -1,27 +1,58 @@
-import React from 'react';
-import {View, StyleSheet} from 'react-native'
-import {Layout} from "react-native-rapi-ui";
-import HorizontalSwitch from "../../components/HorizontalSwitch";
-import NormalText from "../../components/NormalText";
+//Chat with users you have already connected with
 
-export default function ({ route, navigation }) {
-    return(
+import React from 'react';
+import {View, StyleSheet} from 'react-native';
+import {Layout, TopNav} from 'react-native-rapi-ui';
+import NormalText from "../../components/NormalText";
+import {Ionicons} from "@expo/vector-icons";
+import HorizontalSwitch from "../../components/HorizontalSwitch";
+
+export default function ({ navigation }) {
+
+    return (
         <Layout>
-            {/*<View style = {styles.switchView}>*/}
-            {/*    <HorizontalSwitch left="Invites" right="Chats" current="right" press={(val) => navigation.navigate("Invite")}/>*/}
-            {/*</View>*/}
-            {/*<View style = {styles.comingSoonView}>*/}
-            {/*    <NormalText center={"center"}>Chats are coming soon!</NormalText>*/}
-            {/*</View>*/}
+            <TopNav
+                middleContent="Notifications"
+                leftContent={
+                    <Ionicons
+                        name="chevron-back"
+                        size={20}
+                    />
+                }
+                rightContent={
+                    <Ionicons
+                        name="person-add"
+                        size={20}
+                    />
+                }
+                leftAction={() => navigation.goBack()}
+                rightAction={() => navigation.navigate("Connections")}
+            />
+            <View style = {styles.switchView}>
+                <HorizontalSwitch left="Invites" right="Chats" current="right" press={(val) => navigation.navigate("Invite")}/>
+            </View>
+            <View style = {styles.comingSoon}>
+                <NormalText center={"center"}>Coming soon!</NormalText>
+            </View>
+
         </Layout>
+
     );
 }
-//
-// const styles = StyleSheet.create({
-//     switchView: {
-//         marginVertical: 25
-//     },
-//     comingSoonView: {
-//         marginVertical: -15,
-//     }
-// });
+
+const styles = StyleSheet.create({
+    header:	{
+        padding: 40,
+        display: "flex",
+        marginBottom: -20
+    },
+    headingText: {
+        fontSize: 50
+    },
+    switchView: {
+        marginVertical: 10
+    },
+    comingSoon: {
+        marginVertical: -20,
+    }
+});

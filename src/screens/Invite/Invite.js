@@ -1,4 +1,4 @@
-//Chat with users you have already connected with
+//View invites to private events
 
 import React, {useEffect, useState} from 'react';
 import {FlatList, View, StyleSheet, Image, ScrollView, TouchableOpacity, Dimensions} from 'react-native';
@@ -119,7 +119,7 @@ export default function ({ navigation }) {
 	return (
 		<Layout>
 			<TopNav
-				middleContent="Invites"
+				middleContent="Notifications"
 				leftContent={
 					<Ionicons
 						name="chevron-back"
@@ -176,10 +176,10 @@ const styles = StyleSheet.create({
 		fontSize: 50
 	},
 	switchView: {
-		marginVertical: 25
+		marginVertical: 10
 	},
 	noInvitesView: {
-		marginVertical: -15,
+		marginVertical: -20,
 	},
 	listView: {
 		marginLeft: 25
