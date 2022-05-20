@@ -78,7 +78,7 @@ export default function ({ navigation }) {
         </View>
         <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
             data={events} renderItem={({item}) =>
-                                <EventCard event={item} click={() => {
+                                <EventCard event={item} disabled click={() => {
                                     navigation.navigate("FullCardPrivate", {
                                         event: item,
                                         public: false
