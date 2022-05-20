@@ -41,9 +41,9 @@ export default function ({ navigation }) {
   }
 
   return (
+  <Layout>
     <KeyboardAvoidingView behavior="height" enabled style={{ flex: 1 }}>
-      <Layout>
-        <ScrollView
+      <ScrollView
           contentContainerStyle={{
             flexGrow: 1,
           }}
@@ -137,7 +137,7 @@ export default function ({ navigation }) {
             </View>
           </View>
         </ScrollView>
-      </Layout>
     </KeyboardAvoidingView>
+  </Layout>
   );
 }
