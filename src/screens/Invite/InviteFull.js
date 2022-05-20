@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet, Image, Dimensions, TouchableOpacity} from "react-native";
+import {View, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView} from "react-native";
 import {Layout, Text, TopNav} from "react-native-rapi-ui";
 import {Ionicons} from "@expo/vector-icons";
 import MediumText from "../../components/MediumText";
@@ -13,16 +13,7 @@ export default function ({ route, navigation}) {
 
     //Get the current user and firebase ref path
     const user = firebase.auth().currentUser;
-    //const ref = db.collection("User Invites").doc(route.params.invite.ref).collection("Invites").doc(route.params.invite.id);
     const ref = db.collection("User Invites").doc(user.uid).collection("Invites").doc(invite.id);
-
-    // function displayImage(image) {
-    //     if(image == null || image === "") {
-    //         return "https://static.onecms.io/wp-content/uploads/sites/9/2020/04/24/ppp-why-wont-anyone-rescue-restaurants-FT-BLOG0420.jpg"
-    //     } else {
-    //         return image
-    //     }
-    // }
 
     //Check to see if the invite has an image. If not, display a stock image
     function displayImage() {
@@ -54,7 +45,7 @@ export default function ({ route, navigation}) {
                 }
                 leftAction={() => navigation.goBack()}
             />
-            <View style={styles.page}>
+            <ScrollView contentContainerStyle={styles.page}>
                 <View style={styles.background}/>
                 <Image style={styles.image}
                        source={{uri: displayImage()}}/>
@@ -92,8 +83,17 @@ export default function ({ route, navigation}) {
                                     inviteRef.set({
                                         attendees: currentAttendees
                                     }, {merge: true}).then(() => {
-                                        alert("Invite Accepted!");
-                                        navigation.goBack();
+                                        const storeID = {
+                                            type: "private",
+                                            id: invite.inviteID
+                                        };
+
+                                        db.collection("Users").doc(user.uid).update({
+                                            attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)
+                                        }).then(() => {
+                                            alert("Invite Accepted!");
+                                            navigation.goBack();
+                                        });
                                     })
                                 } else {
                                     alert("Invite already accepted.");
@@ -102,23 +102,44 @@ export default function ({ route, navigation}) {
                             })
                         })
                     }}>
-                        <NormalText size = {18} color = {"green"}>Accept Invite</NormalText>
+                        <NormalText size = {18} color = {"green"} center = "center">Accept Invite</NormalText>
                     </TouchableOpacity>
-                    <TouchableOpacity style = {{paddingVertical: 10}}onPress = {() => {
+                    <TouchableOpacity style = {{paddingVertical: 10}} onPress = {() => {
                         ref.set({
                             accepted: "declined"
                         }, {merge: true}).then(() => {
-                            alert("Invite Declined");
+                            const storeID = {
+                                type: "private",
+                                id: invite.inviteID
+                            };
+
+                            db.collection("Users").doc(user.uid).update({
+                                attendingEventIDs: firebase.firestore.FieldValue.arrayRemove(storeID)
+                            }).then(() => {
+                                db.collection("Private Events").doc(invite.inviteID).update({
+                                    attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)
+                                }).then(() => {
+                                    alert("Invite Declined");
+                                    navigation.goBack();
+                                })
+                            });
+                        })
+                    }}>
+                        <NormalText size = {18} color = {"red"} center = "center">Decline Invite</NormalText>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress = {() => {
+                        ref.delete().then(r => {
+                            alert("Invite Cleared")
                             navigation.goBack();
                         })
                     }}>
-                        <NormalText size = {18} color = {"red"}>Decline Invite</NormalText>
+                        <NormalText size = {18} color = {"blue"} center = "center">Clear Invite</NormalText>
                     </TouchableOpacity>
                 </View>
 
 
 
-            </View>
+            </ScrollView>
         </Layout>
     );
 }

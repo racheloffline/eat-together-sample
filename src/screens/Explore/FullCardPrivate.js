@@ -114,6 +114,39 @@ const FullCard = ({ route, navigation }) => {
           />
         }
         leftAction={() => navigation.goBack()}
+        rightContent={
+          <Ionicons
+              name = "close-outline"
+              color = "red"
+              size = {25}
+          />
+        }
+        rightAction = {() => {
+          const storeID = {
+            type: route.params.event.type,
+            id: route.params.event.id
+          };
+          db.collection("Users").doc(user.uid).update({
+            attendingEventIDs: firebase.firestore.FieldValue.arrayRemove(storeID)
+          }).then(() => {
+            if(route.params.event.type === "private") {
+              db.collection("Private Events").doc(route.params.event.id).update({
+                attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)
+              }).then(() => {
+                alert("Event Removed");
+                navigation.goBack();
+              })
+            } else {
+              db.collection("Public Events").doc(route.params.event.id).update({
+                attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)
+              }).then(() => {
+                alert("Event Removed");
+                navigation.goBack();
+              })
+            }
+
+          });
+        }}
       />
       <ScrollView contentContainerStyle={styles.page}>
         <ImageBackground source={image ? {uri: image} : require("../../../assets/foodBackground.png")}
