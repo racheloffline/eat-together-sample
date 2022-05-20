@@ -104,6 +104,7 @@ export default function({ route, navigation }) {
                     attendees: data.attendees
                 });
             });
+            
             setUsers(list);
         });
     }, []);

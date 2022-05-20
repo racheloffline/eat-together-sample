@@ -21,6 +21,7 @@ import Icebreaker from "../../components/Icebreaker";
 
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
+import NormalText from "../../components/NormalText";
 
 import { db, storage, auth } from "../../provider/Firebase";
 import * as firebase from "firebase";
@@ -56,6 +57,7 @@ const FullCard = ({ route, navigation }) => {
     }
   }, []);
 
+  // Mark an attendee absent or present
   const markAttendee = index => {
     let newAttendees = [...attendees];
     newAttendees[index] = !newAttendees[index];
@@ -72,32 +74,36 @@ const FullCard = ({ route, navigation }) => {
     });
   }
 
+  // Fetch icebreaker questions
   const fetchIcebreakers = () => {
     db.collection("Icebreakers").doc("icebreakers").get().then(doc => {
       setIcebreakers(doc.data().icebreakers);
     });
   }
 
+  // Fetch all attendees of this event
   const getAttendees = () => {
     route.params.event.attendees.forEach((attendee, index) => {
-      db.collection("Users").doc(attendee).get().then(doc => {
-        const data = doc.data();
-
-        const ids = data.attendedEventIDs.map(e => e.id);
-        if (ids.includes(route.params.event.id)) {
-          let newAttendees = attendees;
-          newAttendees[index] = true;
-          setAttendees(newAttendees);
-        }
-
-        if (data.hasImage) {
-          storage.ref("profilePictures/" + data.id).getDownloadURL().then(uri => {
-            data.image = uri;
-          }).then(() => setPeople(people => ([...people, data])));
-        } else {
-          setPeople(people => ([...people, data]));
-        }
-      });
+      if (attendee !== user.uid) {
+        db.collection("Users").doc(attendee).get().then(doc => {
+          const data = doc.data();
+  
+          const ids = data.attendedEventIDs.map(e => e.id);
+          if (ids.includes(route.params.event.id)) {
+            let newAttendees = attendees;
+            newAttendees[index] = true;
+            setAttendees(newAttendees);
+          }
+  
+          if (data.hasImage) {
+            storage.ref("profilePictures/" + data.id).getDownloadURL().then(uri => {
+              data.image = uri;
+            }).then(() => setPeople(people => ([...people, data])));
+          } else {
+            setPeople(people => ([...people, data]));
+          }
+        });
+      }
     });
   }
 
@@ -154,8 +160,9 @@ const FullCard = ({ route, navigation }) => {
 
         {route.params.event.hostID === user.uid && <DarkContainer>
             <LargeText color="white">Attendance</LargeText>
-            {openAttendance && <View>
-              {people.map((person, index) => 
+            {openAttendance && <View style={{marginTop: 20}}>
+              {people.length === 0 ? <NormalText color="white">{"No attendees :("}</NormalText>
+              : people.map((person, index) => 
                 <Attendance person={person} key={person.id}
                   attending={attendees[index]} onPress={() => markAttendee(index)}/>)}
             </View>}

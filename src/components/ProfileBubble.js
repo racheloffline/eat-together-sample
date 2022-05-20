@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        maxWidth: Dimensions.get('screen').width/1.55
+        maxWidth: Dimensions.get('screen').width/1.7
     },
 
     tags: {

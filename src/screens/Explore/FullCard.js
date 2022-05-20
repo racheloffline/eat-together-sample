@@ -23,6 +23,7 @@ const FullCard = ({ route, navigation }) => {
   const user = auth.currentUser;
   const [host, setHost] = useState(null);
   const [attending, setAttending] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     db.collection("Users").doc(route.params.event.hostID).get().then(doc => {
@@ -35,9 +36,12 @@ const FullCard = ({ route, navigation }) => {
       if (events.includes(route.params.event.id)) {
         setAttending(true);
       }
+    }).then(() => {
+      setLoading(false);
     })
   }, []);
 
+  // Attend an event
   const attend = () => {
     const storeID = {
       type: "public",
@@ -52,6 +56,25 @@ const FullCard = ({ route, navigation }) => {
       }).then(() => {
         navigation.goBack();
         alert("You are signed up :)");
+      });
+    });
+  }
+
+  // Withdraw from an event you initially attended
+  const withdraw = () => {
+    const storeID = {
+      type: "public",
+      id: route.params.event.id
+    };
+
+    db.collection("Users").doc(user.uid).update({
+      attendingEventIDs: firebase.firestore.FieldValue.arrayRemove(storeID)
+    }).then(() => {
+      db.collection("Public Events").doc(route.params.event.id).update({
+        attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)
+      }).then(() => {
+        navigation.goBack();
+        alert("You withdrew :(");
       });
     });
   }
@@ -85,8 +108,11 @@ const FullCard = ({ route, navigation }) => {
         </View>
 
         <Text size="h4">{route.params.event.additionalInfo}</Text>
-        <Button onPress={attend} disabled={attending || route.params.event.hostID === user.uid} marginVertical={40}>
-          {attending || route.params.event.hostID === user.uid ? "Signed Up!" : "Attend!"}
+        <Button onPress={attending ? withdraw : attend} disabled={route.params.event.hostID === user.uid}
+        marginVertical={40} backgroundColor={loading ? "grey" : attending && 
+          route.params.event.hostID !== user.uid ? "red" : false}>
+          {loading ? "Loading" : route.params.event.hostID === user.uid ? "Your event :)" :
+            attending ? "Withdraw :(" : "Attend!"}
         </Button>
       </View>
     </Layout>
