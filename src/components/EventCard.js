@@ -31,7 +31,7 @@ const EventCard = props => {
     
     return (
         <Section style={styles.card} borderRadius={30}>
-            <TouchableOpacity onPress={props.click}>
+            <TouchableOpacity onPress={props.click} disabled={props.disabled}>
                 <SectionImage source={image ? {uri: image} : require("../../assets/logo.png")}/>
 
                 <SectionContent>
