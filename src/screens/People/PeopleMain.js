@@ -9,7 +9,7 @@ import InviteFull from "../Invite/InviteFull";
 import Connections from "../Profile/Connections";
 import Requests from "../Profile/Requests";
 import Report from "./Report";
-import InviteMain from "../Invite/InviteMain";
+//import InviteMain from "../Invite/InviteMain";
 import Chats from "../Invite/Chats";
 
 const Stack = createStackNavigator();
@@ -25,12 +25,12 @@ export default class PeopleMain extends React.PureComponent {
                     <Stack.Screen name="FullProfile" options={{headerShown: false}}>
                         {props => <FullProfile {...props}/>}
                     </Stack.Screen>
-                    <Stack.Screen name="InviteMain" options={{headerShown: false}} component={InviteMain}/>
+                    {/*<Stack.Screen name="InviteMain" options={{headerShown: false}} component={InviteMain}/>*/}
                     <Stack.Screen name="Invite" component={Invite} options={{headerShown: false}}/>
                     <Stack.Screen name="InviteFull" component={InviteFull} options={{headerShown: false}}/>
-                    <Stack.Screen name="Chats" component={Chats} options={{headerShown: false}}/>
-                    <Stack.Screen name="Connections" component={Connections} options={{headerShown: false}}/>
-                    <Stack.Screen name="Requests" component={Requests} options={{headerShown: false}}/>
+                    <Stack.Screen name="Chats" component={Chats} options={{headerShown: false, animationEnabled: false}}/>
+                    <Stack.Screen name="Connections" component={Connections} options={{headerShown: false, animationEnabled: true}}/>
+                    <Stack.Screen name="Requests" component={Requests} options={{headerShown: false, animationEnabled: false}}/>
                     <Stack.Screen name="Report" component={Report} options={{headerShown: false}}/>
                 </Stack.Navigator>
             </NavigationContainer>

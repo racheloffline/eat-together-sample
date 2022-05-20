@@ -13,16 +13,7 @@ export default function ({ route, navigation}) {
 
     //Get the current user and firebase ref path
     const user = firebase.auth().currentUser;
-    //const ref = db.collection("User Invites").doc(route.params.invite.ref).collection("Invites").doc(route.params.invite.id);
     const ref = db.collection("User Invites").doc(user.uid).collection("Invites").doc(invite.id);
-
-    // function displayImage(image) {
-    //     if(image == null || image === "") {
-    //         return "https://static.onecms.io/wp-content/uploads/sites/9/2020/04/24/ppp-why-wont-anyone-rescue-restaurants-FT-BLOG0420.jpg"
-    //     } else {
-    //         return image
-    //     }
-    // }
 
     //Check to see if the invite has an image. If not, display a stock image
     function displayImage() {
@@ -111,7 +102,7 @@ export default function ({ route, navigation}) {
                             })
                         })
                     }}>
-                        <NormalText size = {18} color = {"green"}>Accept Invite</NormalText>
+                        <NormalText size = {18} color = {"green"} center = "center">Accept Invite</NormalText>
                     </TouchableOpacity>
                     <TouchableOpacity style = {{paddingVertical: 10}} onPress = {() => {
                         ref.set({
@@ -134,7 +125,15 @@ export default function ({ route, navigation}) {
                             });
                         })
                     }}>
-                        <NormalText size = {18} color = {"red"}>Decline Invite</NormalText>
+                        <NormalText size = {18} color = {"red"} center = "center">Decline Invite</NormalText>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress = {() => {
+                        ref.delete().then(r => {
+                            alert("Invite Cleared")
+                            navigation.goBack();
+                        })
+                    }}>
+                        <NormalText size = {18} color = {"blue"} center = "center">Clear Invite</NormalText>
                     </TouchableOpacity>
                 </View>
 
