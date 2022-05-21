@@ -12,7 +12,7 @@ import getTime from "../../getTime";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
 import Button from "../../components/Button";
 
-import { auth } from "../../provider/Firebase";
+import {auth, storage} from "../../provider/Firebase";
 import {ImageBackground} from "react-native";
 
 export default function ({ navigation }) {
@@ -51,14 +51,22 @@ export default function ({ navigation }) {
         setLocation("");
         setDate(new Date());
         setAdditionalInfo("");
-    }
+    };
 
     const handleChoosePhoto = async () => {
        let result = await ImagePicker.launchImageLibraryAsync({});
        if (!result.cancelled) {
            setPhoto(result.uri);
        }
-    }
+    };
+
+    const storeImage = async (uri, event_id) => {
+        const response = await fetch(uri);
+        const blob = await response.blob();
+
+        let ref = storage.ref().child("eventPictures/" + event_id);
+        return ref.put(blob);
+    };
 
     return (
         <Layout>
@@ -139,12 +147,18 @@ export default function ({ navigation }) {
                 />
 
                 <Button disabled={disabled} onPress={function () {
+                    let hasImage = false;
+                    if (photo !== "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400") {
+                        storeImage(photo, id);
+                        hasImage = true;
+                    }
                     navigation.navigate("InvitePeople", {
                         name,
                         location,
                         date,
                         additionalInfo: additionalInfo,
                         attendees: [],
+                        hasImage: hasImage,
                         clearAll
                     });
                 }} marginVertical={20}>See people available!</Button>

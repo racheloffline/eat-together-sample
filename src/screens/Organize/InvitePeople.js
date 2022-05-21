@@ -29,7 +29,7 @@ async function sendInvites (attendees, invite, navigation) {
             description: invite.additionalInfo,
             hostID: user.uid,
             hostName: hostName,
-            hasImage: false,
+            hasImage: invite.hasImage,
             image: "",
             location: invite.location,
             name: invite.name,
