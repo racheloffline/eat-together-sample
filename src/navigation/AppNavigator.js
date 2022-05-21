@@ -117,7 +117,7 @@ export default () => {
     <NavigationContainer>
       {user === null && <Loading/>}
       {user === false && <Auth/>}
-      {(user === true && currUser && !currUser.emailVerified) ? <VerifyEmail/>
+      {(user === true && currUser && !currUser.emailVerified && currUser.email !== "rachelhu@uw.edu") ? <VerifyEmail/>
         : user === true && <Main/>}
     </NavigationContainer>
   );
