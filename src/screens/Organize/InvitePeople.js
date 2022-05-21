@@ -99,7 +99,7 @@ export default function({ route, navigation }) {
                 let data = doc.data();
                 list.push({
                     id: doc.id,
-                    hostID: user.id,
+                    hostID: user.uid,
                     name: data.name,
                     quote: data.quote,
                     profile: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211",
@@ -131,21 +131,27 @@ export default function({ route, navigation }) {
                            leftContent={<FontAwesome name="search" size={18}/>}/>
                 <Button text="Go" color="#5DB075" onPress={()=> {
                     const user = auth.currentUser;
-                    db.collection("Users").limit(1).where("username", "==", curSearch).get().then((snapshot) => {
-                        if (!snapshot.empty) {
-                            const doc = snapshot.docs[0];
-                            const data = doc.data();
-                            setUsers([{
-                                id: doc.id,
-                                name: data.name,
-                                quote: data.quote,
-                                hostID: user.uid,
-                                profile: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211"
-                            }]);
-                        } else {
-                            alert("Username not found.");
+                    db.collection("Users").doc(user.uid).get().then((doc) => {
+                        if (curSearch === doc.data().username) {
+                            alert("No need to invite yourself.")
+                            return;
                         }
-                    });
+                        db.collection("Users").limit(1).where("username", "==", curSearch).get().then((snapshot) => {
+                            if (!snapshot.empty) {
+                                const doc = snapshot.docs[0];
+                                const data = doc.data();
+                                setUsers([{
+                                    id: doc.id,
+                                    name: data.name,
+                                    quote: data.quote,
+                                    hostID: user.uid,
+                                    profile: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211"
+                                }]);
+                            } else {
+                                alert("Username not found.");
+                            }
+                        });
+                    })
                 }} disabled={curSearch === ""}/>
             </View>
             <FlatList contentContainerStyle={styles.invites} keyExtractor={item => item.id}
