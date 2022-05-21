@@ -75,6 +75,14 @@ export default function({ navigation }) {
         search(text);
     }
 
+    // Deletes event from DOM
+    const deleteEvent = id => {
+        const newEvents = events.filter(e => e.id !== id);
+        const newFilteredEvents = events.filter(e => e.id !== id);
+        setEvents(newEvents);
+        setFilteredEvents(newFilteredEvents);
+    }
+
     return (
         <Layout>
             <Header name="Explore" navigation = {navigation}/>
@@ -86,7 +94,8 @@ export default function({ navigation }) {
                       data={filteredEvents} renderItem={({item}) =>
                 <EventCard event={item} click={() => {
                     navigation.navigate("FullCardPrivate", {
-                        event: item
+                        event: item,
+                        deleteEvent
                     });
                 }}/>
             }/>

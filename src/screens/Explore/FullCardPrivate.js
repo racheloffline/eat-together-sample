@@ -25,11 +25,13 @@ import NormalText from "../../components/NormalText";
 
 import { db, storage, auth } from "../../provider/Firebase";
 import * as firebase from "firebase";
+import { clickProps } from "react-native-web/dist/cjs/modules/forwardedProps";
 
 const FullCard = ({ route, navigation }) => {
   // Data for the attendees
   const [attendees, setAttendees] = useState(new Array(route.params.event.attendees.length).fill(false));
   const [people, setPeople] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   // For tracking opening and closing
   const [openAttendance, setOpenAttendance] = useState(false);
@@ -123,37 +125,43 @@ const FullCard = ({ route, navigation }) => {
         rightContent={
           <Ionicons
               name = "close-outline"
-              color = "red"
+              color = {loading ? "grey" : "red"}
               size = {25}
           />
         }
         rightAction = {() => {
-          const storeID = {
-            type: route.params.event.type,
-            id: route.params.event.id
-          };
-          db.collection("Users").doc(user.uid).update({
-            attendingEventIDs: firebase.firestore.FieldValue.arrayRemove(storeID)
-          }).then(() => {
-            if(route.params.event.type === "private") {
-              db.collection("Private Events").doc(route.params.event.id).update({
-                attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)
-              }).then(() => {
-                alert("Event Removed");
-                navigation.goBack();
-              })
-            } else {
-              db.collection("Public Events").doc(route.params.event.id).update({
-                attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)
-              }).then(() => {
-                alert("Event Removed");
-                navigation.goBack();
-              })
-            }
+          if (!loading) {
+            setLoading(true);
+            route.params.deleteEvent(route.params.event.id);
 
-          });
+            const storeID = {
+              type: route.params.event.type,
+              id: route.params.event.id
+            };
+
+            db.collection("Users").doc(user.uid).update({
+              attendingEventIDs: firebase.firestore.FieldValue.arrayRemove(storeID)
+            }).then(() => {
+              if(route.params.event.type === "private") {
+                db.collection("Private Events").doc(route.params.event.id).update({
+                  attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)
+                }).then(() => {
+                  alert("Event Removed");
+                  navigation.goBack();
+                });
+              } else {
+                db.collection("Public Events").doc(route.params.event.id).update({
+                  attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)
+                }).then(() => {
+                  alert("Event Removed");
+                  navigation.goBack();
+                });
+              }
+            });
+          }
         }}
       />
+
       <ScrollView contentContainerStyle={styles.page}>
         <ImageBackground source={image ? {uri: image} : require("../../../assets/foodBackground.png")}
           style={styles.imageBackground} resizeMode="cover">
