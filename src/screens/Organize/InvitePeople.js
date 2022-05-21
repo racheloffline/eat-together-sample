@@ -58,12 +58,8 @@ async function sendInvites (attendees, invite, navigation) {
         await attendees.forEach((attendee) => {
             const ref = db.collection("User Invites").doc(attendee);
             ref.get().then((docRef) => {
-                if (docRef.exists) {
+                if (docRef.exists && (attendee !== user.uid)) {
                     sendInvitations(ref)
-                } else {
-                    ref.set(({})).then(r => {
-                        sendInvitations(ref)
-                    });
                 }
             })
 
@@ -99,7 +95,7 @@ export default function({ route, navigation }) {
                 let data = doc.data();
                 list.push({
                     id: doc.id,
-                    hostID: user.uid,
+                    hostID: data.uid,
                     name: data.name,
                     quote: data.quote,
                     profile: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211",
