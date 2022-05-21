@@ -95,7 +95,7 @@ export default function({ route, navigation }) {
                 let data = doc.data();
                 list.push({
                     id: doc.id,
-                    hostID: data.uid,
+                    hostID: data.id,
                     name: data.name,
                     quote: data.quote,
                     profile: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211",
