@@ -3,7 +3,7 @@
 import React, {useEffect, useState} from "react";
 import {View, StyleSheet, FlatList, Dimensions} from "react-native";
 
-import { db, auth } from "../../provider/Firebase";
+import {db, auth, storage} from "../../provider/Firebase";
 import {TopNav, Button, TextInput} from "react-native-rapi-ui";
 import {FontAwesome, Ionicons} from "@expo/vector-icons";
 import firebase from "firebase";
@@ -18,9 +18,22 @@ const generateColor = () => {
     return `#${randomColor}`;
 };
 
+const storeImage = async (uri, event_id) => {
+    const response = await fetch(uri);
+    const blob = await response.blob();
+
+    let ref = storage.ref().child("eventPictures/" + event_id);
+    return ref.put(blob);
+};
+
 async function sendInvites (attendees, invite, navigation) {
     const user = auth.currentUser;
     const id = Date.now() + user.uid;
+
+    //Add photo as necessary
+    if (invite.hasImage) {
+        storeImage(invite.image, id);
+    }
 
     //Send invites to each of the selected users
     async function sendInvitations(ref) {
@@ -30,7 +43,6 @@ async function sendInvites (attendees, invite, navigation) {
             hostID: user.uid,
             hostName: hostName,
             hasImage: invite.hasImage,
-            image: "",
             location: invite.location,
             name: invite.name,
             inviteID: id

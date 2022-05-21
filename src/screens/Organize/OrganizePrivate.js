@@ -60,14 +60,6 @@ export default function ({ navigation }) {
        }
     };
 
-    const storeImage = async (uri, event_id) => {
-        const response = await fetch(uri);
-        const blob = await response.blob();
-
-        let ref = storage.ref().child("eventPictures/" + event_id);
-        return ref.put(blob);
-    };
-
     return (
         <Layout>
             <KeyboardAvoidingView behavior="position" style={{flex: 1}} navigation={navigation}>
@@ -149,7 +141,6 @@ export default function ({ navigation }) {
                 <Button disabled={disabled} onPress={function () {
                     let hasImage = false;
                     if (photo !== "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400") {
-                        storeImage(photo, id);
                         hasImage = true;
                     }
                     navigation.navigate("InvitePeople", {
@@ -159,6 +150,7 @@ export default function ({ navigation }) {
                         additionalInfo: additionalInfo,
                         attendees: [],
                         hasImage: hasImage,
+                        image: hasImage ? photo : "",
                         clearAll
                     });
                 }} marginVertical={20}>See people available!</Button>
