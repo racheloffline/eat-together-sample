@@ -1,6 +1,7 @@
 import {db} from "./provider/Firebase";
 import firebase from "firebase";
 import { intersection } from "lodash";
+import * as ImagePicker from "expo-image-picker";
 
 /*
 Generates a random color.
@@ -24,7 +25,7 @@ export const getProfileRecs = () => {
     // Array of distances between currentUser tags and tags of every other user
     var distances = []; 
     // Maps of distances and names of other users
-    Map<int, String> otherUsers == new HashMap(); 
+    let otherUsers = new Map();
     // Create string consisting of currentUser's tags concatenated together
     var a = "";
     let aDoc = currentUser.docs()
@@ -82,7 +83,7 @@ export const getProfileRecs = () => {
     distances.sort((a,b)=>a-b); 
     var bestUsers = []; 
     // Store usernames of other users with lowest distance between current user's tags
-    for (i = 0; i < 5; i++) {
+    for (let i = 0; i < 5; i++) {
         bestUsers[i] = otherUsers.get(distances[i]);
     }
     // best users is a string array returning users from the first best match to the fifth

@@ -1,15 +1,15 @@
 //Display upcoming events to join
 
 import React, {useEffect, useState} from "react";
-import {View, StyleSheet, FlatList} from "react-native";
+import {View, StyleSheet, FlatList, Dimensions} from "react-native";
 
-import { db, auth } from "../../provider/Firebase";
-import {TopNav, Button, Layout} from "react-native-rapi-ui";
-import {Ionicons} from "@expo/vector-icons";
-import InvitePerson from "../../components/InvitePerson";
+import {db, auth, storage} from "../../provider/Firebase";
+import {TopNav, Button, TextInput} from "react-native-rapi-ui";
+import {FontAwesome, Ionicons} from "@expo/vector-icons";
 import firebase from "firebase";
 
 import MediumText from "../../components/MediumText";
+import InvitePerson from "../../components/InvitePerson";
 
 const generateColor = () => {
     const randomColor = Math.floor(Math.random() * 16777215)
@@ -18,9 +18,22 @@ const generateColor = () => {
     return `#${randomColor}`;
 };
 
+const storeImage = async (uri, event_id) => {
+    const response = await fetch(uri);
+    const blob = await response.blob();
+
+    let ref = storage.ref().child("eventPictures/" + event_id);
+    return ref.put(blob);
+};
+
 async function sendInvites (attendees, invite, navigation) {
     const user = auth.currentUser;
     const id = Date.now() + user.uid;
+
+    //Add photo as necessary
+    if (invite.hasImage) {
+        storeImage(invite.image, id);
+    }
 
     //Send invites to each of the selected users
     async function sendInvitations(ref) {
@@ -29,8 +42,7 @@ async function sendInvites (attendees, invite, navigation) {
             description: invite.additionalInfo,
             hostID: user.uid,
             hostName: hostName,
-            hasImage: false,
-            image: "",
+            hasImage: invite.hasImage,
             location: invite.location,
             name: invite.name,
             inviteID: id
@@ -58,12 +70,8 @@ async function sendInvites (attendees, invite, navigation) {
         await attendees.forEach((attendee) => {
             const ref = db.collection("User Invites").doc(attendee);
             ref.get().then((docRef) => {
-                if (docRef.exists) {
+                if (docRef.exists && (attendee !== user.uid)) {
                     sendInvitations(ref)
-                } else {
-                    ref.set(({})).then(r => {
-                        sendInvitations(ref)
-                    });
                 }
             })
 
@@ -88,9 +96,11 @@ async function sendInvites (attendees, invite, navigation) {
 export default function({ route, navigation }) {
     const [users, setUsers] = useState([]); // initial state, function used for updating initial state
     const attendees = route.params.attendees;
+    const [curSearch, setCurSearch] = useState("");
 
     useEffect(() => { // updates stuff right after React makes changes to the DOM
         const ref = db.collection("Users");
+        const user = auth.currentUser;
         ref.onSnapshot((query) => {
             const list = [];
             query.forEach((doc) => {
@@ -104,7 +114,7 @@ export default function({ route, navigation }) {
                     attendees: data.attendees
                 });
             });
-            
+
             setUsers(list);
         });
     }, []);
@@ -123,12 +133,45 @@ export default function({ route, navigation }) {
                 }
                 leftAction={() => navigation.goBack()}
             />
+            <View style={styles.tagInput}>
+                <TextInput placeholder="Or search by username" value={curSearch}
+                           containerStyle={styles.input} onChangeText={val => setCurSearch(val)}
+                           leftContent={<FontAwesome name="search" size={18}/>}/>
+                <Button text="Go" color="#5DB075" onPress={()=> {
+                    const user = auth.currentUser;
+                    db.collection("Users").doc(user.uid).get().then((doc) => {
+                        if (curSearch === doc.data().username) {
+                            alert("No need to invite yourself.")
+                            return;
+                        }
+                        db.collection("Users").limit(1).where("username", "==", curSearch).get().then((snapshot) => {
+                            if (!snapshot.empty) {
+                                const doc = snapshot.docs[0];
+                                const data = doc.data();
+                                setUsers([{
+                                    id: doc.id,
+                                    name: data.name,
+                                    quote: data.quote,
+                                    hostID: user.uid,
+                                    profile: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211"
+                                }]);
+                            } else {
+                                alert("Username not found.");
+                            }
+                        });
+                    })
+                }} disabled={curSearch === ""}/>
+            </View>
             <FlatList contentContainerStyle={styles.invites} keyExtractor={item => item.id}
                       data={users} renderItem={({item}) =>
                 <InvitePerson person={item} attendees={attendees} color={generateColor()}/>
             }/>
-            <Button text="Send Invites" status="success" size="lg" onPress={() => sendInvites(attendees, route.params, navigation)}/>
-        </Layout>
+            <View style={styles.buttons}>
+                <Button text="Send Invites" width={200} color="#5DB075" size="lg" onPress={() => sendInvites(attendees, route.params)}/>
+                <Button color="#5DB075" outline width={200} text="Done" onPress={()=> navigation.navigate("OrganizePrivate")}/>
+            </View>
+        </View>
+
     );
 }
 
@@ -140,5 +183,21 @@ const styles = StyleSheet.create({
     submit: {
         position: 'absolute',
         bottom:0,
+    },
+    tagInput: {
+        width: "100%",
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "center",
+        marginVertical: 10
+    },
+
+    input: {
+        width: Dimensions.get('screen').width/1.5,
+        marginRight: 10
+    },
+    buttons: {
+        justifyContent: "center",
+        flexDirection: "row"
     }
 });
