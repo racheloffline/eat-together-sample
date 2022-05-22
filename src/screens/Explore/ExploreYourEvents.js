@@ -29,20 +29,19 @@ export default function({ navigation }) {
                         let data = event.data();
                         data.type = e.type;
                         newEvents.unshift(data);
-                        //setEvents(events => ([...events, data]));
+                        setFilteredEvents(newEvents);
+                        setEvents(newEvents);
                     });
                 } else {
                     db.collection("Private Events").doc(e.id).get().then(event => {
                         let data = event.data();
                         data.type = e.type;
                         newEvents.unshift(data);
-                        //setEvents(events => ([...events, data]));
+                        setFilteredEvents(newEvents);
+                        setEvents(newEvents);
                     });
                 }
             });
-        }).then(() => {
-            setEvents(newEvents);
-            setFilteredEvents(newEvents);
         });
     }, []);
 

@@ -45,47 +45,7 @@ export default function ({ navigation }) {
 		}
 	}
 
-	// //get the list of invites from firebase
-	// function getInvitesFromFirebase(ref) {
-	// 	ref.onSnapshot((query) => {
-	// 		const list = [];
-	// 		query.forEach((doc) => {
-	// 			let data = doc.data();
-	// 			list.push({
-	// 				id: doc.id,
-	// 				name: data.name,
-	// 				image: data.image,
-	// 				hasImage: data.hasImage,
-	// 				location: data.location,
-	// 				date: data.date,
-	// 				details: data.description,
-	// 				hostID: data.hostID,
-	// 				hostName: data.hostName,
-	// 				hostImage: data.hostImage,
-	// 				accepted: data.accepted,
-	// 				inviteID: data.inviteID,
-	// 				ref: refToGive
-	// 			});
-	// 		});
-	// 		setInvites(list);
-	// 	});
-	// }
-
-	useEffect(() => { // updates stuff right after React makes changes to the DOM
-		// let ref = db.collection("User Invites").doc(user.email);
-		// ref.get().then((doc) => {
-		// 	if(doc.exists) {
-		// 		ref = ref.collection("Invites")
-		// 		refToGive = user.email
-		// 		getInvitesFromFirebase(ref)
-		// 	} else {
-		// 		db.collection("Users").doc(user.uid).get().then((doc) => {
-		// 			ref = db.collection("User Invites").doc(doc.data().name).collection("Invites")
-		// 			refToGive = doc.data().name
-		// 			getInvitesFromFirebase(ref)
-		// 		})
-		// 	}
-		// })
+	useEffect(() => {
 
 		let ref = db.collection("User Invites").doc(user.uid).collection("Invites");
 		ref.onSnapshot((query) => {

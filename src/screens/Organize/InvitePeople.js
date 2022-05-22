@@ -4,7 +4,7 @@ import React, {useEffect, useState} from "react";
 import {View, StyleSheet, FlatList} from "react-native";
 
 import { db, auth } from "../../provider/Firebase";
-import {TopNav, Button} from "react-native-rapi-ui";
+import {TopNav, Button, Layout} from "react-native-rapi-ui";
 import {Ionicons} from "@expo/vector-icons";
 import InvitePerson from "../../components/InvitePerson";
 import firebase from "firebase";
@@ -110,7 +110,7 @@ export default function({ route, navigation }) {
     }, []);
 
     return (
-        <View style={{flex:1}}>
+        <Layout style={{flex:1}}>
             <TopNav
                 middleContent={
                     <MediumText center>Suggested People</MediumText>
@@ -128,7 +128,7 @@ export default function({ route, navigation }) {
                 <InvitePerson person={item} attendees={attendees} color={generateColor()}/>
             }/>
             <Button text="Send Invites" status="success" size="lg" onPress={() => sendInvites(attendees, route.params, navigation)}/>
-        </View>
+        </Layout>
     );
 }
 
