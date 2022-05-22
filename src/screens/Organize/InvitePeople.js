@@ -4,7 +4,7 @@ import React, {useEffect, useState} from "react";
 import {View, StyleSheet, FlatList, Dimensions} from "react-native";
 
 import {db, auth, storage} from "../../provider/Firebase";
-import {TopNav, Button, TextInput} from "react-native-rapi-ui";
+import {TopNav, Button, TextInput, Layout} from "react-native-rapi-ui";
 import {FontAwesome, Ionicons} from "@expo/vector-icons";
 import firebase from "firebase";
 
@@ -170,7 +170,7 @@ export default function({ route, navigation }) {
                 <Button text="Send Invites" width={200} color="#5DB075" size="lg" onPress={() => sendInvites(attendees, route.params)}/>
                 <Button color="#5DB075" outline width={200} text="Done" onPress={()=> navigation.navigate("OrganizePrivate")}/>
             </View>
-        </View>
+        </Layout>
 
     );
 }
