@@ -6,13 +6,16 @@ import {Layout, TopNav} from 'react-native-rapi-ui';
 import NormalText from "../../components/NormalText";
 import {Ionicons} from "@expo/vector-icons";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
+import MediumText from "../../components/MediumText";
 
 export default function ({ navigation }) {
 
     return (
         <Layout>
             <TopNav
-                middleContent="Notifications"
+                middleContent={
+                    <MediumText center>Notifications</MediumText>
+                }
                 leftContent={
                     <Ionicons
                         name="chevron-back"

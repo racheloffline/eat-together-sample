@@ -20,9 +20,6 @@ export default function ({ navigation }) {
 	const user = firebase.auth().currentUser;
 	const [invites, setInvites] = useState([]); // initial state, function used for updating initial state
 
-	////Give the correct email/name to the inviteFull screen
-	//let refToGive;
-
 	//check to see which text to display for accepted status
 	function checkAccepted(item) {
 		if(item.accepted == null) {
@@ -72,14 +69,14 @@ export default function ({ navigation }) {
 			setInvites(list);
 		});
 
-
-
 	}, []);
 
 	return (
 		<Layout>
 			<TopNav
-				middleContent="Notifications"
+				middleContent={
+					<MediumText center>Notifications</MediumText>
+				}
 				leftContent={
 					<Ionicons
 						name="chevron-back"
