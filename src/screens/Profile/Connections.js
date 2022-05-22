@@ -5,13 +5,24 @@ import {Layout, Text, TopNav} from 'react-native-rapi-ui';
 import {Ionicons} from "@expo/vector-icons";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
 import {db} from "../../provider/Firebase";
-import {FlatList, StyleSheet} from "react-native";
+import {FlatList, StyleSheet, View} from "react-native";
 import PeopleList from "../../components/PeopleList";
 import {generateColor} from "../../methods";
 import firebase from "firebase";
+import NormalText from "../../components/NormalText";
+import MediumText from "../../components/MediumText";
 
 export default function ({ navigation }) {
     const [users, setUsers] = useState([]); // initial state, function used for updating initial state
+
+    //Check to see if we should display the "No Connections" placeholder text
+    function shouldDisplayPlaceholder(list) {
+        if(list == null ||list.length === 0) {
+            return "No connections. Meet friends on the People page!"
+        } else {
+            return ""
+        }
+    }
 
     useEffect(() => { // updates stuff right after React makes changes to the DOM
         const user = firebase.auth().currentUser;
@@ -38,7 +49,9 @@ export default function ({ navigation }) {
     return (
         <Layout>
             <TopNav
-                middleContent="Connections"
+                middleContent={
+                    <MediumText center>Connections</MediumText>
+                }
                 leftContent={
                     <Ionicons
                         name="chevron-back"
@@ -47,30 +60,38 @@ export default function ({ navigation }) {
                 }
                 leftAction={() => navigation.navigate("Invite")}
             />
-            <HorizontalSwitch left="Connections" right="Requests" current="left" press={(val) => navigation.navigate("Requests")}/>
-            <FlatList contentContainerStyle={styles.invites} keyExtractor={item => item.id}
-                      data={users} renderItem={({item}) =>
-                <PeopleList person={item} color={generateColor()} click={() => {
-                    navigation.navigate("FullProfile", {
-                        person: {
-                            id: item.id,
-                            username: item.username,
-                            name: item.name,
-                            image: item.profile,
-                            quote: "There is no sunrise so beautiful that it is worth waking me up to see it.",
-                            tags: [
-                                "Not here to date",
-                                "Brawl Stars",
-                                "Rock music",
-                                "Lover of Mexican food",
-                                "Memes",
-                                "Extroverted",
-                                "Outgoing"
-                            ]
-                        }
-                    });
-                }}/>
-            }/>
+            <View style = {styles.switchView}>
+                <HorizontalSwitch left="Connections" right="Requests" current="left" press={(val) => navigation.navigate("Requests")}/>
+            </View>
+            <View style = {styles.noConnectionsView}>
+                <NormalText center={"center"}>{shouldDisplayPlaceholder(users)}</NormalText>
+            </View>
+            <View style = {styles.list}>
+                <FlatList contentContainerStyle={styles.invites} keyExtractor={item => item.id}
+                          data={users} renderItem={({item}) =>
+                    <PeopleList person={item} color={generateColor()} click={() => {
+                        navigation.navigate("FullProfile", {
+                            person: {
+                                id: item.id,
+                                username: item.username,
+                                name: item.name,
+                                image: item.profile,
+                                quote: "There is no sunrise so beautiful that it is worth waking me up to see it.",
+                                tags: [
+                                    "Not here to date",
+                                    "Brawl Stars",
+                                    "Rock music",
+                                    "Lover of Mexican food",
+                                    "Memes",
+                                    "Extroverted",
+                                    "Outgoing"
+                                ]
+                            }
+                        });
+                    }}/>
+                }/>
+            </View>
+
         </Layout>
 
     );
@@ -84,5 +105,14 @@ const styles = StyleSheet.create({
     submit: {
         position: 'absolute',
         bottom:0,
+    },
+    switchView: {
+        marginVertical: 10
+    },
+    noConnectionsView: {
+        marginVertical: -20
+    },
+    list: {
+        marginVertical: -20
     }
 });
