@@ -13,6 +13,7 @@ import MediumText from "../../components/MediumText";
 import TagsList from "../../components/TagsList";
 import SmallText from "../../components/SmallText";
 import Button from "../../components/Button";
+import NormalText from "../../components/NormalText";
 
 import { db, storage } from "../../provider/Firebase";
 import firebase from "firebase";
@@ -113,6 +114,9 @@ const FullProfile = ({ route, navigation }) => {
         
         <View style={styles.name}>
           <LargeText>{route.params.person.name}</LargeText>
+          <NormalText>
+          {route.params.person.attendedEventIDs.length + "/" + route.params.person.attendingEventIDs.length + " meals attended"}
+          </NormalText>
           <MediumText>@{route.params.person.username}</MediumText>
 
           <View style={{flexDirection: "row", marginVertical: 10}}>

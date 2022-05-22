@@ -12,10 +12,11 @@ export default function ({ navigation }) {
     return (
         <NavigationContainer independent={true}>
             <profStack.Navigator initialRouteName="Explore" >
-                <profStack.Screen name="Me" component={Me} />
+                <profStack.Screen name="Me" component={Me}  options={{headerShown: false}}/>
                 <profStack.Screen name="Settings" component={Settings}  options={{headerShown: false}}/>
-                <profStack.Screen name="Schedule" component={Schedule}  />
+                <profStack.Screen name="Schedule" component={Schedule} options={{headerShown: false}}/>
             </profStack.Navigator>
         </NavigationContainer>
     );
 }
+
