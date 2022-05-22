@@ -10,6 +10,7 @@ import firebase from "firebase";
 
 import MediumText from "../../components/MediumText";
 import InvitePerson from "../../components/InvitePerson";
+import {getProfileRecs} from "../../methods";
 
 const generateColor = () => {
     const randomColor = Math.floor(Math.random() * 16777215)
@@ -99,8 +100,27 @@ export default function({ route, navigation }) {
     const [curSearch, setCurSearch] = useState("");
 
     useEffect(() => { // updates stuff right after React makes changes to the DOM
+        //LINKING ELAINE'S ALGO
+        /*
+        let bestUsers = getProfileRecs();
         const ref = db.collection("Users");
-        const user = auth.currentUser;
+        const list = [];
+        bestUsers.forEach((user) => {
+            ref.doc(user).get().then((doc) => {
+                let data = doc.data();
+                list.push({
+                    id: doc.id,
+                    hostID: data.id,
+                    name: data.name,
+                    quote: data.quote,
+                    profile: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211",
+                    attendees: data.attendees
+                });
+                setUsers(list);
+            });
+        });
+         */
+        const ref = db.collection("Users");
         ref.onSnapshot((query) => {
             const list = [];
             query.forEach((doc) => {
