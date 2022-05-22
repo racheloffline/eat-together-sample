@@ -25,7 +25,7 @@ export default function ({ navigation }) {
                     id: doc.id,
                     name: data.name,
                     username: data.username,
-                    profile: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211"
+                    profile: data.profile
                 });
             });
             setRequests(list);

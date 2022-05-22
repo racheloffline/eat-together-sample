@@ -22,6 +22,7 @@ const FullProfile = ({ route, navigation }) => {
   const [disabled, setDisabled] = useState(true);
   const [color, setColor] = useState("grey");
   const [image, setImage] = useState(null);
+  const [inviterImage, setInviterImage] = useState("https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211");
 
   useEffect(() => { // updates stuff right after React makes changes to the DOM
     const user = firebase.auth().currentUser;
@@ -29,6 +30,12 @@ const FullProfile = ({ route, navigation }) => {
     let thisUser = db.collection("Users").doc(user.uid);
     thisUser.get().then((doc) => {
       let thisData = doc.data();
+      // Save some images
+      if (thisData.hasImage) {
+        storage.ref("profilePictures/" + thisData.id).getDownloadURL().then(uri => {
+          setInviterImage(uri);
+        });
+      }
       let requestedUser = db.collection("Users").doc(route.params.person.id);
 
       requestedUser.get().then((doc) => {
@@ -84,7 +91,8 @@ const FullProfile = ({ route, navigation }) => {
         let userData = curUser.data();
         db.collection("User Invites").doc(data.id).collection("Connections").doc(user.uid).set({
           name: userData.name,
-          username: userData.username
+          username: userData.username,
+          profile: inviterImage
         }).then(() => {
           setStatus("Request Sent");
           setDisabled(true);

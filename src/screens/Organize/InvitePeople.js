@@ -65,7 +65,7 @@ async function sendInvites (attendees, invite, navigation) {
         date: invite.date,
         additionalInfo: invite.additionalInfo,
         attendees: [user.uid], //ONLY start by putting the current user as an attendee
-        hasImage: false
+        hasImage: invite.hasImage
     }).then(async docRef => {
         await attendees.forEach((attendee) => {
             const ref = db.collection("User Invites").doc(attendee);
