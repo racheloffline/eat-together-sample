@@ -21,7 +21,10 @@ const Button = props => {
             },
             elevation: 5,
         }} onPress={props.onPress} disabled={props.disabled}>
-            <MediumText color="white" center>{props.children}</MediumText>
+            <MediumText color="white" center
+                size={props.fontSize ? props.fontSize : 20}>
+                    {props.children}
+            </MediumText>
         </TouchableOpacity>
     );
 }

@@ -95,6 +95,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingBottom: 40
   },
+  
   page: {
     paddingTop: 30,
     alignItems: "center",
