@@ -37,7 +37,7 @@ export default function ({ navigation }) {
                         id: data.id,
                         username: data.username,
                         name: data.name,
-                        profile: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211",
+                        hasImage: data.hasImage
                     })
                 }).then(() => {
                     setUsers(list);
@@ -70,23 +70,10 @@ export default function ({ navigation }) {
                 <FlatList contentContainerStyle={styles.invites} keyExtractor={item => item.id}
                           data={users} renderItem={({item}) =>
                     <PeopleList person={item} color={generateColor()} click={() => {
-                        navigation.navigate("FullProfile", {
-                            person: {
-                                id: item.id,
-                                username: item.username,
-                                name: item.name,
-                                image: item.profile,
-                                quote: "There is no sunrise so beautiful that it is worth waking me up to see it.",
-                                tags: [
-                                    "Not here to date",
-                                    "Brawl Stars",
-                                    "Rock music",
-                                    "Lover of Mexican food",
-                                    "Memes",
-                                    "Extroverted",
-                                    "Outgoing"
-                                ]
-                            }
+                        db.collection("Users").doc(item.id).get().then((doc) => {
+                            navigation.navigate("FullProfile", {
+                                person: doc.data()
+                            });
                         });
                     }}/>
                 }/>

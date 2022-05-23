@@ -1,28 +1,28 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView} from "react-native";
 import {Layout, Text, TopNav} from "react-native-rapi-ui";
 import {Ionicons} from "@expo/vector-icons";
 import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
 import firebase from "firebase";
-import {db} from "../../provider/Firebase";
+import {db, storage} from "../../provider/Firebase";
 
 export default function ({ route, navigation}) {
     //Save the invite as a shorter name
+    const [image, setImage] = useState("");
     let invite = route.params.invite;
 
     //Get the current user and firebase ref path
     const user = firebase.auth().currentUser;
     const ref = db.collection("User Invites").doc(user.uid).collection("Invites").doc(invite.id);
 
-    //Check to see if the invite has an image. If not, display a stock image
-    function displayImage() {
-        if(!invite.hasImage) {
-            return "https://static.onecms.io/wp-content/uploads/sites/9/2020/04/24/ppp-why-wont-anyone-rescue-restaurants-FT-BLOG0420.jpg"
-        } else {
-            return invite.image
+    useEffect(() => {
+        if (invite.hasImage) {
+            storage.ref("eventPictures/" + invite.inviteID).getDownloadURL().then(uri => {
+                setImage(uri);
+            });
         }
-    }
+    }, [])
 
     //Check to see if there's any details to display
     function displayDetails() {
@@ -48,7 +48,7 @@ export default function ({ route, navigation}) {
             <ScrollView contentContainerStyle={styles.page}>
                 <View style={styles.background}/>
                 <Image style={styles.image}
-                       source={{uri: displayImage()}}/>
+                       source={{uri: (image != "" ? image : "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400")}}/>
                 <MediumText style={styles.text}>{invite.hostName} is inviting you to {invite.name}!</MediumText>
                 <View style = {styles.icons}>
                     <Ionicons name="location-outline" size={24}/>

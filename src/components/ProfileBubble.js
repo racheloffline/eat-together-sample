@@ -2,15 +2,9 @@ import React from 'react';
 import { View, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import MediumText from "./MediumText";
 import NormalText from './NormalText';
+import {generateColor} from "../methods";
 
 import Tag from "./Tag";
-
-const generateColor = () => {
-    const randomColor = Math.floor(Math.random() * 16777215)
-      .toString(16)
-      .padStart(6, '0');
-    return `#${randomColor}`;
-  };
 
 const ProfileBubble = props => {
     return (
