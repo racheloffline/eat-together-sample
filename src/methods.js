@@ -14,7 +14,6 @@ export const generateColor = () => {
 };
 
 /*
-TODO: ELAINE
 Gets a list of the top 5 profiles suggestions based on the current user and tags.
 Returns: A list of usernames of the top 5 user suggestions.
  */
