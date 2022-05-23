@@ -1,7 +1,7 @@
 //Functionality TDB, most likely to be used to implement ice-breaker games
 
 import React, {useEffect, useState} from "react";
-import {View, StyleSheet, Image, Dimensions} from "react-native";
+import {View, StyleSheet, Image, Dimensions, FlatList} from "react-native";
 import {
   Layout,
   TopNav,
@@ -11,8 +11,8 @@ import { Ionicons } from "@expo/vector-icons";
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
 import TagsList from "../../components/TagsList";
-import SmallText from "../../components/SmallText";
 import Button from "../../components/Button";
+import EventCard from "../../components/EventCard";
 import NormalText from "../../components/NormalText";
 
 import { db, storage } from "../../provider/Firebase";
@@ -23,6 +23,7 @@ const FullProfile = ({ route, navigation }) => {
   const [disabled, setDisabled] = useState(true);
   const [color, setColor] = useState("grey");
   const [image, setImage] = useState(null);
+  const [events, setEvents] = useState([]);
   const [inviterImage, setInviterImage] = useState("https://static.wixstatic.com/media/d58e38_29c96d2ee659418489aec2315803f5f8~mv2.png");
 
   useEffect(() => { // updates stuff right after React makes changes to the DOM
@@ -79,6 +80,17 @@ const FullProfile = ({ route, navigation }) => {
           });
         }
       });
+    }).then(() => {
+      let list = [];
+      db.collection("Public Events").onSnapshot(query => {
+        query.forEach(doc => {
+          if (doc.data().hostID === route.params.person.id) {
+            list.push(doc.data());
+          }
+        });
+
+        setEvents(list);
+      });
     });
   }, []);
   
@@ -128,24 +140,28 @@ const FullProfile = ({ route, navigation }) => {
           <MediumText>@{route.params.person.username}</MediumText>
 
           <View style={{flexDirection: "row", marginVertical: 10}}>
-          <Button disabled={disabled} onPress={connect} backgroundColor={color}
-            paddingHorizontal={20}>
-            {status}
-          </Button>
-          <Button onPress={() => {
-            navigation.navigate("Report", {
-              user: route.params.person
-            });
-          }} backgroundColor="red" paddingHorizontal={20}>
-            Report
-          </Button>
+            <Button disabled={disabled} onPress={connect} backgroundColor={color}
+              paddingVertical={5} paddingHorizontal={15} fontSize={14}>
+              {status}
+            </Button>
+            <Button onPress={() => {
+              navigation.navigate("Report", {
+                user: route.params.person
+              });
+            }} backgroundColor="red" paddingVertical={5} 
+            paddingHorizontal={15}  fontSize={14}>
+              Report
+            </Button>
+          </View>
         </View>
-      </View>
 
-      <TagsList tags={route.params.person.tags}/>
-      <MediumText>"{route.params.person.quote}"</MediumText>
-
+        <TagsList tags={route.params.person.tags}/>
+        <MediumText>"{route.params.person.quote}"</MediumText>
+        
       </View>
+      <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
+        data={events} renderItem={({item}) => <EventCard event={item} disabled/>
+      }/>
     </Layout>
   );
 }
@@ -175,6 +191,12 @@ const styles = StyleSheet.create({
   name: {
     alignItems: "center",
     marginVertical: 20
+  },
+
+  cards: {
+    alignItems: "center",
+    paddingTop: 20,
+    paddingBottom: 40
   },
 });
 
