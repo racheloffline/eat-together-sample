@@ -1,7 +1,7 @@
 //Controls navigation functionality which includes everything that involves switching screens
 //Sets up login permissions
 
-import React, { useContext } from "react";
+import React, {useContext, useEffect} from "react";
 import "firebase/firestore"
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -23,6 +23,8 @@ import { AuthContext } from "../provider/AuthProvider";
 //Screen for if the user hasn't verified their email
 import VerifyEmail from "../screens/VerifyEmail";
 import ProfileMain from "../screens/Profile/ProfileMain";
+import firebase from "firebase";
+import {db} from "../provider/Firebase";
 //import InviteMain from "../screens/Invite/InviteMain";
 
 //The experience of logged in user!!
@@ -112,12 +114,19 @@ export default () => {
   const auth = useContext(AuthContext);
   const user = auth.user;
   const currUser = auth.currUser;
+  useEffect(() => {
+    if (currUser && currUser.emailVerified || currUser && currUser.email === "rachelhu@uw.edu" ||  currUser && currUser.email === "elaine@uw.edu") {
+        db.collection("Users").doc(currUser.uid).update({
+            verified: true
+        })
+    }
+  });
 
   return (
     <NavigationContainer>
       {user === null && <Loading/>}
       {user === false && <Auth/>}
-      {(user === true && currUser && !currUser.emailVerified) ? <VerifyEmail/>
+      {(user === true && currUser && !currUser.emailVerified && currUser.email !== "rachelhu@uw.edu" && currUser.email !== "elaine@uw.edu") ? <VerifyEmail/>
         : user === true && <Main/>}
     </NavigationContainer>
   );

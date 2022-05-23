@@ -13,6 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import {db} from "../../provider/Firebase";
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
+import NormalText from "../../components/NormalText";
 import TagsList from "../../components/TagsList";
 import {getAuth} from "firebase/auth";
 import EventCard from '../../components/EventCard';
@@ -21,9 +22,12 @@ export default function ({ navigation }) {
     const user = firebase.auth().currentUser;
     const [name, setName] = React.useState('');
     const [quote, setQuote] = React.useState('');
+    const [username, setUsername] = React.useState('');
     const [image, setImage] = React.useState('');
-    const [tags, setTags] = React.useState('');
+    const [tags, setTags] = React.useState([]);
     const [events, setEvents] = useState([]);
+    const [attendingEventIDs, setattendingEventIDs] = React.useState([]);
+    const [attendedEventIDs, setattendedEventIDs] = React.useState([]);
     useEffect(() => {
             const ref = db.collection("Users");
             ref.onSnapshot((query) => {
@@ -33,6 +37,9 @@ export default function ({ navigation }) {
                         setQuote(doc.data().quote);
                         setImage(doc.data().image);
                         setTags(doc.data().tags);
+                        setUsername(doc.data().username);
+                        setattendedEventIDs(doc.data().attendedEventIDs);
+                        setattendingEventIDs(doc.data().attendingEventIDs);
                     }
                 });
             });
@@ -56,6 +63,7 @@ export default function ({ navigation }) {
             setEvents(list);
             });
     }, []);
+
     return (
     <Layout>
         <View style={styles.page}>
@@ -68,23 +76,21 @@ export default function ({ navigation }) {
                 <Image style={styles.image} source={{uri: image}}/>
                 <View style={styles.name}>
                     <LargeText>{name}</LargeText>
-                    <View style = {{alignItems: 'center'}}>
-                        <Ionicons name="calendar-outline" size = {30} onPress={() => {
-                            navigation.navigate("Schedule");
-                        }}></Ionicons>
-                    </View>
+                    <NormalText>{attendedEventIDs.length + "/" + attendingEventIDs.length + " meals attended"}</NormalText>
+                    <MediumText>{username}</MediumText>
                 </View>
+                <TagsList tags = {tags}/>
                 <MediumText>{quote}</MediumText>
         </View>
         <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
             data={events} renderItem={({item}) =>
-                                <EventCard event={item} disabled click={() => {
-                                    navigation.navigate("FullCardPrivate", {
-                                        event: item,
-                                        public: false
-                                    });
-                                }}/>
-                            }/>
+            <EventCard event={item} disabled click={() => {
+                navigation.navigate("FullCardPrivate", {
+                    event: item,
+                    public: false
+                });
+            }}/>
+            }/>
     </Layout>
 
     );
@@ -95,7 +101,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingBottom: 40
   },
-  
+
   page: {
     paddingTop: 30,
     alignItems: "center",
@@ -105,19 +111,20 @@ const styles = StyleSheet.create({
   background: {
     position: "absolute",
     width: Dimensions.get('screen').width,
-    height: 100,
+    height: 150,
     backgroundColor: "#5DB075"
   },
 
   image: {
-    width: 150,
-    height: 150,
+    width: 175,
+    height: 175,
     borderColor: "white",
     borderWidth: 3,
-    borderRadius: 100
+    borderRadius: 100,
   },
 
   name: {
-    marginVertical: 20
+    marginVertical: 20,
+    alignItems: "center"
   },
 });

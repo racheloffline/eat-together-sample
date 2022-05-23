@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { View, TouchableOpacity, Dimensions, KeyboardAvoidingView } from "react-native";
+import {View, TouchableOpacity, Dimensions, KeyboardAvoidingView, StyleSheet} from "react-native";
 import { Layout, SectionImage  } from "react-native-rapi-ui";
 import { TextInput } from 'react-native-rapi-ui';
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import * as ImagePicker from 'expo-image-picker';
 
 import Header from "../../components/Header";
 import getDate from "../../getDate";
@@ -11,7 +12,8 @@ import getTime from "../../getTime";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
 import Button from "../../components/Button";
 
-import { auth } from "../../provider/Firebase";
+import {auth, storage} from "../../provider/Firebase";
+import {ImageBackground} from "react-native";
 
 export default function ({ navigation }) {
     const user = auth.currentUser;
@@ -21,6 +23,7 @@ export default function ({ navigation }) {
     const [location, setLocation] = useState("");
     const [date, setDate] = useState(new Date());
     const [additionalInfo, setAdditionalInfo] = useState("");
+    const [photo, setPhoto] = useState("https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400");
 
     // Other variables
     const [showDate, setShowDate] = useState(false);
@@ -48,14 +51,27 @@ export default function ({ navigation }) {
         setLocation("");
         setDate(new Date());
         setAdditionalInfo("");
-    }
+    };
+
+    const handleChoosePhoto = async () => {
+       let result = await ImagePicker.launchImageLibraryAsync({});
+       if (!result.cancelled) {
+           setPhoto(result.uri);
+       }
+    };
 
     return (
         <Layout>
             <KeyboardAvoidingView behavior="position" style={{flex: 1}} navigation={navigation}>
                 <Header name="Organize" navigation={navigation}/>
                 <HorizontalSwitch left="Private" right="Public" current="left" press={(val) => navigation.navigate("OrganizePublic")}/>
-                <SectionImage source={require('../../../assets/food.jpg')} />
+                <ImageBackground source={{uri: photo}} style={styles.image}>
+                <View style={styles.imageOverlay}>
+                    <TouchableOpacity onPress={() => handleChoosePhoto()}>
+                        <Ionicons name={"create"} color={"white"} size={40}></Ionicons>
+                    </TouchableOpacity>
+                </View>
+                </ImageBackground>
                 <TextInput
                     placeholder="Event Name"
                     value={name}
@@ -123,12 +139,18 @@ export default function ({ navigation }) {
                 />
 
                 <Button disabled={disabled} onPress={function () {
+                    let hasImage = false;
+                    if (photo !== "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400") {
+                        hasImage = true;
+                    }
                     navigation.navigate("InvitePeople", {
                         name,
                         location,
                         date,
                         additionalInfo: additionalInfo,
                         attendees: [],
+                        hasImage: hasImage,
+                        image: hasImage ? photo : "",
                         clearAll
                     });
                 }} marginVertical={20}>See people available!</Button>
@@ -136,3 +158,20 @@ export default function ({ navigation }) {
         </Layout>
     );
 }
+
+const styles = StyleSheet.create({
+    imageOverlay: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        justifyContent: 'flex-start',
+        alignItems: 'flex-end',
+        margin: 15,
+    },
+    image: {
+        width: '100%',
+        height: 150,
+    }
+});

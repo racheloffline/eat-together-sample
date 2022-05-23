@@ -22,7 +22,7 @@ export default function({ navigation }) {
 		ref.onSnapshot((query) => {
 			let users = [];
 			query.forEach((doc) => {
-				if (doc.data().id !== user.uid) {
+				if (doc.data().id !== user.uid && doc.data().verified) {
 					users.push(doc.data());
 				}
 			});

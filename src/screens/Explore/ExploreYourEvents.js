@@ -11,6 +11,7 @@ import HorizontalSwitch from "../../components/HorizontalSwitch";
 
 import getDate from "../../getDate";
 import { db, auth } from "../../provider/Firebase";
+import * as firebase from "firebase";
 
 export default function({ navigation }) {
     const [events, setEvents] = useState([]); // initial state, function used for updating initial state
@@ -29,20 +30,19 @@ export default function({ navigation }) {
                         let data = event.data();
                         data.type = e.type;
                         newEvents.unshift(data);
-                        //setEvents(events => ([...events, data]));
+                        setFilteredEvents(newEvents);
+                        setEvents(newEvents);
                     });
                 } else {
                     db.collection("Private Events").doc(e.id).get().then(event => {
                         let data = event.data();
                         data.type = e.type;
                         newEvents.unshift(data);
-                        //setEvents(events => ([...events, data]));
+                        setFilteredEvents(newEvents);
+                        setEvents(newEvents);
                     });
                 }
             });
-        }).then(() => {
-            setEvents(newEvents);
-            setFilteredEvents(newEvents);
         });
     }, []);
 
@@ -75,8 +75,20 @@ export default function({ navigation }) {
         search(text);
     }
 
-    // Deletes event from DOM
+    // Deletes event from DOM and updates Firestore
     const deleteEvent = id => {
+        // TODO: Rachel Fix!
+        /*
+        const user = auth.currentUser;
+        db.collection("Private Events").doc(id).update({
+            attendees : firebase.firestore.FieldValue.arrayRemove(user.uid)
+        }).then(() => {
+            db.collection("Private Events").doc(id).get().then((doc) => {
+                if (doc.data().attendees.length == 0) {
+                }
+            });
+        });
+         */
         const newEvents = events.filter(e => e.id !== id);
         const newFilteredEvents = events.filter(e => e.id !== id);
         setEvents(newEvents);

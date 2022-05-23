@@ -16,7 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import getDate from "../../getDate";
 import getTime from "../../getTime";
 
-import { db, auth } from "../../provider/Firebase";
+import {db, auth, storage} from "../../provider/Firebase";
 import * as firebase from "firebase";
 
 const FullCard = ({ route, navigation }) => {
@@ -24,8 +24,15 @@ const FullCard = ({ route, navigation }) => {
   const [host, setHost] = useState(null);
   const [attending, setAttending] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [image, setImage] = useState("");
 
   useEffect(() => {
+    if (route.params.event.hasImage) {
+      storage.ref("eventPictures/" + route.params.event.id).getDownloadURL().then(uri => {
+        setImage(uri);
+      });
+    }
+
     db.collection("Users").doc(route.params.event.hostID).get().then(doc => {
       setHost(doc.data());
     });
@@ -98,7 +105,7 @@ const FullCard = ({ route, navigation }) => {
         <MediumText center>Hosted by: {host ? host.name : "Person"}</MediumText>
         <View style={styles.details}>
             <Image style={styles.image}
-              source={route.params.event.image ? {uri: route.params.event.image} : require("../../../assets/logo.png")}/>
+              source={image ? {uri: image} : {uri: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400"}}/>
 
             <View style={{flexDirection: "column"}}>
                 <NormalText>{getDate(route.params.event.date.toDate())}</NormalText>

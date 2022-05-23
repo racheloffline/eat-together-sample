@@ -13,6 +13,7 @@ import MediumText from "../../components/MediumText";
 import TagsList from "../../components/TagsList";
 import Button from "../../components/Button";
 import EventCard from "../../components/EventCard";
+import NormalText from "../../components/NormalText";
 
 import { db, storage } from "../../provider/Firebase";
 import firebase from "firebase";
@@ -23,6 +24,7 @@ const FullProfile = ({ route, navigation }) => {
   const [color, setColor] = useState("grey");
   const [image, setImage] = useState(null);
   const [events, setEvents] = useState([]);
+  const [inviterImage, setInviterImage] = useState("https://static.wixstatic.com/media/d58e38_29c96d2ee659418489aec2315803f5f8~mv2.png");
 
   useEffect(() => { // updates stuff right after React makes changes to the DOM
     const user = firebase.auth().currentUser;
@@ -30,6 +32,12 @@ const FullProfile = ({ route, navigation }) => {
     let thisUser = db.collection("Users").doc(user.uid);
     thisUser.get().then((doc) => {
       let thisData = doc.data();
+      // Save some images
+      if (thisData.hasImage) {
+        storage.ref("profilePictures/" + thisData.id).getDownloadURL().then(uri => {
+          setInviterImage(uri);
+        });
+      }
       let requestedUser = db.collection("Users").doc(route.params.person.id);
 
       requestedUser.get().then((doc) => {
@@ -96,7 +104,8 @@ const FullProfile = ({ route, navigation }) => {
         let userData = curUser.data();
         db.collection("User Invites").doc(data.id).collection("Connections").doc(user.uid).set({
           name: userData.name,
-          username: userData.username
+          username: userData.username,
+          profile: inviterImage
         }).then(() => {
           setStatus("Request Sent");
           setDisabled(true);
@@ -125,6 +134,9 @@ const FullProfile = ({ route, navigation }) => {
         
         <View style={styles.name}>
           <LargeText>{route.params.person.name}</LargeText>
+          <NormalText>
+          {route.params.person.attendedEventIDs.length + "/" + route.params.person.attendingEventIDs.length + " meals attended"}
+          </NormalText>
           <MediumText>@{route.params.person.username}</MediumText>
 
           <View style={{flexDirection: "row", marginVertical: 10}}>
