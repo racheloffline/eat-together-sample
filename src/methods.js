@@ -74,7 +74,7 @@ export const getProfileRecs = () => {
                     }
                 }
                 // input distance information into map and array
-                distances[count] = matrix[b.length][a.length];
+                distances.push(matrix[b.length][a.length]);
                 otherUsers[matrix[b.length][a.length]] = username;
                 ++count;
             });
@@ -84,7 +84,7 @@ export const getProfileRecs = () => {
     let bestUsers = [];
     // Store usernames of other users with lowest distance between current user's tags
     for (let i = 0; i < 5; i++) {
-        bestUsers[i] = otherUsers[distances[i]];
+        bestUsers.push(otherUsers[distances[i]]);
     }
     // best users is a string array returning users from the first best match to the fifth
     return bestUsers; 
