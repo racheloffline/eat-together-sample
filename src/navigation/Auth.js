@@ -103,7 +103,8 @@ const Auth = () => {
                         },
                         settings: {
                             notifications: true
-                        }
+                        },
+                        verified: false
                     }
                     
                     db.collection("Users").doc(`${uid}`).set(userData);

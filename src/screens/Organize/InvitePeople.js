@@ -146,22 +146,25 @@ export default function({ route, navigation }) {
         });
          */
         const ref = db.collection("Users");
+        const user = firebase.auth().currentUser;
         ref.onSnapshot((query) => {
             const list = [];
             query.forEach((doc) => {
                 let data = doc.data();
-                list.push({
-                    id: doc.id,
-                    username: data.username,
-                    personID: data.id,
-                    name: data.name,
-                    quote: data.quote,
-                    hasImage: data.hasImage,
-                    attendees: data.attendees,
-                    tags: data.tags,
-                    attendedEventIDs: data.attendedEventIDs,
-                    attendingEventIDs: data.attendingEventIDs
-                });
+                if (data.verified && data.id !== user.uid) {
+                    list.push({
+                        id: doc.id,
+                        username: data.username,
+                        personID: data.id,
+                        name: data.name,
+                        quote: data.quote,
+                        hasImage: data.hasImage,
+                        attendees: data.attendees,
+                        tags: data.tags,
+                        attendedEventIDs: data.attendedEventIDs,
+                        attendingEventIDs: data.attendingEventIDs
+                    });
+                }
             });
             setFilteredUsers(list);
             setUsers(list);
