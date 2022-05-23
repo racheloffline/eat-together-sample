@@ -1,7 +1,8 @@
 {
 	"expo": {
 		"name": "Eat Together",
-		"slug": "eat-together",
+		"owner": "eat-together",
+		"slug": "eat-together-mvp",
 		"description": "Connecting students through shared meals.",
 		"version": "0.1.0",
 		"orientation": "portrait",
