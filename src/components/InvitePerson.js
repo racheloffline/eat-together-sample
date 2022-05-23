@@ -1,28 +1,50 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { View, StyleSheet, Image} from 'react-native';
 import {CheckBox} from 'react-native-rapi-ui';
 import LargeText from "./LargeText";
 import MediumText from "./MediumText";
+import {storage} from "../provider/Firebase";
+import {TouchableOpacity} from "react-native";
 
 const InvitePerson = props => {
     const [attendees, setAttendees] = React.useState(props.attendees);
     const [checkBox, setCheckbox] = React.useState(false);
+    const [image, setImage] = React.useState("");
+    const [quote, setQuote] = React.useState("");
+    useEffect(() => {
+        if (props.person.hasImage) {
+            storage.ref("profilePictures/" + props.person.personID).getDownloadURL().then(uri => {
+                setImage(uri);
+            });
+        }
+        if (props.person.quote.length > 31) {
+            setQuote(props.person.quote.substr(0, 28) + "...");
+        } else {
+            setQuote(props.person.quote);
+        }
+    })
     return (
         <View style={styles.outline}>
             <View style={styles.head}>
-                <View style={styles.headleft}>
-                <Image style={styles.image} source={{uri: props.person.profile}}/>
-                <MediumText>{props.person.name}</MediumText>
-                </View>
+                <TouchableOpacity onPress={() => {
+                    props.navigation.navigate("FullProfile", {
+                        person: props.person
+                    });
+                }}>
+                    <View style={styles.headleft}>
+                    <Image style={styles.image} source={{uri: image === "" ? "https://static.wixstatic.com/media/d58e38_29c96d2ee659418489aec2315803f5f8~mv2.png" : image}}/>
+                    <MediumText>{props.person.name}</MediumText>
+                    </View>
+                </TouchableOpacity>
                 <View style={styles.checkbox}>
                     <CheckBox value={checkBox} onValueChange={(val) => {
                         setCheckbox(val);
                         const curr = attendees;
-                        const isName = (elem) => elem == props.person.hostID;
+                        const isName = (elem) => elem == props.person.personID;
                         if (val) {
                             let index = curr.findIndex(isName);
                             if (index == -1) {
-                                curr.push(props.person.hostID.toString());
+                                curr.push(props.person.personID.toString());
                             }
                         } else {
                             let index = curr.findIndex(isName);
@@ -35,7 +57,7 @@ const InvitePerson = props => {
                 </View>
             </View>
             <View style={[styles.body, {backgroundColor: props.color}]}>
-                <MediumText>"{props.person.quote}"</MediumText>
+                <MediumText>"{quote}"</MediumText>
             </View>
         </View>
     );

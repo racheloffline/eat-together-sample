@@ -1,15 +1,24 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { View, StyleSheet, Image} from 'react-native';
 import MediumText from "./MediumText";
 import {TouchableOpacity} from "react-native";
+import {storage} from "../provider/Firebase";
 
 const PeopleList = props => {
+    const [image, setImage] = useState("https://static.wixstatic.com/media/d58e38_29c96d2ee659418489aec2315803f5f8~mv2.png");
+    useEffect(() => {
+        if (props.person.hasImage) {
+            storage.ref("profilePictures/" + props.person.id).getDownloadURL().then(uri => {
+                setImage(uri);
+            });
+        }
+    }, []);
     return (
         <View style={styles.outline}>
             <TouchableOpacity onPress={props.click}>
                 <View style={[styles.head, {backgroundColor: props.color}]}>
                     <View style={styles.headleft}>
-                        <Image style={styles.image} source={{uri: props.person.profile}}/>
+                        <Image style={styles.image} source={{uri: image}}/>
                         <MediumText style={{color: 'white'}}>{props.person.name}</MediumText>
                     </View>
                 </View>

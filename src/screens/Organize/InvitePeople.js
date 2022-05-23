@@ -11,13 +11,9 @@ import firebase from "firebase";
 import MediumText from "../../components/MediumText";
 import InvitePerson from "../../components/InvitePerson";
 import {getProfileRecs} from "../../methods";
-
-const generateColor = () => {
-    const randomColor = Math.floor(Math.random() * 16777215)
-        .toString(16)
-        .padStart(6, '0');
-    return `#${randomColor}`;
-};
+import Searchbar from "../../components/Searchbar";
+import getDate from "../../getDate";
+import {generateColor} from "../../methods";
 
 const storeImage = async (uri, event_id) => {
     const response = await fetch(uri);
@@ -94,10 +90,39 @@ async function sendInvites (attendees, invite, navigation) {
     })
 };
 
+
+const isMatch = (user, text) => {
+    if (user.name.toLowerCase().includes(text.toLowerCase())) { // Name
+        return true;
+    }
+
+    if (user.username.toLowerCase().includes(text.toLowerCase())) { // Location
+        return true;
+    }
+
+    if (user.quote.toLowerCase().includes(text.toLowerCase())) { // Date
+        return true;
+    }
+
+    return false;
+}
+
 export default function({ route, navigation }) {
     const [users, setUsers] = useState([]); // initial state, function used for updating initial state
+    const [filteredUsers, setFilteredUsers] = useState([]);
     const attendees = route.params.attendees;
     const [curSearch, setCurSearch] = useState("");
+    const [image, setImage] = useState(null);
+
+    const onChangeText = (text) => {
+        setCurSearch(text);
+        search(curSearch);
+    }
+
+    const search = (text) => {
+        let newEvents = users.filter(e => isMatch(e, text));
+        setFilteredUsers(newEvents);
+    }
 
     useEffect(() => { // updates stuff right after React makes changes to the DOM
         //LINKING ELAINE'S ALGO
@@ -127,14 +152,18 @@ export default function({ route, navigation }) {
                 let data = doc.data();
                 list.push({
                     id: doc.id,
-                    hostID: data.id,
+                    username: data.username,
+                    personID: data.id,
                     name: data.name,
                     quote: data.quote,
-                    profile: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211",
-                    attendees: data.attendees
+                    hasImage: data.hasImage,
+                    attendees: data.attendees,
+                    tags: data.tags,
+                    attendedEventIDs: data.attendedEventIDs,
+                    attendingEventIDs: data.attendingEventIDs
                 });
             });
-
+            setFilteredUsers(list);
             setUsers(list);
         });
     }, []);
@@ -153,42 +182,17 @@ export default function({ route, navigation }) {
                 }
                 leftAction={() => navigation.goBack()}
             />
-            <View style={styles.tagInput}>
-                <TextInput placeholder="Or search by username" value={curSearch}
-                           containerStyle={styles.input} onChangeText={val => setCurSearch(val)}
-                           leftContent={<FontAwesome name="search" size={18}/>}/>
-                <Button text="Go" color="#5DB075" onPress={()=> {
-                    const user = auth.currentUser;
-                    db.collection("Users").doc(user.uid).get().then((doc) => {
-                        if (curSearch === doc.data().username) {
-                            alert("No need to invite yourself.")
-                            return;
-                        }
-                        db.collection("Users").limit(1).where("username", "==", curSearch).get().then((snapshot) => {
-                            if (!snapshot.empty) {
-                                const doc = snapshot.docs[0];
-                                const data = doc.data();
-                                setUsers([{
-                                    id: doc.id,
-                                    name: data.name,
-                                    quote: data.quote,
-                                    hostID: user.uid,
-                                    profile: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211"
-                                }]);
-                            } else {
-                                alert("Username not found.");
-                            }
-                        });
-                    })
-                }} disabled={curSearch === ""}/>
-            </View>
+                <Searchbar placeholder="Search by name, date, location, or additional info"
+                           value={curSearch} onChangeText={onChangeText}/>
             <FlatList contentContainerStyle={styles.invites} keyExtractor={item => item.id}
-                      data={users} renderItem={({item}) =>
-                <InvitePerson person={item} attendees={attendees} color={generateColor()}/>
+                      data={filteredUsers} renderItem={({item}) =>
+                <InvitePerson navigation={navigation} person={item} attendees={attendees} color={generateColor()}/>
             }/>
             <View style={styles.buttons}>
-                <Button text="Send Invites" width={200} color="#5DB075" size="lg" onPress={() => sendInvites(attendees, route.params)}/>
-                <Button color="#5DB075" outline width={200} text="Done" onPress={()=> navigation.navigate("OrganizePrivate")}/>
+                <Button text="Send Invites" width={Dimensions.get('screen').width} color="#5DB075" size="lg" onPress={() => {
+                    sendInvites(attendees, route.params);
+                    navigation.navigate("OrganizePrivate");
+                }}/>
             </View>
         </Layout>
 

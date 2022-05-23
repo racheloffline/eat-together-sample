@@ -23,7 +23,7 @@ const FullProfile = ({ route, navigation }) => {
   const [disabled, setDisabled] = useState(true);
   const [color, setColor] = useState("grey");
   const [image, setImage] = useState(null);
-  const [inviterImage, setInviterImage] = useState("https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211");
+  const [inviterImage, setInviterImage] = useState("https://static.wixstatic.com/media/d58e38_29c96d2ee659418489aec2315803f5f8~mv2.png");
 
   useEffect(() => { // updates stuff right after React makes changes to the DOM
     const user = firebase.auth().currentUser;
