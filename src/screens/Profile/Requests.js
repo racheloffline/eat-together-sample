@@ -21,7 +21,7 @@ export default function ({ navigation }) {
     //Check to see if we should display the "No Requests" placeholder text
     function shouldDisplayPlaceholder(list) {
         if(list == null ||list.length === 0) {
-            return "No connections. Meet friends on the People page!"
+            return "No requests. You look great today!"
         } else {
             return ""
         }

@@ -1,19 +1,15 @@
 //View invites to private events
 
 import React, {useEffect, useState} from 'react';
-import {FlatList, View, StyleSheet, Image, ScrollView, TouchableOpacity, Dimensions} from 'react-native';
-import {Layout, Text, TopNav} from 'react-native-rapi-ui';
-import LargeText from "../../components/LargeText";
+import {FlatList, View, StyleSheet, TouchableOpacity, Dimensions} from 'react-native';
+import {Layout, TopNav} from 'react-native-rapi-ui';
 import NormalText from "../../components/NormalText";
-import SmallText from "../../components/SmallText";
 import {Ionicons} from "@expo/vector-icons";
-import Tag from "../../components/Tag";
 import MediumText from "../../components/MediumText";
 import {db} from "../../provider/Firebase";
-import {AuthContext, AuthProvider} from "../../provider/AuthProvider";
 import firebase from "firebase";
-import DateTimeConverter from "../../components/utils/DateTimeConverter";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
+import InviteIcon from "./InviteIcon";
 
 export default function ({ navigation }) {
 	//Get a list of current invites from Firebase up here
@@ -23,7 +19,7 @@ export default function ({ navigation }) {
 	//check to see which text to display for accepted status
 	function checkAccepted(item) {
 		if(item.accepted == null) {
-			return ""
+			return "New invite!"
 		} else if(item.accepted === "accepted") {
 			return "You have accepted this invite!"
 		} else if(item.accepted === "declined") {
@@ -35,7 +31,7 @@ export default function ({ navigation }) {
 
 	//Check to see if we should display the "No Invites" placeholder text
 	function shouldDisplayPlaceholder(list) {
-		if(list == null ||list.length === 0) {
+		if(list == null || list.length === 0) {
 			return "No invites as of yet. Explore some public events! :)"
 		} else {
 			return ""
@@ -103,17 +99,23 @@ export default function ({ navigation }) {
 					data = {invites}
 					renderItem={
 						({item}) =>
-							<View>
-								<TouchableOpacity onPress={() => {
-									navigation.navigate("InviteFull", {
-										invite: item
-									})
-								}}>
-									<MediumText style = {styles.listMainText}>{item.hostName}</MediumText>
-									<NormalText style = {styles.listSubText}>Is inviting you to: {item.name}</NormalText>
-									<NormalText style = {styles.listSubText}>{checkAccepted(item)}</NormalText>
-								</TouchableOpacity>
-							</View>
+							<TouchableOpacity onPress={() => {
+								navigation.navigate("InviteFull", {
+									invite: item
+								})
+							}}>
+								<View style = {styles.buttons}>
+									<View width = {60} marginTop = {25}>
+										<InviteIcon accepted = {item.accepted}/>
+									</View>
+									<View width = {300} >
+										<MediumText style = {styles.listMainText}>{item.hostName}</MediumText>
+										<NormalText style = {styles.listSubText}>Is inviting you to: {item.name}</NormalText>
+										<NormalText style = {styles.listSubText}>{checkAccepted(item)}</NormalText>
+									</View>
+								</View>
+							</TouchableOpacity>
+
 					}
 				/>
 			</View>
@@ -139,7 +141,7 @@ const styles = StyleSheet.create({
 		marginVertical: -20,
 	},
 	listView: {
-		marginLeft: 25
+		marginLeft: -15
 	},
 	listMainText: {
 		padding: 12,
@@ -153,5 +155,9 @@ const styles = StyleSheet.create({
 		display: "flex",
 		textAlign: 'left',
 		fontSize: 18
+	},
+	buttons: {
+		justifyContent: "center",
+		flexDirection: "row"
 	}
 });
