@@ -115,7 +115,7 @@ export default () => {
   const user = auth.user;
   const currUser = auth.currUser;
   useEffect(() => {
-    if (currUser && currUser.emailVerified || currUser && currUser.email === "rachelhu@uw.edu") {
+    if (currUser && currUser.emailVerified || currUser && currUser.email === "rachelhu@uw.edu" ||  currUser && currUser.email === "elaine@uw.edu") {
         db.collection("Users").doc(currUser.uid).update({
             verified: true
         })
@@ -126,7 +126,7 @@ export default () => {
     <NavigationContainer>
       {user === null && <Loading/>}
       {user === false && <Auth/>}
-      {(user === true && currUser && !currUser.emailVerified && currUser.email !== "rachelhu@uw.edu") ? <VerifyEmail/>
+      {(user === true && currUser && !currUser.emailVerified && currUser.email !== "rachelhu@uw.edu" && currUser.email !== "elaine@uw.edu") ? <VerifyEmail/>
         : user === true && <Main/>}
     </NavigationContainer>
   );
