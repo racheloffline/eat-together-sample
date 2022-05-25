@@ -1,35 +1,38 @@
 {
-	"expo": {
-		"name": "Eat Together",
-		"owner": "eat-together",
-		"slug": "eat-together-mvp",
-		"description": "Connecting students through shared meals.",
-		"version": "0.1.0",
-		"orientation": "portrait",
-		"icon": "./assets/logo.png",
-		"splash": {
-			"image": "./assets/logo.png",
-			"resizeMode": "contain",
-			"backgroundColor": "#ffffff"
-		},
-		"updates": {
-			"fallbackToCacheTimeout": 0
-		},
-		"assetBundlePatterns": ["**/*"],
-		"ios": {
-			"supportsTablet": true
-		},
-		"web": {
-			"favicon": "./assets/logo.png"
-		},
-		"userInterfaceStyle": "automatic",
-		"plugins": [
-			[
-			  "expo-image-picker",
-			  {
-				"photosPermission": "The app accesses your photos to let you pick a profile image."
-			  }
-			]
-		  ]
-	}
+  "expo": {
+    "name": "Eat Together",
+    "owner": "eat-together",
+    "slug": "eat-together-mvp",
+    "description": "Connecting students through shared meals.",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/logo.png",
+    "splash": {
+      "image": "./assets/logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.eattogether.eattogethermvp"
+    },
+    "web": {
+      "favicon": "./assets/logo.png"
+    },
+    "userInterfaceStyle": "automatic",
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you pick a profile image."
+        }
+      ]
+    ]
+  }
 }
