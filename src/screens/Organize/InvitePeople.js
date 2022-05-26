@@ -1,11 +1,11 @@
 //Display upcoming events to join
 
-import React, {useEffect, useState} from "react";
-import {View, StyleSheet, FlatList, Dimensions} from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet, FlatList, Dimensions } from "react-native";
 
-import {db, auth, storage} from "../../provider/Firebase";
-import {TopNav, Button, TextInput, Layout} from "react-native-rapi-ui";
-import {FontAwesome, Ionicons} from "@expo/vector-icons";
+import { db, auth, storage } from "../../provider/Firebase";
+import { TopNav, Button, Layout } from "react-native-rapi-ui";
+import { Ionicons } from "@expo/vector-icons";
 import firebase from "firebase";
 
 import MediumText from "../../components/MediumText";
@@ -58,6 +58,7 @@ async function sendInvites (attendees, invite, navigation) {
     db.collection("Private Events").doc(id).set({
         id,
         name: invite.name,
+        hostID: user.uid,
         location: invite.location,
         date: invite.date,
         additionalInfo: invite.additionalInfo,

@@ -5,12 +5,14 @@ import { View, ScrollView, StyleSheet, Dimensions } from "react-native";
 import { Layout } from "react-native-rapi-ui";
 
 import LargeText from "../../../components/LargeText";
+import SmallText from "../../../components/SmallText";
 import Button from "../../../components/Button";
 
 export default function ({ navigation }) {
   return (
     <Layout style={styles.page}>
-        <LargeText center>Specify your availabilites for:</LargeText>
+        <LargeText center>Specify your availabilites</LargeText>
+        <SmallText center>Or feel free to do this later :)</SmallText>
 
         <ScrollView style={styles.dates}>
             <Button onPress={() => navigation.navigate("Monday")} marginVertical={5}>Monday</Button>

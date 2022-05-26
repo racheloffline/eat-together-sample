@@ -1,98 +1,96 @@
-import React, {useEffect, useState} from 'react';
-import {View, ScrollView, StyleSheet, Image, Dimensions, FlatList} from 'react-native';
-import {
-  Layout,
-  TopNav,
-  Text,
-  themeColor,
-  useTheme,
-  Button
-} from "react-native-rapi-ui";
-import firebase from "firebase";
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, Image, Dimensions, FlatList } from 'react-native';
+import { Layout } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
-import {db} from "../../provider/Firebase";
+import { db, auth, storage } from "../../provider/Firebase";
+
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
 import TagsList from "../../components/TagsList";
-import {getAuth} from "firebase/auth";
 import EventCard from '../../components/EventCard';
 
 export default function ({ navigation }) {
-    const user = firebase.auth().currentUser;
-    const [name, setName] = React.useState('');
-    const [quote, setQuote] = React.useState('');
-    const [username, setUsername] = React.useState('');
-    const [image, setImage] = React.useState('');
-    const [tags, setTags] = React.useState([]);
+    const user = auth.currentUser;
+
+    const [userInfo, setUserInfo] = useState({});
+    const [mealsAttended, setMealsAttended] = useState(0);
+    const [mealsSignedUp, setMealsSignedUp] = useState(0);
+
+    const [image, setImage] = useState('');
     const [events, setEvents] = useState([]);
-    const [attendingEventIDs, setattendingEventIDs] = React.useState([]);
-    const [attendedEventIDs, setattendedEventIDs] = React.useState([]);
+
     useEffect(() => {
-            const ref = db.collection("Users");
-            ref.onSnapshot((query) => {
-                query.forEach(doc => {
-                    if (doc.data().id === user.uid) {
-                        setName(doc.data().name);
-                        setQuote(doc.data().quote);
-                        setImage(doc.data().image);
-                        setTags(doc.data().tags);
-                        setUsername(doc.data().username);
-                        setattendedEventIDs(doc.data().attendedEventIDs);
-                        setattendingEventIDs(doc.data().attendingEventIDs);
+        db.collection("Users").doc(user.uid).get().then(doc => {
+            setUserInfo(doc.data());
+            setMealsAttended(doc.data().attendedEventIDs.length);
+            setMealsSignedUp(doc.data().attendingEventIDs.length);
+            
+            storage.ref("profilePictures/" + user.uid).getDownloadURL().then(uri => {
+                setImage(uri);
+            }).then(() => {
+                let newEvents = [];
+                doc.data().attendingEventIDs.forEach(e => {
+                    if (e.type === "public") {
+                        db.collection("Public Events").doc(e.id).get().then(event => {
+                            let data = event.data();
+                            data.type = e.type;
+                            newEvents.unshift(data);
+                            setEvents(newEvents);
+                        });
+                    } else {
+                        db.collection("Private Events").doc(e.id).get().then(event => {
+                            let data = event.data();
+                            data.type = e.type;
+                            newEvents.unshift(data);
+                            setEvents(newEvents);
+                        });
                     }
                 });
-            });
-            const ref2 = db.collection("Public Events");
-            let list = [];
-            ref2.onSnapshot((query) => {
-                query.forEach(doc => {
-                if (doc.data().hostID === user.uid) {
-                    list.push(doc.data());
-                }
-                });
-                setEvents(list);
-            });
-            const ref3 = db.collection("Private Events");
-            ref3.onSnapshot((query) => {
-                query.forEach(doc => {
-                if (doc.data().hostID === user.uid) {
-                    list.push(doc.data());
-                }
-                });
-            setEvents(list);
-            });
+            })
+        });
     }, []);
 
+    const updateInfo = (newName, newQuote, newTags, newImage) => {
+        setUserInfo(prev => ({
+            ...prev,
+            name: newName,
+            quote: newQuote,
+            tags: newTags
+        }));
+
+        setImage(newImage);
+    }
+
     return (
-    <Layout>
-        <View style={styles.page}>
-            <View style={styles.background}/>
-                <View style = {{paddingLeft: 350}}>
-                    <Ionicons name="cog-outline" size = {30} onPress={() => {
-                        navigation.navigate("Settings");
+        <Layout>
+            <View style={styles.page}>
+                <View style={styles.background}/>
+                <View style={styles.settings}>
+                    <Ionicons name="settings-sharp" size={40} color="white" onPress={() => {
+                        navigation.navigate("Settings", {
+                            user: userInfo,
+                            image,
+                            updateInfo
+                        });
                     }}></Ionicons>
                 </View>
-                <Image style={styles.image} source={{uri: image}}/>
-                <View style={styles.name}>
-                    <LargeText>{name}</LargeText>
-                    <NormalText>{attendedEventIDs.length + "/" + attendingEventIDs.length + " meals attended"}</NormalText>
-                    <MediumText>{username}</MediumText>
-                </View>
-                <TagsList tags = {tags}/>
-                <MediumText>{quote}</MediumText>
-        </View>
-        <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
-            data={events} renderItem={({item}) =>
-            <EventCard event={item} disabled click={() => {
-                navigation.navigate("FullCardPrivate", {
-                    event: item,
-                    public: false
-                });
-            }}/>
-            }/>
-    </Layout>
 
+                <Image style={styles.image} source={userInfo.hasImage ? {uri: image} : require("../../../assets/logo.png")}/>
+                <View style={styles.name}>
+                    <LargeText>{userInfo.name}</LargeText>
+                    <NormalText>{mealsAttended + "/" + mealsSignedUp + " meals attended"}</NormalText>
+                    <MediumText>@{userInfo.username}</MediumText>
+                </View>
+                <TagsList tags={userInfo.tags ? userInfo.tags : []}/>
+                <MediumText center>"{userInfo.quote}"</MediumText>
+            </View>
+
+            <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
+                data={events} renderItem={({item}) =>
+                <EventCard event={item} disabled/>
+            }/>
+        </Layout>
     );
 }
 const styles = StyleSheet.create({
@@ -127,4 +125,10 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     alignItems: "center"
   },
+
+  settings: {
+      position: "absolute",
+      right: 20,
+      top: 20
+  }
 });
