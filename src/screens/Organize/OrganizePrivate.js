@@ -62,7 +62,7 @@ export default function ({ navigation }) {
 
     return (
         <Layout>
-            <KeyboardAvoidingView behavior="position" style={{flex: 1}} navigation={navigation}>
+            <KeyboardAvoidingView behavior="position" style={{flex: 1}}>
                 <Header name="Organize" navigation={navigation}/>
                 <HorizontalSwitch left="Private" right="Public" current="left" press={(val) => navigation.navigate("OrganizePublic")}/>
                 <ImageBackground source={{uri: photo}} style={styles.image}>

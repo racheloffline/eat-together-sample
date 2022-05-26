@@ -11,7 +11,6 @@ import HorizontalSwitch from "../../components/HorizontalSwitch";
 
 import getDate from "../../getDate";
 import { db, auth } from "../../provider/Firebase";
-import * as firebase from "firebase";
 
 export default function({ navigation }) {
     const [events, setEvents] = useState([]); // initial state, function used for updating initial state

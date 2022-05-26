@@ -1,8 +1,8 @@
 // First page of registration
 
 import React, { useState } from "react";
-import { View, StyleSheet, Dimensions, Image, TouchableOpacity } from "react-native";
-import { Layout, TextInput } from "react-native-rapi-ui";
+import { View, StyleSheet, Dimensions, Image, TouchableOpacity, KeyboardAvoidingView } from "react-native";
+import { TextInput } from "react-native-rapi-ui";
 import { Feather, FontAwesome } from '@expo/vector-icons';
 
 import * as ImagePicker from 'expo-image-picker';
@@ -59,11 +59,8 @@ const Name = props => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
-      aspect: [4, 3],
       quality: 1,
     });
-
-    console.log(result);
 
     if (!result.cancelled) {
       setImage(result.uri);
@@ -71,7 +68,7 @@ const Name = props => {
   }
 
   return (
-    <Layout style={styles.page}>
+    <KeyboardAvoidingView style={styles.page} behavior="position">
       <View style={styles.header}>
         <LargeText color="white" center size={25}>Let's set up your profile!</LargeText>
       </View>
@@ -113,14 +110,13 @@ const Name = props => {
         </View>
         
       </View>
-    </Layout>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   page: {
-    alignItems: "center",
-    width: Dimensions.get('screen').width
+    flex: 1,
   },
 
   header: {
@@ -130,7 +126,8 @@ const styles = StyleSheet.create({
   },
 
   imageContainer: {
-    marginVertical: 30
+    marginTop: 30,
+    alignItems: "center"
   },
 
   image: {
@@ -140,9 +137,8 @@ const styles = StyleSheet.create({
   },
 
   editImage: {
-    position: "absolute",
-    right: -15,
-    bottom: -5,
+    left: 40,
+    bottom: 40,
     padding: 12,
     backgroundColor: "#5DB075",
     borderRadius: 100
