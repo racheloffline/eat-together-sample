@@ -145,6 +145,7 @@ export default function({ route, navigation }) {
             });
         });
          */
+        // COMMENT THIS AREA OUT WHEN READY (START)
         const ref = db.collection("Users");
         const user = firebase.auth().currentUser;
         ref.onSnapshot((query) => {
@@ -169,6 +170,7 @@ export default function({ route, navigation }) {
             setFilteredUsers(list);
             setUsers(list);
         });
+        // COMMENT THIS AREA OUT WHEN READY (END)
     }, []);
 
     return (
