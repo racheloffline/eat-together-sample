@@ -24,12 +24,15 @@ const storeImage = async (uri, event_id) => {
 };
 
 async function sendInvites (attendees, invite, navigation) {
+    console.log(attendees)
+    console.log(invite)
+
     const user = auth.currentUser;
     const id = Date.now() + user.uid;
 
     //Add photo as necessary
     if (invite.hasImage) {
-        storeImage(invite.image, id);
+        await storeImage(invite.image, id);
     }
 
     //Send invites to each of the selected users
@@ -67,9 +70,10 @@ async function sendInvites (attendees, invite, navigation) {
     }).then(async docRef => {
         await attendees.forEach((attendee) => {
             const ref = db.collection("User Invites").doc(attendee);
-            ref.get().then((docRef) => {
-                if (docRef.exists && (attendee !== user.uid)) {
-                    sendInvitations(ref)
+            ref.get().then(async (docRef) => {
+                console.log(docRef.exists)
+                if (attendee !== user.uid) {
+                    await sendInvitations(ref)
                 }
             })
 
@@ -195,9 +199,8 @@ export default function({ route, navigation }) {
                 <InvitePerson navigation={navigation} person={item} attendees={attendees} color={generateColor()}/>
             }/>
             <View style={styles.buttons}>
-                <Button text="Send Invites" width={Dimensions.get('screen').width} color="#5DB075" size="lg" onPress={() => {
-                    sendInvites(attendees, route.params);
-                    navigation.navigate("OrganizePrivate");
+                <Button text="Send Invites" width={Dimensions.get('screen').width} color="#5DB075" size="lg" onPress={async () => {
+                    await sendInvites(attendees, route.params, navigation);
                 }}/>
             </View>
         </Layout>
