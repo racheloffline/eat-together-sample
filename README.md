@@ -1,4 +1,4 @@
-# About the base template ✨✨✨
+# Getting Started ✨✨✨
 
 # Installation
 
@@ -9,8 +9,8 @@
    npm install --global expo-cli
    ```
 
-3. Download this repo
-4. Install deps on your template folder
+3. Clone this repo
+4. Install deps on wherever you cloned this folder
 
    ```jsx
    npm install
@@ -42,17 +42,12 @@ const firebaseConfig = {
 };
 ```
 
-and you good to go!
+and you are good to go!
 
-### Prebuilt UI Screens
-
-- Login screen `./src/screens/auth/login.tsx`
-- Register screen `./src/screens/auth/register.tsx`
-- Forget password screen `./src/screens/auth/forget.tsx`
 
 ### React Navigation Auth Flow
 
-The checking logged users process is inside `./src/provider/AuthProvider` I use React Context, you can add more functions like get the data of the user and store it to the context (better static data, ex: uid)
+The checking logged users process is inside `./src/provider/AuthProvider`.
 
 Inside the navigator `./src/navigation/AppNavigator.js`
 There's 2 stack navigator :
@@ -74,25 +69,3 @@ export default () => {
 	);
 };
 ```
-
-# Rapi UI
-
-These UI components are provided by [Rapi UI](https://rapi-ui.kikiding.space/).
-Check the [documentation](https://rapi-ui.kikiding.space/docs/) for usage and more components.
-
-# File Managements
-
-These are the folders and the functionality
-
-```jsx
-/src/assets -> for media such as images, etc
-/src/components -> for components
-/src/navigation -> for React Navigation
-/src/provider -> for React Context
-/src/screens -> for Screens
-```
-Original Author:
-
-if you find these useful don't forget to give it a star ⭐ and share it to your friends ❤️
-
-Reach me on [twitter](https://twitter.com/kikiding/)
