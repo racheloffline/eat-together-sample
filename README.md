@@ -1,6 +1,6 @@
 # Getting Started ✨✨✨
 
-# Installation
+# React Native Expo Installation
 
 1. Install [node.js](https://nodejs.org/en/)
 2. Install Expo
@@ -16,15 +16,15 @@
    npm install
    ```
 
-5. Start the environtment
+5. Start the environment
 
    ```jsx
    expo start
    ```
+   
+6. Get the expo mobile app (https://expo.dev/client) and scan the generated QR code with the app.
 
-# Auth Flow
-
-### Firebase Setup
+### Firebase Backend Setup
 
 - Fill this firebase config to your config inside `./src/navigation/AppNavigator.js`
 - Check out the Eat Together Google Drive for how to fill this out!
@@ -44,8 +44,10 @@ const firebaseConfig = {
 
 and you are good to go!
 
+Check out https://console.firebase.google.com/u/0/ to look at our database.
 
-### React Navigation Auth Flow
+
+### How React Navigation Auth Flow Works
 
 The checking logged users process is inside `./src/provider/AuthProvider`.
 
