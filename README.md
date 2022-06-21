@@ -26,7 +26,7 @@
 
 ### Firebase Backend Setup
 
-- Fill this firebase config to your config inside `./src/navigation/AppNavigator.js`
+- Fill this firebase config to your config inside `./src/provider/Firebase.js`
 - Check out the Eat Together Google Drive for how to fill this out!
 
 ```jsx
