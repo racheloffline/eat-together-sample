@@ -1,4 +1,4 @@
-//Functionality TDB, most likely to be used to implement ice-breaker games
+// TODO: Josh | You will need to edit this file
 
 import React, { useState, useEffect } from "react";
 import {
@@ -76,7 +76,8 @@ const FullCard = ({ route, navigation }) => {
     });
   }
 
-  // Fetch icebreaker questions
+  // TODO: JOSH | Randomize this
+  // Fetch icebreaker questions from FIREBASE
   const fetchIcebreakers = () => {
     db.collection("Icebreakers").doc("icebreakers").get().then(doc => {
       setIcebreakers(doc.data().icebreakers);
@@ -182,10 +183,11 @@ const FullCard = ({ route, navigation }) => {
           </DarkContainer>}
 
           <DarkContainer>
+            <!-- TODO: JOSH | This is where your randomized icebreakers are displayed -->
             <LargeText color="white">Icebreakers</LargeText>
 
             <View style={styles.icebreakers}>
-              {openIcebreakers && icebreakers.map((ice, index) => 
+              {openIcebreakers && icebreakers.map((ice, index) =>
                 <Icebreaker number={index+1} icebreaker={ice} key={index}/>)}
             </View>
             
