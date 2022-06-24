@@ -25,7 +25,31 @@ import VerifyEmail from "../screens/VerifyEmail";
 import ProfileMain from "../screens/Profile/ProfileMain";
 import firebase from "firebase";
 import {db} from "../provider/Firebase";
-//import InviteMain from "../screens/Invite/InviteMain";
+
+//Push notifications functions and imports
+import * as Notifications from 'expo-notifications'
+
+async function registerForPushNotificationsAsync() {
+    let token;
+
+    const { status : existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+
+    if (existingStatus !== "granted") {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+    }
+
+    if (finalStatus !== "granted") {
+        alert("Push notifications are not enabled.");
+        return;
+    }
+
+    token = (await Notifications.getExpoPushTokenAsync()).data;
+    console.log(token);
+
+    return token;
+}
 
 //The experience of logged in user!!
 const MainStack = createStackNavigator();
@@ -40,7 +64,6 @@ const Main = () => {
       <MainStack.Screen name="MainTabs" component={MainTabs} />
       <MainStack.Screen name="Schedule" component={Schedule} />
       <MainStack.Screen name="OrganizeMain" component={OrganizeMain}/>
-        {/*<MainStack.Screen name="InviteMain" component={InviteMain}/>*/}
     </MainStack.Navigator>
   );
 };
@@ -115,18 +138,19 @@ export default () => {
   const user = auth.user;
   const currUser = auth.currUser;
   useEffect(() => {
-    if (currUser && currUser.emailVerified || currUser && currUser.email === "rachelhu@uw.edu" ||  currUser && currUser.email === "elaine@uw.edu") {
+    if (currUser && (currUser.emailVerified || currUser.email === "rachelhu@uw.edu" || currUser.email === "elaine@uw.edu" || currUser.email === "argharib@uw.edu")) {
         db.collection("Users").doc(currUser.uid).update({
             verified: true
         })
     }
-  });
+    registerForPushNotificationsAsync();
+  }, []);
 
   return (
     <NavigationContainer>
       {user === null && <Loading/>}
       {user === false && <Auth/>}
-      {(user === true && currUser && !currUser.emailVerified && currUser.email !== "rachelhu@uw.edu" && currUser.email !== "elaine@uw.edu") ? <VerifyEmail/>
+      {(user === true && currUser && !currUser.emailVerified && currUser.email !== "rachelhu@uw.edu" && currUser.email !== "elaine@uw.edu" && currUser.email !== "argharib@uw.edu") ? <VerifyEmail/>
         : user === true && <Main/>}
     </NavigationContainer>
   );
