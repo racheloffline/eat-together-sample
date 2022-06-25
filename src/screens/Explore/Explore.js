@@ -12,13 +12,6 @@ import Searchbar from "../../components/Searchbar";
 import getDate from "../../getDate";
 import { db } from "../../provider/Firebase";
 
-// AMPLITUDE EXPERIMENT
-/*
-import { Amplitude, Identify } from "@amplitude/react-native";
-const ampInstance = Amplitude.getInstance();
-ampInstance.init("8ea1a7af07277d5888917ba42f7442ad");
- */
-
 export default function({ navigation }) {
     const [events, setEvents] = useState([]); // initial state, function used for updating initial state
     const [filteredEvents, setFilteredEvents] = useState([]);

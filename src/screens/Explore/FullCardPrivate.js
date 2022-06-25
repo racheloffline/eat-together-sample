@@ -25,7 +25,6 @@ import NormalText from "../../components/NormalText";
 
 import { db, storage, auth } from "../../provider/Firebase";
 import * as firebase from "firebase";
-import { clickProps } from "react-native-web/dist/cjs/modules/forwardedProps";
 
 const FullCard = ({ route, navigation }) => {
   // Data for the attendees
@@ -183,7 +182,7 @@ const FullCard = ({ route, navigation }) => {
           </DarkContainer>}
 
           <DarkContainer>
-            <!-- TODO: JOSH | This is where your randomized icebreakers are displayed -->
+            {/*TODO: JOSH | This is where your randomized icebreakers are displayed*/}
             <LargeText color="white">Icebreakers</LargeText>
 
             <View style={styles.icebreakers}>

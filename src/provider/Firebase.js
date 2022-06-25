@@ -1,4 +1,3 @@
-import Firebase from "firebase";
 import firebase from "firebase";
 //Better put your these secret keys in .env file
 //Connect to firebase
