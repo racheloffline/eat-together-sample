@@ -1,16 +1,15 @@
-import Firebase from "firebase";
 import firebase from "firebase";
 //Better put your these secret keys in .env file
 //Connect to firebase
 
 export const firebaseConfig = {
-    apiKey: "AIzaSyDYuhOpbDxlVHBKxVz6gW45eyutD26AsGg",
-    authDomain: "eat-together-303ec.firebaseapp.com",
-    databaseURL: "https://eat-together-303ec.firebaseio.com",
-    projectId: "eat-together-303ec",
-    storageBucket: "eat-together-303ec.appspot.com",
-    messagingSenderId: "856869460838",
-    appId: "1:856869460838:web:01e0197a0abc9fffb686a7",
+    apiKey: "",
+    authDomain: "",
+    databaseURL: "",
+    projectId: "",
+    storageBucket: "",
+    messagingSenderId: "",
+    appId: "",
 }
 
 if (firebase.apps.length === 0) {

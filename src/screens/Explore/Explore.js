@@ -68,7 +68,8 @@ export default function({ navigation }) {
 
         <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
         data={filteredEvents} renderItem={({item}) =>
-          <EventCard event={item} click={() => { 
+          <EventCard event={item} click={() => {
+              //ampInstance.logEvent('BUTTON_CLICKED'); // EXPERIMENT
             navigation.navigate("FullCard", {
               event: item,
               public: true
