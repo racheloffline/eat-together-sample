@@ -1,20 +1,24 @@
 //Meet other people
 
 import React, {useEffect, useState} from "react";
-import { StyleSheet, FlatList, Dimensions } from "react-native";
+import { StyleSheet, FlatList, View, Dimensions, TouchableOpacity } from "react-native";
 import { Layout } from "react-native-rapi-ui";
 import firebase from "firebase";
+import { Ionicons } from '@expo/vector-icons';
 
 import Searchbar from "../../components/Searchbar";
 import ProfileBubble from "../../components/ProfileBubble";
 import Header from "../../components/Header";
-import { getProfileRecs } from "../../methods";
+import Button from "../../components/Button";
+import NormalText from "../../components/NormalText";
+
 import {db} from "../../provider/Firebase";
 
 export default function({ navigation }) {
 	const [people, setPeople] = useState([]); // initial state, function used for updating initial state
 	const [filteredPeople, setFilteredPeople] = useState([]);
 	const [searchQuery, setSearchQuery] = useState("");
+	const [showFilters, setShowFilters] = useState(false); // show filters or not
 
 	useEffect(() => { // updates stuff right after React makes changes to the DOM
 		const ref = db.collection("Users");
@@ -66,21 +70,71 @@ export default function({ navigation }) {
 			<Searchbar placeholder="Search by name, username, quote, or tags"
 				value={searchQuery} onChangeText={onChangeText}/>
 
-			<FlatList contentContainerStyle={styles.body} keyExtractor={item => item.id}
-				data={filteredPeople} renderItem={({item}) =>
-					<ProfileBubble person={item} click={() => {
-						navigation.navigate("FullProfile", {
-							person: item
-						});
-					}}/>
-				}/>
+			{showFilters && <View style={styles.overlay}>
+				<View style={styles.filterContainer}>
+					<TouchableOpacity onPress={() => setShowFilters(false)}
+						style={{ position: "absolute", left: 0, top: 0 }}>
+						<Ionicons name="ios-close" size={50} color="black" />
+					</TouchableOpacity>
+					
+					<Button>Apply</Button>
+				</View>
+			</View>}
+
+			<View style={styles.body}>
+				<View style={styles.filter}>
+					<Button paddingVertical={10} paddingHorizontal={20}
+						onPress={() => setShowFilters(true)}>
+						<Ionicons name="filter" size={24}/> Filter
+					</Button>
+				</View>
+
+				<FlatList contentContainerStyle={{ paddingTop: 40 }} keyExtractor={item => item.id}
+					data={filteredPeople} renderItem={({item}) =>
+						<ProfileBubble person={item} click={() => {
+							navigation.navigate("FullProfile", {
+								person: item
+							});
+						}}/>
+					}/>
+			</View>
 		</Layout>
 	);
 }
 
 const styles = StyleSheet.create({
 	body: {
+		flex: 1,
 		alignItems: "center",
-		backgroundColor: "black"
+		backgroundColor: "black",
 	},
+	
+	filter: {
+		position: "absolute",
+		left: 0,
+		zIndex: 1
+	},
+	
+	overlay: {
+		position: "absolute",
+		left: 0,
+		top: 0,
+		width: "100%",
+		height: "100%",
+		backgroundColor: "rgba(0,0,0,0.5)",
+		zIndex: 2,
+		alignItems: "center",
+		justifyContent: "center"
+	},
+
+	filterContainer: {
+		position: "absolute",
+		width: Dimensions.get("window").width - 60,
+		backgroundColor: "white",
+		zIndex: 3,
+		alignItems: "center",
+		justifyContent: "center",
+		padding: 30,
+		borderRadius: 20
+	}
 });
