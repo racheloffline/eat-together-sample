@@ -13,6 +13,7 @@ import Link from "../../components/Link";
 import Button from "../../components/Button";
 
 import MediumText from "../../components/MediumText";
+import DeviceToken from "../utils/DeviceToken";
 
 export default function ({ route, navigation }) {
     const [name, setName] = useState('');
@@ -55,14 +56,13 @@ export default function ({ route, navigation }) {
 
     //Sign out, and remove this push token from the list of acceptable push tokens
     const signOut = async () => {
-        let currentToken;
-        await db.collection("Users").doc(route.params.user.id).get().then((ss) => {
-            currentToken = ss.data().currentToken;
-        })
+        // let currentToken;
+        // await db.collection("Users").doc(route.params.user.id).get().then((ss) => {
+        //     currentToken = ss.data().currentToken;
+        // })
 
         await db.collection("Users").doc(route.params.user.id).update({
-            currentToken: "",
-            pushTokens: firebase.firestore.FieldValue.arrayRemove(currentToken)
+            pushTokens: firebase.firestore.FieldValue.arrayRemove(DeviceToken.getToken())
         })
         await firebase.auth().signOut()
     }

@@ -8,7 +8,11 @@ import {
   KeyboardAvoidingView,
   Image,
 } from "react-native";
-import * as firebase from "firebase";
+import {db} from "../../provider/Firebase";
+import {auth} from "../../provider/Firebase";
+import "firebase/firestore"
+import firebase from "firebase";
+
 
 import {
   Layout,
@@ -19,6 +23,7 @@ import { Ionicons, Entypo } from "@expo/vector-icons";
 import Button from "../../components/Button";
 import LargeText from "../../components/LargeText";
 import NormalText from "../../components/NormalText";
+import DeviceToken from "../utils/DeviceToken";
 
 export default function ({ navigation }) {
   const [email, setEmail] = useState("");
@@ -27,17 +32,23 @@ export default function ({ navigation }) {
 
   async function login() {
     setLoading(true);
-    await firebase
-      .auth()
-      .signInWithEmailAndPassword(email, password)
-      .catch(function (error) {
+    await firebase.auth().signInWithEmailAndPassword(email, password).catch(function (error) {
         // Handle Errors here.
         var errorCode = error.code;
         var errorMessage = error.message;
         // ...
         setLoading(false);
         alert(errorMessage);
-      });
+    });
+
+    const user = auth.currentUser;
+
+    //If this is a sign-in to a new acct from the same phone, register the device token on that new acct
+    if(DeviceToken.getToken() != null) {
+        await db.collection("Users").doc(user.uid).update({
+            pushTokens: firebase.firestore.FieldValue.arrayUnion(DeviceToken.getToken())
+        })
+    }
   }
 
   return (
