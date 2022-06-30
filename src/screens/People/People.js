@@ -10,7 +10,10 @@ import Searchbar from "../../components/Searchbar";
 import ProfileBubble from "../../components/ProfileBubble";
 import Header from "../../components/Header";
 import Button from "../../components/Button";
-import NormalText from "../../components/NormalText";
+import Filter from "../../components/Filter";
+import Divider from "../../components/Divider";
+
+import LargeText from "../../components/LargeText";
 
 import {db} from "../../provider/Firebase";
 
@@ -19,6 +22,11 @@ export default function({ navigation }) {
 	const [filteredPeople, setFilteredPeople] = useState([]);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [showFilters, setShowFilters] = useState(false); // show filters or not
+
+	// Filters
+	const [mutualFriends, setMutualFriends] = useState(false);
+	const [similarInterests, setSimilarInterests] = useState(false);
+	const [sharedEvents, setSharedEvents] = useState(false);
 
 	useEffect(() => { // updates stuff right after React makes changes to the DOM
 		const ref = db.collection("Users");
@@ -73,11 +81,19 @@ export default function({ navigation }) {
 			{showFilters && <View style={styles.overlay}>
 				<View style={styles.filterContainer}>
 					<TouchableOpacity onPress={() => setShowFilters(false)}
-						style={{ position: "absolute", left: 0, top: 0 }}>
+						style={{ position: "absolute", left: 10, top: 10 }}>
 						<Ionicons name="ios-close" size={50} color="black" />
 					</TouchableOpacity>
 					
-					<Button>Apply</Button>
+					<LargeText center marginBottom={10}>Filters</LargeText>
+					<Filter checked={mutualFriends}
+						onPress={() => setMutualFriends(!mutualFriends)} text="Mutual friends"/>
+					<Filter checked={similarInterests}
+						onPress={() => setSimilarInterests(!similarInterests)} text="Similar interests/tags"/>
+					<Filter checked={sharedEvents}
+						onPress={() => setSharedEvents(!sharedEvents)} text="Shared events"/>
+
+					<Button marginVertical={20}>Apply</Button>
 				</View>
 			</View>}
 
@@ -132,8 +148,6 @@ const styles = StyleSheet.create({
 		width: Dimensions.get("window").width - 60,
 		backgroundColor: "white",
 		zIndex: 3,
-		alignItems: "center",
-		justifyContent: "center",
 		padding: 30,
 		borderRadius: 20
 	}
