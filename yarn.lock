@@ -11271,6 +11271,11 @@
   "resolved" "https://registry.npmjs.org/react-native-rapi-ui/-/react-native-rapi-ui-0.2.1.tgz"
   "version" "0.2.1"
 
+"react-native-raw-bottom-sheet@^2.2.0":
+  "integrity" "sha512-qL4JKIqvbcVxbkKzeh51hjV7suoJN3ouxzvLmOg0FBUV1yiJAfEbacjQdtRCI6+OU5pyGFBIifLsTXcFDwHggg=="
+  "resolved" "https://registry.npmjs.org/react-native-raw-bottom-sheet/-/react-native-raw-bottom-sheet-2.2.0.tgz"
+  "version" "2.2.0"
+
 "react-native-reanimated@~2.8.0":
   "integrity" "sha512-kJvf/UWLBMaGCs9X66MKq5zdFMgwx8D0nHnolbHR7s8ZnbLdb7TlQ/yuzIXqn/9wABfnwtNRI3CyaP1aHWMmZg=="
   "resolved" "https://registry.npmjs.org/react-native-reanimated/-/react-native-reanimated-2.8.0.tgz"
