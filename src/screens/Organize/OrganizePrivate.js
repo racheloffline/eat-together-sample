@@ -25,8 +25,6 @@ export default function ({ navigation }) {
     const [location, setLocation] = useState("");
     const [date, setDate] = useState(new Date());
     const [additionalInfo, setAdditionalInfo] = useState("");
-    const [tagsSelected, setTagsSelected] = useState([]);
-    const [tagsValue, setTagsValue] = useState("");
 
     // Other variables
     const [showDate, setShowDate] = useState(false);
@@ -43,19 +41,7 @@ export default function ({ navigation }) {
         } else {
             setDisabled(false);
         }
-
-        // Determine text to display for selected tags
-        let tags = "";
-        if (tagsSelected.length > 0) {
-            tags += tagsSelected[0];
-        }
-
-        for (let i = 1; i < tagsSelected.length; i++) {
-            tags += ", " + tagsSelected[i];
-        }
-
-        setTagsValue(tags);
-    }, [name, location, tagsSelected]);
+    }, [name, location]);
 
     // For selecting a date and time
     const changeDate = (selectedDate) => {
@@ -155,50 +141,6 @@ export default function ({ navigation }) {
                         <Ionicons name="document-text-outline" size={20}/>
                     }
                 />
-
-                <TouchableOpacity onPress={() => refRBSheet.current.open()}>
-                    <TextInput
-                        placeholder="Tags"
-                        value={tagsValue}
-                        leftContent={
-                            <Ionicons name="pricetags-outline" size={20}/>
-                        }
-                        editable={false}
-                    />
-                </TouchableOpacity>
-
-                <RBSheet
-                    ref={refRBSheet}
-                    closeOnDragDown={true}
-                    closeOnPressMask={false}
-                    customStyles={{
-                        wrapper: {
-                            backgroundColor: "rgba(0,0,0,0.5)"
-                        },
-                        draggableIcon: {
-                            backgroundColor: "#5DB075"
-                        },
-                        container: {
-                            borderTopLeftRadius: 20,
-                            borderTopRightRadius: 20,
-                        }
-                    }}>
-                        <TagsSection
-                            multi={true}
-                            selectedItems={tagsSelected}
-                            onItemSelect={(item) => {
-                                setTagsSelected([...tagsSelected, item]);
-                            }}
-                            onRemoveItem={(item, index) => {
-                                const newTags = tagsSelected.filter((tag, i) => i !== index);
-                                setTagsSelected(newTags);
-                            }}
-                            itemsContainerStyle={{ maxHeight: 140 }}
-                            items={cloneDeep(eventTags)}
-                            chip={true}
-                            resetValue={false}
-                        />
-                </RBSheet>
 
                 <Button disabled={disabled} onPress={function () {
                     let hasImage = false;
