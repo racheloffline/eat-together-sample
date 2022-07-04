@@ -10,16 +10,30 @@ import Header from "../../components/Header";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
 import Searchbar from "../../components/Searchbar";
 import Button from "../../components/Button";
+import Filter from "../../components/Filter";
+import Divider from "../../components/Divider";
+
+import LargeText from "../../components/LargeText";
+import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
 
 import getDate from "../../getDate";
 import { db } from "../../provider/Firebase";
 
 export default function({ navigation }) {
-    const [events, setEvents] = useState([]); // initial state, function used for updating initial state
+    const [events, setEvents] = useState([]);
     const [filteredEvents, setFilteredEvents] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [showFilters, setShowFilters] = useState(false); // show filters or not
+
+    // Filters: sorting
+    const [date, setDate] = useState(false);
+    const [popularity, setPopularity] = useState(false);
+    const [closeness, setCloseness] = useState(false);
+
+    // Filters: other
+    const [fromFriends, setFromFriends] = useState(false);
+    const [similarInterests, setSimilarInterests] = useState(false);
 
     useEffect(() => { // updates stuff right after React makes changes to the DOM
       const ref = db.collection("Public Events");
@@ -73,11 +87,28 @@ export default function({ navigation }) {
         {showFilters && <View style={styles.overlay}>
           <View style={styles.filterContainer}>
             <TouchableOpacity onPress={() => setShowFilters(false)}
-              style={{ position: "absolute", left: 0, top: 0 }}>
+              style={{ position: "absolute", left: 10, top: 10 }}>
               <Ionicons name="ios-close" size={50} color="black" />
             </TouchableOpacity>
             
-            <Button>Apply</Button>
+            <LargeText center marginBottom={10}>Filters</LargeText>
+            <MediumText>Sort by:</MediumText>
+            <Filter checked={date}
+              onPress={() => setDate(!date)} text="Date (recent)"/>
+            <Filter checked={popularity}
+              onPress={() => setPopularity(!popularity)} text="Popularity"/>
+            <Filter checked={closeness}
+              onPress={() => setCloseness(!closeness)} text="Closeness"/>
+
+            <Divider width="100%"/>
+            
+            <MediumText>Other:</MediumText>
+            <Filter checked={fromFriends}
+              onPress={() => setFromFriends(!fromFriends)} text="From friends"/>
+            <Filter checked={similarInterests}
+              onPress={() => setSimilarInterests(!similarInterests)} text="Similar interests"/>
+
+            <Button marginVertical={20}>Apply</Button>
           </View>
         </View>}
 
@@ -134,9 +165,8 @@ const styles = StyleSheet.create({
 		width: Dimensions.get("window").width - 60,
 		backgroundColor: "white",
 		zIndex: 3,
-		alignItems: "center",
-		justifyContent: "center",
-		padding: 30,
+		paddingVertical: 20,
+    paddingHorizontal: 40,
 		borderRadius: 20
 	}
 });
