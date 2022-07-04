@@ -16,6 +16,7 @@
     "@react-navigation/native": "^5.9.4",
     "@react-navigation/stack": "^5.14.5",
     "axios": "^0.26.1",
+    "dotenv": "^16.0.1",
     "eas-cli": "^0.52.0",
     "expo": "^45.0.0",
     "expo-app-loading": "~2.0.0",
