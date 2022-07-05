@@ -9,7 +9,8 @@ const TagsList = props => {
             flexDirection: "row",
             marginBottom: 10
         }}>
-          {props.tags.map(tag => <Tag text={tag} key={tag}/>)}
+          {props.tags.map((tag, i) => <Tag text={tag} key={tag}
+            remove={props.remove ? () => props.remove(tag, i) : false}/>)}
         </ScrollView>
     );
 }

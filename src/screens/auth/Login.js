@@ -24,6 +24,7 @@ export default function ({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPass, setShowPass] = useState(false);
 
   async function login() {
     setLoading(true);
@@ -95,8 +96,11 @@ export default function ({ navigation }) {
               autoCapitalize="none"
               autoCompleteType="off"
               autoCorrect={false}
-              secureTextEntry={true}
+              secureTextEntry={!showPass ? true : false}
               onChangeText={(text) => setPassword(text)}
+              rightContent={<TouchableOpacity onPress={() => setShowPass(!showPass)}>
+                <Ionicons name={!showPass ? "eye" : "eye-off"} size={22}/>
+              </TouchableOpacity>}
             />
             <Button onPress={login} marginVertical={10} disabled={loading}>
               {loading ? "Loading" : "Login"}

@@ -1,29 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView } from 'react-native';
+import { View, StyleSheet, Image, Dimensions, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
 import { Layout, TopNav, TextInput } from "react-native-rapi-ui";
-import { FontAwesome, Ionicons, Feather } from '@expo/vector-icons';
+import { Ionicons, Feather } from '@expo/vector-icons';
 
 import * as ImagePicker from 'expo-image-picker';
 import { db, storage } from "../../provider/Firebase";
 import * as firebase from "firebase";
 
-import TagsList from "../../components/TagsList";
-import Link from "../../components/Link";
-import Button from "../../components/Button";
+import { cloneDeep } from "lodash";
+import allTags from "../../allTags";
 
+import TagsSection from "../../components/TagsSection";
+import Button from "../../components/Button";
 import MediumText from "../../components/MediumText";
+import SmallText from "../../components/SmallText";
 
 export default function ({ route, navigation }) {
     const [name, setName] = useState('');
     const [quote, setQuote] = useState('');
     const [image, setImage] = useState('');
     const [tags, setTags] = useState([]);
-    const [currentTag, setCurrentTag] = useState(""); // Current tag the user typed out
-
-    const addTag = () => {
-        setTags([...tags, currentTag]);
-        setCurrentTag("");
-    }
 
     useEffect(() => {
         setName(route.params.user.name);
@@ -67,7 +63,7 @@ export default function ({ route, navigation }) {
                 leftAction={() => navigation.goBack()}
             />
 
-            <ScrollView>
+            <KeyboardAvoidingView behavior="position" style={{flex: 1}}>
                 <View style={styles.imageContainer}>
                     <Image style={styles.image} source={image ? {uri: image} : require("../../../assets/logo.png")}/>
                     <TouchableOpacity style={styles.editImage} onPress={pickImage}>
@@ -93,19 +89,27 @@ export default function ({ route, navigation }) {
                     value={quote}
                 />
 
-                <View style={styles.tagInput}>
-                    <TextInput placeholder="Tag" value={currentTag}
-                        containerStyle={styles.input} onChangeText={val => setCurrentTag(val)}
-                        leftContent={<FontAwesome name="tag" size={18}/>}/>
-                    <Button onPress={addTag} disabled={currentTag === ""} paddingHorizontal={25}>+</Button>
-                 </View>
+                <TagsSection
+                    multi={true}
+                    selectedItems={tags}
+                    onItemSelect={(tag) => {
+                        setTags([...tags, tag]);
+                    }}
+                    onRemoveItem={(item, index) => {
+                        const newTags = tags.filter((tag, i) => i !== index);
+                        setTags(newTags);
+                    }}
+                    inline={true}
+                    items={cloneDeep(allTags)}
+                    chip={true}
+                    resetValue={false}
+                />
 
-                <View style = {{alignItems: 'center'}}>
-                    <TagsList tags={tags}/>
-                    {tags.length > 0 && <Link size={14} onPress={() => setTags(tags.slice(0, -1))}>Delete Last Tag</Link>}
-                </View>
+                <SmallText center>Note: must have between 3 and 6 tags (inclusive).</SmallText>
 
-                <TouchableOpacity style={{alignItems: 'center', marginVertical: 10}} onPress={function () {
+                <TouchableOpacity disabled={name === "" || quote === "" || tags.length < 3 || tags.length > 6}
+                    style={name === "" || quote === "" || tags.length < 3 || tags.length > 6 ? styles.saveDisabled : styles.save} 
+                    onPress={function () {
                     route.params.updateInfo(name, quote, tags, image);
 
                     db.collection("Users").doc(route.params.user.id).update({
@@ -126,7 +130,7 @@ export default function ({ route, navigation }) {
 
                 <Button onPress={() => firebase.auth().signOut()}
                     marginVertical={20}>Log Out</Button>
-            </ScrollView>
+            </KeyboardAvoidingView>
         </Layout>
     );
 }
@@ -171,4 +175,15 @@ const styles = StyleSheet.create({
         backgroundColor: "#5DB075",
         borderRadius: 100
     },
+
+    save: {
+        alignItems: 'center',
+        marginVertical: 10
+    },
+
+    saveDisabled: {
+        alignItems: 'center',
+        marginVertical: 10,
+        opacity: 0.7
+    }
 });
