@@ -124,7 +124,7 @@ const FullCard = ({ route, navigation }) => {
         leftAction={() => navigation.goBack()}
         rightContent={
           <Ionicons
-              name = "close-outline"
+              name = "trash"
               color = {loading ? "grey" : "red"}
               size = {25}
           />

@@ -222,7 +222,8 @@ export default function ({ navigation }) {
                             date,
                             additionalInfo,
                             attendees: [],
-                            hasImage: hasImage
+                            hasImage,
+                            tags: tagsSelected
                         }).then(() => {
                             const storeID = {
                                 type: "public",
@@ -238,6 +239,7 @@ export default function ({ navigation }) {
                                 setLocation("");
                                 setDate(new Date());
                                 setAdditionalInfo("");
+                                setTagsSelected([]);
                                 alert("Success!");
                             });
                         });

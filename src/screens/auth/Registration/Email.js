@@ -19,16 +19,11 @@ const Email = props => {
   }
 
   const verifyEmail = () => {
-    if (props.emails.includes(email)) {
-      alert("This email has been taken :(");
-      setVerified(null);
+    const isAcademic = email.split("@");
+    if (isAcademic[isAcademic.length-1] === "uw.edu" || isAcademic[isAcademic.length-1] === "cs.washington.edu") {
+      setVerified(true);
     } else {
-      const isAcademic = email.split("@");
-      if (isAcademic[isAcademic.length-1] === "uw.edu" || isAcademic[isAcademic.length-1] === "cs.washington.edu") {
-        setVerified(true);
-      } else {
-        setVerified(false);
-      }
+      setVerified(false);
     }
   }
 

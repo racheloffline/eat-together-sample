@@ -48,21 +48,16 @@ const Auth = () => {
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
 
-    // List of all emails and usernames
-    const [emails, setEmails] = useState([]);
-    const [usernames, setUsernames] = useState([]);
+    const [usernames, setUsernames] = useState([]); // List of all usernames
 
     useEffect(() => {
-        db.collection("Users").get().then(querySnapshot => {
-            let emailList = [];
+        db.collection("Usernames").get().then(querySnapshot => {
             let usernameList = [];
 
             querySnapshot.forEach(doc => {
-                emailList.push(doc.data().email);
-                usernameList.push(doc.data().username);
+                usernameList.push(doc.id);
             });
 
-            setEmails(emailList);
             setUsernames(usernameList);
         });
     }, []);
@@ -72,7 +67,7 @@ const Auth = () => {
 
         if (usernames.includes(username)) {
             setLoading(false);
-            alert("Your username has already been picked. Choose another one :(");
+            alert("Your username has already been picked, choose another one :(");
         } else {
             try {
                 const response = await auth.createUserWithEmailAndPassword(email, password);
@@ -148,7 +143,7 @@ const Auth = () => {
                 tags={tags} setTags={setTags}/>}
         </Stack.Screen>
         <Stack.Screen name="Email" options={{headerShown: false}}>
-            {props => <Email {...props} email={email} setEmail={setEmail} emails={emails}/>}
+            {props => <Email {...props} email={email} setEmail={setEmail}/>}
         </Stack.Screen>
         <Stack.Screen name="Availabilities" options={{headerShown: false}} component={Availabilities}/>
         <Stack.Screen name="Monday" options={{headerShown: false}}>

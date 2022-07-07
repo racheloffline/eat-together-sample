@@ -33,7 +33,7 @@ const Password = props => {
       <LargeText center>Finally, set a username and password!</LargeText>
 
       <TextInput placeholder="Username (at least 4 characters)" value={username}
-          onChangeText={val => setUsername(val)} containerStyle={{marginTop: 30}}
+          onChangeText={val => setUsername(val.replace(/\s+/g, ''))} containerStyle={{marginTop: 30}}
           leftContent={<FontAwesome name="user" size={18}/>}/>
           
       <TextInput placeholder="Password (at least 8 characters)" value={password}

@@ -11,6 +11,7 @@ import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
 import Button from "../../components/Button";
+import TagsList from "../../components/TagsList";
 import { Ionicons } from "@expo/vector-icons";
 
 import getDate from "../../getDate";
@@ -103,6 +104,9 @@ const FullCard = ({ route, navigation }) => {
       <View style={styles.page}>
         <LargeText center>{route.params.event.name}</LargeText>
         <MediumText center>Hosted by: {host ? host.name : "Person"}</MediumText>
+
+        {route.params.event.tags && <TagsList tags={route.params.event.tags}/>}
+
         <View style={styles.details}>
             <Image style={styles.image}
               source={image ? {uri: image} : {uri: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400"}}/>
