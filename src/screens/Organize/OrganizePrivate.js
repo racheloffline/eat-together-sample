@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from "react";
-import {View, TouchableOpacity, Dimensions, KeyboardAvoidingView, StyleSheet} from "react-native";
-import { Layout, SectionImage  } from "react-native-rapi-ui";
+import React, { useState, useEffect, useRef } from "react";
+import { View, TouchableOpacity, Dimensions, KeyboardAvoidingView, StyleSheet, ImageBackground } from "react-native";
+import { Layout  } from "react-native-rapi-ui";
 import { TextInput } from 'react-native-rapi-ui';
 import { Ionicons } from "@expo/vector-icons";
+import eventTags from "../../eventTags";
+
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import * as ImagePicker from 'expo-image-picker';
+import RBSheet from "react-native-raw-bottom-sheet";
+import TagsSection from "../../components/TagsSection";
 
 import Header from "../../components/Header";
 import getDate from "../../getDate";
@@ -12,26 +15,27 @@ import getTime from "../../getTime";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
 import Button from "../../components/Button";
 
-import {auth, storage} from "../../provider/Firebase";
-import {ImageBackground} from "react-native";
+import { cloneDeep } from "lodash";
+import * as ImagePicker from 'expo-image-picker';
 
 export default function ({ navigation }) {
-    const user = auth.currentUser;
-
     // State variables for the inputs
+    const [photo, setPhoto] = useState("https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400");
     const [name, setName] = useState("");
     const [location, setLocation] = useState("");
     const [date, setDate] = useState(new Date());
     const [additionalInfo, setAdditionalInfo] = useState("");
-    const [photo, setPhoto] = useState("https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400");
 
     // Other variables
     const [showDate, setShowDate] = useState(false);
     const [mode, setMode] = useState("date");
     const [disabled, setDisabled] = useState(true);
 
+    const refRBSheet = useRef(); // To toggle the bottom drawer on/off
+
     // Checks whether we should disable the Post button or not
     useEffect(() => {
+        // Disable button or not
         if (name === "" || location == "") {
             setDisabled(true);
         } else {

@@ -11,7 +11,8 @@ const LargeText = props => {
                 fontSize: props.size ? props.size : 30,
                 fontFamily: 'sans-serif',
                 color: props.color ? props.color : "black",
-                textAlign: props.center ? "center" : "auto"
+                textAlign: props.center ? "center" : "auto",
+                marginBottom: props.marginBottom ? props.marginBottom : 0
             }}>
                 {props.children}
             </Text>
@@ -22,7 +23,8 @@ const LargeText = props => {
             fontSize: props.size ? props.size : 30,
             fontFamily: 'Inter_800ExtraBold',
             color: props.color ? props.color : "black",
-            textAlign: props.center ? "center" : "auto"
+            textAlign: props.center ? "center" : "auto",
+            marginBottom: props.marginBottom ? props.marginBottom : 0
         }, props.style]}>
             {props.children}
         </Text>
