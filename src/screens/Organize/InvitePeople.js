@@ -24,9 +24,6 @@ const storeImage = async (uri, event_id) => {
 };
 
 async function sendInvites (attendees, invite, navigation) {
-    console.log(attendees)
-    console.log(invite)
-
     const user = auth.currentUser;
     const id = Date.now() + user.uid;
 
@@ -71,7 +68,6 @@ async function sendInvites (attendees, invite, navigation) {
         await attendees.forEach((attendee) => {
             const ref = db.collection("User Invites").doc(attendee);
             ref.get().then(async (docRef) => {
-                console.log(docRef.exists)
                 if (attendee !== user.uid) {
                     await sendInvitations(ref)
                 }
