@@ -30,7 +30,7 @@ export default function ({ navigation }) {
                 setImage(uri);
             }).then(() => {
                 let newEvents = [];
-                doc.data().attendingEventIDs.forEach(e => {
+                doc.data().archivedEventIDs.forEach(e => {
                     if (e.type === "public") {
                         db.collection("Public Events").doc(e.id).get().then(event => {
                             let data = event.data();

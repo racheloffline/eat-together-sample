@@ -25,6 +25,7 @@ import NormalText from "../../components/NormalText";
 
 import { db, storage, auth } from "../../provider/Firebase";
 import * as firebase from "firebase";
+import {Menu, MenuOption, MenuOptions, MenuTrigger} from "react-native-popup-menu";
 
 const FullCard = ({ route, navigation }) => {
   // Data for the attendees
@@ -109,6 +110,73 @@ const FullCard = ({ route, navigation }) => {
     });
   }
 
+  //Delete the event; this is the old action
+  function deleteEvent() {
+    if (!loading) {
+      setLoading(true);
+      route.params.deleteEvent(route.params.event.id);
+
+      const storeID = {
+        type: route.params.event.type,
+        id: route.params.event.id
+      };
+
+      db.collection("Users").doc(user.uid).update({
+        attendingEventIDs: firebase.firestore.FieldValue.arrayRemove(storeID)
+      }).then(() => {
+        if(route.params.event.type === "private") {
+          db.collection("Private Events").doc(route.params.event.id).update({
+            attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)
+          }).then(() => {
+            alert("Event Removed");
+            navigation.goBack();
+          });
+        } else {
+          db.collection("Public Events").doc(route.params.event.id).update({
+            attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)
+          }).then(() => {
+            alert("Event Removed");
+            navigation.goBack();
+          });
+        }
+      });
+    }
+  }
+
+  //Archive the event
+  function archiveEvent() {
+    if (!loading) {
+      setLoading(true);
+      route.params.deleteEvent(route.params.event.id);
+
+      const storeID = {
+        type: route.params.event.type,
+        id: route.params.event.id
+      };
+
+      db.collection("Users").doc(user.uid).update({
+        attendingEventIDs: firebase.firestore.FieldValue.arrayRemove(storeID),
+        archivedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)
+      }).then(() => {
+        if(route.params.event.type === "private") {
+          db.collection("Private Events").doc(route.params.event.id).update({
+            attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)
+          }).then(() => {
+            alert("Event Archived");
+            navigation.goBack();
+          });
+        } else {
+          db.collection("Public Events").doc(route.params.event.id).update({
+            attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)
+          }).then(() => {
+            alert("Event Archived");
+            navigation.goBack();
+          });
+        }
+      });
+    }
+  }
+
   return (
     <Layout>
       <TopNav
@@ -118,48 +186,34 @@ const FullCard = ({ route, navigation }) => {
         leftContent={
           <Ionicons
             name="chevron-back"
+            color = {loading ? "grey" : "black"}
             size={20}
           />
         }
         leftAction={() => navigation.goBack()}
         rightContent={
-          <Ionicons
-              name = "close-outline"
-              color = {loading ? "grey" : "red"}
-              size = {25}
-          />
+          <Menu>
+            <MenuTrigger>
+              <Ionicons
+                  name = "ellipsis-horizontal"
+                  color = {loading ? "grey" : "black"}
+                  size = {20}
+              />
+            </MenuTrigger>
+            <MenuOptions>
+              <MenuOption onSelect={() => alert("Report feature coming soon!")}>
+                <NormalText size = {18}>Report Event</NormalText>
+              </MenuOption>
+              <MenuOption onSelect={() => archiveEvent()}>
+                <NormalText size = {18}>Archive Event</NormalText>
+              </MenuOption>
+              <MenuOption onSelect={() => deleteEvent()}>
+                <NormalText size = {18} color = "red">Delete Event</NormalText>
+              </MenuOption>
+            </MenuOptions>
+          </Menu>
+
         }
-        rightAction = {() => {
-          if (!loading) {
-            setLoading(true);
-            route.params.deleteEvent(route.params.event.id);
-
-            const storeID = {
-              type: route.params.event.type,
-              id: route.params.event.id
-            };
-
-            db.collection("Users").doc(user.uid).update({
-              attendingEventIDs: firebase.firestore.FieldValue.arrayRemove(storeID)
-            }).then(() => {
-              if(route.params.event.type === "private") {
-                db.collection("Private Events").doc(route.params.event.id).update({
-                  attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)
-                }).then(() => {
-                  alert("Event Removed");
-                  navigation.goBack();
-                });
-              } else {
-                db.collection("Public Events").doc(route.params.event.id).update({
-                  attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)
-                }).then(() => {
-                  alert("Event Removed");
-                  navigation.goBack();
-                });
-              }
-            });
-          }
-        }}
       />
 
       <ScrollView contentContainerStyle={styles.page}>
