@@ -2,6 +2,8 @@ import React from "react";
 import AppNavigator from "./src/navigation/AppNavigator";
 import { AuthProvider } from "./src/provider/AuthProvider";
 import { ThemeProvider } from "react-native-rapi-ui";
+import {MenuProvider} from "react-native-popup-menu";
+
 export default function App() {
   const images = [
     require("./assets/icon.png"),
@@ -10,11 +12,14 @@ export default function App() {
     require("./assets/register.png"),
     require("./assets/forget.png"),
   ];
+
   return (
-    <ThemeProvider images={images}>
-      <AuthProvider>
-        <AppNavigator />
-      </AuthProvider>
-    </ThemeProvider>
+    <MenuProvider>
+      <ThemeProvider images={images}>
+        <AuthProvider>
+          <AppNavigator />
+        </AuthProvider>
+      </ThemeProvider>
+    </MenuProvider>
   );
 }
