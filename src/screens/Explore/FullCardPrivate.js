@@ -79,9 +79,35 @@ const FullCard = ({ route, navigation }) => {
   // TODO: JOSH | Randomize this
   // Fetch icebreaker questions from FIREBASE
   const fetchIcebreakers = () => {
-    db.collection("Icebreakers").doc("icebreakers").get().then(doc => {
-      setIcebreakers(doc.data().icebreakers);
+//    db.collection("Icebreakers").doc("otherThing").get().then(doc => {
+//        setIcebreakers(doc.data().icebreakers);
+//    });
+
+    const breakerOptions = ["icebreakers", "otherThing", "thirdOptionlol", "anothaOne"];
+    var num = Math.floor(Math.random()*breakerOptions.length);
+    db.collection("Icebreakers").doc(breakerOptions[num]).get().then(doc => {
+        setIcebreakers(doc.data().icebreakers);
     });
+
+//    db.collection("Icebreakers").doc("otherThing").get().then(doc => {
+//        var num = 3;
+//        if(num == 3) {
+//            setIcebreakers(doc.data().icebreakers);
+//        }
+////        if(doc.data().icebreakers[0] == "YO THIS WORKED!!!") {
+////            setIcebreakers(doc.data().icebreakers);
+////       }
+//    });
+
+
+//    var num = 1;
+//      for (var i in docSnapshots) {
+//          const doc = docSnapshots[i].data();
+//          if(num == 1) {
+//              setIcebreakers(doc.get().icebreakers);
+//          }
+//          num--;
+//      }
   }
 
   // Fetch all attendees of this event
