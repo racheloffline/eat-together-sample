@@ -38,7 +38,11 @@ export default function ({ navigation }) {
 		}
 	}
 
-	useEffect(() => {
+	useEffect(async () => {
+
+		await db.collection("Users").doc(user.uid).update({
+			hasNotif: false
+		});
 
 		let ref = db.collection("User Invites").doc(user.uid).collection("Invites");
 		ref.onSnapshot((query) => {

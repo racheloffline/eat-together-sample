@@ -3,15 +3,18 @@ import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { Feather } from '@expo/vector-icons';
 
 import LargeText from "./LargeText";
+import NotifIcon from "./NotifIcon";
 
 const Header = props => {
+
     return (
         <View style={styles.header}>
-			<LargeText>{props.name}</LargeText>
+			<LargeText>{this.props.name}</LargeText>
             <TouchableOpacity onPress={() => {
-                props.navigation.navigate("Invite")
+                this.props.navigation.navigate("Invite")
             }}>
-                <Feather name="mail" size={36} color="black" style={{marginRight: 10}}/>
+                {/*<Feather name="mail" size={36} color="black" style={{marginRight: 10}}/>*/}
+                <NotifIcon hasNotif = {this.props.hasNotif == null ? false : this.props.hasNotif}/>
             </TouchableOpacity>
 		</View>
     );
