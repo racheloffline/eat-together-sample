@@ -5,13 +5,15 @@ import { FontAwesome, Ionicons, Feather } from '@expo/vector-icons';
 
 import * as ImagePicker from 'expo-image-picker';
 import { db, storage } from "../../provider/Firebase";
-import * as firebase from "firebase";
+import firebase from "firebase";
+import "firebase/firestore"
 
 import TagsList from "../../components/TagsList";
 import Link from "../../components/Link";
 import Button from "../../components/Button";
 
 import MediumText from "../../components/MediumText";
+import DeviceToken from "../utils/DeviceToken";
 
 export default function ({ route, navigation }) {
     const [name, setName] = useState('');
@@ -50,6 +52,19 @@ export default function ({ route, navigation }) {
 
         var ref = storage.ref().child("profilePictures/" + route.params.user.id);
         return ref.put(blob);
+    }
+
+    //Sign out, and remove this push token from the list of acceptable push tokens
+    const signOut = async () => {
+        // let currentToken;
+        // await db.collection("Users").doc(route.params.user.id).get().then((ss) => {
+        //     currentToken = ss.data().currentToken;
+        // })
+
+        await db.collection("Users").doc(route.params.user.id).update({
+            pushTokens: firebase.firestore.FieldValue.arrayRemove(DeviceToken.getToken())
+        })
+        await firebase.auth().signOut()
     }
 
     return (
@@ -124,7 +139,7 @@ export default function ({ route, navigation }) {
                     <MediumText color="#5DB075">Update Profile</MediumText>
                 </TouchableOpacity>
 
-                <Button onPress={() => firebase.auth().signOut()}
+                <Button onPress={() => signOut()}
                     marginVertical={20}>Log Out</Button>
             </ScrollView>
         </Layout>
@@ -156,12 +171,6 @@ const styles = StyleSheet.create({
     imageContainer: {
         marginTop: 30,
         alignItems: "center"
-    },
-    
-    image: {
-        width: 125,
-        height: 125,
-        borderRadius: 125
     },
     
     editImage: {
