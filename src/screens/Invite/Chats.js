@@ -1,8 +1,8 @@
 //Chat with users you have already connected with
 
 import React, {useEffect, useState} from 'react';
-import {View, StyleSheet, FlatList} from 'react-native';
-import {Layout, TopNav} from 'react-native-rapi-ui';
+import {View, StyleSheet, FlatList, TouchableOpacity} from 'react-native';
+import {Button, Layout, TopNav} from 'react-native-rapi-ui';
 import NormalText from "../../components/NormalText";
 import {Ionicons} from "@expo/vector-icons";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
@@ -10,6 +10,7 @@ import MediumText from "../../components/MediumText";
 import Searchbar from "../../components/Searchbar";
 import PeopleList from "../../components/PeopleList";
 import {generateColor} from "../../methods";
+import SelectSearch from 'react-select-search';
 import {db} from "../../provider/Firebase";
 import firebase from "firebase";
 import ChatPreview from "../../components/ChatPreview";
@@ -17,6 +18,7 @@ import ChatPreview from "../../components/ChatPreview";
 export default function ({ navigation }) {
     const [searchQuery, setSearchQuery] = useState("");
     const [users, setUsers] = useState([]);
+    const [hasInput, setHasInput] = useState(false);
     const onChangeText = (text) => {
         setSearchQuery(text);
     }
@@ -35,7 +37,8 @@ export default function ({ navigation }) {
                         name: data.name,
                         hasImage: data.hasImage,
                         message: "TODO",
-                        time: "8m ago"
+                        time: "8m ago",
+                        pictureID: data.id
                     })
                 }).then(() => {
                     setUsers(list);
@@ -43,6 +46,8 @@ export default function ({ navigation }) {
             });
         });
     }, []);
+    // Code for searchbar suggestions (your taste buds)
+
     return (
         <Layout>
             <TopNav
@@ -68,17 +73,26 @@ export default function ({ navigation }) {
                 <HorizontalSwitch left="Invites" right="Chats" current="right" press={() => navigation.navigate("Invite")}/>
             </View>
             <View style = {styles.content}>
-                <Searchbar placeholder="Search by name, date, location, or additional info"
-                           value={searchQuery} onChangeText={onChangeText}/>
+                <View style={styles.searchArea}>
+                    <Searchbar placeholder="Search by name"
+                           value={searchQuery} onChangeText={onChangeText} width={320}/>
+                    <Button text="Chat" disabled={!hasInput} color="black"></Button>
+                </View>
                 <FlatList contentContainerStyle={styles.invites} keyExtractor={item => item.id}
                           data={users} renderItem={({item}) =>
-                    <ChatPreview person={item} click={() => {
+                    <TouchableOpacity onPress={() => {
+                    navigation.navigate("ChatRoom", {
+                    invite: item
+                })
+                }}>
+                    <ChatPreview group={item} click={() => {
                         db.collection("Users").doc(item.id).get().then((doc) => {
                             navigation.navigate("FullProfile", {
                                 person: doc.data()
                             });
                         });
                     }}/>
+                    </TouchableOpacity>
                 }/>
             </View>
 
@@ -101,5 +115,9 @@ const styles = StyleSheet.create({
     },
     content: {
         marginVertical: -20,
+    },
+    searchArea: {
+        flexDirection: "row",
+        justifyContent: "space-evenly"
     }
 });

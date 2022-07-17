@@ -8,8 +8,8 @@ import SmallText from "./SmallText";
 const ChatPreview = props => {
     const [image, setImage] = useState("https://static.wixstatic.com/media/d58e38_29c96d2ee659418489aec2315803f5f8~mv2.png");
     useEffect(() => { // TODO: Fix these pictures not showing up
-        if (props.person.hasImage) {
-            storage.ref("profilePictures/" + props.person.id).getDownloadURL().then(uri => {
+        if (props.group.hasImage) {
+            storage.ref("profilePictures/" + props.group.pictureID).getDownloadURL().then(uri => {
                 setImage(uri);
             });
         }
@@ -22,11 +22,11 @@ const ChatPreview = props => {
                             <Image style={styles.image} source={{uri: image}}/>
                         </TouchableOpacity>
                         <View style={styles.textContainer}>
-                            <MediumText>{props.person.name}</MediumText>
-                            <SmallText>{props.person.message}</SmallText>
+                            <MediumText>{props.group.name}</MediumText>
+                            <SmallText>{props.group.message}</SmallText>
                         </View>
                     </View>
-                    <SmallText style={{justifySelf: "end"}}>{props.person.time}</SmallText>
+                    <SmallText style={{justifySelf: "end"}}>{props.group.time}</SmallText>
                 </View>
         </View>
     );
