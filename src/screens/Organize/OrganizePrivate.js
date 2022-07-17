@@ -18,6 +18,8 @@ import Button from "../../components/Button";
 import { cloneDeep } from "lodash";
 import * as ImagePicker from 'expo-image-picker';
 
+import { db, auth } from "../../provider/Firebase";
+
 export default function ({ navigation }) {
     // State variables for the inputs
     const [photo, setPhoto] = useState("https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400");
@@ -30,17 +32,27 @@ export default function ({ navigation }) {
     const [showDate, setShowDate] = useState(false);
     const [mode, setMode] = useState("date");
     const [disabled, setDisabled] = useState(true);
+    const [unread, setUnread] = useState(false);
 
     const refRBSheet = useRef(); // To toggle the bottom drawer on/off
 
+    const uid = auth.currentUser.uid; //Current user's uid (to get notif)
+
     // Checks whether we should disable the Post button or not
     useEffect(() => {
-        // Disable button or not
-        if (name === "" || location == "") {
-            setDisabled(true);
-        } else {
-            setDisabled(false);
+        async function fetchData() {
+            // Disable button or not
+            if (name === "" || location == "") {
+                setDisabled(true);
+            } else {
+                setDisabled(false);
+            }
+
+            await db.collection("Users").doc(uid).onSnapshot((doc) => {
+                setUnread(doc.data().hasNotif);
+            })
         }
+        fetchData();
     }, [name, location]);
 
     // For selecting a date and time
@@ -67,7 +79,7 @@ export default function ({ navigation }) {
     return (
         <Layout>
             <KeyboardAvoidingView behavior="position" style={{flex: 1}}>
-                <Header name="Organize" navigation={navigation}/>
+                <Header name="Organize" navigation={navigation} hasNotif = {unread}/>
                 <HorizontalSwitch left="Private" right="Public" current="left" press={(val) => navigation.navigate("OrganizePublic")}/>
                 <ImageBackground source={{uri: photo}} style={styles.image}>
                 <View style={styles.imageOverlay}>

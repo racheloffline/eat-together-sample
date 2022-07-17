@@ -18,9 +18,13 @@ import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
 
 import getDate from "../../getDate";
-import { db } from "../../provider/Firebase";
+import { auth, db } from "../../provider/Firebase";
 
 export default function({ navigation }) {
+
+    //Get the user
+    const user = auth.currentUser;
+
     const [events, setEvents] = useState([]);
     const [filteredEvents, setFilteredEvents] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
@@ -35,17 +39,29 @@ export default function({ navigation }) {
     const [fromFriends, setFromFriends] = useState(false);
     const [similarInterests, setSimilarInterests] = useState(false);
 
-    useEffect(() => { // updates stuff right after React makes changes to the DOM
-      const ref = db.collection("Public Events");
-      ref.onSnapshot((query) => {
-        let newEvents = [];
-        query.forEach((doc) => {
-          newEvents.push(doc.data());
-        });
+    //See if we need to display unread notif icon
+    const [unread, setUnread] = useState(false);
 
-        setEvents(newEvents);
-        setFilteredEvents(newEvents);
-      });
+    useEffect(() => { // updates stuff right after React makes changes to the DOM
+        async function fetchData() {
+            const ref = db.collection("Public Events");
+            await ref.onSnapshot((query) => {
+                let newEvents = [];
+                query.forEach((doc) => {
+                    newEvents.push(doc.data());
+                });
+
+                setEvents(newEvents);
+                setFilteredEvents(newEvents);
+            })
+
+            //See if there's a new notif
+            await db.collection("Users").doc(user.uid).onSnapshot((doc) => {
+                let data = doc.data();
+                setUnread(data.hasNotif);
+            })
+        }
+        fetchData();
     }, []);
 
     // Method to filter out events
@@ -79,7 +95,7 @@ export default function({ navigation }) {
 
     return (
       <Layout>
-        <Header name="Explore" navigation = {navigation}/>
+        <Header name="Explore" navigation = {navigation} hasNotif = {unread}/>
         <HorizontalSwitch left="Your Events" right="Public" current="right" press={() => navigation.navigate("ExploreYourEvents")}/>
         <Searchbar placeholder="Search by name, date, location, or additional info"
 				  value={searchQuery} onChangeText={onChangeText}/>
