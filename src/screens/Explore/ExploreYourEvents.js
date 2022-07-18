@@ -17,12 +17,15 @@ export default function({ navigation }) {
     const [filteredEvents, setFilteredEvents] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
 
+    const [unread, setUnread] = useState(false);
+
     const user = auth.currentUser;
 
     useEffect(() => { // updates stuff right after React makes changes to the DOM
         let newEvents = [];
 
         db.collection("Users").doc(user.uid).get().then(doc => {
+            setUnread(doc.data().hasNotif)
             doc.data().attendingEventIDs.forEach(e => {
                 if (e.type === "public") {
                     db.collection("Public Events").doc(e.id).get().then(event => {
@@ -96,7 +99,7 @@ export default function({ navigation }) {
 
     return (
         <Layout>
-            <Header name="Explore" navigation = {navigation}/>
+            <Header name="Explore" navigation = {navigation} hasNotif = {unread}/>
             <HorizontalSwitch left="Your Events" right="Public" current="left" press={() => navigation.navigate("Explore")}/>
             <Searchbar placeholder="Search by name, date, location, or additional info"
 				value={searchQuery} onChangeText={onChangeText}/>

@@ -22,6 +22,7 @@ export default function({ navigation }) {
 	const [filteredPeople, setFilteredPeople] = useState([]);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [showFilters, setShowFilters] = useState(false); // show filters or not
+	const [unread, setUnread] = useState(false); //show the unread notification icon
 
 	// Filters
 	const [mutualFriends, setMutualFriends] = useState(false);
@@ -29,18 +30,26 @@ export default function({ navigation }) {
 	const [sharedEvents, setSharedEvents] = useState(false);
 
 	useEffect(() => { // updates stuff right after React makes changes to the DOM
-		const ref = db.collection("Users");
-		const user = firebase.auth().currentUser;
-		ref.onSnapshot((query) => {
-			let users = [];
-			query.forEach((doc) => {
-				if (doc.data().id !== user.uid && doc.data().verified) {
-					users.push(doc.data());
-				}
+		async function fetchData() {
+			const ref = db.collection("Users");
+			const user = firebase.auth().currentUser;
+
+			await ref.onSnapshot((query) => {
+				let users = [];
+				query.forEach((doc) => {
+					if (doc.data().id !== user.uid && doc.data().verified) {
+						users.push(doc.data());
+					}
+				});
+				setPeople(users);
+				setFilteredPeople(users);
 			});
-			setPeople(users);
-			setFilteredPeople(users);
-		});
+
+			await ref.doc(user.uid).onSnapshot((doc) => {
+				setUnread(doc.data().hasNotif);
+			})
+		}
+		fetchData();
 	}, []);
 
 	// Method to filter out people based on name, username, or tags
@@ -74,7 +83,7 @@ export default function({ navigation }) {
 
 	return (
 		<Layout>
-			<Header name="People" navigation = {navigation}/>
+			<Header name="People" navigation = {navigation} hasNotif = {unread}/>
 			<Searchbar placeholder="Search by name, username, quote, or tags"
 				value={searchQuery} onChangeText={onChangeText}/>
 

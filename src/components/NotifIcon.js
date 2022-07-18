@@ -13,7 +13,7 @@ const NotifIcon = props => {
     }
 
     return(
-        <Ionicons name={iconName} size={36} color="black" style={{marginRight: 10}}/>
+        <Ionicons name={iconName} size={40} color="black" style={{marginRight: 10}}/>
     );
 }
 
