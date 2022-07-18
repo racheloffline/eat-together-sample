@@ -41,6 +41,7 @@ const FullCard = ({ route, navigation }) => {
   // List of icebreaker questions
   const [icebreakers, setIcebreakers] = useState([]);
 
+  // Get the current user
   const user = auth.currentUser;
 
   useEffect(() => {
