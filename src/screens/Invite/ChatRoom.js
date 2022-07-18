@@ -1,89 +1,99 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {View, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView} from "react-native";
-import {Layout, Text, TopNav} from "react-native-rapi-ui";
-import {Ionicons} from "@expo/vector-icons";
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  View,
+  StyleSheet,
+  Image,
+  Dimensions,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
+import { Layout, Text, TextInput, TopNav } from "react-native-rapi-ui";
+import { Ionicons } from "@expo/vector-icons";
 import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
 import firebase from "firebase";
-import {db, storage} from "../../provider/Firebase";
-import {GiftedChat} from "react-native-gifted-chat";
+import { db, storage } from "../../provider/Firebase";
+import moment from 'moment';
+import TextMessage from "../../components/TextMessage";
 
-export default function ({ route, navigation}) {
-    //Save the invite as a shorter name
-    const [image, setImage] = useState("https://images.immediate.co.uk/production/volatile/sites/30/2017/01/Bananas-218094b-scaled.jpg");
-    const [messages, setMessages] = useState([{
-        _id: 1,
-        text: 'Hello developer',
-        createdAt: new Date(),
-        user: {
-            _id: 2,
-            name: 'React Native',
-        },
-    }]);
-    let invite = route.params.invite;
+export default function ({ route, navigation }) {
+  const [image, setImage] = useState(
+    "https://images.immediate.co.uk/production/volatile/sites/30/2017/01/Bananas-218094b-scaled.jpg"
+  );
+  const [messages, setMessages] = useState([]);
+  const [message, setMessage] = useState("");
 
-    //Get the current user and firebase ref path
-    const user = firebase.auth().currentUser;
-    const ref = db.collection("User Invites").doc(user.uid).collection("Invites").doc(invite.id);
+  // Common constant references
+  let group = route.params.group;
+  const user = firebase.auth().currentUser;
+  const messageRef = db.collection("Groups").doc(group.groupID);
 
-    useEffect(() => {
-        if (invite.hasImage) {
-            storage.ref("eventPictures/" + invite.inviteID).getDownloadURL().then(uri => {
-                setImage(uri);
-            });
+  // On update
+  useEffect(() => {
+    let temp = []
+    messageRef.get().then((doc) => {
+        doc.data().messages.forEach((message) => {
+            temp.push(message);
+            console.log(message);
+        });
+        setMessages(temp);
+    });
+  }, [])
+
+  const onSend = () => {
+    messageRef.update({
+        messages: firebase.firestore.FieldValue.arrayUnion({
+            message: message,
+            sentAt: moment().format('MMMM Do YYYY, h:mm:ss a'),
+            sentBy: user.uid
+        })
+    }).then(() => {
+        alert("SUCCESS")
+        setMessage("");
+    })
+  };
+
+  return (
+    <Layout>
+      <TopNav
+        middleContent={group.name}
+        leftContent={<Ionicons name="chevron-back" size={20} />}
+        rightContent={<Image style={styles.image} source={{ uri: image }} />}
+        leftAction={() => navigation.goBack()}
+      />
+      <TextInput
+        placeholder="Send Message!!!"
+        value={message}
+        onChangeText={(val) => setMessage(val)}
+        rightContent={
+          <TouchableOpacity
+            onPress={() => {
+              onSend();
+            }}
+          >
+            <Ionicons name="send" size={20} color={"#D3D3D3"} />
+          </TouchableOpacity>
         }
-    }, []);
-
-    const onSend = useCallback((messages = []) => {
-        setMessages(previousMessages => GiftedChat.append(previousMessages, messages))
-    }, [])
-
-    return (
-        <Layout>
-            <TopNav
-                middleContent={invite.name}
-                leftContent={
-                    <Ionicons
-                        name="chevron-back"
-                        size={20}
-                    />
-                }
-                rightContent={
-                    <Image style={styles.image} source={{uri: image}}/>
-                }
-                leftAction={() => navigation.goBack()}
-            />
-            <GiftedChat
-                messages={messages}
-                onSend={messages => onSend(messages)}
-                user={{
-                    _id: 1,
-                }}
-            />
-        </Layout>
-    );
+      />
+    </Layout>
+  );
 }
 
 const styles = StyleSheet.create({
-    page: {
-        paddingTop: 30,
-        alignItems: "center",
-        paddingHorizontal: 10
-    },
+  page: {
+    paddingTop: 30,
+    alignItems: "center",
+    paddingHorizontal: 10,
+  },
 
-    background: {
-        position: "absolute",
-        width: Dimensions.get('screen').width,
-        height: 100,
-        backgroundColor: "#5DB075"
-    },
+  background: {
+    position: "absolute",
+    width: Dimensions.get("screen").width,
+    height: 100,
+    backgroundColor: "#5DB075",
+  },
 
-    image: {
-        width: 40,
-        height: 40,
-        borderRadius: 90,
-        borderColor: "white",
-        borderWidth: 2,
-    },
+  messages: {
 
+  },
 });

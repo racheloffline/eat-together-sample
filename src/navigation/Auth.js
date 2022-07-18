@@ -92,6 +92,7 @@ const Auth = () => {
                         attendingEventIDs: [],
                         attendedEventIDs: [],
                         friendIDs: [],
+                        groupIDs: [],
                         availabilites: {
                             monday,
                             tuesday,
