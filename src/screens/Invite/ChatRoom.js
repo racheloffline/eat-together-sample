@@ -6,6 +6,7 @@ import {
   Dimensions,
   TouchableOpacity,
   ScrollView,
+  FlatList
 } from "react-native";
 import { Layout, Text, TextInput, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
@@ -30,8 +31,8 @@ export default function ({ route, navigation }) {
 
   // On update
   useEffect(() => {
-    let temp = []
-    messageRef.get().then((doc) => {
+    messageRef.onSnapshot((doc) => {
+        let temp = []
         doc.data().messages.forEach((message) => {
             temp.push(message);
             console.log(message);
@@ -48,7 +49,6 @@ export default function ({ route, navigation }) {
             sentBy: user.uid
         })
     }).then(() => {
-        alert("SUCCESS")
         setMessage("");
     })
   };
@@ -61,6 +61,15 @@ export default function ({ route, navigation }) {
         rightContent={<Image style={styles.image} source={{ uri: image }} />}
         leftAction={() => navigation.goBack()}
       />
+      <FlatList
+          data={messages}
+          renderItem={({ item }) => (
+              <TextMessage
+                sentBy={item.sentBy}
+                message={item.message}
+              />
+          )}
+        />
       <TextInput
         placeholder="Send Message!!!"
         value={message}

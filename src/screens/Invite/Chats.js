@@ -62,14 +62,19 @@ export default function ({ navigation }) {
       let temp = [];
       groups.forEach((groupID) => {
         db.collection("Groups").doc(groupID).get().then((doc) => {
+          // now store all the chat rooms
           let data = doc.data();
+          // store the most recent message
+          // store most recent message in variable
+          let message = data.messages.length != 0 ? data.messages[data.messages.length - 1].message : "";
+          let time = data.messages.length != 0 ? data.messages[data.messages.length - 1].sentAt : "";
           temp.push({
             groupID: groupID,
             name: data.name,
             uids: data.uids,
             hasImage: data.hasImage,
-            message: "TODO",
-            time: "8m ago",
+            message: message,
+            time: time,
             pictureID: data.id,
           });
         }).then(() => {
