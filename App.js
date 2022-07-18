@@ -5,6 +5,8 @@ import { ThemeProvider } from "react-native-rapi-ui";
 import {MenuProvider} from "react-native-popup-menu";
 
 export default function App() {
+  console.disableYellowBox = true; //DISABLE THOSE STUPID WARNINGS SLAYYYYY
+
   const images = [
     require("./assets/icon.png"),
     require("./assets/splash.png"),

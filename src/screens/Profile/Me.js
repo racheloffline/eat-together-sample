@@ -25,6 +25,7 @@ export default function ({ navigation }) {
             setUserInfo(doc.data());
             setMealsAttended(doc.data().attendedEventIDs.length);
             setMealsSignedUp(doc.data().attendingEventIDs.length);
+            console.log(doc.data().archivedEventIDs);
             
             storage.ref("profilePictures/" + user.uid).getDownloadURL().then(uri => {
                 setImage(uri);
