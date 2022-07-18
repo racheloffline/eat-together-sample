@@ -21,15 +21,12 @@ export default function ({ navigation }) {
     const [events, setEvents] = useState([]);
 
     useEffect(() => {
-        db.collection("Users").doc(user.uid).get().then(doc => {
-            setUserInfo(doc.data());
-            setMealsAttended(doc.data().attendedEventIDs.length);
-            setMealsSignedUp(doc.data().attendingEventIDs.length);
-            console.log(doc.data().archivedEventIDs);
-            
-            storage.ref("profilePictures/" + user.uid).getDownloadURL().then(uri => {
-                setImage(uri);
-            }).then(() => {
+        async function fetchData() {
+            await db.collection("Users").doc(user.uid).get().then(async doc => {
+                setUserInfo(doc.data());
+                setMealsAttended(doc.data().attendedEventIDs.length);
+                setMealsSignedUp(doc.data().attendingEventIDs.length);
+
                 let newEvents = [];
                 doc.data().archivedEventIDs.forEach(e => {
                     if (e.type === "public") {
@@ -48,8 +45,13 @@ export default function ({ navigation }) {
                         });
                     }
                 });
-            })
-        });
+
+                await storage.ref("profilePictures/" + user.uid).getDownloadURL().then(uri => {
+                    setImage(uri);
+                })
+            });
+        }
+        fetchData();
     }, []);
 
     const updateInfo = (newName, newQuote, newTags, newImage) => {
