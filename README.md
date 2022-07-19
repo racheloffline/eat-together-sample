@@ -9,7 +9,7 @@
    npm install --global expo-cli
    ```
 
-3. Clone this rep
+3. Clone this repo
 4. Install deps on wherever you cloned this folder
 
    ```jsx
