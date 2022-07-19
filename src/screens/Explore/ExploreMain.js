@@ -14,6 +14,7 @@ import FullProfile from "../People/FullProfile";
 import Report from "../People/Report";
 //import InviteMain from "../Invite/InviteMain";
 import Chats from "../Invite/Chats";
+import ChatRoom from "../Invite/ChatRoom";
 
 const Stack = createStackNavigator();
 
@@ -29,10 +30,12 @@ export default function ({ navigation }) {
                     <Stack.Screen name="Invite" component={Invite} options={{headerShown: false}}/>
                     <Stack.Screen name="InviteFull" component={InviteFull} options={{headerShown: false}}/>
                     <Stack.Screen name="Chats" component={Chats} options={{headerShown: false, animationEnabled: false}}/>
+                    <Stack.Screen name="ChatRoom" component={ChatRoom} options={{headerShown: false}}/>
                     <Stack.Screen name="Connections" component={Connections} options={{headerShown: false, animationEnabled: true}}/>
                     <Stack.Screen name="Requests" component={Requests} options={{headerShown: false, animationEnabled: false}}/>
                     <Stack.Screen name="FullProfile" component={FullProfile} options={{headerShown: false}}/>
                     <Stack.Screen name="Report" component={Report} options={{headerShown: false}}/>
+
 
                 </Stack.Navigator>
             </NavigationContainer>
