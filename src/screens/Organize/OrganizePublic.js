@@ -36,29 +36,37 @@ export default function ({ navigation }) {
     const [showDate, setShowDate] = useState(false);
     const [mode, setMode] = useState("date");
     const [disabled, setDisabled] = useState(true);
+    const [unread, setUnread] = useState(false);
 
     const refRBSheet = useRef(); // To toggle the bottom drawer on/off
 
     // Checks whether we should disable the Post button or not
-    useEffect(() => {
-        // Disable button or not
-        if (name === "" || location == "") {
-            setDisabled(true);
-        } else {
-            setDisabled(false);
-        }
+    useEffect( () => {
+        async function fetchData() {
+            await db.collection("Users").doc(user.uid).onSnapshot((doc) => {
+                setUnread(doc.data().hasNotif);
+            })
 
-        // Determine text to display for selected tags
-        let tags = "";
-        if (tagsSelected.length > 0) {
-            tags += tagsSelected[0];
-        }
+            // Disable button or not
+            if (name === "" || location == "") {
+                setDisabled(true);
+            } else {
+                setDisabled(false);
+            }
 
-        for (let i = 1; i < tagsSelected.length; i++) {
-            tags += ", " + tagsSelected[i];
-        }
+            // Determine text to display for selected tags
+            let tags = "";
+            if (tagsSelected.length > 0) {
+                tags += tagsSelected[0];
+            }
 
-        setTagsValue(tags);
+            for (let i = 1; i < tagsSelected.length; i++) {
+                tags += ", " + tagsSelected[i];
+            }
+
+            setTagsValue(tags);
+        }
+        fetchData();
     }, [name, location, tagsSelected]);
 
     // For selecting a date and time
@@ -86,7 +94,7 @@ export default function ({ navigation }) {
     return (
         <Layout>
             <KeyboardAvoidingView behavior="position" style={{flex: 1}}>
-                <Header name="Organize" navigation={navigation}/>
+                <Header name="Organize" navigation={navigation} hasNotif = {unread}/>
                 <HorizontalSwitch left="Private" right="Public" current="right" press={(val) => navigation.navigate("OrganizePrivate")}/>
                 <ImageBackground source={{uri: photo}} style={styles.image}>
                 <View style={styles.imageOverlay}>

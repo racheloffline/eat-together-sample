@@ -39,31 +39,37 @@ export default function ({ navigation }) {
 	}
 
 	useEffect(() => {
-
-		let ref = db.collection("User Invites").doc(user.uid).collection("Invites");
-		ref.onSnapshot((query) => {
-			const list = [];
-			query.forEach((doc) => {
-				let data = doc.data();
-				list.push({
-					id: doc.id,
-					name: data.name,
-					image: data.image,
-					hasImage: data.hasImage,
-					location: data.location,
-					//date: DateTimeConverter.getDate(DateTimeConverter.toDate(data.date)), // Fix this, add time back?
-					date: data.date.toDate().toDateString(),
-					time: data.date.toDate().toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'}),
-					details: data.description,
-					hostID: data.hostID,
-					hostName: data.hostName,
-					hostImage: data.hostImage,
-					accepted: data.accepted,
-					inviteID: data.inviteID
-				});
+		async function fetchData() {
+			await db.collection("Users").doc(user.uid).update({
+				hasNotif: false
 			});
-			setInvites(list);
-		});
+
+			let ref = db.collection("User Invites").doc(user.uid).collection("Invites");
+			ref.onSnapshot((query) => {
+				const list = [];
+				query.forEach((doc) => {
+					let data = doc.data();
+					list.push({
+						id: doc.id,
+						name: data.name,
+						image: data.image,
+						hasImage: data.hasImage,
+						location: data.location,
+						//date: DateTimeConverter.getDate(DateTimeConverter.toDate(data.date)), // Fix this, add time back?
+						date: data.date.toDate().toDateString(),
+						time: data.date.toDate().toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'}),
+						details: data.description,
+						hostID: data.hostID,
+						hostName: data.hostName,
+						hostImage: data.hostImage,
+						accepted: data.accepted,
+						inviteID: data.inviteID
+					});
+				});
+				setInvites(list);
+			});
+		}
+		fetchData()
 
 	}, []);
 

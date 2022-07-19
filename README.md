@@ -15,11 +15,20 @@
    ```jsx
    npm install
    ```
+   for mac users use yarn instead:
+   ```
+   npm install --global yarn
+   yarn install
+   ```
 5. To link this project with Firebase, download the `.env` file from our [Google Drive](https://drive.google.com/drive/folders/1eOrcYGYxwPWrVTMVeQIACACIpNpj3vNb). Simply put it in the root directory.
 6. Start the environment
 
    ```jsx
-   expo start
+   npm start
+   ```
+   for mac users use yarn instead:
+   ```
+   yarn start
    ```
    
 7. Get the expo mobile app (https://expo.dev/client) and scan the generated QR code with the app.

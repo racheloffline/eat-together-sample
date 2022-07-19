@@ -36,7 +36,9 @@ export default function ({ route, navigation}) {
     return (
         <Layout>
             <TopNav
-                middleContent="View Invite"
+                middleContent={
+                <MediumText>View Invite</MediumText>
+                }
                 leftContent={
                     <Ionicons
                         name="chevron-back"

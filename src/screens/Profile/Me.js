@@ -21,16 +21,14 @@ export default function ({ navigation }) {
     const [events, setEvents] = useState([]);
 
     useEffect(() => {
-        db.collection("Users").doc(user.uid).get().then(doc => {
-            setUserInfo(doc.data());
-            setMealsAttended(doc.data().attendedEventIDs.length);
-            setMealsSignedUp(doc.data().attendingEventIDs.length);
-            
-            storage.ref("profilePictures/" + user.uid).getDownloadURL().then(uri => {
-                setImage(uri);
-            }).then(() => {
+        async function fetchData() {
+            await db.collection("Users").doc(user.uid).get().then(async doc => {
+                setUserInfo(doc.data());
+                setMealsAttended(doc.data().attendedEventIDs.length);
+                setMealsSignedUp(doc.data().attendingEventIDs.length);
+
                 let newEvents = [];
-                doc.data().attendingEventIDs.forEach(e => {
+                doc.data().archivedEventIDs.forEach(e => {
                     if (e.type === "public") {
                         db.collection("Public Events").doc(e.id).get().then(event => {
                             let data = event.data();
@@ -47,8 +45,13 @@ export default function ({ navigation }) {
                         });
                     }
                 });
-            })
-        });
+
+                await storage.ref("profilePictures/" + user.uid).getDownloadURL().then(uri => {
+                    setImage(uri);
+                })
+            });
+        }
+        fetchData();
     }, []);
 
     const updateInfo = (newName, newQuote, newTags, newImage) => {
