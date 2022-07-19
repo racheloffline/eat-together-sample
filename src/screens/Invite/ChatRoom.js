@@ -29,13 +29,12 @@ export default function ({ route, navigation }) {
   const user = firebase.auth().currentUser;
   const messageRef = db.collection("Groups").doc(group.groupID);
 
-  // On update
+  // On update, push messages
   useEffect(() => {
     messageRef.onSnapshot((doc) => {
         let temp = []
         doc.data().messages.forEach((message) => {
             temp.push(message);
-            console.log(message);
         });
         setMessages(temp);
     });
