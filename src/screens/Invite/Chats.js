@@ -37,19 +37,23 @@ export default function ({ navigation }) {
       });
       allUIDs.push(user.uid);
       // Step 1: Create a new doc in the groups collection on firestore
-      db.collection("Groups").doc(chatID).set({
-        uids: allUIDs,
-        name: allNames.join(", "),
-        messages: []
-      });
+      db.collection("Groups")
+        .doc(chatID)
+        .set({
+          uids: allUIDs,
+          name: allNames.join(", "),
+          messages: [],
+        });
       // Step 2: Create a messages storage for this group
       // Step 3: Update each user's data to include this chat
       allUIDs.map((uid) => {
-        db.collection("Users").doc(uid).update({
-          groupIDs: firebase.firestore.FieldValue.arrayUnion(chatID)
-        });
+        db.collection("Users")
+          .doc(uid)
+          .update({
+            groupIDs: firebase.firestore.FieldValue.arrayUnion(chatID),
+          });
       });
-      alert("New chat created.")
+      alert("New chat created.");
     });
   };
 
@@ -61,26 +65,36 @@ export default function ({ navigation }) {
       // update the groups displayed
       let temp = [];
       groups.forEach((groupID) => {
-        db.collection("Groups").doc(groupID).get().then((doc) => {
-          // now store all the chat rooms
-          let data = doc.data();
-          // store the most recent message
-          // store most recent message in variable
-          let message = data.messages.length != 0 ? data.messages[data.messages.length - 1].message : "";
-          let time = data.messages.length != 0 ? data.messages[data.messages.length - 1].sentAt : "";
-          temp.push({
-            groupID: groupID,
-            name: data.name,
-            uids: data.uids,
-            hasImage: data.hasImage,
-            message: message,
-            time: time,
-            pictureID: data.id,
+        db.collection("Groups")
+          .doc(groupID)
+          .get()
+          .then((doc) => {
+            // now store all the chat rooms
+            let data = doc.data();
+            // store the most recent message
+            // store most recent message in variable
+            let message =
+              data.messages.length != 0
+                ? data.messages[data.messages.length - 1].message
+                : "";
+            let time =
+              data.messages.length != 0
+                ? data.messages[data.messages.length - 1].sentAt
+                : "";
+            temp.push({
+              groupID: groupID,
+              name: data.name,
+              uids: data.uids,
+              hasImage: data.hasImage,
+              message: message,
+              time: time,
+              pictureID: data.id,
+            });
+          })
+          .then(() => {
+            setGroups(temp);
           });
-        }).then(() => {
-          setGroups(temp);
-        })
-      })
+      });
       // prepare the list of all connections for searchbar
       let list = [];
       friends.forEach((uid) => {
@@ -129,7 +143,7 @@ export default function ({ navigation }) {
             onItemSelect={(item) => {
               setSelectedUsers([...selectedUsers, item]);
             }}
-            containerStyle={{ padding: 0 }}
+            containerStyle={{ padding: 0 , width: 200}}
             onRemoveItem={(item, index) => {
               const items = selectedUsers.filter(
                 (sitem) => sitem.id !== item.id
@@ -144,11 +158,12 @@ export default function ({ navigation }) {
               borderWidth: 1,
               borderRadius: 5,
             }}
+            
             itemTextStyle={{ color: "#222" }}
             itemsContainerStyle={{ maxHeight: 140 }}
             items={users}
             defaultIndex={2}
-            chip={true}
+            chip={false}
             resetValue={false}
             textInputProps={{
               placeholder: "Search for taste buds",
@@ -170,7 +185,10 @@ export default function ({ navigation }) {
             disabled={selectedUsers.length == 0}
             color="black"
             style={{ height: 50 }}
-            onPress={() => createNewChat()}
+            onPress={() => {
+              createNewChat();
+              setSelectedUsers([]);
+            }}
           ></Button>
         </View>
         <FlatList
