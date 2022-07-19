@@ -14,6 +14,7 @@ import getDate from "../../getDate";
 import getTime from "../../getTime";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
 import Button from "../../components/Button";
+import NormalText from "../../components/NormalText";
 
 import * as firebase from "firebase";
 import * as ImagePicker from "expo-image-picker";
@@ -181,6 +182,7 @@ export default function ({ navigation }) {
                 </TouchableOpacity>
 
                 <RBSheet
+                    height={400}
                     ref={refRBSheet}
                     closeOnDragDown={true}
                     closeOnPressMask={false}
@@ -196,6 +198,7 @@ export default function ({ navigation }) {
                             borderTopRightRadius: 20,
                         }
                     }}>
+                        <NormalText center>Add as many tags as you want :)</NormalText>
                         <TagsSection
                             multi={true}
                             selectedItems={tagsSelected}
@@ -206,7 +209,6 @@ export default function ({ navigation }) {
                                 const newTags = tagsSelected.filter((tag, i) => i !== index);
                                 setTagsSelected(newTags);
                             }}
-                            itemsContainerStyle={{ maxHeight: 140 }}
                             items={cloneDeep(eventTags)}
                             chip={true}
                             resetValue={false}
@@ -228,7 +230,8 @@ export default function ({ navigation }) {
                             date,
                             additionalInfo,
                             attendees: [],
-                            hasImage: hasImage
+                            hasImage,
+                            tags: tagsSelected
                         }).then(() => {
                             const storeID = {
                                 type: "public",
@@ -244,6 +247,7 @@ export default function ({ navigation }) {
                                 setLocation("");
                                 setDate(new Date());
                                 setAdditionalInfo("");
+                                setTagsSelected([]);
                                 alert("Success!");
                             });
                         });

@@ -1,3 +1,5 @@
+// Note: this is a modification of the library https://github.com/zubairpaizer/react-native-searchable-dropdown
+
 import React, { Component } from 'react';
 import {
   FlatList,
@@ -9,8 +11,9 @@ import {
 import { TextInput } from 'react-native-rapi-ui';
 import { Ionicons } from '@expo/vector-icons';
 
+import Tag from './Tag';
+import TagsList from './TagsList';
 import NormalText from "./NormalText";
-import SmallText from './SmallText';
 
 export default class TagsSection extends Component {
   constructor(props) {
@@ -28,7 +31,7 @@ export default class TagsSection extends Component {
 
   renderFlatList = () => {
     if (this.state.focus) {
-      const flatListPorps = { ...this.props.listProps };
+      const flatListProps = { ...this.props.listProps };
       const oldSupport = [
         { key: 'keyboardShouldPersistTaps', val: 'always' }, 
         { key: 'nestedScrollEnabled', val : false },
@@ -38,17 +41,18 @@ export default class TagsSection extends Component {
         { key: 'renderItem', val : ({ item, index }) => this.renderItems(item, index) },
       ];
       oldSupport.forEach((kv) => {
-        if(!Object.keys(flatListPorps).includes(kv.key)) {
-          flatListPorps[kv.key] = kv.val;
+        if(!Object.keys(flatListProps).includes(kv.key)) {
+          flatListProps[kv.key] = kv.val;
         } else {
           if(kv.key === 'style') {
-            flatListPorps['style'] = kv.val;
+            flatListProps['style'] = kv.val;
           }
         }
       });
       return (
         <FlatList
-          { ...flatListPorps }
+          { ...flatListProps }
+          style={{ maxHeight: 200 }}
         />
       );
     }
@@ -211,6 +215,7 @@ export default class TagsSection extends Component {
             
             this.setState({ focus: false, item: this.props.selectedItems });
         }}
+        containerStyle={{ marginBottom: 10 }}
       />
     )
   }
@@ -231,20 +236,17 @@ export default class TagsSection extends Component {
   renderSelectedItems() {
     let items = this.props.selectedItems || [];
     if (items !== undefined && items.length > 0 && this.props.chip && this.props.multi) {
+      if (this.props.inline) {
+        return <TagsList tags={items} remove={this.props.onRemoveItem}/>
+      } else {
         return (
-            <View style={styles.itemDisplay}>
-                    { items.map((item, index) => {
-                        return (
-                            <View key={index} style={styles.tag}>
-                                <SmallText color="white">{item}</SmallText>
-                                <TouchableOpacity onPress={() => this.props.onRemoveItem(item, index)} style={styles.close}>
-                                    <Ionicons name="close" size={16} color="white" />
-                                </TouchableOpacity>
-                            </View>
-                        )
-                    })}
-            </View>
+          <View style={styles.itemDisplay}>
+            { items.map((tag, i) => 
+              <Tag key={i} text={tag} remove={() => this.props.onRemoveItem(tag, i)}/>
+            )}
+          </View>
         );
+      }
     }
   }
 }
@@ -274,7 +276,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         margin: 2,
-        borderRadius: 15,
+        borderRadius: 20,
         paddingVertical: 5,
         paddingHorizontal: 10,
     },

@@ -19,16 +19,11 @@ const Email = props => {
   }
 
   const verifyEmail = () => {
-    if (props.emails.includes(email)) {
-      alert("This email has been taken :(");
-      setVerified(null);
+    const isAcademic = email.split("@");
+    if (isAcademic[isAcademic.length-1] === "uw.edu" || isAcademic[isAcademic.length-1] === "cs.washington.edu") {
+      setVerified(true);
     } else {
-      const isAcademic = email.split("@");
-      if (isAcademic[isAcademic.length-1] === "uw.edu") {
-        setVerified(true);
-      } else {
-        setVerified(false);
-      }
+      setVerified(false);
     }
   }
 
@@ -47,7 +42,7 @@ const Email = props => {
         <Button disabled={!checkEmail(email)} onPress={verifyEmail} marginVertical={15}>Verify</Button>
         {verified !== null &&
         <NormalText color={verified ? "#5DB075" : "red"}>
-          {verified ? "Verified!" : "Not verified"}
+          {verified ? "Is a student!" : "Not a student"}
         </NormalText>}
 
         <View style={styles.buttons}>

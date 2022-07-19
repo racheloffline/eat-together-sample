@@ -193,6 +193,11 @@ const FullCard = ({ route, navigation }) => {
         }
         leftAction={() => navigation.goBack()}
         rightContent={
+          <Ionicons
+              name = "trash"
+              color = {loading ? "grey" : "red"}
+              size = {25}
+          />
           <Menu>
             <MenuTrigger>
               <Ionicons
@@ -213,7 +218,6 @@ const FullCard = ({ route, navigation }) => {
               </MenuOption>
             </MenuOptions>
           </Menu>
-
         }
       />
 
