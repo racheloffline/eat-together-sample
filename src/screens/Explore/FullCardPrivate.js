@@ -194,31 +194,26 @@ const FullCard = ({ route, navigation }) => {
         leftAction={() => navigation.goBack()}
         rightContent={
           <View>
-          <Ionicons
-              name = "trash"
-              color = {loading ? "grey" : "red"}
-              size = {25}
-          />
-          <Menu>
-            <MenuTrigger>
-              <Ionicons
-                  name = "ellipsis-horizontal"
-                  color = {loading ? "grey" : "black"}
-                  size = {20}
-              />
-            </MenuTrigger>
-            <MenuOptions>
-              <MenuOption onSelect={() => alert("Report feature coming soon!")}>
-                <NormalText size = {18}>Report Event</NormalText>
-              </MenuOption>
-              <MenuOption onSelect={() => archiveEvent()}>
-                <NormalText size = {18}>Archive Event</NormalText>
-              </MenuOption>
-              <MenuOption onSelect={() => deleteEvent()}>
-                <NormalText size = {18} color = "red">Delete Event</NormalText>
-              </MenuOption>
-            </MenuOptions>
-          </Menu>
+            <Menu>
+              <MenuTrigger>
+                <Ionicons
+                    name = "ellipsis-horizontal"
+                    color = {loading ? "grey" : "black"}
+                    size = {20}
+                />
+              </MenuTrigger>
+              <MenuOptions>
+                <MenuOption onSelect={() => alert("Report feature coming soon!")}>
+                  <NormalText size = {18}>Report Event</NormalText>
+                </MenuOption>
+                <MenuOption onSelect={() => archiveEvent()}>
+                  <NormalText size = {18}>Archive Event</NormalText>
+                </MenuOption>
+                <MenuOption onSelect={() => deleteEvent()}>
+                  <NormalText size = {18} color = "red">Delete Event</NormalText>
+                </MenuOption>
+              </MenuOptions>
+            </Menu>
           </View>
         }
       />
