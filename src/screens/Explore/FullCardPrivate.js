@@ -44,7 +44,9 @@ const FullCard = ({ route, navigation }) => {
   const user = auth.currentUser;
 
   useEffect(() => {
-    fetchIcebreakers();
+    if(icebreakers.length === 0) {
+        fetchIcebreakers();
+    }
 
     if (route.params.event.hasImage) {
       storage.ref("eventPictures/" + route.params.event.id).getDownloadURL().then(uri => {
@@ -82,32 +84,24 @@ const FullCard = ({ route, navigation }) => {
 //    db.collection("Icebreakers").doc("otherThing").get().then(doc => {
 //        setIcebreakers(doc.data().icebreakers);
 //    });
-
-    const breakerOptions = ["icebreakers", "otherThing", "thirdOptionlol", "anothaOne"];
-    var num = Math.floor(Math.random()*breakerOptions.length);
-    db.collection("Icebreakers").doc(breakerOptions[num]).get().then(doc => {
-        setIcebreakers(doc.data().icebreakers);
-    });
-
-//    db.collection("Icebreakers").doc("otherThing").get().then(doc => {
-//        var num = 3;
-//        if(num == 3) {
-//            setIcebreakers(doc.data().icebreakers);
-//        }
-////        if(doc.data().icebreakers[0] == "YO THIS WORKED!!!") {
-////            setIcebreakers(doc.data().icebreakers);
-////       }
-//    });
-
-
-//    var num = 1;
-//      for (var i in docSnapshots) {
-//          const doc = docSnapshots[i].data();
-//          if(num == 1) {
-//              setIcebreakers(doc.get().icebreakers);
-//          }
-//          num--;
-//      }
+    console.log(icebreakers);
+    console.log('WOAHHHH!!!');
+    if(icebreakers.length === 0) {
+        console.log("ONLY onceeEEEEE!!");
+        var breakOptions = [];
+        //    breakOptions.push("anothaOne");
+            db.collection("Icebreakers").onSnapshot((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    breakOptions.push(doc.id);
+                    console.log(doc.id);
+                    console.log("IS THIS WORKING?????")
+                })
+                var num = Math.floor(Math.random()*breakOptions.length);
+                db.collection("Icebreakers").doc(breakOptions[num]).get().then(doc => {
+                        setIcebreakers(doc.data().icebreakers);
+                    })
+            });
+    }
   }
 
   // Fetch all attendees of this event

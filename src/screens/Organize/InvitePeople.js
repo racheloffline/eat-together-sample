@@ -23,6 +23,7 @@ const storeImage = async (uri, event_id) => {
     return ref.put(blob);
 };
 
+//WORK ON THIS
 async function sendInvites (attendees, invite, navigation) {
     const user = auth.currentUser;
     const id = Date.now() + user.uid;
