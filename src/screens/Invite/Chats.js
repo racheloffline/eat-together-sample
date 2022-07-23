@@ -194,6 +194,7 @@ export default function ({ navigation }) {
         <FlatList
           keyExtractor={(item) => item.id}
           data={groups}
+          contentContainerStyle={styles.list}
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => {
@@ -242,4 +243,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-evenly",
   },
+  list: {
+    paddingBottom: 225
+  }
 });
