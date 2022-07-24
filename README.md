@@ -61,7 +61,7 @@ Check out https://console.firebase.google.com/u/0/ to look at our database.
 The checking logged users process is inside `./src/provider/AuthProvider`.
 
 Inside the navigator `./src/navigation/AppNavigator.js`
-There's 2 stack navigator :
+There are 2 stack navigators:
 
 - `<Auth/>` → for not logged in users stack
 - `<Main/>` → for logged in users stack

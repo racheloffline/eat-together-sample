@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         paddingHorizontal: 20,
         paddingVertical: 10,
-        alignSelf: "flex-start",
+        alignSelf: "flex-end",
         maxWidth: 200
     },
     other : {
@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         paddingHorizontal: 20,
         paddingVertical: 10,
-        alignSelf: "flex-end",
+        alignSelf: "flex-start",
         maxWidth: 200
     },
 });

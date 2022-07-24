@@ -18,15 +18,12 @@ const ChatPreview = props => {
         <View style={styles.outline}>
                 <View style={styles.head}>
                     <View style={styles.headleft}>
-                        <TouchableOpacity onPress={props.click}>
                             <Image style={styles.image} source={{uri: image}}/>
-                        </TouchableOpacity>
                         <View style={styles.textContainer}>
                             <MediumText>{props.group.name}</MediumText>
                             <SmallText>{props.group.message}</SmallText>
                         </View>
                     </View>
-                    <SmallText style={{justifySelf: "end"}}>{props.group.time}</SmallText>
                 </View>
         </View>
     );
@@ -53,6 +50,7 @@ const styles = StyleSheet.create({
     },
     textContainer: {
         flexDirection: "column",
+        maxWidth: 250
     },
     image: {
         width: 60,
