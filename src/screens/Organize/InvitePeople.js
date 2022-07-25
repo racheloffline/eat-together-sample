@@ -23,14 +23,13 @@ const storeImage = async (uri, event_id) => {
     return ref.put(blob);
 };
 
-//WORK ON THIS
-async function sendInvites (attendees, invite, navigation) {
+async function sendInvites (attendees, invite, navigation, icebreakers) {
     const user = auth.currentUser;
     const id = Date.now() + user.uid;
 
     //Add photo as necessary
     if (invite.hasImage) {
-        storeImage(invite.image, id);
+        await storeImage(invite.image, id);
     }
 
     //Send invites to each of the selected users
@@ -56,6 +55,7 @@ async function sendInvites (attendees, invite, navigation) {
         hostName = snapshot.data().name
     })
 
+
     db.collection("Private Events").doc(id).set({
         id,
         name: invite.name,
@@ -63,14 +63,15 @@ async function sendInvites (attendees, invite, navigation) {
         location: invite.location,
         date: invite.date,
         additionalInfo: invite.additionalInfo,
+        ice: icebreakers,
         attendees: [user.uid], //ONLY start by putting the current user as an attendee
         hasImage: invite.hasImage
     }).then(async docRef => {
         await attendees.forEach((attendee) => {
             const ref = db.collection("User Invites").doc(attendee);
-            ref.get().then((docRef) => {
-                if (docRef.exists && (attendee !== user.uid)) {
-                    sendInvitations(ref)
+            ref.get().then(async (docRef) => {
+                if (attendee !== user.uid) {
+                    await sendInvitations(ref)
                 }
             })
 
@@ -115,6 +116,7 @@ export default function({ route, navigation }) {
     const attendees = route.params.attendees;
     const [curSearch, setCurSearch] = useState("");
     const [image, setImage] = useState(null);
+    const [icebreakers, setIcebreakers] = useState([]);
 
     const onChangeText = (text) => {
         setCurSearch(text);
@@ -125,6 +127,7 @@ export default function({ route, navigation }) {
         let newEvents = users.filter(e => isMatch(e, text));
         setFilteredUsers(newEvents);
     }
+
 
     useEffect(() => { // updates stuff right after React makes changes to the DOM
         //LINKING ELAINE'S ALGO
@@ -148,6 +151,22 @@ export default function({ route, navigation }) {
         });
          */
         // COMMENT THIS AREA OUT WHEN READY (START)
+//      picks icebreaker set from set of icebreakers randomly
+        const breakOptions = [];
+        db.collection("Icebreakers").onSnapshot((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                breakOptions.push(doc.id);
+                console.log(doc.id);
+                console.log("IS THIS WORKING?????")
+            })
+            console.log(breakOptions);
+            var num = Math.floor(Math.random()*breakOptions.length);
+            db.collection("Icebreakers").doc(breakOptions[num]).get().then(doc => {
+                    console.log("please be working!!!!");
+                    setIcebreakers(doc.data().icebreakers);
+                })
+        });
+
         const ref = db.collection("Users");
         const user = firebase.auth().currentUser;
         ref.onSnapshot((query) => {
@@ -196,9 +215,8 @@ export default function({ route, navigation }) {
                 <InvitePerson navigation={navigation} person={item} attendees={attendees} color={generateColor()}/>
             }/>
             <View style={styles.buttons}>
-                <Button text="Send Invites" width={Dimensions.get('screen').width} color="#5DB075" size="lg" onPress={() => {
-                    sendInvites(attendees, route.params);
-                    navigation.navigate("OrganizePrivate");
+                <Button text="Send Invites" width={Dimensions.get('screen').width} color="#5DB075" size="lg" onPress={async () => {
+                    await sendInvites(attendees, route.params, navigation, icebreakers);
                 }}/>
             </View>
         </Layout>
@@ -232,3 +250,4 @@ const styles = StyleSheet.create({
         flexDirection: "row"
     }
 });
+
