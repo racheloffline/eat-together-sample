@@ -178,6 +178,13 @@ const FullCard = ({ route, navigation }) => {
     }
   }
 
+  //Reporting event function
+  function reportEvent() {
+    navigation.navigate("ReportEvent", {
+      eventID: route.params.event.id
+    })
+  }
+
   return (
     <Layout>
       <TopNav
@@ -203,7 +210,7 @@ const FullCard = ({ route, navigation }) => {
                 />
               </MenuTrigger>
               <MenuOptions>
-                <MenuOption onSelect={() => alert("Report feature coming soon!")}>
+                <MenuOption onSelect={() => reportEvent()}>
                   <NormalText size = {18}>Report Event</NormalText>
                 </MenuOption>
                 <MenuOption onSelect={() => archiveEvent()}>
