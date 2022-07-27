@@ -27,15 +27,22 @@ const styles = StyleSheet.create({
     card: {
         padding: 10,
         width: Dimensions.get('screen').width - 10,
-        marginVertical: 10,
-        borderRadius: 10
+        marginVertical: 5,
+        borderRadius: 10,
+        shadowColor: "#000000",
+        shadowOpacity: 0.25,
+        shadowOffset: {
+            width: 0,
+            height: 4
+        },
+        elevation: 5,
     },
 
     row: {
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        maxWidth: Dimensions.get('screen').width/1.7
+        maxWidth: Dimensions.get('screen').width/1.5
     },
 
     tags: {

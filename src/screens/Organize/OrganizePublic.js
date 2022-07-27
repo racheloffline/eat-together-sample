@@ -231,6 +231,7 @@ export default function ({ navigation }) {
                             storeImage(photo, id);
                             hasImage = true;
                         }
+                        
                         db.collection("Public Events").doc(id).set({
                             id,
                             hostID: user.uid,

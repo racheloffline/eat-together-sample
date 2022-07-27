@@ -139,7 +139,7 @@ const FullProfile = ({ route, navigation }) => {
           </NormalText>
           <MediumText>@{route.params.person.username}</MediumText>
 
-          <View style={{flexDirection: "row", marginVertical: 10}}>
+          <View style={{flexDirection: "row", marginTop: 10}}>
             <Button disabled={disabled} onPress={connect} backgroundColor={color}
               paddingVertical={5} paddingHorizontal={15} fontSize={14}>
               {status}
