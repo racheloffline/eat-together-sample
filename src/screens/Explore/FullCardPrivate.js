@@ -81,27 +81,14 @@ const FullCard = ({ route, navigation }) => {
   // TODO: JOSH | Randomize this
   // Fetch icebreaker questions from FIREBASE
   const fetchIcebreakers = () => {
-//    db.collection("Icebreakers").doc("otherThing").get().then(doc => {
-//        setIcebreakers(doc.data().icebreakers);
-//    });
-    console.log(icebreakers);
-    console.log('WOAHHHH!!!');
-    if(icebreakers.length === 0) {
-        console.log("ONLY onceeEEEEE!!");
-        var breakOptions = [];
-        //    breakOptions.push("anothaOne");
-            db.collection("Icebreakers").onSnapshot((querySnapshot) => {
-                querySnapshot.forEach((doc) => {
-                    breakOptions.push(doc.id);
-                    console.log(doc.id);
-                    console.log("IS THIS WORKING?????")
-                })
-                var num = Math.floor(Math.random()*breakOptions.length);
-                db.collection("Icebreakers").doc(breakOptions[num]).get().then(doc => {
-                        setIcebreakers(doc.data().icebreakers);
-                    })
-            });
-    }
+
+      const eventID = route.params.event.id;
+
+      db.collection("Private Events").doc(eventID).get().then(doc => {
+        setIcebreakers(doc.data().ice);
+        console.log('icebreakers:');
+        console.log(doc.data().ice);
+      })
   }
 
   // Fetch all attendees of this event
