@@ -41,12 +41,20 @@ const InvitePerson = props => {
                         setCheckbox(val);
                         const curr = attendees;
                         const isName = (elem) => elem == props.person.personID;
-                        if (val) {
+                        if (val) { // Add attendee
+                            if (curr.length == 0) { // Undisable the "send invites" button
+                                props.undisable();
+                            }
+
                             let index = curr.findIndex(isName);
                             if (index == -1) {
                                 curr.push(props.person.personID.toString());
                             }
-                        } else {
+                        } else { // Remove attendee
+                            if (curr.length == 1) { // Disable the "send invites" button
+                                props.disable();
+                            }
+
                             let index = curr.findIndex(isName);
                             if (index != -1) {
                                 curr.splice(index, 1);

@@ -58,8 +58,10 @@ export default function({ navigation }) {
 				setUnread(doc.data().hasNotif);
 			});
 		}
-		fetchData();
-		setLoading(false);
+
+		fetchData().then(() => {
+			setLoading(false);
+		});
 	}, []);
 
 	// Method to filter out people based on name, username, or tags
@@ -115,7 +117,10 @@ export default function({ navigation }) {
 				setFilteredPeople(copy);
 				setSimilarInterests(true);
 				setLoading(false);
-		  	});
+		  	}).catch(e => { // If error, alert the user
+				alert("An error occured, try again later :(");
+				setLoading(false);
+			});
 		} else {
 			setLoading(false);
 		  	setFilteredPeople(people);

@@ -75,14 +75,15 @@ export default function ({ navigation }) {
         setLocation("");
         setDate(new Date());
         setAdditionalInfo("");
-    };
+    }
 
+    // For selecting a photo
     const handleChoosePhoto = async () => {
        let result = await ImagePicker.launchImageLibraryAsync({});
        if (!result.cancelled) {
            setPhoto(result.uri);
        }
-    };
+    }
 
     return (
         <Layout>

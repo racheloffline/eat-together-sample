@@ -1,7 +1,7 @@
 //Display upcoming events to join
 
-import React, {useEffect, useState} from "react";
-import { StyleSheet, FlatList, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, FlatList, View, ActivityIndicator } from "react-native";
 import { Layout } from "react-native-rapi-ui";
 
 import EventCard from '../../components/EventCard';
@@ -30,8 +30,8 @@ export default function({ navigation }) {
     const [friendsAttending, setFriendsAttending] = useState(false);
     const [similarInterests, setSimilarInterests] = useState(false);
 
-    //See if we need to display unread notif icon
-    const [unread, setUnread] = useState(false);
+    const [unread, setUnread] = useState(false); // See if we need to display unread notif icon
+    const [loading, setLoading] = useState(true); // State variable to show loading screen when fetching data
 
     useEffect(() => { // updates stuff right after React makes changes to the DOM
         async function fetchData() {
@@ -48,7 +48,7 @@ export default function({ navigation }) {
                 
                 // Sort events by date
                 newEvents = newEvents.sort((a, b) => {
-                    return b.date.seconds - a.date.seconds;
+                    return a.date.seconds - b.date.seconds;
                 });
                 setEvents(newEvents);
                 setFilteredEvents(newEvents);
@@ -60,13 +60,18 @@ export default function({ navigation }) {
                 setUnread(data.hasNotif);
             });
         }
-        fetchData();
+
+        fetchData().then(() => {
+          setLoading(false);
+        });
     }, []);
 
     // Method to filter out events
     const search = text => {
+      setLoading(true);
       let newEvents = events.filter(e => isMatch(e, text));
       setFilteredEvents(newEvents);
+      setLoading(false);
     }
 
     // Determines if an event matches search query or not
@@ -83,17 +88,20 @@ export default function({ navigation }) {
         return true;
       }
 
-      return event.additionalInfo.toLowerCase().includes(text.toLowerCase()); // Additional info
+      return event.hostName.toLowerCase().includes(text.toLowerCase()); // Host
     }
 
     // Method called when a new query is typed in/deleted
     const onChangeText = text => {
+      setLoading(true);
       setSearchQuery(text);
       search(text);
+      setLoading(false);
     }
 
     // Sort events by popularity
     const sortByPopularity = () => {
+      setLoading(true);
       if (!popularity) {
         const copy = [...events];
         let newEvents = copy.sort((a, b) => b.attendees.length - a.attendees.length);
@@ -108,10 +116,12 @@ export default function({ navigation }) {
       setFromFriends(false);
       setFriendsAttending(false);
       setSimilarInterests(false);
+      setLoading(false);
     }
 
     // Display events that friends are hosting
     const filterByFriendsHosting = () => {
+      setLoading(true);
       if (!fromFriends) {
         const copy = [...events];
         let newEvents = copy.filter(e => userInfo.friendIDs.includes(e.hostID));
@@ -126,10 +136,12 @@ export default function({ navigation }) {
       setPopularity(false);
       setFriendsAttending(false);
       setSimilarInterests(false);
+      setLoading(false);
     }
 
     // Display events that friends are attending
     const filterByFriendsAttending = () => {
+      setLoading(true);
       if (!friendsAttending) {
         const copy = [...events];
         let newEvents = copy.filter(e => {
@@ -146,10 +158,12 @@ export default function({ navigation }) {
       setPopularity(false);
       setFromFriends(false);
       setSimilarInterests(false);
+      setLoading(false);
     }
 
     // Display events in descending order of similar tags
     const sortBySimilarInterests = () => {
+      setLoading(true);
       if (!similarInterests) {
         let copy = [...events];
 
@@ -169,9 +183,14 @@ export default function({ navigation }) {
           copy = copy.sort((a, b) => b.similarity - a.similarity);
           setFilteredEvents(copy);
           setSimilarInterests(true);
+          setLoading(false);
+        }).catch(e => { // If error, alert the user
+          alert("An error occured, try again later :(");
+          setLoading(false);
         });
       } else {
         setFilteredEvents(events);
+        setLoading(false);
       }
 
       setSimilarInterests(!similarInterests);
@@ -193,23 +212,24 @@ export default function({ navigation }) {
     return (
       <Layout>
         <Header name="Explore" navigation = {navigation} hasNotif = {unread}/>
-        <HorizontalSwitch left="Your Events" right="Public" current="right" press={() => navigation.navigate("ExploreYourEvents")}/>
-        <Searchbar placeholder="Search by name, date, location, or additional info"
+        <HorizontalSwitch left="Your Events" right="Public" current="right"
+          press={() => navigation.navigate("ExploreYourEvents")}/>
+        <Searchbar placeholder="Search by name, location, date, or host name"
 				  value={searchQuery} onChangeText={onChangeText}/>
 
         <HorizontalRow>
-          <Filter text="Sort by popularity" checked={popularity}
-            onPress={sortByPopularity}/>
+          <Filter checked={similarInterests}
+            onPress={sortBySimilarInterests} text="Sort by similar interests"/>
+          <Filter checked={popularity}
+            onPress={sortByPopularity} text="Sort by popularity" />
           <Filter checked={fromFriends}
             onPress={filterByFriendsHosting} text="From friends"/>
           <Filter checked={friendsAttending}
             onPress={filterByFriendsAttending} text="Friends attending"/>
-          <Filter checked={similarInterests}
-            onPress={sortBySimilarInterests} text="Sort by similar interests"/>
         </HorizontalRow>
 
         <View style={{ flex: 1 }}>
-          <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
+          {!loading ? <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
             data={filteredEvents} renderItem={({item}) =>
               <EventCard event={item} click={() => {
                   //ampInstance.logEvent('BUTTON_CLICKED'); // EXPERIMENT
@@ -218,7 +238,9 @@ export default function({ navigation }) {
                   public: true
                 });
               }}/>
-            }/>
+            }/> : <View style={{ flex: 1, justifyContent: "center" }}>
+              <ActivityIndicator size={100} color="#5DB075"/>
+            </View>}
         </View>
       </Layout>
     );

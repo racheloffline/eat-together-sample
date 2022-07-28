@@ -15,6 +15,7 @@ import Searchbar from "../../components/Searchbar";
 import getDate from "../../getDate";
 import {generateColor} from "../../methods";
 
+// Stores image in Firebase Storage
 const storeImage = async (uri, event_id) => {
     const response = await fetch(uri);
     const blob = await response.blob();
@@ -23,15 +24,13 @@ const storeImage = async (uri, event_id) => {
     return ref.put(blob);
 };
 
-async function sendInvites (attendees, invite, navigation) {
-    const user = auth.currentUser;
-    const id = Date.now() + user.uid;
+// Fetches image from Firebase Storage
+const fetchImage = async (id) => {
+    let ref = storage.ref().child("eventPictures/" + id);
+    return ref.getDownloadURL();
+}
 
-    //Add photo as necessary
-    if (invite.hasImage) {
-        await storeImage(invite.image, id);
-    }
-
+async function sendInvites (attendees, invite, navigation, user, id, image) {
     //Send invites to each of the selected users
     async function sendInvitations(ref) {
         ref.collection("Invites").add({
@@ -46,24 +45,29 @@ async function sendInvites (attendees, invite, navigation) {
         }).then(r => {
             invite.clearAll();
             navigation.navigate("OrganizePrivate");
-        })
+        });
     }
 
     let hostName;
+    let hostImage;
 
     await db.collection("Users").doc(user.uid).get().then((snapshot) => {
-        hostName = snapshot.data().name
-    })
+        hostName = snapshot.data().name;
+        hostImage = snapshot.data().image;
+    });
 
     db.collection("Private Events").doc(id).set({
         id,
         name: invite.name,
         hostID: user.uid,
+        hostName,
+        hostImage,
         location: invite.location,
         date: invite.date,
         additionalInfo: invite.additionalInfo,
         attendees: [user.uid], //ONLY start by putting the current user as an attendee
-        hasImage: invite.hasImage
+        hasImage: invite.hasImage,
+        image
     }).then(async docRef => {
         await attendees.forEach((attendee) => {
             const ref = db.collection("User Invites").doc(attendee);
@@ -71,9 +75,8 @@ async function sendInvites (attendees, invite, navigation) {
                 if (attendee !== user.uid) {
                     await sendInvitations(ref)
                 }
-            })
-
-        })
+            });
+        });
 
         const storeID = {
             type: "private",
@@ -84,7 +87,7 @@ async function sendInvites (attendees, invite, navigation) {
             hostedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
             attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
             attendedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)
-        })
+        });
 
         alert("Invitations sent!");
 
@@ -109,22 +112,16 @@ const isMatch = (user, text) => {
 }
 
 export default function({ route, navigation }) {
-    const [users, setUsers] = useState([]); // initial state, function used for updating initial state
-    const [filteredUsers, setFilteredUsers] = useState([]);
     const attendees = route.params.attendees;
+
+    const [users, setUsers] = useState([]);
+    const [filteredUsers, setFilteredUsers] = useState([]);
     const [curSearch, setCurSearch] = useState("");
-    const [image, setImage] = useState(null);
+    
+    const [disabled, setDisabled] = useState(true);
+    const [loading, setLoading] = useState(false);
 
-    const onChangeText = (text) => {
-        setCurSearch(text);
-        search(curSearch);
-    }
-
-    const search = (text) => {
-        let newEvents = users.filter(e => isMatch(e, text));
-        setFilteredUsers(newEvents);
-    }
-
+    // Loading data
     useEffect(() => { // updates stuff right after React makes changes to the DOM
         //LINKING ELAINE'S ALGO
         /*
@@ -174,6 +171,16 @@ export default function({ route, navigation }) {
         // COMMENT THIS AREA OUT WHEN READY (END)
     }, []);
 
+    const onChangeText = (text) => {
+        setCurSearch(text);
+        search(curSearch);
+    }
+
+    const search = (text) => {
+        let newEvents = users.filter(e => isMatch(e, text));
+        setFilteredUsers(newEvents);
+    }
+
     return (
         <Layout style={{flex:1}}>
             <TopNav
@@ -188,15 +195,36 @@ export default function({ route, navigation }) {
                 }
                 leftAction={() => navigation.goBack()}
             />
-                <Searchbar placeholder="Search by name, date, location, or additional info"
-                           value={curSearch} onChangeText={onChangeText}/>
+
+            <Searchbar placeholder="Search by name"
+                value={curSearch} onChangeText={onChangeText}/>
             <FlatList contentContainerStyle={styles.invites} keyExtractor={item => item.id}
-                      data={filteredUsers} renderItem={({item}) =>
-                <InvitePerson navigation={navigation} person={item} attendees={attendees} color={generateColor()}/>
-            }/>
+                data={filteredUsers} renderItem={({item}) =>
+                    <InvitePerson navigation={navigation} person={item}
+                        attendees={attendees} color={generateColor()}
+                        disable={() => setDisabled(true)}
+                        undisable={() => setDisabled(false)}/>
+                }/>
+
             <View style={styles.buttons}>
-                <Button text="Send Invites" width={Dimensions.get('screen').width} color="#5DB075" size="lg" onPress={async () => {
-                    await sendInvites(attendees, route.params, navigation);
+                <Button text={loading ? "Sending ..." : "Send Invites"} width={Dimensions.get('screen').width}
+                    disabled={disabled || loading} color="#5DB075" size="lg" onPress={() => {
+                        setLoading(true);
+                        const user = auth.currentUser;
+                        const id = Date.now() + user.uid;
+                        if (route.params.hasImage) {
+                            storeImage(route.params.image, id).then(() => {
+                                fetchImage(id).then(uri => {
+                                    sendInvites(attendees, route.params, navigation, user, id, uri).then(() => {
+                                        setLoading(false);
+                                    })
+                                });
+                            });
+                        } else {
+                            sendInvites(attendees, route.params, navigation, user, id, "").then(() => {
+                                setLoading(false);
+                            });
+                        }
                 }}/>
             </View>
         </Layout>

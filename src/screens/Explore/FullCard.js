@@ -19,6 +19,7 @@ import getTime from "../../getTime";
 
 import {db, auth, storage} from "../../provider/Firebase";
 import * as firebase from "firebase";
+import { clickProps } from "react-native-web/dist/cjs/modules/forwardedProps";
 
 const FullCard = ({ route, navigation }) => {
   const user = auth.currentUser;
@@ -109,7 +110,8 @@ const FullCard = ({ route, navigation }) => {
 
         <View style={styles.details}>
             <Image style={styles.image}
-              source={image ? {uri: image} : {uri: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400"}}/>
+              source={route.params.event.hasImage ? {uri: route.params.event.image}
+                : {uri: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400"}}/>
 
             <View style={{flexDirection: "column"}}>
                 <NormalText>{getDate(route.params.event.date.toDate())}</NormalText>

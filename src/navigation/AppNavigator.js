@@ -137,21 +137,25 @@ export default () => {
   const auth = useContext(AuthContext);
   const user = auth.user;
   const currUser = auth.currUser;
-  useEffect(async () => {
-      const token = await registerForPushNotificationsAsync();
-      DeviceToken.setToken(token);
-
-      if (currUser && (currUser.emailVerified || currUser.email === "rachelhu@uw.edu" || currUser.email === "elaine@uw.edu" || currUser.email === "argharib@uw.edu")) {
-          await db.collection("Users").doc(currUser.uid).update({
-              verified: true,
+  useEffect(() => {
+      async function getUser() {
+          const token = await registerForPushNotificationsAsync();
+          DeviceToken.setToken(token);
+    
+          if (currUser && (currUser.emailVerified || currUser.email === "rachelhu@uw.edu" || currUser.email === "elaine@uw.edu" || currUser.email === "argharib@uw.edu")) {
+              await db.collection("Users").doc(currUser.uid).update({
+                  verified: true,
+                  pushTokens: firebase.firestore.FieldValue.arrayUnion(token)
+              })
+          }
+    
+          //Register the push token by storing it in firebase, so cloud functions can use it
+          await db.collection("Users").doc(firebase.auth().currentUser.uid).update({
               pushTokens: firebase.firestore.FieldValue.arrayUnion(token)
           })
       }
-
-      //Register the push token by storing it in firebase, so cloud functions can use it
-      await db.collection("Users").doc(firebase.auth().currentUser.uid).update({
-          pushTokens: firebase.firestore.FieldValue.arrayUnion(token)
-      })
+      
+      getUser();
   }, []);
 
   return (

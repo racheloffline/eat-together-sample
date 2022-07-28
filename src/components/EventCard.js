@@ -14,12 +14,6 @@ const EventCard = props => {
     const [image, setImage] = useState("");
 
     useEffect(() => {
-        if (props.event.hasImage) {
-            storage.ref("eventPictures/" + props.event.id).getDownloadURL().then(uri => {
-                setImage(uri);
-            });
-        }
-
         db.collection("Users").doc(props.event.hostID).get().then(doc => {
             if (doc.data().hasImage) {
                 storage.ref("profilePictures/" + props.event.hostID).getDownloadURL().then(uri => {
@@ -32,7 +26,8 @@ const EventCard = props => {
     return (
         <Section style={styles.card} borderRadius={30}>
             <TouchableOpacity onPress={props.click} disabled={props.disabled}>
-                <SectionImage source={image ? {uri: image} : {uri: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400"}}/>
+                <SectionImage source={props.event.hasImage ? {uri: props.event.image}
+                    : {uri: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400"}}/>
 
                 <SectionContent>
                     <View style={styles.details}>
