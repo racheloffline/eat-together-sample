@@ -120,7 +120,8 @@ export default function ({ navigation }) {
 						inviteID: item.inviteID
 					}
 					navigation.navigate("InviteFull", {
-						invite: inviteToSend
+						invite: inviteToSend,
+						hasPassed: (item.date.toDate().getTime() < (new Date()).getTime())
 					});
 				}}/>
 			}/>
