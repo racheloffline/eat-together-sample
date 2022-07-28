@@ -28,7 +28,8 @@ const EventCard = props => {
             }
         });
     }, []);
-    
+
+    console.log(props.event)
     return (
         <Section style={styles.card} borderRadius={30}>
             <TouchableOpacity onPress={props.click} disabled={props.disabled}>

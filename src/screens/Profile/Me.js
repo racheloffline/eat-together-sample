@@ -22,7 +22,7 @@ export default function ({ navigation }) {
 
     useEffect(() => {
         async function fetchData() {
-            await db.collection("Users").doc(user.uid).get().then(async doc => {
+            await db.collection("Users").doc(user.uid).onSnapshot(async doc => {
                 setUserInfo(doc.data());
                 setMealsAttended(doc.data().attendedEventIDs.length);
                 setMealsSignedUp(doc.data().attendingEventIDs.length);
