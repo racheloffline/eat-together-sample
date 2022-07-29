@@ -26,7 +26,8 @@ import {db, auth, storage} from "../provider/Firebase";
 const Stack = createStackNavigator();
 const Auth = () => {
     // Name.js
-    const [name, setName] = useState("");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
     const [quote, setQuote] = useState("");
     const [image, setImage] = useState("");
     const [tags, setTags] = useState([]);
@@ -77,7 +78,8 @@ const Auth = () => {
     
                     const userData = {
                         id: uid,
-                        name,
+                        firstName,
+                        lastName,
                         username,
                         email,
                         hasImage: image !== "",
@@ -139,8 +141,8 @@ const Auth = () => {
         <Stack.Screen name="ForgetPassword" component={ForgetPassword} />
 
         <Stack.Screen name="Name" options={{headerShown: false}}>
-            {props => <Name {...props} name={name} setName={setName} quote={quote}
-                setQuote={setQuote} image={image} setImage={setImage}
+            {props => <Name {...props} firstName={firstName} lastName={lastName} setFirstName={setFirstName}
+                setLastName={setLastName} quote={quote} setQuote={setQuote} image={image} setImage={setImage}
                 tags={tags} setTags={setTags}/>}
         </Stack.Screen>
         <Stack.Screen name="Email" options={{headerShown: false}}>

@@ -54,10 +54,11 @@ export default function ({ navigation }) {
         fetchData();
     }, []);
 
-    const updateInfo = (newName, newQuote, newTags, newImage) => {
+    const updateInfo = (newFirstName, newLastName, newQuote, newTags, newImage) => {
         setUserInfo(prev => ({
             ...prev,
-            name: newName,
+            firstName: newFirstName,
+            lastName: newLastName,
             quote: newQuote,
             tags: newTags
         }));

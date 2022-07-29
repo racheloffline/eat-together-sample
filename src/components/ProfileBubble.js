@@ -12,7 +12,9 @@ const ProfileBubble = props => {
             <TouchableOpacity onPress={props.click}>
                 <MediumText color="white">"{props.person.quote}"</MediumText>
                 <View style={styles.row}>
-                    <NormalText color="white">- {props.person.name}</NormalText>
+                    <NormalText color="white">
+                        - {props.person.firstName + " " + props.person.lastName.substring(0, 1) + "."}
+                    </NormalText>
 
                     <View style={styles.tags}>
                         {props.person.tags.slice(0, 4).map(tag => <Tag text={tag} key={tag}/>)}

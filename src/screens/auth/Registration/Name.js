@@ -19,7 +19,8 @@ import { cloneDeep } from "lodash";
 
 const Name = props => {
   // Input fields
-  const [name, setName] = useState(props.name);
+  const [firstName, setFirstName] = useState(props.firstName);
+  const [lastName, setLastName] = useState(props.lastName);
   const [quote, setQuote] = useState(props.quote);
   const [image, setImage] = useState(props.image);
   const [tags, setTags] = useState(props.tags);
@@ -32,10 +33,11 @@ const Name = props => {
   }
 
   const goNext = () => {
-    if (checkProfanity(name) || checkProfanity(quote)) {
+    if (checkProfanity(firstName) || checkProfanity(lastName) || checkProfanity(quote)) {
       alert("Inappropriate words used >:(");
     } else {
-      props.setName(name);
+      props.setFirstName(firstName);
+      props.setLastName(lastName);
       props.setQuote(quote);
       props.setImage(image);
       props.setTags(tags);
@@ -71,14 +73,20 @@ const Name = props => {
       </View>
 
       <View style={styles.content}>
-        <TextInput placeholder="What's your name?" value={name}
-          onChangeText={val => setName(val)} containerStyle={{marginBottom: 10}}
-          leftContent={<FontAwesome name="user" size={18}/>} autoComplete="name"/>
+        <View style={styles.name}>
+          <TextInput placeholder="First name" value={firstName}
+            onChangeText={val => setFirstName(val)} containerStyle={{width: "47%"}}
+            leftContent={<FontAwesome name="user" size={18}/>} autoComplete="name"/>
+          <TextInput placeholder="Last name" value={lastName}
+            onChangeText={val => setLastName(val)} containerStyle={{width: "47%"}}
+            leftContent={<FontAwesome name="user" size={18}/>} autoComplete="name"/>
+        </View>
+
         <TextInput placeholder="Favorite quote (no quotation marks)" value={quote}
-          onChangeText={val => setQuote(val)} containerStyle={{marginBottom: 20}}
+          onChangeText={val => setQuote(val)} containerStyle={{marginBottom: 30}}
           leftContent={<FontAwesome name="quote-left" size={18}/>}/>
   
-        <MediumText>Add Some Tags:</MediumText>
+        <MediumText>Describe yourself with tags!</MediumText>
         <SmallText>Note: must have between 3 and 6 tags (inclusive).</SmallText>
         <View style={styles.tagInput}>
           <TagsSection
@@ -101,7 +109,7 @@ const Name = props => {
         <View style={styles.buttons}>
           <Button onPress={() => props.navigation.goBack()}
             marginHorizontal={10}>Back</Button>
-          <Button disabled={name === "" || quote === "" || tags.length < 3 || tags.length > 6}
+          <Button disabled={firstName === "" || lastName === "" || quote === "" || tags.length < 3 || tags.length > 6}
             onPress={goNext}
             marginHorizontal={10}>Next</Button>
         </View>
@@ -142,9 +150,15 @@ const styles = StyleSheet.create({
   },
 
   content: {
-    width: "100%",
     paddingHorizontal: 20,
     alignItems: "center"
+  },
+
+  name: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10
   },
 
   tagInput: {

@@ -133,7 +133,9 @@ const FullProfile = ({ route, navigation }) => {
         <Image style={styles.image} source={image ? {uri: image} : require("../../../assets/logo.png")}/>
         
         <View style={styles.name}>
-          <LargeText>{route.params.person.name}</LargeText>
+          <LargeText>
+            {route.params.person.firstName + " " + route.params.person.lastName.substring(0, 1) + "."}
+          </LargeText>
           <NormalText>
           {route.params.person.attendedEventIDs.length + "/" + route.params.person.attendingEventIDs.length + " meals attended"}
           </NormalText>

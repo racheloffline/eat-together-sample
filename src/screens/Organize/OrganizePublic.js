@@ -119,15 +119,16 @@ export default function ({ navigation }) {
     const storeEvent = (id, hasImage, image) => {
         db.collection("Public Events").doc(id).set({
             id,
-            hostID: user.uid,
             name,
-            hostName: userInfo.name,
+            hostID: user.uid,
+            hostFirstName: userInfo.firstName,
+            hostLastName: userInfo.lastName,
             hasHostImage: userInfo.hasImage,
             hostImage: userInfo.hasImage ? userInfo.image : "",
             location,
             date,
             additionalInfo,
-            attendees: [],
+            attendees: [user.uid], //ONLY start by putting the current user as an attendee
             hasImage,
             image,
             tags: tagsSelected
@@ -251,7 +252,7 @@ export default function ({ navigation }) {
                     closeOnPressMask={false}
                     customStyles={{
                         wrapper: {
-                            backgroundColor: "rgba(0,0,0,0.5)"
+                            backgroundColor: "rgba(0,0,0,0.5)",
                         },
                         draggableIcon: {
                             backgroundColor: "#5DB075"
@@ -259,6 +260,7 @@ export default function ({ navigation }) {
                         container: {
                             borderTopLeftRadius: 20,
                             borderTopRightRadius: 20,
+                            padding: 10
                         }
                     }}>
                     <NormalText center>Add as many tags as you want :)</NormalText>

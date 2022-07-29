@@ -36,8 +36,8 @@ async function sendInvites (attendees, invite, navigation, user, id, image) {
         ref.collection("Invites").add({
             date: invite.date,
             description: invite.additionalInfo,
-            hostID: user.uid,
-            hostName: hostName,
+            hostID: user.id,
+            hostName: user.firstName + " " + user.lastName,
             hasImage: invite.hasImage,
             location: invite.location,
             name: invite.name,
@@ -48,24 +48,18 @@ async function sendInvites (attendees, invite, navigation, user, id, image) {
         });
     }
 
-    let hostName;
-    let hostImage;
-
-    await db.collection("Users").doc(user.uid).get().then((snapshot) => {
-        hostName = snapshot.data().name;
-        hostImage = snapshot.data().image;
-    });
-
     db.collection("Private Events").doc(id).set({
         id,
         name: invite.name,
-        hostID: user.uid,
-        hostName,
-        hostImage,
+        hostID: user.id,
+        hostFirstName: user.firstName,
+        hostLastName: user.lastName,
+        hasHostImage: user.hasImage,
+        hostImage: user.image,
         location: invite.location,
         date: invite.date,
         additionalInfo: invite.additionalInfo,
-        attendees: [user.uid], //ONLY start by putting the current user as an attendee
+        attendees: [user.id], //ONLY start by putting the current user as an attendee
         hasImage: invite.hasImage,
         image
     }).then(async docRef => {
@@ -112,6 +106,10 @@ const isMatch = (user, text) => {
 }
 
 export default function({ route, navigation }) {
+    // Current user
+    const user = auth.currentUser;
+    const [userInfo, setUserInfo] = useState([]);
+
     const attendees = route.params.attendees;
 
     const [users, setUsers] = useState([]);
@@ -163,6 +161,8 @@ export default function({ route, navigation }) {
                         attendedEventIDs: data.attendedEventIDs,
                         attendingEventIDs: data.attendingEventIDs
                     });
+                } else if (data.id === user.uid) {
+                    setUserInfo(data);
                 }
             });
             setFilteredUsers(list);
@@ -210,12 +210,12 @@ export default function({ route, navigation }) {
                 <Button text={loading ? "Sending ..." : "Send Invites"} width={Dimensions.get('screen').width}
                     disabled={disabled || loading} color="#5DB075" size="lg" onPress={() => {
                         setLoading(true);
-                        const user = auth.currentUser;
-                        const id = Date.now() + user.uid;
+                        const id = Date.now() + user.uid; // Generate a unique ID for the event
+                        
                         if (route.params.hasImage) {
                             storeImage(route.params.image, id).then(() => {
                                 fetchImage(id).then(uri => {
-                                    sendInvites(attendees, route.params, navigation, user, id, uri).then(() => {
+                                    sendInvites(attendees, route.params, navigation, userInfo, id, uri).then(() => {
                                         setLoading(false);
                                     })
                                 });

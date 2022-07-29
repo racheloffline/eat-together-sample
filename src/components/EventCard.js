@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View, StyleSheet, Image, Dimensions, TouchableOpacity } from 'react-native';
 import { Section, SectionContent, SectionImage } from 'react-native-rapi-ui';
 import MediumText from './MediumText';
@@ -6,23 +6,8 @@ import SmallText from './SmallText';
 
 import getDate from "../getDate";
 import getTime from "../getTime";
-import { db, storage } from '../provider/Firebase';
 
-const EventCard = props => {
-    // Stores image URLs
-    const [hostImage, setHostImage] = useState("");
-    const [image, setImage] = useState("");
-
-    useEffect(() => {
-        db.collection("Users").doc(props.event.hostID).get().then(doc => {
-            if (doc.data().hasImage) {
-                storage.ref("profilePictures/" + props.event.hostID).getDownloadURL().then(uri => {
-                    setHostImage(uri);
-                });
-            }
-        });
-    }, []);
-    
+const EventCard = props => {    
     return (
         <Section style={styles.card} borderRadius={30}>
             <TouchableOpacity onPress={props.click} disabled={props.disabled}>
@@ -31,7 +16,7 @@ const EventCard = props => {
 
                 <SectionContent>
                     <View style={styles.details}>
-                        <Image style={styles.profile} source={hostImage ? {uri: hostImage}
+                        <Image style={styles.profile} source={props.event.hasHostImage ? {uri: props.event.hostImage}
                             : require("../../assets/logo.png")}/>
                             
                         <View style={styles.text}>

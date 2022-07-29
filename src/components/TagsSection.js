@@ -220,7 +220,7 @@ export default class TagsSection extends Component {
     return (
       <View
         keyboardShouldPersist="always"
-        style={{ padding: 10 }}
+        style={{ padding: 0 }}
       >
         { this.renderTextInput() }
         { this.renderListType() }
