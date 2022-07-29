@@ -33,6 +33,10 @@ export default function ({ route, navigation}) {
         }
     }
 
+    function chooseColor() {
+        return route.params.hasPassed ? "red" : "black";
+    }
+
     return (
         <Layout>
             <TopNav
@@ -49,8 +53,7 @@ export default function ({ route, navigation}) {
             />
             <ScrollView contentContainerStyle={styles.page}>
                 <View style={styles.background}/>
-                <Image style={styles.image}
-                       source={{uri: (image != "" ? image : "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400")}}/>
+                <Image style={styles.image} source={(image != "") ? {uri: image} : require("../../../assets/stockEvent.png")}/>
                 <MediumText style={styles.text}>{invite.hostName} is inviting you to {invite.name}!</MediumText>
                 <View style = {styles.icons}>
                     <Ionicons name="location-outline" size={24}/>
@@ -58,14 +61,14 @@ export default function ({ route, navigation}) {
                     <NormalText size = {20}>{invite.location}</NormalText>
                 </View>
                 <View style = {styles.icons}>
-                    <Ionicons name="calendar-outline" size={24}/>
+                    <Ionicons name="calendar-outline" size={24} color={chooseColor()}/>
                     <Text>  </Text>
-                    <NormalText size = {20}>{invite.date}</NormalText>
+                    <NormalText size = {20} color={chooseColor()}>{invite.date}</NormalText>
                 </View>
                 <View style = {styles.icons}>
-                    <Ionicons name="time-outline" size={24}/>
+                    <Ionicons name="time-outline" size={24} color={chooseColor()}/>
                     <Text>  </Text>
-                    <NormalText size = {20}>{invite.time}</NormalText>
+                    <NormalText size = {20} color={chooseColor()}>{invite.time}</NormalText>
                 </View>
                 <View style = {styles.text}>
                     <NormalText size = {20}>Details: {displayDetails()}</NormalText>

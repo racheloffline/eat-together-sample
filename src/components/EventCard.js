@@ -29,11 +29,10 @@ const EventCard = props => {
         });
     }, []);
 
-    console.log(props.event)
     return (
         <Section style={styles.card} borderRadius={30}>
             <TouchableOpacity onPress={props.click} disabled={props.disabled}>
-                <SectionImage source={image ? {uri: image} : {uri: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400"}}/>
+                <SectionImage source={image ? {uri: image} : require("../../assets/stockEvent.png")}/>
 
                 <SectionContent>
                     <View style={styles.details}>
