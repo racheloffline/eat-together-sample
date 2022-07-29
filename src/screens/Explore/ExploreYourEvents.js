@@ -1,7 +1,7 @@
 // Display your events
 
 import React, {useEffect, useState} from "react";
-import { StyleSheet, FlatList } from "react-native";
+import {StyleSheet, FlatList, View} from "react-native";
 import { Layout } from "react-native-rapi-ui";
 
 import EventCard from '../../components/EventCard';
@@ -11,6 +11,7 @@ import HorizontalSwitch from "../../components/HorizontalSwitch";
 
 import getDate from "../../getDate";
 import { db, auth } from "../../provider/Firebase";
+import NormalText from "../../components/NormalText";
 
 export default function({ navigation }) {
     const [events, setEvents] = useState([]); // initial state, function used for updating initial state
@@ -47,6 +48,15 @@ export default function({ navigation }) {
             });
         });
     }, []);
+
+    //Check to see if we should display the "No Events" placeholder text
+    function shouldDisplayPlaceholder(list) {
+        if(list == null || list.length === 0) {
+            return "You are not signed up for any upcoming events."
+        } else {
+            return ""
+        }
+    }
 
     // Method to filter out events
     const search = text => {
@@ -104,6 +114,9 @@ export default function({ navigation }) {
             <Searchbar placeholder="Search by name, date, location, or additional info"
 				value={searchQuery} onChangeText={onChangeText}/>
 
+            <View style = {(shouldDisplayPlaceholder(events) === "") ? {marginVertical: -7} : {marginVertical: 15}}>
+                <NormalText center={"center"}>{shouldDisplayPlaceholder(events)}</NormalText>
+            </View>
             <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
                       data={filteredEvents} renderItem={({item}) =>
                 <EventCard event={item} click={() => {

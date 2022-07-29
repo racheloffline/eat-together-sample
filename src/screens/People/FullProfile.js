@@ -135,7 +135,7 @@ const FullProfile = ({ route, navigation }) => {
         <View style={styles.name}>
           <LargeText>{route.params.person.name}</LargeText>
           <NormalText>
-          {route.params.person.attendedEventIDs.length + "/" + route.params.person.attendingEventIDs.length + " meals attended"}
+          {route.params.person.attendedEventIDs.length + "/" + (route.params.person.attendedEventIDs.length+ route.params.person.attendingEventIDs.length) + " meals attended"}
           </NormalText>
           <MediumText>@{route.params.person.username}</MediumText>
 

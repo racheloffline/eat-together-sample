@@ -64,6 +64,15 @@ export default function({ navigation }) {
         fetchData();
     }, []);
 
+    //Check to see if we should display the "No Events" placeholder text
+    function shouldDisplayPlaceholder(list) {
+        if(list == null || list.length === 0) {
+            return "No events available at this time."
+        } else {
+            return ""
+        }
+    }
+
     // Method to filter out events
     const search = text => {
       let newEvents = events.filter(e => isMatch(e, text));
@@ -101,6 +110,9 @@ export default function({ navigation }) {
 				  value={searchQuery} onChangeText={onChangeText}/>
         
         {showFilters && <View style={styles.overlay}>
+            <View style = {(shouldDisplayPlaceholder(events) === "") ? {marginVertical: -5} : {marginVertical: 15}}>
+                <NormalText center={"center"}>{shouldDisplayPlaceholder(events)}</NormalText>
+            </View>
           <View style={styles.filterContainer}>
             <TouchableOpacity onPress={() => setShowFilters(false)}
               style={{ position: "absolute", left: 10, top: 10 }}>

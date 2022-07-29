@@ -25,7 +25,7 @@ export default function ({ navigation }) {
             await db.collection("Users").doc(user.uid).onSnapshot(async doc => {
                 setUserInfo(doc.data());
                 setMealsAttended(doc.data().attendedEventIDs.length);
-                setMealsSignedUp(doc.data().attendingEventIDs.length);
+                setMealsSignedUp(doc.data().attendingEventIDs.length + doc.data().attendedEventIDs.length);
 
                 let newEvents = [];
                 doc.data().archivedEventIDs.forEach(e => {
