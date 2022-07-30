@@ -1,43 +1,31 @@
 //Functionality TDB, most likely to be used to implement ice-breaker games
 
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Image } from "react-native";
-import {
-  Layout,
-  TopNav,
-  Text
-} from "react-native-rapi-ui";
+import { View, ScrollView, StyleSheet, ImageBackground } from "react-native";
+import { Layout, TopNav } from "react-native-rapi-ui";
+import { Ionicons } from "@expo/vector-icons";
+
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
 import Button from "../../components/Button";
 import TagsList from "../../components/TagsList";
-import { Ionicons } from "@expo/vector-icons";
+import DarkContainer from "../../components/DarkContainer";
 
 import getDate from "../../getDate";
 import getTime from "../../getTime";
 
-import {db, auth, storage} from "../../provider/Firebase";
+import {db, auth} from "../../provider/Firebase";
 import * as firebase from "firebase";
+
 
 const FullCard = ({ route, navigation }) => {
   const user = auth.currentUser;
-  const [host, setHost] = useState(null);
+
   const [attending, setAttending] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [image, setImage] = useState("");
 
   useEffect(() => {
-    if (route.params.event.hasImage) {
-      storage.ref("eventPictures/" + route.params.event.id).getDownloadURL().then(uri => {
-        setImage(uri);
-      });
-    }
-
-    db.collection("Users").doc(route.params.event.hostID).get().then(doc => {
-      setHost(doc.data());
-    });
-
     db.collection("Users").doc(user.uid).get().then(doc => {
       const events = doc.data().attendingEventIDs.map(e => e.id);
 
@@ -101,56 +89,58 @@ const FullCard = ({ route, navigation }) => {
         }
         leftAction={() => navigation.goBack()}
       />
-      <View style={styles.page}>
+      <ScrollView contentContainerStyle={styles.page}>
         <LargeText center>{route.params.event.name}</LargeText>
-        <MediumText center>Hosted by: {host ? host.name : "Person"}</MediumText>
+        <MediumText center>Hosted by: {route.params.event.hostFirstName ? 
+          route.params.event.hostFirstName + " " + route.params.event.hostLastName.substring(0, 1) + "."
+          : route.params.event.hostName}</MediumText>
 
         {route.params.event.tags && <TagsList tags={route.params.event.tags}/>}
 
-        <View style={styles.details}>
-            <Image style={styles.image}
-              source={image ? {uri: image} : require("../../../assets/stockEvent.png")}/>
+        <ImageBackground style={styles.image} imageStyle={{ borderRadius: 10 }}
+          source={route.params.event.hasImage ? {uri: route.params.event.image}
+            : {uri: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400"}}>
 
-            <View style={{flexDirection: "column"}}>
-                <NormalText>{getDate(route.params.event.date.toDate())}</NormalText>
-                <NormalText>{getTime(route.params.event.date.toDate())}</NormalText>
-                <NormalText>{route.params.event.location}</NormalText>
-            </View>
-        </View>
+          <View style={styles.logistics}>
+            <DarkContainer align="flex-start">
+              <NormalText color="white">{getDate(route.params.event.date.toDate())}</NormalText>
+              <NormalText color="white">{getTime(route.params.event.date.toDate())}</NormalText>
+              <NormalText color="white">{route.params.event.location}</NormalText>
+            </DarkContainer>
+          </View>
+        </ImageBackground>
 
-        <Text size="h4">{route.params.event.additionalInfo}</Text>
+        <NormalText>{route.params.event.additionalInfo}</NormalText>
         <Button onPress={attending ? withdraw : attend} disabled={route.params.event.hostID === user.uid}
-        marginVertical={40} backgroundColor={loading ? "grey" : attending && 
+        marginVertical={20} backgroundColor={loading ? "grey" : attending && 
           route.params.event.hostID !== user.uid ? "red" : false}>
-          {loading ? "Loading" : route.params.event.hostID === user.uid ? "Your event :)" :
+          {loading ? "Loading ..." : route.params.event.hostID === user.uid ? "Your event :)" :
             attending ? "Withdraw :(" : "Attend!"}
         </Button>
-      </View>
+      </ScrollView>
     </Layout>
   );
 }
 
 const styles = StyleSheet.create({
     page: {
-      flex: 1,
       alignItems: "center",
       justifyContent: "center",
       paddingHorizontal: 10
     },
 
-    details: {
-      display: "flex",
-      flexDirection: "row",
-      alignItems: "center",
-      marginVertical: 40
+    image: {
+      width: 300,
+      height: 350,
+      marginVertical: 20
     },
 
-    image: {
-      marginRight: 20,
-      width: 150,
-      height: 150,
-      borderRadius: 30,
-    },
+    logistics: {
+      position: "absolute",
+      bottom: 10,
+      left: 10,
+      maxWidth: 150,
+    }
 });
 
 export default FullCard;

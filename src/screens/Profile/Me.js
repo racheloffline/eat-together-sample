@@ -17,7 +17,6 @@ export default function ({ navigation }) {
     const [mealsAttended, setMealsAttended] = useState(0);
     const [mealsSignedUp, setMealsSignedUp] = useState(0);
 
-    const [image, setImage] = useState('');
     const [events, setEvents] = useState([]);
 
     useEffect(() => {
@@ -45,24 +44,22 @@ export default function ({ navigation }) {
                         });
                     }
                 });
-
-                await storage.ref("profilePictures/" + user.uid).getDownloadURL().then(uri => {
-                    setImage(uri);
-                })
             });
         }
+
         fetchData();
     }, []);
 
-    const updateInfo = (newName, newQuote, newTags, newImage) => {
+    const updateInfo = (newFirstName, newLastName, newQuote, newTags, newImage) => {
         setUserInfo(prev => ({
             ...prev,
-            name: newName,
+            firstName: newFirstName,
+            lastName: newLastName,
             quote: newQuote,
             tags: newTags
         }));
 
-        setImage(newImage);
+        setUserInfo({...userInfo, image: newImage});
     }
 
     return (
@@ -73,13 +70,13 @@ export default function ({ navigation }) {
                     <Ionicons name="settings-sharp" size={40} color="white" onPress={() => {
                         navigation.navigate("Settings", {
                             user: userInfo,
-                            image,
+                            image: userInfo.image,
                             updateInfo
                         });
                     }}></Ionicons>
                 </View>
 
-                <Image style={styles.image} source={userInfo.hasImage ? {uri: image} : require("../../../assets/logo.png")}/>
+                <Image style={styles.image} source={userInfo.hasImage ? {uri: userInfo.image} : require("../../../assets/logo.png")}/>
                 <View style={styles.name}>
                     <LargeText>{userInfo.name}</LargeText>
                     <NormalText>{mealsAttended + "/" + mealsSignedUp + " meals attended"}</NormalText>

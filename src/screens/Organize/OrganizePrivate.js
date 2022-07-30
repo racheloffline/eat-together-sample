@@ -11,17 +11,14 @@ import {
 import { Layout  } from "react-native-rapi-ui";
 import { TextInput } from 'react-native-rapi-ui';
 import { Ionicons } from "@expo/vector-icons";
-import eventTags from "../../eventTags";
-
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import RBSheet from "react-native-raw-bottom-sheet";
-import TagsSection from "../../components/TagsSection";
 
 import Header from "../../components/Header";
 import getDate from "../../getDate";
 import getTime from "../../getTime";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
 import Button from "../../components/Button";
+import KeyboardAvoidingWrapper from "../../components/KeyboardAvoidingWrapper";
 
 import { cloneDeep } from "lodash";
 import * as ImagePicker from 'expo-image-picker';
@@ -75,29 +72,24 @@ export default function ({ navigation }) {
         setLocation("");
         setDate(new Date());
         setAdditionalInfo("");
-    };
+    }
 
+    // For selecting a photo
     const handleChoosePhoto = async () => {
        let result = await ImagePicker.launchImageLibraryAsync({});
        if (!result.cancelled) {
            setPhoto(result.uri);
        }
-    };
+    }
 
     return (
         <Layout>
-            <KeyboardAvoidingView behavior="position" style={{flex: 1}}>
-                <Header name="Organize" navigation={navigation} hasNotif = {unread}/>
-                <HorizontalSwitch left="Private" right="Public" current="left" press={(val) => navigation.navigate("OrganizePublic")}/>
-                <ScrollView contentContainerStyle={styles.scrollView}>
-                    <View>
-                        <ImageBackground source={{uri: photo}} style={styles.image}>
-                            <View style={styles.imageOverlay}>
-                                <TouchableOpacity onPress={() => handleChoosePhoto()}>
-                                    <Ionicons name={"create"} color={"white"} size={40}></Ionicons>
-                                </TouchableOpacity>
-                            </View>
-                        </ImageBackground>
+            <KeyboardAvoidingWrapper>
+                <View>
+                    <Header name="Organize" navigation={navigation} hasNotif = {unread}/>
+                    <HorizontalSwitch left="Private" right="Public" current="left" press={(val) => navigation.navigate("OrganizePublic")}/>
+
+                    <View style={styles.content}>
                         <TextInput
                             placeholder="Event Name"
                             value={name}
@@ -107,7 +99,48 @@ export default function ({ navigation }) {
                             leftContent={
                                 <Ionicons name="chatbubble-outline" size={20} />
                             }
+                            containerStyle={styles.input}
                         />
+
+                        <View style={styles.imageContainer}>
+                            <TouchableOpacity onPress={() => handleChoosePhoto()}>
+                            <ImageBackground source={{ uri: photo }}
+                                style={styles.image} imageStyle={{ borderRadius: 10 }}>
+                                <View style={styles.imageOverlay}>
+                                    <Ionicons name="md-image-outline" color="white" size={30}></Ionicons>
+                                </View>
+                            </ImageBackground>
+                            </TouchableOpacity>
+
+                            <View style={styles.dateTime}>
+                                <TouchableOpacity onPress={() => {
+                                    setShowDate(true);
+                                    setMode("date");
+                                }}>
+                                    <TextInput
+                                        value={getDate(date)}
+                                        leftContent={
+                                            <Ionicons name="calendar-outline" size={20}/>
+                                        }
+                                        editable={false}
+                                    />
+                                </TouchableOpacity>
+
+                                <TouchableOpacity onPress={() => {
+                                    setShowDate(true);
+                                    setMode("time");
+                                }}>
+                                    <TextInput
+                                        value={getTime(date)}
+                                        leftContent={
+                                            <Ionicons name="time-outline" size={20}/>
+                                        }
+                                        editable={false}
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                        
                         <TextInput
                             placeholder="Location"
                             value={location}
@@ -117,45 +150,17 @@ export default function ({ navigation }) {
                             leftContent={
                                 <Ionicons name="location-outline" size={20}/>
                             }
+                            containerStyle={styles.input}
                         />
 
-                        <View style={{display: "flex", flexDirection: "row"}}>
-                            <TouchableOpacity onPress={() => {
-                                setShowDate(true);
-                                setMode("date");
-                            }}>
-                                <TextInput
-                                    value={getDate(date)}
-                                    leftContent={
-                                        <Ionicons name="calendar-outline" size={20}/>
-                                    }
-                                    editable={false}
-                                    containerStyle={{width: Dimensions.get('screen').width/2}}
-                                />
-                            </TouchableOpacity>
-
-                            <TouchableOpacity onPress={() => {
-                                setShowDate(true);
-                                setMode("time");
-                            }}>
-                                <TextInput
-                                    value={getTime(date)}
-                                    leftContent={
-                                        <Ionicons name="time-outline" size={20}/>
-                                    }
-                                    editable={false}
-                                    containerStyle={{width: Dimensions.get('screen').width/2}}
-                                />
-                            </TouchableOpacity>
-                        </View>
                         <DateTimePickerModal isVisible={showDate} date={date}
-                                             mode={mode} onConfirm={changeDate} onCancel={() => setShowDate(false)}/>
+                            mode={mode} onConfirm={changeDate} onCancel={() => setShowDate(false)}/>
 
                         <TextInput
                             placeholder="Additional Info"
                             value={additionalInfo}
                             onChangeText={(val) => setAdditionalInfo(val)}
-                            containerStyle={{paddingBottom: 60}}
+                            containerStyle={{...styles.input, paddingBottom: 60}}
                             multiline={true}
                             leftContent={
                                 <Ionicons name="document-text-outline" size={20}/>
@@ -178,30 +183,46 @@ export default function ({ navigation }) {
                                 clearAll
                             });
                         }} marginVertical={20}>See people available!</Button>
-                    </View>
-                </ScrollView>
 
-            </KeyboardAvoidingView>
+                    </View>
+                </View>
+            </KeyboardAvoidingWrapper>
         </Layout>
     );
 }
 
 const styles = StyleSheet.create({
+    content: {
+        paddingHorizontal: 20
+    },
+
     imageOverlay: {
         position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        justifyContent: 'flex-start',
-        alignItems: 'flex-end',
-        margin: 15,
+        left: 10,
+        top: 10,
+        padding: 5,
+        backgroundColor: "rgba(0, 0, 0, 0.7)",
+        borderRadius: 10
     },
+
+    input: {
+        marginTop: 10
+    },
+
     image: {
-        width: '100%',
-        height: 150,
+        width: 130,
+        height: 110
     },
-    scrollView: {
-        paddingBottom: 120
-    }
+
+    imageContainer: {
+        marginTop: 10,
+        flexDirection: "row",
+        justifyContent: "space-between"
+    },
+
+    dateTime: {
+        flexDirection: "column",
+        justifyContent: "space-between",
+        width: Dimensions.get('screen').width-180
+    },
 });

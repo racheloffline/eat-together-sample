@@ -35,14 +35,17 @@ const Email = props => {
         </View>
 
         <TextInput placeholder="Enter email address ..." value={email}
-          onChangeText={val => setEmail(val)} containerStyle={{marginBottom: 20}}
+          onChangeText={val => {
+            setEmail(val);
+            setVerified(null);
+          }} containerStyle={{marginBottom: 20}}
           autoComplete="email" keyboardType="email-address"
           leftContent={<Ionicons name="mail" size={18}/>}/>
 
         <Button disabled={!checkEmail(email)} onPress={verifyEmail} marginVertical={15}>Verify</Button>
         {verified !== null &&
         <NormalText color={verified ? "#5DB075" : "red"}>
-          {verified ? "Is a student!" : "Not a student"}
+          {verified ? "Is a UW student!" : "Not a UW student"}
         </NormalText>}
 
         <View style={styles.buttons}>

@@ -72,18 +72,18 @@ export default class TagsSection extends Component {
   };
 
   searchedItems = searchedText => {
-    let setSort = this.props.setSort;
-    if (!setSort && typeof setSort !== 'function') {
-        setSort = (item, searchedText) => { 
-          return item.toLowerCase().indexOf(searchedText.toLowerCase()) > -1
-        };
-    }
+      let setSort = this.props.setSort;
+      if (!setSort && typeof setSort !== 'function') {
+          setSort = (item, searchedText) => { 
+              return item.toLowerCase().indexOf(searchedText.toLowerCase()) > -1
+          };
+      }
 
-    var ac = this.props.items.filter((item) => {
-      return setSort(item, searchedText);
-    });
+      var ac = this.props.items.filter((item) => {
+          return setSort(item, searchedText);
+      });
 
-    this.setState({ listItems: ac, item: searchedText });
+      this.setState({ listItems: ac, item: searchedText });
   };
 
   renderItems = (item, index) => {
@@ -93,7 +93,7 @@ export default class TagsSection extends Component {
                 this.props.selectedItems.find(sitem => sitem === item) ?
 
                 <TouchableOpacity style={{...styles.item, backgroundColor: "#5DB075", borderBottomWidth: 0}}>
-                    <NormalText>{ item }</NormalText>
+                    <NormalText color="white">{ item }</NormalText>
                 </TouchableOpacity>
 
                 : <TouchableOpacity
@@ -117,20 +117,14 @@ export default class TagsSection extends Component {
                     onPress={() => {
                         this.setState({ item: item, focus: false });
                         Keyboard.dismiss();
-                        setTimeout(() => {
                         this.props.onItemSelect(item);
                         if (this.props.resetValue) {
                             this.setState({ focus: true, item: "" });
                             this.input.focus();
                         }
-                        }, 0);
                     }}
                 >
-                { 
-                    this.props.selectedItems && this.props.selectedItems.length > 0 && this.props.selectedItems.find(sitem => sitem === item) ?
-                        <NormalText>{item}</NormalText>
-                        : <NormalText>{item}</NormalText>
-                }
+                  <NormalText>{ item }</NormalText>
                 </TouchableOpacity>
             );
         }
@@ -224,7 +218,7 @@ export default class TagsSection extends Component {
     return (
       <View
         keyboardShouldPersist="always"
-        style={{ padding: 10 }}
+        style={{ padding: 0 }}
       >
         { this.renderTextInput() }
         { this.renderListType() }

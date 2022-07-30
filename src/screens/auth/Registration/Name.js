@@ -13,13 +13,15 @@ import MediumText from "../../../components/MediumText";
 import SmallText from "../../../components/SmallText";
 import Button from "../../../components/Button";
 import TagsSection from "../../../components/TagsSection";
+import KeyboardAvoidingWrapper from "../../../components/KeyboardAvoidingWrapper";
 
 import profaneWords from "./profaneWords";
 import { cloneDeep } from "lodash";
 
 const Name = props => {
   // Input fields
-  const [name, setName] = useState(props.name);
+  const [firstName, setFirstName] = useState(props.firstName);
+  const [lastName, setLastName] = useState(props.lastName);
   const [quote, setQuote] = useState(props.quote);
   const [image, setImage] = useState(props.image);
   const [tags, setTags] = useState(props.tags);
@@ -32,10 +34,11 @@ const Name = props => {
   }
 
   const goNext = () => {
-    if (checkProfanity(name) || checkProfanity(quote)) {
+    if (checkProfanity(firstName) || checkProfanity(lastName) || checkProfanity(quote)) {
       alert("Inappropriate words used >:(");
     } else {
-      props.setName(name);
+      props.setFirstName(firstName);
+      props.setLastName(lastName);
       props.setQuote(quote);
       props.setImage(image);
       props.setTags(tags);
@@ -57,65 +60,68 @@ const Name = props => {
   }
 
   return (
-    <KeyboardAvoidingView style={styles.page} behavior="position">
-      <View style={styles.header}>
-        <LargeText color="white" center size={25}>Let's set up your profile!</LargeText>
-      </View>
-
-      <View style={styles.imageContainer}>
-        {image !== "" ? <Image style={styles.image} source={{uri: image}}/>
-          : <Image style={styles.image} source={require("../../../../assets/logo.png")}/>}
-        <TouchableOpacity style={styles.editImage} onPress={pickImage}>
-          <Feather name="edit-2" size={25} color="black"/>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.content}>
-        <TextInput placeholder="What's your name?" value={name}
-          onChangeText={val => setName(val)} containerStyle={{marginBottom: 10}}
-          leftContent={<FontAwesome name="user" size={18}/>} autoComplete="name"/>
-        <TextInput placeholder="Favorite quote (no quotation marks)" value={quote}
-          onChangeText={val => setQuote(val)} containerStyle={{marginBottom: 20}}
-          leftContent={<FontAwesome name="quote-left" size={18}/>}/>
-  
-        <MediumText>Add Some Tags:</MediumText>
-        <SmallText>Note: must have between 3 and 6 tags (inclusive).</SmallText>
-        <View style={styles.tagInput}>
-          <TagsSection
-            multi={true}
-            selectedItems={tags}
-            onItemSelect={(item) => {
-              setTags([...tags, item]);
-            }}
-            onRemoveItem={(item, index) => {
-              const newTags = tags.filter((tag, i) => i !== index);
-              setTags(newTags);
-            }}
-            inline={true}
-            items={cloneDeep(allTags)}
-            chip={true}
-            resetValue={false}
-          />
+    <KeyboardAvoidingWrapper>
+      <View>
+        <View style={styles.header}>
+          <LargeText color="white" center size={25}>Let's set up your profile!</LargeText>
         </View>
 
-        <View style={styles.buttons}>
-          <Button onPress={() => props.navigation.goBack()}
-            marginHorizontal={10}>Back</Button>
-          <Button disabled={name === "" || quote === "" || tags.length < 3 || tags.length > 6}
-            onPress={goNext}
-            marginHorizontal={10}>Next</Button>
+        <View style={styles.imageContainer}>
+          {image !== "" ? <Image style={styles.image} source={{uri: image}}/>
+            : <Image style={styles.image} source={require("../../../../assets/logo.png")}/>}
+          <TouchableOpacity style={styles.editImage} onPress={pickImage}>
+            <Feather name="edit-2" size={25} color="black"/>
+          </TouchableOpacity>
         </View>
-        
+
+        <View style={styles.content}>
+          <View style={styles.name}>
+            <TextInput placeholder="First name" value={firstName}
+              onChangeText={val => setFirstName(val)} containerStyle={{width: "47%"}}
+              leftContent={<FontAwesome name="user" size={18}/>} autoComplete="name"/>
+            <TextInput placeholder="Last name" value={lastName}
+              onChangeText={val => setLastName(val)} containerStyle={{width: "47%"}}
+              leftContent={<FontAwesome name="user" size={18}/>} autoComplete="name"/>
+          </View>
+
+          <TextInput placeholder="Favorite quote (no quotation marks)" value={quote}
+            onChangeText={val => setQuote(val)} containerStyle={{marginBottom: 30}}
+            leftContent={<FontAwesome name="quote-left" size={18}/>}/>
+    
+          <MediumText>Describe yourself with tags!</MediumText>
+          <SmallText>Note: must have between 3 and 6 tags (inclusive).</SmallText>
+          <View style={styles.tagInput}>
+            <TagsSection
+              multi={true}
+              selectedItems={tags}
+              onItemSelect={(item) => {
+                setTags([...tags, item]);
+              }}
+              onRemoveItem={(item, index) => {
+                const newTags = tags.filter((tag, i) => i !== index);
+                setTags(newTags);
+              }}
+              inline={true}
+              items={cloneDeep(allTags)}
+              chip={true}
+              resetValue={false}
+            />
+          </View>
+
+          <View style={styles.buttons}>
+            <Button onPress={() => props.navigation.goBack()}
+              marginHorizontal={10}>Back</Button>
+            <Button disabled={firstName === "" || lastName === "" || quote === "" || tags.length < 3 || tags.length > 6}
+              onPress={goNext}
+              marginHorizontal={10}>Next</Button>
+          </View>    
+        </View>
       </View>
-    </KeyboardAvoidingView>
+    </KeyboardAvoidingWrapper>
   );
 }
 
 const styles = StyleSheet.create({
-  page: {
-    flex: 1,
-  },
-
   header: {
     paddingVertical: 20,
     width: "100%",
@@ -142,9 +148,15 @@ const styles = StyleSheet.create({
   },
 
   content: {
-    width: "100%",
     paddingHorizontal: 20,
     alignItems: "center"
+  },
+
+  name: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10
   },
 
   tagInput: {

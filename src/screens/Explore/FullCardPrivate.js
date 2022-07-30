@@ -47,15 +47,7 @@ const FullCard = ({ route, navigation }) => {
   useEffect(() => {
     fetchIcebreakers();
 
-    if (route.params.event.hasImage) {
-      storage.ref("eventPictures/" + route.params.event.id).getDownloadURL().then(uri => {
-        setImage(uri);
-      }).then(() => {
-        if (route.params.event.hostID === user.uid) {
-          getAttendees();
-        }
-      });
-    } else if (route.params.event.hostID === user.uid) {
+    if (route.params.event.hostID === user.uid) {
       getAttendees();
     }
   }, []);
@@ -210,13 +202,15 @@ const FullCard = ({ route, navigation }) => {
       />
 
       <ScrollView contentContainerStyle={styles.page}>
-        <ImageBackground source={image ? {uri: image} : require("../../../assets/foodBackground.png")}
+        <ImageBackground source={route.params.event.hasImage ? {uri: route.params.event.image}
+          : require("../../../assets/foodBackground.png")}
           style={styles.imageBackground} resizeMode="cover">
 
-        {route.params.event.hostID === user.uid && <DarkContainer>
+        {route.params.event.hostID === user.uid && 
+          <DarkContainer marginVertical={20} width={Dimensions.get('screen').width - 40}>
             <LargeText color="white">Attendance</LargeText>
             {openAttendance && <View style={{marginTop: 20}}>
-              {people.length === 0 ? <NormalText color="white">{"No attendees :("}</NormalText>
+              {people.length === 0 ? <NormalText color="white">{"Just yourself ;)"}</NormalText>
               : people.map((person, index) => 
                 <Attendance person={person} key={person.id}
                   attending={attendees[index]} onPress={() => markAttendee(index)}/>)}
@@ -228,7 +222,7 @@ const FullCard = ({ route, navigation }) => {
             </TouchableOpacity>
           </DarkContainer>}
 
-          <DarkContainer>
+          <DarkContainer marginVertical={20} width={Dimensions.get('screen').width - 40}>
             {/*TODO: JOSH | This is where your randomized icebreakers are displayed*/}
             <LargeText color="white">Icebreakers</LargeText>
 
