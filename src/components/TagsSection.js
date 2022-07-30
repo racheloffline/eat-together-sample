@@ -98,7 +98,6 @@ export default class TagsSection extends Component {
 
                 : <TouchableOpacity
                     onPress={() => {
-                        console.log("Hit");
                         Keyboard.dismiss();
                         this.setState({
                             item: "",
@@ -116,7 +115,6 @@ export default class TagsSection extends Component {
                 <TouchableOpacity
                     style={styles.item}
                     onPress={() => {
-                        console.log("Hit");
                         this.setState({ item: item, focus: false });
                         Keyboard.dismiss();
                         this.props.onItemSelect(item);

@@ -16,6 +16,7 @@ import Button from "../../components/Button";
 import MediumText from "../../components/MediumText";
 import SmallText from "../../components/SmallText";
 import DeviceToken from "../utils/DeviceToken";
+import KeyboardAvoidingWrapper from "../../components/KeyboardAvoidingWrapper";
 
 export default function ({ route, navigation }) {
     // Input fields
@@ -112,85 +113,87 @@ export default function ({ route, navigation }) {
                 leftAction={() => navigation.goBack()}
             />
 
-            <KeyboardAvoidingView behavior="position" style={{flex: 1, paddingHorizontal: 20}}>
-                <View style={styles.imageContainer}>
-                    <Image style={styles.image} source={image ? {uri: image} : require("../../../assets/logo.png")}/>
-                    <TouchableOpacity style={styles.editImage} onPress={pickImage}>
-                        <Feather name="edit-2" size={25} color="black"/>
+            <KeyboardAvoidingWrapper>
+                <View style={{ paddingHorizontal: 20 }}>
+                    <View style={styles.imageContainer}>
+                        <Image style={styles.image} source={image ? {uri: image} : require("../../../assets/logo.png")}/>
+                        <TouchableOpacity style={styles.editImage} onPress={pickImage}>
+                            <Feather name="edit-2" size={25} color="black"/>
+                        </TouchableOpacity>
+                    </View>
+                    
+                    <View style={styles.name}>
+                        <TextInput
+                            placeholder="First name"
+                            onChangeText={(val) => setFirstName(val)}
+                            leftContent={
+                                <Ionicons name="person-circle-outline" size={20} />
+                            }
+                            value={firstName}
+                            containerStyle={{ width: "47%" }}
+                        />
+                        <TextInput
+                            placeholder="Last name"
+                            onChangeText={(val) => setLastName(val)}
+                            leftContent={
+                                <Ionicons name="person-circle-outline" size={20} />
+                            }
+                            value={lastName}
+                            containerStyle={{ width: "47%" }}
+                        />
+                    </View>
+                    
+
+                    <TextInput
+                        placeholder="Quote"
+                        onChangeText={(val) => setQuote(val)}
+                        leftContent={
+                            <Ionicons name="chatbox-ellipses-outline" size={20}/>
+                        }
+                        value={quote}
+                        containerStyle={{ marginBottom: 10 }}
+                    />
+
+                    <TagsSection
+                        multi={true}
+                        selectedItems={tags}
+                        onItemSelect={(tag) => {
+                            setTags([...tags, tag]);
+                        }}
+                        onRemoveItem={(item, index) => {
+                            const newTags = tags.filter((tag, i) => i !== index);
+                            setTags(newTags);
+                        }}
+                        inline={true}
+                        items={cloneDeep(allTags)}
+                        chip={true}
+                        resetValue={false}
+                    />
+
+                    <SmallText center>Note: must have between 3 and 6 tags (inclusive).</SmallText>
+
+                    <TouchableOpacity disabled={firstName === "" || lastName === "" || quote === ""
+                            || tags.length < 3 || tags.length > 6 || loading}
+                        style={firstName === "" || lastName === "" || quote === "" || tags.length < 3
+                            || tags.length > 6 ? styles.saveDisabled : styles.save} 
+                        onPress={() => {
+                            setLoading(true);
+
+                            if (image !== "") {
+                                updateImage().then(() => {
+                                    fetchImage().then(uri => {
+                                        updateUser(uri);
+                                    })
+                                });
+                            }
+                        }}>
+                        <MediumText color="#5DB075">{loading ? "Updating ..." : "Update Profile"}</MediumText>
                     </TouchableOpacity>
+
+                    <Button onPress={() => signOut()}
+                        marginVertical={20}>Log Out</Button>
                 </View>
-                
-                <View style={styles.name}>
-                    <TextInput
-                        placeholder="First name"
-                        onChangeText={(val) => setFirstName(val)}
-                        leftContent={
-                            <Ionicons name="person-circle-outline" size={20} />
-                        }
-                        value={firstName}
-                        containerStyle={{ width: "47%" }}
-                    />
-                    <TextInput
-                        placeholder="Last name"
-                        onChangeText={(val) => setLastName(val)}
-                        leftContent={
-                            <Ionicons name="person-circle-outline" size={20} />
-                        }
-                        value={lastName}
-                        containerStyle={{ width: "47%" }}
-                    />
-                </View>
-                
-
-                <TextInput
-                    placeholder="Quote"
-                    onChangeText={(val) => setQuote(val)}
-                    leftContent={
-                        <Ionicons name="chatbox-ellipses-outline" size={20}/>
-                    }
-                    value={quote}
-                    containerStyle={{ marginBottom: 10 }}
-                />
-
-                <TagsSection
-                    multi={true}
-                    selectedItems={tags}
-                    onItemSelect={(tag) => {
-                        setTags([...tags, tag]);
-                    }}
-                    onRemoveItem={(item, index) => {
-                        const newTags = tags.filter((tag, i) => i !== index);
-                        setTags(newTags);
-                    }}
-                    inline={true}
-                    items={cloneDeep(allTags)}
-                    chip={true}
-                    resetValue={false}
-                />
-
-                <SmallText center>Note: must have between 3 and 6 tags (inclusive).</SmallText>
-
-                <TouchableOpacity disabled={firstName === "" || lastName === "" || quote === ""
-                        || tags.length < 3 || tags.length > 6 || loading}
-                    style={firstName === "" || lastName === "" || quote === "" || tags.length < 3
-                        || tags.length > 6 ? styles.saveDisabled : styles.save} 
-                    onPress={() => {
-                        setLoading(true);
-
-                        if (image !== "") {
-                            updateImage().then(() => {
-                                fetchImage().then(uri => {
-                                    updateUser(uri);
-                                })
-                            });
-                        }
-                    }}>
-                    <MediumText color="#5DB075">{loading ? "Updating ..." : "Update Profile"}</MediumText>
-                </TouchableOpacity>
-
-                <Button onPress={() => signOut()}
-                    marginVertical={20}>Log Out</Button>
-            </KeyboardAvoidingView>
+            </KeyboardAvoidingWrapper>
         </Layout>
     );
 }
