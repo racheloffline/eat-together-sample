@@ -10,6 +10,7 @@ import {db} from "../../provider/Firebase";
 import firebase from "firebase";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
 import InviteIcon from "./InviteIcon";
+import EventCard from "../../components/EventCard";
 
 export default function ({ navigation }) {
 	//Get a list of current invites from Firebase up here
@@ -39,31 +40,37 @@ export default function ({ navigation }) {
 	}
 
 	useEffect(() => {
-
-		let ref = db.collection("User Invites").doc(user.uid).collection("Invites");
-		ref.onSnapshot((query) => {
-			const list = [];
-			query.forEach((doc) => {
-				let data = doc.data();
-				list.push({
-					id: doc.id,
-					name: data.name,
-					image: data.image,
-					hasImage: data.hasImage,
-					location: data.location,
-					//date: DateTimeConverter.getDate(DateTimeConverter.toDate(data.date)), // Fix this, add time back?
-					date: data.date.toDate().toDateString(),
-					time: data.date.toDate().toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'}),
-					details: data.description,
-					hostID: data.hostID,
-					hostName: data.hostName,
-					hostImage: data.hostImage,
-					accepted: data.accepted,
-					inviteID: data.inviteID
-				});
+		async function fetchData() {
+			await db.collection("Users").doc(user.uid).update({
+				hasNotif: false
 			});
-			setInvites(list);
-		});
+
+			let ref = db.collection("User Invites").doc(user.uid).collection("Invites");
+			ref.onSnapshot((query) => {
+				const list = [];
+				query.forEach((doc) => {
+					let data = doc.data();
+					list.push({
+						docID: doc.id,
+						name: data.name,
+						image: data.image,
+						hasImage: data.hasImage,
+						location: data.location,
+						//date: DateTimeConverter.getDate(DateTimeConverter.toDate(data.date)), // Fix this, add time back?
+						date: data.date,
+						details: data.description,
+						hostID: data.hostID,
+						hostName: data.hostName,
+						hostImage: data.hostImage,
+						accepted: data.accepted,
+						inviteID: data.inviteID,
+						id: data.inviteID
+					});
+				});
+				setInvites(list);
+			});
+		}
+		fetchData()
 
 	}, []);
 
@@ -94,35 +101,91 @@ export default function ({ navigation }) {
 			<View style = {styles.noInvitesView}>
 				<NormalText center={"center"}>{shouldDisplayPlaceholder(invites)}</NormalText>
 			</View>
-			<View style = {styles.listView}>
-				<FlatList
-					data = {invites}
-					renderItem={
-						({item}) =>
-							<TouchableOpacity onPress={() => {
-								navigation.navigate("InviteFull", {
-									invite: item
-								})
-							}}>
-								<View style = {styles.buttons}>
-									<View width = {60} marginTop = {25}>
-										<InviteIcon accepted = {item.accepted}/>
-									</View>
-									<View width = {300} >
-										<MediumText style = {styles.listMainText}>{item.hostName}</MediumText>
-										<NormalText style = {styles.listSubText}>Is inviting you to: {item.name}</NormalText>
-										<NormalText style = {styles.listSubText}>{checkAccepted(item)}</NormalText>
-									</View>
-								</View>
-							</TouchableOpacity>
-
+			<FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
+					  data={invites} renderItem={({item}) =>
+				<EventCard event={item} click={() => {
+					let inviteToSend = {
+						id: item.docID,
+						name: item.name,
+						image: item.image,
+						hasImage: item.hasImage,
+						location: item.location,
+						date: item.date.toDate().toDateString(),
+						time: item.date.toDate().toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'}),
+						details: item.description,
+						hostID: item.hostID,
+						hostName: item.hostName,
+						hostImage: item.hostImage,
+						accepted: item.accepted,
+						inviteID: item.inviteID
 					}
-				/>
-			</View>
-
+					navigation.navigate("InviteFull", {
+						invite: inviteToSend,
+						hasPassed: (item.date.toDate().getTime() < (new Date()).getTime())
+					});
+				}}/>
+			}/>
 		</Layout>
-
 	);
+
+	//OLD CODE:
+	
+	// return (
+	// 	<Layout>
+	// 		<TopNav
+	// 			middleContent={
+	// 				<MediumText center>Notifications</MediumText>
+	// 			}
+	// 			leftContent={
+	// 				<Ionicons
+	// 					name="chevron-back"
+	// 					size={20}
+	// 				/>
+	// 			}
+	// 			rightContent={
+	// 				<Ionicons
+	// 					name="person-add"
+	// 					size={20}
+	// 				/>
+	// 			}
+	// 			leftAction={() => navigation.goBack()}
+	// 			rightAction={() => navigation.navigate("Connections")}
+	// 		/>
+	// 		<View style = {styles.switchView}>
+	// 			<HorizontalSwitch left="Invites" right="Chats" current="left" press={(val) => navigation.navigate("Chats")}/>
+	// 		</View>
+	// 		<View style = {styles.noInvitesView}>
+	// 			<NormalText center={"center"}>{shouldDisplayPlaceholder(invites)}</NormalText>
+	// 		</View>
+	// 		<View style = {styles.listView}>
+	// 			<FlatList
+	// 				data = {invites}
+	// 				renderItem={
+	// 					({item}) =>
+	// 						<TouchableOpacity onPress={() => {
+	// 							navigation.navigate("InviteFull", {
+	// 								invite: item
+	// 							})
+	// 						}}>
+	// 							<View style = {styles.buttons}>
+	// 								<View width = {60} marginTop = {25}>
+	// 									<InviteIcon accepted = {item.accepted}/>
+	// 								</View>
+	// 								<View width = {300} >
+	// 									<MediumText style = {styles.listMainText}>{item.hostName}</MediumText>
+	// 									<NormalText style = {styles.listSubText}>Is inviting you to: {item.name}</NormalText>
+	// 									<NormalText style = {styles.listSubText}>{checkAccepted(item)}</NormalText>
+	// 								</View>
+	// 							</View>
+	// 						</TouchableOpacity>
+	//
+	// 				}
+	// 			/>
+	// 		</View>
+	//
+	// 	</Layout>
+	//
+	// );
 }
 
 const styles = StyleSheet.create({
@@ -159,5 +222,10 @@ const styles = StyleSheet.create({
 	buttons: {
 		justifyContent: "center",
 		flexDirection: "row"
+	},
+	cards: {
+		alignItems: "center",
+		paddingTop: 20,
+		paddingBottom: 40
 	}
 });

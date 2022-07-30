@@ -1,42 +1,63 @@
-import React, { useState, useEffect } from "react";
-import {View, TouchableOpacity, Dimensions, KeyboardAvoidingView, StyleSheet} from "react-native";
-import { Layout, SectionImage  } from "react-native-rapi-ui";
+import React, { useState, useEffect, useRef } from "react";
+import {
+    View,
+    TouchableOpacity,
+    Dimensions,
+    KeyboardAvoidingView,
+    StyleSheet,
+    ImageBackground,
+    ScrollView
+} from "react-native";
+import { Layout  } from "react-native-rapi-ui";
 import { TextInput } from 'react-native-rapi-ui';
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import * as ImagePicker from 'expo-image-picker';
 
 import Header from "../../components/Header";
 import getDate from "../../getDate";
 import getTime from "../../getTime";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
 import Button from "../../components/Button";
+import KeyboardAvoidingWrapper from "../../components/KeyboardAvoidingWrapper";
 
-import {auth, storage} from "../../provider/Firebase";
-import {ImageBackground} from "react-native";
+import { cloneDeep } from "lodash";
+import * as ImagePicker from 'expo-image-picker';
+
+import { db, auth } from "../../provider/Firebase";
 
 export default function ({ navigation }) {
-    const user = auth.currentUser;
-
     // State variables for the inputs
+    const [photo, setPhoto] = useState("https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400");
     const [name, setName] = useState("");
     const [location, setLocation] = useState("");
     const [date, setDate] = useState(new Date());
     const [additionalInfo, setAdditionalInfo] = useState("");
-    const [photo, setPhoto] = useState("https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400");
 
     // Other variables
     const [showDate, setShowDate] = useState(false);
     const [mode, setMode] = useState("date");
     const [disabled, setDisabled] = useState(true);
+    const [unread, setUnread] = useState(false);
+
+    const refRBSheet = useRef(); // To toggle the bottom drawer on/off
+
+    const uid = auth.currentUser.uid; //Current user's uid (to get notif)
 
     // Checks whether we should disable the Post button or not
     useEffect(() => {
-        if (name === "" || location == "") {
-            setDisabled(true);
-        } else {
-            setDisabled(false);
+        async function fetchData() {
+            // Disable button or not
+            if (name === "" || location == "") {
+                setDisabled(true);
+            } else {
+                setDisabled(false);
+            }
+
+            await db.collection("Users").doc(uid).onSnapshot((doc) => {
+                setUnread(doc.data().hasNotif);
+            })
         }
+        fetchData();
     }, [name, location]);
 
     // For selecting a date and time
@@ -51,127 +72,157 @@ export default function ({ navigation }) {
         setLocation("");
         setDate(new Date());
         setAdditionalInfo("");
-    };
+    }
 
+    // For selecting a photo
     const handleChoosePhoto = async () => {
        let result = await ImagePicker.launchImageLibraryAsync({});
        if (!result.cancelled) {
            setPhoto(result.uri);
        }
-    };
+    }
 
     return (
         <Layout>
-            <KeyboardAvoidingView behavior="position" style={{flex: 1}}>
-                <Header name="Organize" navigation={navigation}/>
-                <HorizontalSwitch left="Private" right="Public" current="left" press={(val) => navigation.navigate("OrganizePublic")}/>
-                <ImageBackground source={{uri: photo}} style={styles.image}>
-                <View style={styles.imageOverlay}>
-                    <TouchableOpacity onPress={() => handleChoosePhoto()}>
-                        <Ionicons name={"create"} color={"white"} size={40}></Ionicons>
-                    </TouchableOpacity>
-                </View>
-                </ImageBackground>
-                <TextInput
-                    placeholder="Event Name"
-                    value={name}
-                    onChangeText={(val) => {
-                        setName(val);
-                    }}
-                    leftContent={
-                        <Ionicons name="chatbubble-outline" size={20} />
-                    }
-                />
-                <TextInput
-                    placeholder="Location"
-                    value={location}
-                    onChangeText={(val) => {
-                        setLocation(val);
-                    }}
-                    leftContent={
-                        <Ionicons name="location-outline" size={20}/>
-                    }
-                />
+            <KeyboardAvoidingWrapper>
+                <View>
+                    <Header name="Organize" navigation={navigation} hasNotif = {unread}/>
+                    <HorizontalSwitch left="Private" right="Public" current="left" press={(val) => navigation.navigate("OrganizePublic")}/>
 
-                <View style={{display: "flex", flexDirection: "row"}}>
-                    <TouchableOpacity onPress={() => {
-                        setShowDate(true);
-                        setMode("date");
-                    }}>
+                    <View style={styles.content}>
                         <TextInput
-                            value={getDate(date)}
+                            placeholder="Event Name"
+                            value={name}
+                            onChangeText={(val) => {
+                                setName(val);
+                            }}
                             leftContent={
-                                <Ionicons name="calendar-outline" size={20}/>
+                                <Ionicons name="chatbubble-outline" size={20} />
                             }
-                            editable={false}
-                            containerStyle={{width: Dimensions.get('screen').width/2}}
+                            containerStyle={styles.input}
                         />
-                    </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => {
-                        setShowDate(true);
-                        setMode("time");
-                    }}>
+                        <View style={styles.imageContainer}>
+                            <TouchableOpacity onPress={() => handleChoosePhoto()}>
+                            <ImageBackground source={{ uri: photo }}
+                                style={styles.image} imageStyle={{ borderRadius: 10 }}>
+                                <View style={styles.imageOverlay}>
+                                    <Ionicons name="md-image-outline" color="white" size={30}></Ionicons>
+                                </View>
+                            </ImageBackground>
+                            </TouchableOpacity>
+
+                            <View style={styles.dateTime}>
+                                <TouchableOpacity onPress={() => {
+                                    setShowDate(true);
+                                    setMode("date");
+                                }}>
+                                    <TextInput
+                                        value={getDate(date)}
+                                        leftContent={
+                                            <Ionicons name="calendar-outline" size={20}/>
+                                        }
+                                        editable={false}
+                                    />
+                                </TouchableOpacity>
+
+                                <TouchableOpacity onPress={() => {
+                                    setShowDate(true);
+                                    setMode("time");
+                                }}>
+                                    <TextInput
+                                        value={getTime(date)}
+                                        leftContent={
+                                            <Ionicons name="time-outline" size={20}/>
+                                        }
+                                        editable={false}
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                        
                         <TextInput
-                            value={getTime(date)}
+                            placeholder="Location"
+                            value={location}
+                            onChangeText={(val) => {
+                                setLocation(val);
+                            }}
                             leftContent={
-                                <Ionicons name="time-outline" size={20}/>
+                                <Ionicons name="location-outline" size={20}/>
                             }
-                            editable={false}
-                            containerStyle={{width: Dimensions.get('screen').width/2}}
+                            containerStyle={styles.input}
                         />
-                    </TouchableOpacity>
+
+                        <DateTimePickerModal isVisible={showDate} date={date}
+                            mode={mode} onConfirm={changeDate} onCancel={() => setShowDate(false)}/>
+
+                        <TextInput
+                            placeholder="Additional Info"
+                            value={additionalInfo}
+                            onChangeText={(val) => setAdditionalInfo(val)}
+                            containerStyle={{...styles.input, paddingBottom: 60}}
+                            multiline={true}
+                            leftContent={
+                                <Ionicons name="document-text-outline" size={20}/>
+                            }
+                        />
+
+                        <Button disabled={disabled} onPress={function () {
+                            let hasImage = false;
+                            if (photo !== "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400") {
+                                hasImage = true;
+                            }
+                            navigation.navigate("InvitePeople", {
+                                name,
+                                location,
+                                date,
+                                additionalInfo: additionalInfo,
+                                attendees: [],
+                                hasImage: hasImage,
+                                image: hasImage ? photo : "",
+                                clearAll
+                            });
+                        }} marginVertical={20}>See people available!</Button>
+
+                    </View>
                 </View>
-
-
-                <DateTimePickerModal isVisible={showDate} date={date}
-                    mode={mode} onConfirm={changeDate} onCancel={() => setShowDate(false)}/>
-
-                <TextInput
-                    placeholder="Additional Info"
-                    value={additionalInfo}
-                    onChangeText={(val) => setAdditionalInfo(val)}
-                    containerStyle={{paddingBottom: 60}}
-                    multiline={true}
-                    leftContent={
-                        <Ionicons name="document-text-outline" size={20}/>
-                    }
-                />
-
-                <Button disabled={disabled} onPress={function () {
-                    let hasImage = false;
-                    if (photo !== "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400") {
-                        hasImage = true;
-                    }
-                    navigation.navigate("InvitePeople", {
-                        name,
-                        location,
-                        date,
-                        additionalInfo: additionalInfo,
-                        attendees: [],
-                        hasImage: hasImage,
-                        image: hasImage ? photo : "",
-                        clearAll
-                    });
-                }} marginVertical={20}>See people available!</Button>
-            </KeyboardAvoidingView>
+            </KeyboardAvoidingWrapper>
         </Layout>
     );
 }
 
 const styles = StyleSheet.create({
+    content: {
+        paddingHorizontal: 20
+    },
+
     imageOverlay: {
         position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        justifyContent: 'flex-start',
-        alignItems: 'flex-end',
-        margin: 15,
+        left: 10,
+        top: 10,
+        padding: 5,
+        backgroundColor: "rgba(0, 0, 0, 0.7)",
+        borderRadius: 10
     },
+
+    input: {
+        marginTop: 10
+    },
+
     image: {
-        width: '100%',
-        height: 150,
-    }
+        width: 130,
+        height: 110
+    },
+
+    imageContainer: {
+        marginTop: 10,
+        flexDirection: "row",
+        justifyContent: "space-between"
+    },
+
+    dateTime: {
+        flexDirection: "column",
+        justifyContent: "space-between",
+        width: Dimensions.get('screen').width-180
+    },
 });

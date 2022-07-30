@@ -19,16 +19,11 @@ const Email = props => {
   }
 
   const verifyEmail = () => {
-    if (props.emails.includes(email)) {
-      alert("This email has been taken :(");
-      setVerified(null);
+    const isAcademic = email.split("@");
+    if (isAcademic[isAcademic.length-1] === "uw.edu" || isAcademic[isAcademic.length-1] === "cs.washington.edu") {
+      setVerified(true);
     } else {
-      const isAcademic = email.split("@");
-      if (isAcademic[isAcademic.length-1] === "uw.edu") {
-        setVerified(true);
-      } else {
-        setVerified(false);
-      }
+      setVerified(false);
     }
   }
 
@@ -40,14 +35,17 @@ const Email = props => {
         </View>
 
         <TextInput placeholder="Enter email address ..." value={email}
-          onChangeText={val => setEmail(val)} containerStyle={{marginBottom: 20}}
+          onChangeText={val => {
+            setEmail(val);
+            setVerified(null);
+          }} containerStyle={{marginBottom: 20}}
           autoComplete="email" keyboardType="email-address"
           leftContent={<Ionicons name="mail" size={18}/>}/>
 
         <Button disabled={!checkEmail(email)} onPress={verifyEmail} marginVertical={15}>Verify</Button>
         {verified !== null &&
         <NormalText color={verified ? "#5DB075" : "red"}>
-          {verified ? "Verified!" : "Not verified"}
+          {verified ? "Is a UW student!" : "Not a UW student"}
         </NormalText>}
 
         <View style={styles.buttons}>

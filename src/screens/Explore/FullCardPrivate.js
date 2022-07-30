@@ -25,6 +25,7 @@ import NormalText from "../../components/NormalText";
 
 import { db, storage, auth } from "../../provider/Firebase";
 import * as firebase from "firebase";
+import {Menu, MenuOption, MenuOptions, MenuTrigger} from "react-native-popup-menu";
 
 const FullCard = ({ route, navigation }) => {
   // Data for the attendees
@@ -40,20 +41,13 @@ const FullCard = ({ route, navigation }) => {
   // List of icebreaker questions
   const [icebreakers, setIcebreakers] = useState([]);
 
+  // Get the current user
   const user = auth.currentUser;
 
   useEffect(() => {
     fetchIcebreakers();
 
-    if (route.params.event.hasImage) {
-      storage.ref("eventPictures/" + route.params.event.id).getDownloadURL().then(uri => {
-        setImage(uri);
-      }).then(() => {
-        if (route.params.event.hostID === user.uid) {
-          getAttendees();
-        }
-      });
-    } else if (route.params.event.hostID === user.uid) {
+    if (route.params.event.hostID === user.uid) {
       getAttendees();
     }
   }, []);
@@ -109,6 +103,64 @@ const FullCard = ({ route, navigation }) => {
     });
   }
 
+  //Delete the event; this is the old action
+  function withdraw() {
+    if (!loading) {
+      setLoading(true);
+      route.params.deleteEvent(route.params.event.id);
+
+      const storeID = {
+        type: route.params.event.type,
+        id: route.params.event.id
+      };
+
+      db.collection("Users").doc(user.uid).update({
+        attendingEventIDs: firebase.firestore.FieldValue.arrayRemove(storeID)
+      }).then(() => {
+        if(route.params.event.type === "private") {
+          db.collection("Private Events").doc(route.params.event.id).update({
+            attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)
+          }).then(() => {
+            alert("You withdrew from the event");
+            navigation.goBack();
+          });
+        } else {
+          db.collection("Public Events").doc(route.params.event.id).update({
+            attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)
+          }).then(() => {
+            alert("You withdrew from the event");
+            navigation.goBack();
+          });
+        }
+      });
+    }
+  }
+
+  //Archive the event
+  function archiveEvent() {
+    if (!loading) {
+      setLoading(true);
+      route.params.deleteEvent(route.params.event.id);
+
+      const storeID = {
+        type: route.params.event.type,
+        id: route.params.event.id
+      };
+
+      db.collection("Users").doc(user.uid).update({
+        attendingEventIDs: firebase.firestore.FieldValue.arrayRemove(storeID),
+        archivedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)
+      });
+    }
+  }
+
+  //Reporting event function
+  function reportEvent() {
+    navigation.navigate("ReportEvent", {
+      eventID: route.params.event.id
+    })
+  }
+
   return (
     <Layout>
       <TopNav
@@ -118,58 +170,47 @@ const FullCard = ({ route, navigation }) => {
         leftContent={
           <Ionicons
             name="chevron-back"
+            color = {loading ? "grey" : "black"}
             size={20}
           />
         }
         leftAction={() => navigation.goBack()}
         rightContent={
-          <Ionicons
-              name = "close-outline"
-              color = {loading ? "grey" : "red"}
-              size = {25}
-          />
+          <View>
+            <Menu>
+              <MenuTrigger>
+                <Ionicons
+                    name = "ellipsis-horizontal"
+                    color = {loading ? "grey" : "black"}
+                    size = {20}
+                />
+              </MenuTrigger>
+              <MenuOptions>
+                <MenuOption onSelect={() => reportEvent()}>
+                  <NormalText size = {18}>Report Event</NormalText>
+                </MenuOption>
+                <MenuOption onSelect={() => archiveEvent()}>
+                  <NormalText size = {18}>Archive Event</NormalText>
+                </MenuOption>
+                <MenuOption onSelect={() => withdraw()}>
+                  <NormalText size = {18} color = "red">Withdraw</NormalText>
+                </MenuOption>
+              </MenuOptions>
+            </Menu>
+          </View>
         }
-        rightAction = {() => {
-          if (!loading) {
-            setLoading(true);
-            route.params.deleteEvent(route.params.event.id);
-
-            const storeID = {
-              type: route.params.event.type,
-              id: route.params.event.id
-            };
-
-            db.collection("Users").doc(user.uid).update({
-              attendingEventIDs: firebase.firestore.FieldValue.arrayRemove(storeID)
-            }).then(() => {
-              if(route.params.event.type === "private") {
-                db.collection("Private Events").doc(route.params.event.id).update({
-                  attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)
-                }).then(() => {
-                  alert("Event Removed");
-                  navigation.goBack();
-                });
-              } else {
-                db.collection("Public Events").doc(route.params.event.id).update({
-                  attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)
-                }).then(() => {
-                  alert("Event Removed");
-                  navigation.goBack();
-                });
-              }
-            });
-          }
-        }}
       />
 
       <ScrollView contentContainerStyle={styles.page}>
-        <ImageBackground source={image ? {uri: image} : require("../../../assets/foodBackground.png")}
+        <ImageBackground source={route.params.event.hasImage ? {uri: route.params.event.image}
+          : require("../../../assets/foodBackground.png")}
           style={styles.imageBackground} resizeMode="cover">
 
-        {route.params.event.hostID === user.uid && <DarkContainer>
+        {route.params.event.hostID === user.uid && 
+          <DarkContainer marginVertical={20} width={Dimensions.get('screen').width - 40}>
             <LargeText color="white">Attendance</LargeText>
             {openAttendance && <View style={{marginTop: 20}}>
-              {people.length === 0 ? <NormalText color="white">{"No attendees :("}</NormalText>
+              {people.length === 0 ? <NormalText color="white">{"Just yourself ;)"}</NormalText>
               : people.map((person, index) => 
                 <Attendance person={person} key={person.id}
                   attending={attendees[index]} onPress={() => markAttendee(index)}/>)}
@@ -181,7 +222,7 @@ const FullCard = ({ route, navigation }) => {
             </TouchableOpacity>
           </DarkContainer>}
 
-          <DarkContainer>
+          <DarkContainer marginVertical={20} width={Dimensions.get('screen').width - 40}>
             {/*TODO: JOSH | This is where your randomized icebreakers are displayed*/}
             <LargeText color="white">Icebreakers</LargeText>
 

@@ -1,37 +1,42 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView } from 'react-native';
+import { View, StyleSheet, Image, Dimensions, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
 import { Layout, TopNav, TextInput } from "react-native-rapi-ui";
-import { FontAwesome, Ionicons, Feather } from '@expo/vector-icons';
+import { Ionicons, Feather } from '@expo/vector-icons';
 
 import * as ImagePicker from 'expo-image-picker';
 import { db, storage } from "../../provider/Firebase";
-import * as firebase from "firebase";
+import firebase from "firebase";
+import "firebase/firestore"
 
-import TagsList from "../../components/TagsList";
-import Link from "../../components/Link";
+import { cloneDeep } from "lodash";
+import allTags from "../../allTags";
+
+import TagsSection from "../../components/TagsSection";
 import Button from "../../components/Button";
-
 import MediumText from "../../components/MediumText";
+import SmallText from "../../components/SmallText";
+import DeviceToken from "../utils/DeviceToken";
+import KeyboardAvoidingWrapper from "../../components/KeyboardAvoidingWrapper";
 
 export default function ({ route, navigation }) {
-    const [name, setName] = useState('');
+    // Input fields
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
     const [quote, setQuote] = useState('');
     const [image, setImage] = useState('');
     const [tags, setTags] = useState([]);
-    const [currentTag, setCurrentTag] = useState(""); // Current tag the user typed out
 
-    const addTag = () => {
-        setTags([...tags, currentTag]);
-        setCurrentTag("");
-    }
+    const [loading, setLoading] = useState(false); // Disabling button if user profile is being updated
 
     useEffect(() => {
-        setName(route.params.user.name);
+        setFirstName(route.params.user.firstName);
+        setLastName(route.params.user.lastName);
         setQuote(route.params.user.quote);
         setImage(route.params.image);
         setTags(route.params.user.tags);
     }, []);
 
+    // Select image from library
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -44,12 +49,53 @@ export default function ({ route, navigation }) {
         }
     };
 
+    // Upload image to firebase
     const updateImage = async () => {
         const response = await fetch(image);
         const blob = await response.blob();
 
         var ref = storage.ref().child("profilePictures/" + route.params.user.id);
         return ref.put(blob);
+    }
+
+    // Fetches image from Firebase Storage
+    const fetchImage = async () => {
+        let ref = storage.ref().child("profilePictures/" + route.params.user.id);
+        return ref.getDownloadURL();
+    }
+
+    // Update user profile in Firebase
+    const updateUser = async (uri) => {
+        route.params.updateInfo(firstName, lastName, quote, tags, image);
+                        
+        db.collection("Users").doc(route.params.user.id).update({
+            firstName,
+            lastName,
+            quote,
+            tags,
+            hasImage: image !== "",
+            image: uri
+        }).then(() => {
+            if (image !== "") {
+                updateImage();
+            }
+            
+            alert("Profile updated!");
+            setLoading(false);
+        });
+    }
+
+    //Sign out, and remove this push token from the list of acceptable push tokens
+    const signOut = async () => {
+        // let currentToken;
+        // await db.collection("Users").doc(route.params.user.id).get().then((ss) => {
+        //     currentToken = ss.data().currentToken;
+        // })
+
+        await db.collection("Users").doc(route.params.user.id).update({
+            pushTokens: firebase.firestore.FieldValue.arrayRemove(DeviceToken.getToken())
+        })
+        await firebase.auth().signOut()
     }
 
     return (
@@ -67,66 +113,87 @@ export default function ({ route, navigation }) {
                 leftAction={() => navigation.goBack()}
             />
 
-            <ScrollView>
-                <View style={styles.imageContainer}>
-                    <Image style={styles.image} source={image ? {uri: image} : require("../../../assets/logo.png")}/>
-                    <TouchableOpacity style={styles.editImage} onPress={pickImage}>
-                        <Feather name="edit-2" size={25} color="black"/>
-                    </TouchableOpacity>
-                </View>
+            <KeyboardAvoidingWrapper>
+                <View style={{ paddingHorizontal: 20 }}>
+                    <View style={styles.imageContainer}>
+                        <Image style={styles.image} source={image ? {uri: image} : require("../../../assets/logo.png")}/>
+                        <TouchableOpacity style={styles.editImage} onPress={pickImage}>
+                            <Feather name="edit-2" size={25} color="black"/>
+                        </TouchableOpacity>
+                    </View>
+                    
+                    <View style={styles.name}>
+                        <TextInput
+                            placeholder="First name"
+                            onChangeText={(val) => setFirstName(val)}
+                            leftContent={
+                                <Ionicons name="person-circle-outline" size={20} />
+                            }
+                            value={firstName}
+                            containerStyle={{ width: "47%" }}
+                        />
+                        <TextInput
+                            placeholder="Last name"
+                            onChangeText={(val) => setLastName(val)}
+                            leftContent={
+                                <Ionicons name="person-circle-outline" size={20} />
+                            }
+                            value={lastName}
+                            containerStyle={{ width: "47%" }}
+                        />
+                    </View>
+                    
 
-                <TextInput
-                    placeholder="Name"
-                    onChangeText={(val) => setName(val)}
-                    leftContent={
-                        <Ionicons name="person-circle-outline" size={20} />
-                    }
-                    value={name}
-                />
-
-                <TextInput
-                    placeholder="Quote"
-                    onChangeText={(val) => setQuote(val)}
-                    leftContent={
-                        <Ionicons name="chatbox-ellipses-outline" size={20}/>
-                    }
-                    value={quote}
-                />
-
-                <View style={styles.tagInput}>
-                    <TextInput placeholder="Tag" value={currentTag}
-                        containerStyle={styles.input} onChangeText={val => setCurrentTag(val)}
-                        leftContent={<FontAwesome name="tag" size={18}/>}/>
-                    <Button onPress={addTag} disabled={currentTag === ""} paddingHorizontal={25}>+</Button>
-                 </View>
-
-                <View style = {{alignItems: 'center'}}>
-                    <TagsList tags={tags}/>
-                    {tags.length > 0 && <Link size={14} onPress={() => setTags(tags.slice(0, -1))}>Delete Last Tag</Link>}
-                </View>
-
-                <TouchableOpacity style={{alignItems: 'center', marginVertical: 10}} onPress={function () {
-                    route.params.updateInfo(name, quote, tags, image);
-
-                    db.collection("Users").doc(route.params.user.id).update({
-                        name: name,
-                        quote: quote,
-                        tags: tags,
-                        hasImage: image !== ""
-                    }).then(() => {
-                        if (image !== "") {
-                            updateImage();
+                    <TextInput
+                        placeholder="Quote"
+                        onChangeText={(val) => setQuote(val)}
+                        leftContent={
+                            <Ionicons name="chatbox-ellipses-outline" size={20}/>
                         }
-                        
-                        alert("Profile Updated");
-                    });
-                }}>
-                    <MediumText color="#5DB075">Update Profile</MediumText>
-                </TouchableOpacity>
+                        value={quote}
+                        containerStyle={{ marginBottom: 10 }}
+                    />
 
-                <Button onPress={() => firebase.auth().signOut()}
-                    marginVertical={20}>Log Out</Button>
-            </ScrollView>
+                    <TagsSection
+                        multi={true}
+                        selectedItems={tags}
+                        onItemSelect={(tag) => {
+                            setTags([...tags, tag]);
+                        }}
+                        onRemoveItem={(item, index) => {
+                            const newTags = tags.filter((tag, i) => i !== index);
+                            setTags(newTags);
+                        }}
+                        inline={true}
+                        items={cloneDeep(allTags)}
+                        chip={true}
+                        resetValue={false}
+                    />
+
+                    <SmallText center>Note: must have between 3 and 6 tags (inclusive).</SmallText>
+
+                    <TouchableOpacity disabled={firstName === "" || lastName === "" || quote === ""
+                            || tags.length < 3 || tags.length > 6 || loading}
+                        style={firstName === "" || lastName === "" || quote === "" || tags.length < 3
+                            || tags.length > 6 ? styles.saveDisabled : styles.save} 
+                        onPress={() => {
+                            setLoading(true);
+
+                            if (image !== "") {
+                                updateImage().then(() => {
+                                    fetchImage().then(uri => {
+                                        updateUser(uri);
+                                    })
+                                });
+                            }
+                        }}>
+                        <MediumText color="#5DB075">{loading ? "Updating ..." : "Update Profile"}</MediumText>
+                    </TouchableOpacity>
+
+                    <Button onPress={() => signOut()}
+                        marginVertical={20}>Log Out</Button>
+                </View>
+            </KeyboardAvoidingWrapper>
         </Layout>
     );
 }
@@ -158,12 +225,6 @@ const styles = StyleSheet.create({
         alignItems: "center"
     },
     
-    image: {
-        width: 125,
-        height: 125,
-        borderRadius: 125
-    },
-    
     editImage: {
         left: 40,
         bottom: 40,
@@ -171,4 +232,22 @@ const styles = StyleSheet.create({
         backgroundColor: "#5DB075",
         borderRadius: 100
     },
+
+    name: {
+        width: "100%",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginBottom: 10
+    },
+
+    save: {
+        alignItems: 'center',
+        marginVertical: 10
+    },
+
+    saveDisabled: {
+        alignItems: 'center',
+        marginVertical: 10,
+        opacity: 0.7
+    }
 });

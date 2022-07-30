@@ -1,28 +1,19 @@
 import React, {useState} from "react";
 import {View, StyleSheet, Image, Dimensions} from "react-native";
-import {
-    Layout,
-    TopNav,
-    Text,
-    themeColor,
-    useTheme,
-    Button, TextInput
-} from "react-native-rapi-ui";
+import {Layout, TopNav, Button, TextInput} from "react-native-rapi-ui";
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
-import NormalText from "../../components/NormalText";
 import {FontAwesome, Ionicons} from "@expo/vector-icons";
-import getDate from "../../getDate";
 import admin from "firebase";
 import firebase from "firebase";
 
-const Report = ({ route, navigation }) => {
+const ReportEvent = ({ route, navigation }) => {
     const [report, setReport] = useState('');
     return (
         <Layout>
             <TopNav
                 middleContent={
-                    <MediumText center>Report User</MediumText>
+                    <MediumText center>Report Event</MediumText>
                 }
                 leftContent={
                     <Ionicons
@@ -44,7 +35,7 @@ const Report = ({ route, navigation }) => {
                         .add({
                             to: "eat.together.team@gmail.com",
                             message: {
-                                subject: "USER REPORT ON " + route.params.user.username + " by " + firebase.auth().currentUser.uid,
+                                subject: "EVENT REPORT ON " + route.params.eventID + " by " + firebase.auth().currentUser.uid,
                                 text: report,
                             },
                         })
@@ -72,4 +63,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default Report;
+export default ReportEvent;

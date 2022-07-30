@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet, Dimensions, Image, TouchableOpacity } from "react-native";
 import { Layout, TextInput } from "react-native-rapi-ui";
-import { FontAwesome, Entypo } from '@expo/vector-icons';
+import { FontAwesome, Entypo, Ionicons } from '@expo/vector-icons';
 
 import LargeText from "../../../components/LargeText";
 import SmallText from "../../../components/SmallText";
@@ -14,6 +14,8 @@ const Password = props => {
   const [password, setPassword] = useState(props.password);
   const [confirmPassword, setConfirmPassword] = useState("");
   const [confirmed, setConfirmed] = useState(false);
+  const [showPass, setShowPass] = useState(false);
+  const [showConfirmPass, setShowConfirmPass] = useState(false);
 
   useEffect(() => {
     props.setUsername(username);
@@ -31,19 +33,24 @@ const Password = props => {
       <LargeText center>Finally, set a username and password!</LargeText>
 
       <TextInput placeholder="Username (at least 4 characters)" value={username}
-          onChangeText={val => setUsername(val)} containerStyle={{marginTop: 30}}
+          onChangeText={val => setUsername(val.replace(/\s+/g, ''))} containerStyle={{marginTop: 30}}
           leftContent={<FontAwesome name="user" size={18}/>}/>
           
       <TextInput placeholder="Password (at least 8 characters)" value={password}
-          secureTextEntry={true} onChangeText={val => {
+          secureTextEntry={!showPass ? true : false} onChangeText={val => {
             setPassword(val);
-            
           }}
-          containerStyle={{marginTop: 10}} leftContent={<Entypo name="lock" size={18}/>}/>
+          containerStyle={{marginTop: 10}} leftContent={<Entypo name="lock" size={18}/>}
+          rightContent={<TouchableOpacity onPress={() => setShowPass(!showPass)}>
+            <Ionicons name={!showPass ? "eye" : "eye-off"} size={22}/>
+          </TouchableOpacity>}/>
 
       <TextInput placeholder="Confirm password" value={confirmPassword}
-          secureTextEntry={true} onChangeText={val => setConfirmPassword(val)}
-          containerStyle={{marginVertical: 10}} leftContent={<Entypo name="lock" size={18}/>}/>
+          secureTextEntry={!showConfirmPass ? true : false} onChangeText={val => setConfirmPassword(val)}
+          containerStyle={{marginVertical: 10}} leftContent={<Entypo name="lock" size={18}/>}
+          rightContent={<TouchableOpacity onPress={() => setShowConfirmPass(!showConfirmPass)}>
+            <Ionicons name={!showConfirmPass ? "eye" : "eye-off"} size={22}/>
+          </TouchableOpacity>}/>
       
       {password.length >= 8 && <SmallText color={!confirmed ? "red" : "#5DB075"}>
         {!confirmed ? "Passwords don't match" : "Passwords match!"}
