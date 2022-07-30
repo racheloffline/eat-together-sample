@@ -66,6 +66,15 @@ export default function({ navigation }) {
         });
     }, []);
 
+    //Check to see if we should display the "No Events" placeholder text
+    function shouldDisplayPlaceholder(list) {
+        if(list == null || list.length === 0) {
+            return "No events available at this time."
+        } else {
+            return ""
+        }
+    }
+
     // Method to filter out events
     const search = text => {
       setLoading(true);

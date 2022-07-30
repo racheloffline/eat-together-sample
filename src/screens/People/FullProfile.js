@@ -137,7 +137,7 @@ const FullProfile = ({ route, navigation }) => {
             {route.params.person.firstName + " " + route.params.person.lastName.substring(0, 1) + "."}
           </LargeText>
           <NormalText>
-          {route.params.person.attendedEventIDs.length + "/" + route.params.person.attendingEventIDs.length + " meals attended"}
+          {route.params.person.attendedEventIDs.length + "/" + (route.params.person.attendedEventIDs.length+ route.params.person.attendingEventIDs.length) + " meals attended"}
           </NormalText>
           <MediumText>@{route.params.person.username}</MediumText>
 
