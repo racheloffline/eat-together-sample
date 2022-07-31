@@ -36,7 +36,7 @@ export default function ({ navigation }) {
         allUIDs.push(user.id);
       });
       allUIDs.push(user.uid);
-      // Step 1: Create a new doc in the groups collection on firestore
+      // Create a new doc in the groups collection on firestore
       db.collection("Groups")
         .doc(chatID)
         .set({
@@ -44,8 +44,7 @@ export default function ({ navigation }) {
           name: allNames.join(", "),
           messages: [],
         });
-      // Step 2: Create a messages storage for this group
-      // Step 3: Update each user's data to include this chat
+      // Update each user's data to include this chat
       allUIDs.map((uid) => {
         db.collection("Users")
           .doc(uid)
@@ -60,6 +59,7 @@ export default function ({ navigation }) {
   // Get your taste buds as search suggestions
   useEffect(() => {
     userInfo.onSnapshot((doc) => {
+      const nameCurrent = doc.data().name;
       const friends = doc.data().friendIDs;
       const groups = doc.data().groupIDs;
       // update the groups displayed
@@ -71,7 +71,6 @@ export default function ({ navigation }) {
           .then((doc) => {
             // now store all the chat rooms
             let data = doc.data();
-            // store the most recent message
             // store most recent message in variable
             let message =
               data.messages.length != 0
@@ -81,9 +80,10 @@ export default function ({ navigation }) {
               data.messages.length != 0
                 ? data.messages[data.messages.length - 1].sentAt
                 : "";
+            let name = data.name.replace(nameCurrent + ", ", "").replace(", " + nameCurrent, "");
             temp.push({
               groupID: groupID,
-              name: data.name,
+              name: name,
               uids: data.uids,
               hasImage: data.hasImage,
               message: message,

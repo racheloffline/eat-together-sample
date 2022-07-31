@@ -5,16 +5,13 @@ import {
   Image,
   Dimensions,
   TouchableOpacity,
-  ScrollView,
-  FlatList
+  FlatList,
 } from "react-native";
 import { Layout, Text, TextInput, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
-import MediumText from "../../components/MediumText";
-import NormalText from "../../components/NormalText";
 import firebase from "firebase";
 import { db, storage } from "../../provider/Firebase";
-import moment from 'moment';
+import moment from "moment";
 import TextMessage from "../../components/TextMessage";
 
 export default function ({ route, navigation }) {
@@ -32,24 +29,26 @@ export default function ({ route, navigation }) {
   // On update, push messages
   useEffect(() => {
     messageRef.onSnapshot((doc) => {
-        let temp = []
-        doc.data().messages.forEach((message) => {
-            temp.push(message);
-        });
-        setMessages(temp);
+      let temp = [];
+      doc.data().messages.forEach((message) => {
+        temp.push(message);
+      });
+      setMessages(temp);
     });
-  }, [])
+  }, []);
 
   const onSend = () => {
-    messageRef.update({
+    messageRef
+      .update({
         messages: firebase.firestore.FieldValue.arrayUnion({
-            message: message,
-            sentAt: moment().format('MMMM Do YYYY, h:mm:ss a'),
-            sentBy: user.uid
-        })
-    }).then(() => {
+          message: message,
+          sentAt: moment().format("MMMM Do YYYY, h:mm:ss a"),
+          sentBy: user.uid,
+        }),
+      })
+      .then(() => {
         setMessage("");
-    })
+      });
   };
 
   return (
@@ -58,17 +57,18 @@ export default function ({ route, navigation }) {
         middleContent={group.name}
         leftContent={<Ionicons name="chevron-back" size={20} />}
         rightContent={<Image style={styles.image} source={{ uri: image }} />}
-        leftAction={() => navigation.goBack()}
+        leftAction={() => {
+          // Temporary fix with invalid chat preview, to be fixed in the future for better speed.
+          navigation.navigate("Invite");
+          navigation.navigate("Chats");
+        }}
       />
       <FlatList
-          data={messages}
-          renderItem={({ item }) => (
-              <TextMessage
-                sentBy={item.sentBy}
-                message={item.message}
-              />
-          )}
-        />
+        data={messages}
+        renderItem={({ item }) => (
+          <TextMessage sentBy={item.sentBy} message={item.message} />
+        )}
+      />
       <TextInput
         placeholder="Send Message!!!"
         value={message}
@@ -101,7 +101,5 @@ const styles = StyleSheet.create({
     backgroundColor: "#5DB075",
   },
 
-  messages: {
-
-  },
+  messages: {},
 });
