@@ -15,6 +15,7 @@ import Searchbar from "../../components/Searchbar";
 import getDate from "../../getDate";
 import {generateColor} from "../../methods";
 
+// Stores image in Firebase Storage
 const storeImage = async (uri, event_id) => {
     const response = await fetch(uri);
     const blob = await response.blob();
@@ -31,22 +32,22 @@ async function sendInvites (attendees, invite, navigation, icebreakers) {
     if (invite.hasImage) {
         await storeImage(invite.image, id);
     }
-
     //Send invites to each of the selected users
     async function sendInvitations(ref) {
         ref.collection("Invites").add({
             date: invite.date,
             description: invite.additionalInfo,
-            hostID: user.uid,
-            hostName: hostName,
+            hostID: user.id,
+            hostName: user.firstName + " " + user.lastName,
             hasImage: invite.hasImage,
+            image: invite.image,
             location: invite.location,
             name: invite.name,
             inviteID: id
         }).then(r => {
             invite.clearAll();
             navigation.navigate("OrganizePrivate");
-        })
+        });
     }
 
     let hostName;
@@ -55,11 +56,14 @@ async function sendInvites (attendees, invite, navigation, icebreakers) {
         hostName = snapshot.data().name
     })
 
-
     db.collection("Private Events").doc(id).set({
         id,
         name: invite.name,
-        hostID: user.uid,
+        hostID: user.id,
+        hostFirstName: user.firstName,
+        hostLastName: user.lastName,
+        hasHostImage: user.hasImage,
+        hostImage: user.image,
         location: invite.location,
         date: invite.date,
         additionalInfo: invite.additionalInfo,
@@ -73,9 +77,8 @@ async function sendInvites (attendees, invite, navigation, icebreakers) {
                 if (attendee !== user.uid) {
                     await sendInvitations(ref)
                 }
-            })
-
-        })
+            });
+        });
 
         const storeID = {
             type: "private",
@@ -86,7 +89,7 @@ async function sendInvites (attendees, invite, navigation, icebreakers) {
             hostedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
             attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
             attendedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)
-        })
+        });
 
         alert("Invitations sent!");
 
@@ -118,16 +121,14 @@ export default function({ route, navigation }) {
     const [image, setImage] = useState(null);
     const [icebreakers, setIcebreakers] = useState([]);
 
-    const onChangeText = (text) => {
-        setCurSearch(text);
-        search(curSearch);
-    }
+    const attendees = route.params.attendees;
 
-    const search = (text) => {
-        let newEvents = users.filter(e => isMatch(e, text));
-        setFilteredUsers(newEvents);
-    }
-
+    const [users, setUsers] = useState([]);
+    const [filteredUsers, setFilteredUsers] = useState([]);
+    const [curSearch, setCurSearch] = useState("");
+    
+    const [disabled, setDisabled] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => { // updates stuff right after React makes changes to the DOM
         //LINKING ELAINE'S ALGO
@@ -186,6 +187,8 @@ export default function({ route, navigation }) {
                         attendedEventIDs: data.attendedEventIDs,
                         attendingEventIDs: data.attendingEventIDs
                     });
+                } else if (data.id === user.uid) {
+                    setUserInfo(data);
                 }
             });
             setFilteredUsers(list);
@@ -193,6 +196,16 @@ export default function({ route, navigation }) {
         });
         // COMMENT THIS AREA OUT WHEN READY (END)
     }, []);
+
+    const onChangeText = (text) => {
+        setCurSearch(text);
+        search(curSearch);
+    }
+
+    const search = (text) => {
+        let newEvents = users.filter(e => isMatch(e, text));
+        setFilteredUsers(newEvents);
+    }
 
     return (
         <Layout style={{flex:1}}>
@@ -208,12 +221,17 @@ export default function({ route, navigation }) {
                 }
                 leftAction={() => navigation.goBack()}
             />
-                <Searchbar placeholder="Search by name, date, location, or additional info"
-                           value={curSearch} onChangeText={onChangeText}/>
+
+            <Searchbar placeholder="Search by name"
+                value={curSearch} onChangeText={onChangeText}/>
             <FlatList contentContainerStyle={styles.invites} keyExtractor={item => item.id}
-                      data={filteredUsers} renderItem={({item}) =>
-                <InvitePerson navigation={navigation} person={item} attendees={attendees} color={generateColor()}/>
-            }/>
+                data={filteredUsers} renderItem={({item}) =>
+                    <InvitePerson navigation={navigation} person={item}
+                        attendees={attendees} color={generateColor()}
+                        disable={() => setDisabled(true)}
+                        undisable={() => setDisabled(false)}/>
+                }/>
+
             <View style={styles.buttons}>
                 <Button text="Send Invites" width={Dimensions.get('screen').width} color="#5DB075" size="lg" onPress={async () => {
                     await sendInvites(attendees, route.params, navigation, icebreakers);

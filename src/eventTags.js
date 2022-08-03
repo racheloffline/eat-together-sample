@@ -371,6 +371,15 @@ const eventTags = [
     'Health Education and Promotion',
     'Nutritional Sciences',
     'Social Welfare',
+    'Undergrad student',
+    'Grad student',
+    'Masters',
+    'PhD',
+    'First year',
+    'Second year',
+    'Third year',
+    'Fourth year',
+    'Fifth year',
 ]
 
 export default eventTags;

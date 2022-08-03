@@ -1,83 +1,136 @@
 // Display your events
 
-import React, {useEffect, useState} from "react";
-import { StyleSheet, FlatList } from "react-native";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, FlatList, View } from "react-native";
 import { Layout } from "react-native-rapi-ui";
 
-import EventCard from '../../components/EventCard';
+import EventCard from "../../components/EventCard";
 import Header from "../../components/Header";
 import Searchbar from "../../components/Searchbar";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
+import HorizontalRow from "../../components/HorizontalRow";
+import Filter from "../../components/Filter";
 
 import getDate from "../../getDate";
 import { db, auth } from "../../provider/Firebase";
+import { ActivityIndicator } from "react-native";
 
-export default function({ navigation }) {
-    const [events, setEvents] = useState([]); // initial state, function used for updating initial state
-    const [filteredEvents, setFilteredEvents] = useState([]);
-    const [searchQuery, setSearchQuery] = useState("");
+export default function ({ navigation }) {
+  // Get current user
+  const user = auth.currentUser;
 
-    const user = auth.currentUser;
+  const [events, setEvents] = useState([]); // initial state, function used for updating initial state
+  const [filteredEvents, setFilteredEvents] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
-    useEffect(() => { // updates stuff right after React makes changes to the DOM
-        let newEvents = [];
+  // Filters
+  const [publicEvents, setPublicEvents] = useState(false);
+  const [privateEvents, setPrivateEvents] = useState(false);
 
-        db.collection("Users").doc(user.uid).get().then(doc => {
-            doc.data().attendingEventIDs.forEach(e => {
-                if (e.type === "public") {
-                    db.collection("Public Events").doc(e.id).get().then(event => {
-                        let data = event.data();
-                        data.type = e.type;
-                        newEvents.unshift(data);
-                        setFilteredEvents(newEvents);
-                        setEvents(newEvents);
-                    });
-                } else {
-                    db.collection("Private Events").doc(e.id).get().then(event => {
-                        let data = event.data();
-                        data.type = e.type;
-                        newEvents.unshift(data);
-                        setFilteredEvents(newEvents);
-                        setEvents(newEvents);
-                    });
+  const [unread, setUnread] = useState(false); // See if we need to display unread notif icon
+  const [loading, setLoading] = useState(true); // State variable to show loading screen when fetching data
+
+  useEffect(() => {
+    // updates stuff right after React makes changes to the DOM
+    let newEvents = [];
+    let userInfo;
+
+    async function fetchEvents() {
+      await db
+        .collection("Users")
+        .doc(user.uid)
+        .get()
+        .then((doc) => {
+          setUnread(doc.data().hasNotif);
+          userInfo = doc.data();
+        })
+        .then(() => {
+          let eventsLength = userInfo.attendingEventIDs.length;
+
+          userInfo.attendingEventIDs.forEach((e) => {
+            let type = "Private Events";
+            if (e.type === "public") {
+              type = "Public Events";
+            }
+
+            db.collection(type)
+              .doc(e.id)
+              .get()
+              .then((event) => {
+                let data = event.data();
+                data.type = e.type;
+                newEvents.push(data);
+                eventsLength--;
+
+                if (eventsLength === 0) {
+                  // Sort events by date
+                  newEvents = newEvents.sort((a, b) => {
+                    return a.date.seconds - b.date.seconds;
+                  });
+
+                  setEvents(newEvents);
+                  setFilteredEvents(newEvents);
+                  setLoading(false);
                 }
-            });
+              });
+          });
         });
-    }, []);
-
-    // Method to filter out events
-    const search = text => {
-        let newEvents = events.filter(e => isMatch(e, text));
-        setFilteredEvents(newEvents);
     }
 
-    // Determines if an event
-    const isMatch = (event, text) => {
-        if (event.name.toLowerCase().includes(text.toLowerCase())) { // Name
-            return true;
-        }
+    fetchEvents().then(() => {
+      setLoading(false);
+    });
+  }, []);
 
-        if (event.location.toLowerCase().includes(text.toLowerCase())) { // Location
-            return true;
-        }
+  //Check to see if we should display the "No Events" placeholder text
+  function shouldDisplayPlaceholder(list) {
+    if (list == null || list.length === 0) {
+      return "You are not signed up for any upcoming events.";
+    } else {
+      return "";
+    }
+  }
 
-        if (getDate(event.date.toDate()).toLowerCase().includes(text.toLowerCase())) { // Date
-            return true;
-        }
+  // Method to filter out events
+  const search = (text) => {
+    setLoading(true);
+    let newEvents = events.filter((e) => isMatch(e, text));
+    setFilteredEvents(newEvents);
+    setLoading(false);
+  };
 
-        return event.additionalInfo.toLowerCase().includes(text.toLowerCase()); // Additional info
+  // Determines if an event
+  const isMatch = (event, text) => {
+    if (event.name.toLowerCase().includes(text.toLowerCase())) {
+      // Name
+      return true;
     }
 
-    // Method called when a new query is typed in/deleted
-    const onChangeText = text => {
-        setSearchQuery(text);
-        search(text);
+    if (event.location.toLowerCase().includes(text.toLowerCase())) {
+      // Location
+      return true;
     }
 
-    // Deletes event from DOM and updates Firestore
-    const deleteEvent = id => {
-        // TODO: Rachel Fix!
-        /*
+    if (
+      getDate(event.date.toDate()).toLowerCase().includes(text.toLowerCase())
+    ) {
+      // Date
+      return true;
+    }
+
+    return event.hostName.toLowerCase().includes(text.toLowerCase()); // Host
+  };
+
+  // Method called when a new query is typed in/deleted
+  const onChangeText = (text) => {
+    setSearchQuery(text);
+    search(text);
+  };
+
+  // Deletes event from DOM and updates Firestore
+  const deleteEvent = (id) => {
+    // TODO: Rachel Fix!
+    /*
         const user = auth.currentUser;
         db.collection("Private Events").doc(id).update({
             attendees : firebase.firestore.FieldValue.arrayRemove(user.uid)
@@ -88,36 +141,93 @@ export default function({ navigation }) {
             });
         });
          */
-        const newEvents = events.filter(e => e.id !== id);
-        const newFilteredEvents = events.filter(e => e.id !== id);
-        setEvents(newEvents);
-        setFilteredEvents(newFilteredEvents);
+    const newEvents = events.filter((e) => e.id !== id);
+    const newFilteredEvents = events.filter((e) => e.id !== id);
+    setEvents(newEvents);
+    setFilteredEvents(newFilteredEvents);
+  };
+
+  // Display public events only
+  const publicOnly = () => {
+    if (!publicEvents) {
+      setFilteredEvents(events.filter((e) => e.type === "public"));
+    } else {
+      setFilteredEvents(events);
     }
 
-    return (
-        <Layout>
-            <Header name="Explore" navigation = {navigation}/>
-            <HorizontalSwitch left="Your Events" right="Public" current="left" press={() => navigation.navigate("Explore")}/>
-            <Searchbar placeholder="Search by name, date, location, or additional info"
-				value={searchQuery} onChangeText={onChangeText}/>
+    setPublicEvents(!publicEvents);
+    setPrivateEvents(false);
+  };
 
-            <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
-                      data={filteredEvents} renderItem={({item}) =>
-                <EventCard event={item} click={() => {
-                    navigation.navigate("FullCardPrivate", {
-                        event: item,
-                        deleteEvent
-                    });
-                }}/>
-            }/>
-        </Layout>
-    );
+  // Display private events only
+  const privateOnly = () => {
+    if (!privateEvents) {
+      setFilteredEvents(events.filter((e) => e.type === "private"));
+    } else {
+      setFilteredEvents(events);
+    }
+
+    setPrivateEvents(!privateEvents);
+    setPublicEvents(false);
+  };
+  return (
+    <Layout>
+      <Header name="Explore" navigation={navigation} hasNotif={unread} />
+      <HorizontalSwitch
+        left="Your Events"
+        right="Public"
+        current="left"
+        press={() => navigation.navigate("Explore")}
+      />
+      <Searchbar
+        placeholder="Search by name, location, date, or host name"
+        value={searchQuery}
+        onChangeText={onChangeText}
+      />
+
+      <HorizontalRow>
+        <Filter
+          checked={publicEvents}
+          onPress={publicOnly}
+          text="Public events"
+        />
+        <Filter
+          checked={privateEvents}
+          onPress={privateOnly}
+          text="Private events"
+        />
+      </HorizontalRow>
+
+      {!loading ? (
+        <FlatList
+          contentContainerStyle={styles.cards}
+          keyExtractor={(item) => item.id}
+          data={filteredEvents}
+          renderItem={({ item }) => (
+            <EventCard
+              event={item}
+              click={() => {
+                navigation.navigate("FullCardPrivate", {
+                  event: item,
+                  deleteEvent,
+                });
+              }}
+            />
+          )}
+        />
+      ) : (
+        <View style={{ flex: 1, justifyContent: "center" }}>
+          <ActivityIndicator size={100} color="#5DB075" />
+        </View>
+      )}
+    </Layout>
+  );
 }
 
 const styles = StyleSheet.create({
-    cards: {
-        alignItems: "center",
-        paddingTop: 20,
-        paddingBottom: 40
-    },
+  cards: {
+    alignItems: "center",
+    paddingTop: 20,
+    paddingBottom: 40,
+  },
 });

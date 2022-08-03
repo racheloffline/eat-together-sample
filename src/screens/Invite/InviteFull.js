@@ -33,10 +33,16 @@ export default function ({ route, navigation}) {
         }
     }
 
+    function chooseColor() {
+        return route.params.hasPassed ? "red" : "black";
+    }
+
     return (
         <Layout>
             <TopNav
-                middleContent="View Invite"
+                middleContent={
+                <MediumText>View Invite</MediumText>
+                }
                 leftContent={
                     <Ionicons
                         name="chevron-back"
@@ -47,8 +53,7 @@ export default function ({ route, navigation}) {
             />
             <ScrollView contentContainerStyle={styles.page}>
                 <View style={styles.background}/>
-                <Image style={styles.image}
-                       source={{uri: (image != "" ? image : "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400")}}/>
+                <Image style={styles.image} source={(image != "") ? {uri: image} : require("../../../assets/stockEvent.png")}/>
                 <MediumText style={styles.text}>{invite.hostName} is inviting you to {invite.name}!</MediumText>
                 <View style = {styles.icons}>
                     <Ionicons name="location-outline" size={24}/>
@@ -56,14 +61,14 @@ export default function ({ route, navigation}) {
                     <NormalText size = {20}>{invite.location}</NormalText>
                 </View>
                 <View style = {styles.icons}>
-                    <Ionicons name="calendar-outline" size={24}/>
+                    <Ionicons name="calendar-outline" size={24} color={chooseColor()}/>
                     <Text>  </Text>
-                    <NormalText size = {20}>{invite.date}</NormalText>
+                    <NormalText size = {20} color={chooseColor()}>{invite.date}</NormalText>
                 </View>
                 <View style = {styles.icons}>
-                    <Ionicons name="time-outline" size={24}/>
+                    <Ionicons name="time-outline" size={24} color={chooseColor()}/>
                     <Text>  </Text>
-                    <NormalText size = {20}>{invite.time}</NormalText>
+                    <NormalText size = {20} color={chooseColor()}>{invite.time}</NormalText>
                 </View>
                 <View style = {styles.text}>
                     <NormalText size = {20}>Details: {displayDetails()}</NormalText>
@@ -71,35 +76,30 @@ export default function ({ route, navigation}) {
 
                 <View style = {styles.buttonView}>
                     <TouchableOpacity onPress = {() => {
-                        ref.set({
-                            accepted: "accepted"
-                        }, {merge: true}).then(() => {
-                            const inviteRef = db.collection("Private Events").doc(invite.inviteID)
-                            inviteRef.get().then((doc) => {
-                                let data = doc.data()
-                                let currentAttendees = data.attendees
-                                if(!currentAttendees.includes(user.uid)) {
-                                    currentAttendees.push(user.uid)
-                                    inviteRef.set({
-                                        attendees: currentAttendees
-                                    }, {merge: true}).then(() => {
-                                        const storeID = {
-                                            type: "private",
-                                            id: invite.inviteID
-                                        };
+                        const inviteRef = db.collection("Private Events").doc(invite.inviteID)
+                        inviteRef.get().then((doc) => {
+                        let data = doc.data()
+                        let currentAttendees = data.attendees
+                            currentAttendees.push(user.uid)
+                            inviteRef.set({
+                                attendees: currentAttendees
+                            }, {merge: true}).then(() => {
+                                const storeID = {
+                                    type: "private",
+                                    id: invite.inviteID
+                                };
 
-                                        db.collection("Users").doc(user.uid).update({
-                                            attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)
-                                        }).then(() => {
-                                            alert("Invite Accepted!");
-                                            navigation.goBack();
-                                        });
+                                db.collection("Users").doc(user.uid).update({
+                                    attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)
+                                }).then(() => {
+                                    ref.delete().then(r => {
+                                        alert("Invite accepted! It will now appear under Your Events.")
+                                        navigation.goBack();
                                     })
-                                } else {
-                                    alert("Invite already accepted.");
-                                }
-
+                                });
                             })
+
+
                         })
                     }}>
                         <NormalText size = {18} color = {"green"} center = "center">Accept Invite</NormalText>
@@ -119,22 +119,84 @@ export default function ({ route, navigation}) {
                                 db.collection("Private Events").doc(invite.inviteID).update({
                                     attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)
                                 }).then(() => {
-                                    alert("Invite Declined");
-                                    navigation.goBack();
+                                    ref.delete().then(r => {
+                                        alert("Invite declined. It will be removed from your list of invites.");
+                                        navigation.goBack();
+                                    })
                                 })
                             });
                         })
                     }}>
                         <NormalText size = {18} color = {"red"} center = "center">Decline Invite</NormalText>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress = {() => {
-                        ref.delete().then(r => {
-                            alert("Invite Cleared")
-                            navigation.goBack();
-                        })
-                    }}>
-                        <NormalText size = {18} color = {"blue"} center = "center">Clear Invite</NormalText>
-                    </TouchableOpacity>
+
+                    {/*Old code*/}
+
+                    {/*<TouchableOpacity onPress = {() => {*/}
+                    {/*    ref.set({*/}
+                    {/*        accepted: "accepted"*/}
+                    {/*    }, {merge: true}).then(() => {*/}
+                    {/*        const inviteRef = db.collection("Private Events").doc(invite.inviteID)*/}
+                    {/*        inviteRef.get().then((doc) => {*/}
+                    {/*            let data = doc.data()*/}
+                    {/*            let currentAttendees = data.attendees*/}
+                    {/*            if(!currentAttendees.includes(user.uid)) {*/}
+                    {/*                currentAttendees.push(user.uid)*/}
+                    {/*                inviteRef.set({*/}
+                    {/*                    attendees: currentAttendees*/}
+                    {/*                }, {merge: true}).then(() => {*/}
+                    {/*                    const storeID = {*/}
+                    {/*                        type: "private",*/}
+                    {/*                        id: invite.inviteID*/}
+                    {/*                    };*/}
+
+                    {/*                    db.collection("Users").doc(user.uid).update({*/}
+                    {/*                        attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)*/}
+                    {/*                    }).then(() => {*/}
+                    {/*                        alert("Invite Accepted!");*/}
+                    {/*                        navigation.goBack();*/}
+                    {/*                    });*/}
+                    {/*                })*/}
+                    {/*            } else {*/}
+                    {/*                alert("Invite already accepted.");*/}
+                    {/*            }*/}
+
+                    {/*        })*/}
+                    {/*    })*/}
+                    {/*}}>*/}
+                    {/*    <NormalText size = {18} color = {"green"} center = "center">Accept Invite</NormalText>*/}
+                    {/*</TouchableOpacity>*/}
+                    {/*<TouchableOpacity style = {{paddingVertical: 10}} onPress = {() => {*/}
+                    {/*    ref.set({*/}
+                    {/*        accepted: "declined"*/}
+                    {/*    }, {merge: true}).then(() => {*/}
+                    {/*        const storeID = {*/}
+                    {/*            type: "private",*/}
+                    {/*            id: invite.inviteID*/}
+                    {/*        };*/}
+
+                    {/*        db.collection("Users").doc(user.uid).update({*/}
+                    {/*            attendingEventIDs: firebase.firestore.FieldValue.arrayRemove(storeID)*/}
+                    {/*        }).then(() => {*/}
+                    {/*            db.collection("Private Events").doc(invite.inviteID).update({*/}
+                    {/*                attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)*/}
+                    {/*            }).then(() => {*/}
+                    {/*                alert("Invite Declined");*/}
+                    {/*                navigation.goBack();*/}
+                    {/*            })*/}
+                    {/*        });*/}
+                    {/*    })*/}
+                    {/*}}>*/}
+                    {/*    <NormalText size = {18} color = {"red"} center = "center">Decline Invite</NormalText>*/}
+                    {/*</TouchableOpacity>*/}
+                    {/*<TouchableOpacity onPress = {() => {*/}
+                    {/*    ref.delete().then(r => {*/}
+                    {/*        alert("Invite Cleared")*/}
+                    {/*        navigation.goBack();*/}
+                    {/*    })*/}
+                    {/*}}>*/}
+                    {/*    <NormalText size = {18} color = {"blue"} center = "center">Clear Invite</NormalText>*/}
+                    {/*</TouchableOpacity>*/}
                 </View>
 
 
