@@ -2,6 +2,7 @@
 
 import React, {useEffect, useState} from "react";
 import { View, ActivityIndicator, StyleSheet, FlatList } from "react-native";
+import {StyleSheet, FlatList, View} from "react-native";
 import { Layout } from "react-native-rapi-ui";
 
 import EventCard from '../../components/EventCard';
@@ -13,6 +14,7 @@ import Filter from "../../components/Filter";
 
 import getDate from "../../getDate";
 import { db, auth } from "../../provider/Firebase";
+import NormalText from "../../components/NormalText";
 
 export default function({ navigation }) {
     // Get current user
@@ -71,6 +73,15 @@ export default function({ navigation }) {
             setLoading(false);
         });
     }, []);
+
+    //Check to see if we should display the "No Events" placeholder text
+    function shouldDisplayPlaceholder(list) {
+        if(list == null || list.length === 0) {
+            return "You are not signed up for any upcoming events."
+        } else {
+            return ""
+        }
+    }
 
     // Method to filter out events
     const search = text => {

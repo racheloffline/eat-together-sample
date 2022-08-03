@@ -39,6 +39,7 @@ async function sendInvites (attendees, invite, navigation, user, id, image) {
             hostID: user.id,
             hostName: user.firstName + " " + user.lastName,
             hasImage: invite.hasImage,
+            image: invite.image,
             location: invite.location,
             name: invite.name,
             inviteID: id

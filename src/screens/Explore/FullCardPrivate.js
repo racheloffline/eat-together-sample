@@ -104,7 +104,7 @@ const FullCard = ({ route, navigation }) => {
   }
 
   //Delete the event; this is the old action
-  function deleteEvent() {
+  function withdraw() {
     if (!loading) {
       setLoading(true);
       route.params.deleteEvent(route.params.event.id);
@@ -121,14 +121,14 @@ const FullCard = ({ route, navigation }) => {
           db.collection("Private Events").doc(route.params.event.id).update({
             attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)
           }).then(() => {
-            alert("Event Removed");
+            alert("You withdrew from the event");
             navigation.goBack();
           });
         } else {
           db.collection("Public Events").doc(route.params.event.id).update({
             attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)
           }).then(() => {
-            alert("Event Removed");
+            alert("You withdrew from the event");
             navigation.goBack();
           });
         }
@@ -150,24 +150,15 @@ const FullCard = ({ route, navigation }) => {
       db.collection("Users").doc(user.uid).update({
         attendingEventIDs: firebase.firestore.FieldValue.arrayRemove(storeID),
         archivedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)
-      }).then(() => {
-        if(route.params.event.type === "private") {
-          db.collection("Private Events").doc(route.params.event.id).update({
-            attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)
-          }).then(() => {
-            alert("Event Archived");
-            navigation.goBack();
-          });
-        } else {
-          db.collection("Public Events").doc(route.params.event.id).update({
-            attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)
-          }).then(() => {
-            alert("Event Archived");
-            navigation.goBack();
-          });
-        }
       });
     }
+  }
+
+  //Reporting event function
+  function reportEvent() {
+    navigation.navigate("ReportEvent", {
+      eventID: route.params.event.id
+    })
   }
 
   return (
@@ -195,14 +186,14 @@ const FullCard = ({ route, navigation }) => {
                 />
               </MenuTrigger>
               <MenuOptions>
-                <MenuOption onSelect={() => alert("Report feature coming soon!")}>
+                <MenuOption onSelect={() => reportEvent()}>
                   <NormalText size = {18}>Report Event</NormalText>
                 </MenuOption>
                 <MenuOption onSelect={() => archiveEvent()}>
                   <NormalText size = {18}>Archive Event</NormalText>
                 </MenuOption>
-                <MenuOption onSelect={() => deleteEvent()}>
-                  <NormalText size = {18} color = "red">Delete Event</NormalText>
+                <MenuOption onSelect={() => withdraw()}>
+                  <NormalText size = {18} color = "red">Withdraw</NormalText>
                 </MenuOption>
               </MenuOptions>
             </Menu>

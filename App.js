@@ -12,7 +12,7 @@ export default function App() {
     require("./assets/splash.png"),
     require("./assets/login.png"),
     require("./assets/register.png"),
-    require("./assets/forget.png"),
+    require("./assets/forget.png")
   ];
 
   return (
