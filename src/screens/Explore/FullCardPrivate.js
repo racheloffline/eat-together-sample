@@ -1,4 +1,5 @@
 // TODO: Josh | You will need to edit this file
+// hello
 
 import React, { useState, useEffect } from "react";
 import {
@@ -45,7 +46,9 @@ const FullCard = ({ route, navigation }) => {
   const user = auth.currentUser;
 
   useEffect(() => {
-    fetchIcebreakers();
+    if(icebreakers.length === 0) {
+        fetchIcebreakers();
+    }
 
     if (route.params.event.hostID === user.uid) {
       getAttendees();
@@ -72,9 +75,14 @@ const FullCard = ({ route, navigation }) => {
   // TODO: JOSH | Randomize this
   // Fetch icebreaker questions from FIREBASE
   const fetchIcebreakers = () => {
-    db.collection("Icebreakers").doc("icebreakers").get().then(doc => {
-      setIcebreakers(doc.data().icebreakers);
-    });
+
+      const eventID = route.params.event.id;
+
+      db.collection("Private Events").doc(eventID).get().then(doc => {
+        setIcebreakers(doc.data().ice);
+        console.log('icebreakers:');
+        console.log(doc.data().ice);
+      })
   }
 
   // Fetch all attendees of this event

@@ -24,13 +24,14 @@ const storeImage = async (uri, event_id) => {
     return ref.put(blob);
 };
 
-// Fetches image from Firebase Storage
-const fetchImage = async (id) => {
-    let ref = storage.ref().child("eventPictures/" + id);
-    return ref.getDownloadURL();
-}
+async function sendInvites (attendees, invite, navigation, icebreakers) {
+    const user = auth.currentUser;
+    const id = Date.now() + user.uid;
 
-async function sendInvites (attendees, invite, navigation, user, id, image) {
+    //Add photo as necessary
+    if (invite.hasImage) {
+        await storeImage(invite.image, id);
+    }
     //Send invites to each of the selected users
     async function sendInvitations(ref) {
         ref.collection("Invites").add({
@@ -49,6 +50,12 @@ async function sendInvites (attendees, invite, navigation, user, id, image) {
         });
     }
 
+    let hostName;
+
+    await db.collection("Users").doc(user.uid).get().then((snapshot) => {
+        hostName = snapshot.data().name
+    })
+
     db.collection("Private Events").doc(id).set({
         id,
         name: invite.name,
@@ -60,9 +67,9 @@ async function sendInvites (attendees, invite, navigation, user, id, image) {
         location: invite.location,
         date: invite.date,
         additionalInfo: invite.additionalInfo,
-        attendees: [user.id], //ONLY start by putting the current user as an attendee
-        hasImage: invite.hasImage,
-        image
+        ice: icebreakers,
+        attendees: [user.uid], //ONLY start by putting the current user as an attendee
+        hasImage: invite.hasImage
     }).then(async docRef => {
         await attendees.forEach((attendee) => {
             const ref = db.collection("User Invites").doc(attendee);
@@ -107,9 +114,12 @@ const isMatch = (user, text) => {
 }
 
 export default function({ route, navigation }) {
-    // Current user
-    const user = auth.currentUser;
-    const [userInfo, setUserInfo] = useState([]);
+    const [users, setUsers] = useState([]); // initial state, function used for updating initial state
+    const [filteredUsers, setFilteredUsers] = useState([]);
+    const attendees = route.params.attendees;
+    const [curSearch, setCurSearch] = useState("");
+    const [image, setImage] = useState(null);
+    const [icebreakers, setIcebreakers] = useState([]);
 
     const attendees = route.params.attendees;
 
@@ -120,7 +130,6 @@ export default function({ route, navigation }) {
     const [disabled, setDisabled] = useState(true);
     const [loading, setLoading] = useState(false);
 
-    // Loading data
     useEffect(() => { // updates stuff right after React makes changes to the DOM
         //LINKING ELAINE'S ALGO
         /*
@@ -143,6 +152,22 @@ export default function({ route, navigation }) {
         });
          */
         // COMMENT THIS AREA OUT WHEN READY (START)
+//      picks icebreaker set from set of icebreakers randomly
+        const breakOptions = [];
+        db.collection("Icebreakers").onSnapshot((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                breakOptions.push(doc.id);
+                console.log(doc.id);
+                console.log("IS THIS WORKING?????")
+            })
+            console.log(breakOptions);
+            var num = Math.floor(Math.random()*breakOptions.length);
+            db.collection("Icebreakers").doc(breakOptions[num]).get().then(doc => {
+                    console.log("please be working!!!!");
+                    setIcebreakers(doc.data().icebreakers);
+                })
+        });
+
         const ref = db.collection("Users");
         const user = firebase.auth().currentUser;
         ref.onSnapshot((query) => {
@@ -208,24 +233,8 @@ export default function({ route, navigation }) {
                 }/>
 
             <View style={styles.buttons}>
-                <Button text={loading ? "Sending ..." : "Send Invites"} width={Dimensions.get('screen').width}
-                    disabled={disabled || loading} color="#5DB075" size="lg" onPress={() => {
-                        setLoading(true);
-                        const id = Date.now() + user.uid; // Generate a unique ID for the event
-                        
-                        if (route.params.hasImage) {
-                            storeImage(route.params.image, id).then(() => {
-                                fetchImage(id).then(uri => {
-                                    sendInvites(attendees, route.params, navigation, userInfo, id, uri).then(() => {
-                                        setLoading(false);
-                                    })
-                                });
-                            });
-                        } else {
-                            sendInvites(attendees, route.params, navigation, user, id, "").then(() => {
-                                setLoading(false);
-                            });
-                        }
+                <Button text="Send Invites" width={Dimensions.get('screen').width} color="#5DB075" size="lg" onPress={async () => {
+                    await sendInvites(attendees, route.params, navigation, icebreakers);
                 }}/>
             </View>
         </Layout>
@@ -259,3 +268,4 @@ const styles = StyleSheet.create({
         flexDirection: "row"
     }
 });
+
