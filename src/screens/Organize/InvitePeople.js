@@ -67,7 +67,7 @@ async function sendInvites (attendees, invite, navigation, user, id, image) {
         await attendees.forEach((attendee) => {
             const ref = db.collection("User Invites").doc(attendee);
             ref.get().then(async (docRef) => {
-                if (attendee !== user.uid) {
+                if (attendee !== user.id) {
                     await sendInvitations(ref)
                 }
             });
@@ -78,7 +78,7 @@ async function sendInvites (attendees, invite, navigation, user, id, image) {
             id
         };
 
-        await db.collection("Users").doc(user.uid).update({
+        await db.collection("Users").doc(user.id).update({
             hostedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
             attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
             attendedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)
@@ -218,11 +218,11 @@ export default function({ route, navigation }) {
                                 fetchImage(id).then(uri => {
                                     sendInvites(attendees, route.params, navigation, userInfo, id, uri).then(() => {
                                         setLoading(false);
-                                    })
+                                    });
                                 });
                             });
                         } else {
-                            sendInvites(attendees, route.params, navigation, user, id, "").then(() => {
+                            sendInvites(attendees, route.params, navigation, userInfo, id, "").then(() => {
                                 setLoading(false);
                             });
                         }

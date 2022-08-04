@@ -22,7 +22,7 @@ const Name = props => {
   // Input fields
   const [firstName, setFirstName] = useState(props.firstName);
   const [lastName, setLastName] = useState(props.lastName);
-  const [quote, setQuote] = useState(props.quote);
+  const [bio, setBio] = useState(props.bio);
   const [image, setImage] = useState(props.image);
   const [tags, setTags] = useState(props.tags);
 
@@ -34,12 +34,12 @@ const Name = props => {
   }
 
   const goNext = () => {
-    if (checkProfanity(firstName) || checkProfanity(lastName) || checkProfanity(quote)) {
+    if (checkProfanity(firstName) || checkProfanity(lastName) || checkProfanity(bio)) {
       alert("Inappropriate words used >:(");
     } else {
       props.setFirstName(firstName);
       props.setLastName(lastName);
-      props.setQuote(quote);
+      props.setBio(bio);
       props.setImage(image);
       props.setTags(tags);
       props.navigation.navigate("Email");
@@ -76,16 +76,16 @@ const Name = props => {
 
         <View style={styles.content}>
           <View style={styles.name}>
-            <TextInput placeholder="First name" value={firstName}
+            <TextInput placeholder="First name" value={firstName} maxLength={20}
               onChangeText={val => setFirstName(val)} containerStyle={{width: "47%"}}
               leftContent={<FontAwesome name="user" size={18}/>} autoComplete="name"/>
-            <TextInput placeholder="Last name" value={lastName}
+            <TextInput placeholder="Last name" value={lastName} maxLength={30}
               onChangeText={val => setLastName(val)} containerStyle={{width: "47%"}}
               leftContent={<FontAwesome name="user" size={18}/>} autoComplete="name"/>
           </View>
 
-          <TextInput placeholder="Favorite quote (no quotation marks)" value={quote}
-            onChangeText={val => setQuote(val)} containerStyle={{marginBottom: 30}}
+          <TextInput placeholder="Bio (max. 100 characters)" value={bio} maxLength={100}
+            onChangeText={val => setBio(val)} containerStyle={{marginBottom: 30}}
             leftContent={<FontAwesome name="quote-left" size={18}/>}/>
     
           <MediumText>Describe yourself with tags!</MediumText>
@@ -111,7 +111,7 @@ const Name = props => {
           <View style={styles.buttons}>
             <Button onPress={() => props.navigation.goBack()}
               marginHorizontal={10}>Back</Button>
-            <Button disabled={firstName === "" || lastName === "" || quote === "" || tags.length < 3 || tags.length > 6}
+            <Button disabled={firstName === "" || lastName === "" || bio === "" || tags.length < 3 || tags.length > 6}
               onPress={goNext}
               marginHorizontal={10}>Next</Button>
           </View>    

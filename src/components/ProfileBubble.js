@@ -10,7 +10,7 @@ const ProfileBubble = props => {
     return (
         <View style={[styles.card, {backgroundColor: generateColor()}]}>
             <TouchableOpacity onPress={props.click}>
-                <MediumText color="white">"{props.person.quote}"</MediumText>
+                <MediumText color="white">{props.person.bio}</MediumText>
                 <View style={styles.row}>
                     <NormalText color="white">
                         - {props.person.firstName + " " + props.person.lastName.substring(0, 1) + "."}

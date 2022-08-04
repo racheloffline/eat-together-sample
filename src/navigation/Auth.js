@@ -28,7 +28,7 @@ const Auth = () => {
     // Name.js
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
-    const [quote, setQuote] = useState("");
+    const [bio, setBio] = useState("");
     const [image, setImage] = useState("");
     const [tags, setTags] = useState([]);
 
@@ -75,46 +75,20 @@ const Auth = () => {
     
                 if (response.user.uid) {
                     const { uid } = response.user;
-    
-                    const userData = {
-                        id: uid,
-                        firstName,
-                        lastName,
-                        username,
-                        email,
-                        hasImage: image !== "",
-                        tags,
-                        quote,
-                        hostedEventIDs: [],
-                        attendingEventIDs: [],
-                        attendedEventIDs: [],
-                        friendIDs: [],
-                        groupIDs: [],
-                        availabilites: {
-                            monday,
-                            tuesday,
-                            wednesday,
-                            thursday,
-                            friday,
-                            saturday,
-                            sunday
-                        },
-                        settings: {
-                            notifications: true
-                        },
-                        verified: false
-                    }
-                    
-                    db.collection("Users").doc(`${uid}`).set(userData);
-                    db.collection("Usernames").doc(userData.username).set({
-                        id: uid
-                    });
 
                     if (image !== "") {
-                        storeImage(image, uid);
+                        storeImage(image, uid).then(() => {
+                            fetchImage(uid).then(uri => {
+                                makeUser(uid, image).then(() => {
+                                    response.user.sendEmailVerification();
+                                });
+                            });
+                        });
+                    } else {
+                        makeUser(uid, "").then(() => {
+                            response.user.sendEmailVerification();
+                        });
                     }
-
-                    response.user.sendEmailVerification();
                 }
             } catch (error) {
                 alert(error.message);
@@ -123,12 +97,57 @@ const Auth = () => {
         }
     }
 
+    const makeUser = async (uid, image) => {
+        const userData = {
+            id: uid,
+            firstName,
+            lastName,
+            username,
+            email,
+            hasImage: image !== "",
+            image,
+            tags,
+            bio,
+            hostedEventIDs: [],
+            attendingEventIDs: [],
+            attendedEventIDs: [],
+            archivedEventIDs: [],
+            friendIDs: [],
+            groupIDs: [],
+            availabilites: {
+                monday,
+                tuesday,
+                wednesday,
+                thursday,
+                friday,
+                saturday,
+                sunday
+            },
+            settings: {
+                notifications: true
+            },
+            verified: false
+        }
+        
+        await db.collection("Users").doc(`${uid}`).set(userData);
+        await db.collection("Usernames").doc(userData.username).set({
+            id: uid
+        });
+    }
+
+    // Stores image in Firebase Storage
     const storeImage = async (uri, id) => {
         const response = await fetch(uri);
         const blob = await response.blob();
 
         var ref = storage.ref().child("profilePictures/" + id);
         return ref.put(blob);
+    }
+
+    // Fetches image from Firebase Storage
+    const fetchImage = async (id) => {
+        let ref = storage.ref().child("eventPictures/" + id);
+        return ref.getDownloadURL();
     }
 
     return (
@@ -142,7 +161,7 @@ const Auth = () => {
 
         <Stack.Screen name="Name" options={{headerShown: false}}>
             {props => <Name {...props} firstName={firstName} lastName={lastName} setFirstName={setFirstName}
-                setLastName={setLastName} quote={quote} setQuote={setQuote} image={image} setImage={setImage}
+                setLastName={setLastName} bio={bio} setBio={setBio} image={image} setImage={setImage}
                 tags={tags} setTags={setTags}/>}
         </Stack.Screen>
         <Stack.Screen name="Email" options={{headerShown: false}}>

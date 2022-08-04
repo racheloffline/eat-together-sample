@@ -158,7 +158,7 @@ const FullProfile = ({ route, navigation }) => {
         </View>
 
         <TagsList tags={route.params.person.tags}/>
-        <MediumText>"{route.params.person.quote}"</MediumText>
+        <MediumText>{route.params.person.bio}</MediumText>
         
       </View>
       <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
