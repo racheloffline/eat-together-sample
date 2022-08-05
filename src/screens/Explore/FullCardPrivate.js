@@ -242,75 +242,68 @@ const FullCard = ({ route, navigation }) => {
           style={styles.imageBackground} resizeMode="cover">
         </ImageBackground>
 
-        <LargeText marginBottom={10} color="Black">{route.params.event.name} (that is event title)</LargeText>
+        <MediumText size={20} textAlign="left" marginBottom={10} color="Black">{route.params.event.name} (that is event title)</MediumText>
 
-        <NormalText color="black"> Hosted by you </NormalText>
+        <NormalText color="black"> Hosted by You </NormalText>
 
         {/* 3 event details (location, date, time} are below */}
 
-        <HorizontalRow horizontal={false}>
-            <Ionicons
-                name="location-sharp"
-                size={20}
-            />
-            <NormalText color="black">{location}</NormalText>
-        </HorizontalRow>
+        <View style = {styles.logistics}>
+            <View style={styles.row}>
+                <Ionicons
+                    name="location-sharp"
+                    size={20}
+                />
+                <NormalText paddingHorizontal={10} color="black">{location}</NormalText>
+            </View>
 
-        <HorizontalRow horizontal={false}>
-            <Ionicons
-                name="calendar-outline"
-                size={20}
-            />
-            <NormalText color="black">{date}</NormalText>
-        </HorizontalRow>
+            <View style={styles.row}>
+                <Ionicons
+                    name="calendar-outline"
+                    size={20}
+                />
+                <NormalText paddingHorizontal={10} color="black">{date}</NormalText>
+            </View>
 
-        <HorizontalRow horizontal={false}>
-            <Ionicons
-                name="time-outline"
-                size={20}
-            />
-            <NormalText color="black">{time%12} {(time < 12 ? "am" : "pm")}</NormalText>
-        </HorizontalRow>
+            <View style={styles.row}>
+                <Ionicons
+                    name="time-outline"
+                    size={20}
+                />
+                <NormalText paddingHorizontal={10} color="black">{time%12} {(time < 12 ? "am" : "pm")}</NormalText>
+            </View>
+          </View>
 
 
         {/* Icebreakers dropdown */}
 
-        <HorizontalRow horizontal={false}>
+        <View style={styles.row}>
             <TouchableOpacity onPress={() =>
               setOpenIcebreakers(!openIcebreakers)}>
               <Ionicons name={!openIcebreakers ? "caret-forward-sharp" : "caret-down-sharp"} size={20} color="black"/>
             </TouchableOpacity>
-
-            <MediumText color="black">Icebreakers</MediumText>
-
-        {/* icebreakers currently not showing on tap*/}
-          {openIcebreakers && <View style={{marginTop: 20}}>
-               {icebreakers.map((ice, index) =>
-                               <Icebreaker number={index+1} icebreaker={ice}
-                                 key={index}/>)}
-           </View>}
-
-           {/* <View style={styles.icebreakers}>
-              {openIcebreakers && icebreakers.map((ice, index) =>
-                <Icebreaker number={index+1} icebreaker={ice} key={index}/>)}
-            </View> */}
-        </HorizontalRow>
+            <NormalText paddingHorizontal={7} size={17} color ="black">Icebreakers</NormalText>
+        </View>
+        <View style={styles.icebreakers}>
+          {openIcebreakers && icebreakers.map((ice, index) =>
+            <Icebreaker number={index+1} icebreaker={ice} key={index}/>)}
+        </View>
 
         {/* Attendance dropdown */}
-        <HorizontalRow horizontal={false}>
+        <View style={styles.row}>
             <TouchableOpacity onPress={() =>
               setOpenAttendance(!openAttendance)}>
               <Ionicons name={!openAttendance ? "caret-forward-sharp" : "caret-down-sharp"} size={20} color="black"/>
             </TouchableOpacity>
 
-           <MediumText color="black">Attendance</MediumText>
-           {openAttendance && <View style={{marginTop: 20}}>
-               {people.length === 0 ? <NormalText color="black">{"Just yourself ;)"}</NormalText>
-                             : people.map((person, index) =>
-                               <Attendance person={person} key={person.id}
-                                 attending={attendees[index]} onPress={() => markAttendee(index)}/>)}
-           </View>}
-        </HorizontalRow>
+           <NormalText paddingHorizontal={7} size={17} color="black">Attendance</NormalText>
+        </View>
+       {openAttendance && <View style={{marginTop: 10}}>
+           {people.length === 0 ? <NormalText paddingHorizontal={25} size={17} color="black">{"Just yourself ;)"}</NormalText>
+                         : people.map((person, index) =>
+                           <Attendance size={17} person={person} key={person.id}
+                             attending={attendees[index]} onPress={() => markAttendee(index)}/>)}
+       </View>}
       </ScrollView>
     </Layout>
   );
@@ -318,21 +311,35 @@ const FullCard = ({ route, navigation }) => {
 
 const styles = StyleSheet.create({
     page: {
-      flex: 1,
-      alignItems: "center",
+//    appears to be contributing to large margin underneath image
+//      flex: 1,
+//      alignItems: "center",
       justifyContent: "left",
-      paddingHorizontal: 10
+      paddingHorizontal: 30
     },
 
+    row: {
+        flexDirection: "row",
+        marginVertical: 4
+    },
 
     imageBackground: {
       width: Dimensions.get('screen').width,
-      height: "50%",
-      alignItems: "center",
+      height: 130,
+      justifyContent: "center",
+      marginBottom: 20
     },
 
     icebreakers: {
-      textAlign: "left"
+      textAlign: "left",
+      marginBottom: 20,
+      paddingHorizontal: 25
+    },
+
+    logistics: {
+      alignItems: "left",
+      marginBottom: 15,
+      marginVertical: 10
     }
 
 });
