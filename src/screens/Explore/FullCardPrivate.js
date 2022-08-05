@@ -23,6 +23,7 @@ import Icebreaker from "../../components/Icebreaker";
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
+import HorizontalRow from "../../components/HorizontalRow"
 
 import { db, storage, auth } from "../../provider/Firebase";
 import * as firebase from "firebase";
@@ -42,6 +43,10 @@ const FullCard = ({ route, navigation }) => {
   // List of icebreaker questions
   const [icebreakers, setIcebreakers] = useState([]);
 
+  const [location, setLocation] = useState("");
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState(0);
+
   // Get the current user
   const user = auth.currentUser;
 
@@ -53,7 +58,28 @@ const FullCard = ({ route, navigation }) => {
     if (route.params.event.hostID === user.uid) {
       getAttendees();
     }
+
+    if(location === "") {
+        assignEventDetails();
+    }
   }, []);
+
+  const assignEventDetails =() => {
+      console.log("assigning event details");
+      const eventID = route.params.event.id;
+
+      db.collection("Private Events").doc(eventID).get().then(doc => {
+        setLocation(doc.data().location);
+
+// converts Date object to String object
+        const dateInfo = doc.data().date.toDate();
+        const eventDay = dateInfo.toDateString().substring(4);
+        const eventStartHour = parseInt(dateInfo.toTimeString().substring(0,2));
+
+        setDate(eventDay);
+        setTime(eventStartHour);
+      });
+  }
 
   // Mark an attendee absent or present
   const markAttendee = index => {
@@ -210,41 +236,81 @@ const FullCard = ({ route, navigation }) => {
       />
 
       <ScrollView contentContainerStyle={styles.page}>
+      {/* not sure how to remove the giant vertical margin underneath the background image right now */}
         <ImageBackground source={route.params.event.hasImage ? {uri: route.params.event.image}
           : require("../../../assets/foodBackground.png")}
           style={styles.imageBackground} resizeMode="cover">
+        </ImageBackground>
 
-        {route.params.event.hostID === user.uid && 
-          <DarkContainer marginVertical={20} width={Dimensions.get('screen').width - 40}>
-            <LargeText color="white">Attendance</LargeText>
-            {openAttendance && <View style={{marginTop: 20}}>
-              {people.length === 0 ? <NormalText color="white">{"Just yourself ;)"}</NormalText>
-              : people.map((person, index) => 
-                <Attendance person={person} key={person.id}
-                  attending={attendees[index]} onPress={() => markAttendee(index)}/>)}
-            </View>}
+        <LargeText marginBottom={10} color="Black">{route.params.event.name} (that is event title)</LargeText>
 
-            <TouchableOpacity onPress={() => 
-              setOpenAttendance(!openAttendance)}>
-              <Feather name={!openAttendance ? "chevrons-down" : "chevrons-up"} size={50} color="white"/>
+        <NormalText color="black"> Hosted by you </NormalText>
+
+        {/* 3 event details (location, date, time} are below */}
+
+        <HorizontalRow horizontal={false}>
+            <Ionicons
+                name="location-sharp"
+                size={20}
+            />
+            <NormalText color="black">{location}</NormalText>
+        </HorizontalRow>
+
+        <HorizontalRow horizontal={false}>
+            <Ionicons
+                name="calendar-outline"
+                size={20}
+            />
+            <NormalText color="black">{date}</NormalText>
+        </HorizontalRow>
+
+        <HorizontalRow horizontal={false}>
+            <Ionicons
+                name="time-outline"
+                size={20}
+            />
+            <NormalText color="black">{time%12} {(time < 12 ? "am" : "pm")}</NormalText>
+        </HorizontalRow>
+
+
+        {/* Icebreakers dropdown */}
+
+        <HorizontalRow horizontal={false}>
+            <TouchableOpacity onPress={() =>
+              setOpenIcebreakers(!openIcebreakers)}>
+              <Ionicons name={!openIcebreakers ? "caret-forward-sharp" : "caret-down-sharp"} size={20} color="black"/>
             </TouchableOpacity>
-          </DarkContainer>}
 
-          <DarkContainer marginVertical={20} width={Dimensions.get('screen').width - 40}>
-            {/*TODO: JOSH | This is where your randomized icebreakers are displayed*/}
-            <LargeText color="white">Icebreakers</LargeText>
+            <MediumText color="black">Icebreakers</MediumText>
 
-            <View style={styles.icebreakers}>
+        {/* icebreakers currently not showing on tap*/}
+          {openIcebreakers && <View style={{marginTop: 20}}>
+               {icebreakers.map((ice, index) =>
+                               <Icebreaker number={index+1} icebreaker={ice}
+                                 key={index}/>)}
+           </View>}
+
+           {/* <View style={styles.icebreakers}>
               {openIcebreakers && icebreakers.map((ice, index) =>
                 <Icebreaker number={index+1} icebreaker={ice} key={index}/>)}
-            </View>
-            
-            <TouchableOpacity onPress={() => 
-              setOpenIcebreakers(!openIcebreakers)}>
-              <Feather name={!openIcebreakers ? "chevrons-down" : "chevrons-up"} size={50} color="white"/>
+            </View> */}
+        </HorizontalRow>
+
+        {/* Attendance dropdown */}
+        <HorizontalRow horizontal={false}>
+            <TouchableOpacity onPress={() =>
+              setOpenAttendance(!openAttendance)}>
+              <Ionicons name={!openAttendance ? "caret-forward-sharp" : "caret-down-sharp"} size={20} color="black"/>
             </TouchableOpacity>
-          </DarkContainer>
-        </ImageBackground>
+
+           <MediumText color="black">Attendance</MediumText>
+           {openAttendance && <View style={{marginTop: 20}}>
+               {people.length === 0 ? <NormalText color="black">{"Just yourself ;)"}</NormalText>
+                             : people.map((person, index) =>
+                               <Attendance person={person} key={person.id}
+                                 attending={attendees[index]} onPress={() => markAttendee(index)}/>)}
+           </View>}
+        </HorizontalRow>
       </ScrollView>
     </Layout>
   );
@@ -254,19 +320,21 @@ const styles = StyleSheet.create({
     page: {
       flex: 1,
       alignItems: "center",
-      justifyContent: "center",
+      justifyContent: "left",
       paddingHorizontal: 10
     },
 
+
     imageBackground: {
       width: Dimensions.get('screen').width,
-      height: "100%",
+      height: "50%",
       alignItems: "center",
     },
 
     icebreakers: {
       textAlign: "left"
     }
+
 });
 
 export default FullCard;
