@@ -1,7 +1,7 @@
 //Chat with users you have already connected with
 
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, FlatList, TouchableOpacity } from "react-native";
+import { View, StyleSheet, FlatList, TouchableOpacity, Dimensions } from "react-native";
 import { Button, Layout, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
@@ -10,6 +10,7 @@ import { db } from "../../provider/Firebase";
 import firebase from "firebase";
 import ChatPreview from "../../components/ChatPreview";
 import SearchableDropdown from "react-native-searchable-dropdown";
+import moment from "moment";
 
 export default function ({ navigation }) {
   const [selectedUsers, setSelectedUsers] = useState([]);
@@ -52,7 +53,14 @@ export default function ({ navigation }) {
             groupIDs: firebase.firestore.FieldValue.arrayUnion(chatID),
           });
       });
-      alert("New chat created.");
+      navigation.navigate("ChatRoom", {
+        group: {
+          groupID: chatID,
+          uids: allUIDs,
+          name: allNames.join(", "),
+          messages: [],
+        },
+      });
     });
   };
 
@@ -80,7 +88,12 @@ export default function ({ navigation }) {
               data.messages.length != 0
                 ? data.messages[data.messages.length - 1].sentAt
                 : "";
-            let name = data.name.replace(nameCurrent + ", ", "").replace(", " + nameCurrent, "");
+            // Get rid of your own name and all the ways it can be formatted in group title
+            let name = data.name
+              .replace(nameCurrent + ", ", "")
+            if (name.endsWith(", " + nameCurrent)) {
+              name = name.slice(0, -1*(nameCurrent.length + 2));
+            }
             temp.push({
               groupID: groupID,
               name: name,
@@ -92,6 +105,12 @@ export default function ({ navigation }) {
             });
           })
           .then(() => {
+            // sort display by time
+            temp.sort((a, b) => {
+
+              console.log(`A: ${a.time}, B:${b.time}`)
+              return b.time- a.time;
+            })
             setGroups(temp);
           });
       });
@@ -143,8 +162,8 @@ export default function ({ navigation }) {
             onItemSelect={(item) => {
               setSelectedUsers([...selectedUsers, item]);
             }}
-            containerStyle={{ padding: 0 , width: 200}}
-            onRemoveItem={(item, index) => {
+            containerStyle={{ padding: 0, width: 300}}
+            onRemoveItem={(item) => {
               const items = selectedUsers.filter(
                 (sitem) => sitem.id !== item.id
               );
@@ -156,28 +175,23 @@ export default function ({ navigation }) {
               backgroundColor: "#ddd",
               borderColor: "#bbb",
               borderWidth: 1,
-              borderRadius: 5,
+              borderRadius: 5
             }}
-            
             itemTextStyle={{ color: "#222" }}
             itemsContainerStyle={{ maxHeight: 140 }}
             items={users}
             defaultIndex={2}
             chip={false}
-            resetValue={false}
+            resetValue={true}
             textInputProps={{
               placeholder: "Search for taste buds",
-              underlineColorAndroid: "transparent",
               style: {
                 padding: 12,
                 borderWidth: 1,
                 borderColor: "#ccc",
                 borderRadius: 5,
-                maxWidth: 250,
+                maxWidth: 220,
               },
-            }}
-            listProps={{
-              nestedScrollEnabled: true,
             }}
           />
           <Button
@@ -225,25 +239,17 @@ export default function ({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    padding: 40,
-    display: "flex",
-    marginBottom: -20,
-  },
-  headingText: {
-    fontSize: 50,
-  },
   switchView: {
-    marginVertical: 10,
+    marginTop: 10,
   },
   content: {
-    marginVertical: -20,
+    paddingHorizontal: 10
   },
   searchArea: {
     flexDirection: "row",
-    justifyContent: "space-evenly",
+    justifyContent: "space-between",
   },
   list: {
-    paddingBottom: 225
-  }
+    paddingBottom: 225,
+  },
 });

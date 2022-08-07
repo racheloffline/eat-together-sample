@@ -7,10 +7,10 @@ import {
   TouchableOpacity,
   FlatList,
 } from "react-native";
-import { Layout, Text, TextInput, TopNav } from "react-native-rapi-ui";
+import { Layout, TextInput, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 import firebase from "firebase";
-import { db, storage } from "../../provider/Firebase";
+import { db } from "../../provider/Firebase";
 import moment from "moment";
 import TextMessage from "../../components/TextMessage";
 
@@ -42,7 +42,7 @@ export default function ({ route, navigation }) {
       .update({
         messages: firebase.firestore.FieldValue.arrayUnion({
           message: message,
-          sentAt: moment().format("MMMM Do YYYY, h:mm:ss a"),
+          sentAt: moment().unix(),
           sentBy: user.uid,
         }),
       })
@@ -70,7 +70,7 @@ export default function ({ route, navigation }) {
         )}
       />
       <TextInput
-        placeholder="Send Message!!!"
+        placeholder="Send Message"
         value={message}
         onChangeText={(val) => setMessage(val)}
         rightContent={

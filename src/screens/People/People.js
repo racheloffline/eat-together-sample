@@ -38,7 +38,9 @@ export default function({ navigation }) {
 				setUserInfo(doc.data());
 				doc.data().friendIDs.forEach(id => {
 					db.collection("Users").doc(id).get().then(doc => {
-						setMutuals(mutuals => mutuals.concat(doc.data().friendIDs));
+						if (doc) {
+							setMutuals(mutuals => mutuals.concat(doc.data().friendIDs));
+						}
 					});
 				});
 			});
