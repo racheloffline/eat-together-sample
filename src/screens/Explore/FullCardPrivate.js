@@ -16,6 +16,7 @@ import { Ionicons, Feather } from "@expo/vector-icons";
 import DarkContainer from "../../components/DarkContainer";
 import Attendance from "../../components/Attendance";
 import Icebreaker from "../../components/Icebreaker";
+import TagsList from "../../components/TagsList";
 
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
@@ -72,22 +73,42 @@ const FullCard = ({ route, navigation }) => {
     console.log("assigning event details");
     const eventID = route.params.event.id;
 
-    db.collection("Private Events")
-      .doc(eventID)
-      .get()
-      .then((doc) => {
-        setLocation(doc.data().location);
+    if (route.params.event.type === "private") {
+        db.collection("Private Events")
+          .doc(eventID)
+          .get()
+          .then((doc) => {
+            setLocation(doc.data().location);
 
-        // converts Date object to String object
-        const dateInfo = doc.data().date.toDate();
-        const eventDay = dateInfo.toDateString().substring(4);
-        const eventStartHour = parseInt(
-          dateInfo.toTimeString().substring(0, 2)
-        );
+            // converts Date object to String object
+            const dateInfo = doc.data().date.toDate();
+            const eventDay = dateInfo.toDateString().substring(4);
+            const eventStartHour = parseInt(
+              dateInfo.toTimeString().substring(0, 2)
+            );
 
-        setDate(eventDay);
-        setTime(eventStartHour);
-      });
+            setDate(eventDay);
+            setTime(eventStartHour);
+          });
+    }
+    else {
+        db.collection("Public Events")
+          .doc(eventID)
+          .get()
+          .then((doc) => {
+            setLocation(doc.data().location);
+
+            // converts Date object to String object
+            const dateInfo = doc.data().date.toDate();
+            const eventDay = dateInfo.toDateString().substring(4);
+            const eventStartHour = parseInt(
+              dateInfo.toTimeString().substring(0, 2)
+            );
+
+            setDate(eventDay);
+            setTime(eventStartHour);
+          });
+    }
   };
 
   // Mark an attendee absent or present
@@ -270,7 +291,6 @@ const FullCard = ({ route, navigation }) => {
       />
 
       <ScrollView contentContainerStyle={styles.page}>
-        {/* not sure how to remove the giant vertical margin underneath the background image right now */}
         <ImageBackground
           source={
             route.params.event.hasImage
@@ -287,10 +307,13 @@ const FullCard = ({ route, navigation }) => {
             marginBottom={10}
             color="Black"
           >
-            {route.params.event.name} (that is event title)
+            {route.params.event.name}
           </MediumText>
 
-          <NormalText color="black"> Hosted by You </NormalText>
+          <NormalText color="black"> Hosted by {route.params.event.hostID === user.uid ?
+          "You" : (route.params.event.hostFirstName ? route.params.event.hostFirstName + " " + route.params.event.hostLastName.substring(0, 1) + "." : route.params.event.hostName)} </NormalText>
+
+          {route.params.event.tags && <TagsList marginVertical={20} tags={route.params.event.tags}/>}
 
           {/* 3 event details (location, date, time} are below */}
 
@@ -417,7 +440,7 @@ const styles = StyleSheet.create({
 
   logistics: {
     marginBottom: 15,
-    marginVertical: 10,
+    marginVertical: 5
   },
 });
 

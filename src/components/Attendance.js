@@ -10,7 +10,7 @@ const Attendance = props => {
         }]} onPress={props.onPress}>
             <Image source={props.person.image ? {uri: props.person.image}
                 : require("../../assets/logo.png")} style={styles.image}/>
-            <NormalText size={props.size ? props.size : 14} color="white">{props.person.name}</NormalText>
+            <NormalText size={props.size ? props.size : 14} color="black">{props.person.name}</NormalText>
             <Foundation name="check" size={24} color={props.attending ? "#5DB075" : "grey"}
                 style={styles.checkMark}/>
         </TouchableOpacity>
