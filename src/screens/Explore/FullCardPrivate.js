@@ -395,6 +395,7 @@ const styles = StyleSheet.create({
 
   infoContainer: {
     marginHorizontal: 30,
+    marginBottom: 50
   },
 
   row: {
