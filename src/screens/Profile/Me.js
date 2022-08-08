@@ -24,7 +24,7 @@ export default function ({ navigation }) {
             await db.collection("Users").doc(user.uid).onSnapshot(async doc => {
                 setUserInfo(doc.data());
                 setMealsAttended(doc.data().attendedEventIDs.length);
-                setMealsSignedUp(doc.data().attendingEventIDs.length + doc.data().attendedEventIDs.length);
+                setMealsSignedUp(doc.data().attendingEventIDs.length + doc.data().archivedEventIDs.length);
 
                 let newEvents = [];
                 doc.data().archivedEventIDs.forEach(e => {
@@ -119,6 +119,7 @@ const styles = StyleSheet.create({
     borderColor: "white",
     borderWidth: 3,
     borderRadius: 100,
+    backgroundColor: "white"
   },
 
   name: {
