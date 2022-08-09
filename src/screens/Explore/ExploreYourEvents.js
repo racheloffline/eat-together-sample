@@ -68,8 +68,6 @@ export default function ({ navigation }) {
                   });
 
                   setEvents(newEvents);
-                  console.log("the new events");
-                  console.log(newEvents);
                   setFilteredEvents(newEvents);
                   setLoading(false);
                 }
