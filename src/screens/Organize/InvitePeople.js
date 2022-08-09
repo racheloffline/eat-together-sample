@@ -68,7 +68,7 @@ async function sendInvites (attendees, invite, navigation, user, id, image, iceb
         await attendees.forEach((attendee) => {
             const ref = db.collection("User Invites").doc(attendee);
             ref.get().then(async (docRef) => {
-                if (attendee !== user.uid) {
+                if (attendee !== user.id) {
                     await sendInvitations(ref)
                 }
             });
@@ -225,25 +225,25 @@ export default function({ route, navigation }) {
                 }/>
 
             <View style={styles.buttons}>
-            <Button text={loading ? "Sending ..." : "Send Invites"} width={Dimensions.get('screen').width}
-                disabled={disabled || loading} color="#5DB075" size="lg" onPress={() => {
-                    setLoading(true);
-                    const id = Date.now() + user.uid; // Generate a unique ID for the event
+                <Button text={loading ? "Sending ..." : "Send Invites"} width={Dimensions.get('screen').width}
+                    disabled={disabled || loading} color="#5DB075" size="lg" onPress={() => {
+                        setLoading(true);
+                        const id = Date.now() + user.uid; // Generate a unique ID for the event
 
-                    if (route.params.hasImage) {
-                        storeImage(route.params.image, id).then(() => {
-                            fetchImage(id).then(uri => {
-                                sendInvites(attendees, route.params, navigation, userInfo, id, uri, icebreakers).then(() => {
-                                    setLoading(false);
+                        if (route.params.hasImage) {
+                            storeImage(route.params.image, id).then(() => {
+                                fetchImage(id).then(uri => {
+                                    sendInvites(attendees, route.params, navigation, userInfo, id, uri, icebreakers).then(() => {
+                                        setLoading(false);
+                                    });
                                 });
                             });
-                        });
-                    } else {
-                        sendInvites(attendees, route.params, navigation, userInfo, id, "", icebreakers).then(() => {
-                            setLoading(false);
-                        });
-                    }
-                }}/>
+                        } else {
+                            sendInvites(attendees, route.params, navigation, userInfo, id, "", icebreakers).then(() => {
+                                setLoading(false);
+                            });
+                        }
+                    }}/>
             </View>
         </Layout>
 

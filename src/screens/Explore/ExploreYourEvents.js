@@ -1,7 +1,7 @@
 // Display your events
 
 import React, { useEffect, useState } from "react";
-import { StyleSheet, FlatList, View } from "react-native";
+import { View, ActivityIndicator, StyleSheet, FlatList } from "react-native";
 import { Layout } from "react-native-rapi-ui";
 
 import EventCard from "../../components/EventCard";

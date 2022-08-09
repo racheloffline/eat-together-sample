@@ -24,7 +24,7 @@ export default function ({ navigation }) {
             await db.collection("Users").doc(user.uid).onSnapshot(async doc => {
                 setUserInfo(doc.data());
                 setMealsAttended(doc.data().attendedEventIDs.length);
-                setMealsSignedUp(doc.data().attendingEventIDs.length + doc.data().attendedEventIDs.length);
+                setMealsSignedUp(doc.data().attendingEventIDs.length + doc.data().archivedEventIDs.length);
 
                 let newEvents = [];
                 doc.data().archivedEventIDs.forEach(e => {
@@ -50,12 +50,12 @@ export default function ({ navigation }) {
         fetchData();
     }, []);
 
-    const updateInfo = (newFirstName, newLastName, newQuote, newTags, newImage) => {
+    const updateInfo = (newFirstName, newLastName, newBio, newTags, newImage) => {
         setUserInfo(prev => ({
             ...prev,
             firstName: newFirstName,
             lastName: newLastName,
-            quote: newQuote,
+            bio: newBio,
             tags: newTags
         }));
 
@@ -78,12 +78,12 @@ export default function ({ navigation }) {
 
                 <Image style={styles.image} source={userInfo.hasImage ? {uri: userInfo.image} : require("../../../assets/logo.png")}/>
                 <View style={styles.name}>
-                    <LargeText>{userInfo.name}</LargeText>
+                    <LargeText>{userInfo.firstName + " " + userInfo.lastName}</LargeText>
                     <NormalText>{mealsAttended + "/" + mealsSignedUp + " meals attended"}</NormalText>
                     <MediumText>@{userInfo.username}</MediumText>
                 </View>
                 <TagsList tags={userInfo.tags ? userInfo.tags : []}/>
-                <MediumText center>"{userInfo.quote}"</MediumText>
+                <MediumText center>{userInfo.bio}</MediumText>
             </View>
 
             <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
@@ -119,6 +119,7 @@ const styles = StyleSheet.create({
     borderColor: "white",
     borderWidth: 3,
     borderRadius: 100,
+    backgroundColor: "white"
   },
 
   name: {

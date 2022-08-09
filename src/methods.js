@@ -89,3 +89,18 @@ export const getProfileRecs = () => {
     // best users is a string array returning users from the first best match to the fifth
     return bestUsers; 
 }
+
+/*
+Determines if an event is in the morning, afternoon, or evening.
+Returns: "morning", "afternoon", or "evening".
+ */
+export const getTimeOfDay = (time) => {
+    let hour = time.getHours();
+    if (hour < 12) {
+        return "morning";
+    } else if (hour < 17) {
+        return "afternoon";
+    } else {
+        return "evening";
+    }
+}

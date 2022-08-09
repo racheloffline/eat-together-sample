@@ -4,7 +4,8 @@ import NormalText from "./NormalText";
 
 const Filter = props => {
     return (
-        <TouchableOpacity style={props.checked ? styles.checked : styles.unchecked}
+        <TouchableOpacity style={{ ...(props.checked ? styles.checked : styles.unchecked),
+            marginBottom: props.marginBottom ? props.marginBottom : 0 }}
             onPress={props.onPress}>
             <NormalText color={props.checked ? "white" : "#5DB075"}
                 center>{props.text}</NormalText>
@@ -27,7 +28,7 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         padding: 5,
         backgroundColor: "#5DB075",
-        borderColor: "none",
+        borderColor: "#5DB075",
         borderWidth: 2,
         marginHorizontal: 5,
         alignItems: "center",
