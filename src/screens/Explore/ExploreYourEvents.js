@@ -13,7 +13,6 @@ import Filter from "../../components/Filter";
 
 import getDate from "../../getDate";
 import { db, auth } from "../../provider/Firebase";
-import { ActivityIndicator } from "react-native";
 
 export default function ({ navigation }) {
   // Get current user
