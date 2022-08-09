@@ -13,7 +13,6 @@ import Filter from "../../components/Filter";
 
 import getDate from "../../getDate";
 import { db, auth } from "../../provider/Firebase";
-import NormalText from "../../components/NormalText";
 
 export default function ({ navigation }) {
   // Get current user
@@ -170,7 +169,6 @@ export default function ({ navigation }) {
     setPrivateEvents(!privateEvents);
     setPublicEvents(false);
   };
-
   return (
     <Layout>
       <Header name="Explore" navigation={navigation} hasNotif={unread} />

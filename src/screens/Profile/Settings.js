@@ -22,7 +22,7 @@ export default function ({ route, navigation }) {
     // Input fields
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
-    const [quote, setQuote] = useState('');
+    const [bio, setBio] = useState('');
     const [image, setImage] = useState('');
     const [tags, setTags] = useState([]);
 
@@ -31,7 +31,7 @@ export default function ({ route, navigation }) {
     useEffect(() => {
         setFirstName(route.params.user.firstName);
         setLastName(route.params.user.lastName);
-        setQuote(route.params.user.quote);
+        setBio(route.params.user.bio);
         setImage(route.params.image);
         setTags(route.params.user.tags);
     }, []);
@@ -66,12 +66,12 @@ export default function ({ route, navigation }) {
 
     // Update user profile in Firebase
     const updateUser = async (uri) => {
-        route.params.updateInfo(firstName, lastName, quote, tags, image);
+        route.params.updateInfo(firstName, lastName, bio, tags, image);
                         
         db.collection("Users").doc(route.params.user.id).update({
             firstName,
             lastName,
-            quote,
+            bio,
             tags,
             hasImage: image !== "",
             image: uri
@@ -145,12 +145,12 @@ export default function ({ route, navigation }) {
                     
 
                     <TextInput
-                        placeholder="Quote"
-                        onChangeText={(val) => setQuote(val)}
+                        placeholder="Bio"
+                        onChangeText={(val) => setBio(val)}
                         leftContent={
                             <Ionicons name="chatbox-ellipses-outline" size={20}/>
                         }
-                        value={quote}
+                        value={bio}
                         containerStyle={{ marginBottom: 10 }}
                     />
 
@@ -172,9 +172,9 @@ export default function ({ route, navigation }) {
 
                     <SmallText center>Note: must have between 3 and 6 tags (inclusive).</SmallText>
 
-                    <TouchableOpacity disabled={firstName === "" || lastName === "" || quote === ""
+                    <TouchableOpacity disabled={firstName === "" || lastName === "" || bio === ""
                             || tags.length < 3 || tags.length > 6 || loading}
-                        style={firstName === "" || lastName === "" || quote === "" || tags.length < 3
+                        style={firstName === "" || lastName === "" || bio === "" || tags.length < 3
                             || tags.length > 6 ? styles.saveDisabled : styles.save} 
                         onPress={() => {
                             setLoading(true);

@@ -166,7 +166,6 @@ export default function ({ navigation }) {
                                 <Ionicons name="document-text-outline" size={20}/>
                             }
                         />
-
                         <Button disabled={disabled} onPress={function () {
                             let hasImage = false;
                             if (photo !== "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400") {

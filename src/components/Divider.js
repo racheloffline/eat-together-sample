@@ -5,9 +5,9 @@ const Divider = props => {
     return (
         <View style={{
             width: props.width ? props.width : "100%",
-            borderColor: "#5DB075",
+            borderColor: props.color ? props.color : "#5DB075",
             borderWidth: 2,
-            marginVertical: 20,
+            marginVertical: 10,
             justifyContent: props.center ? "center" : "flex-start"
         }}/>
     );

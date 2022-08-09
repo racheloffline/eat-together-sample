@@ -6,10 +6,11 @@ import SmallText from "./SmallText";
 const Tag = props => {
     return (
         <View style={styles.tag}>
-            <SmallText color="white">{props.text}</SmallText>
+        {/*tag text isn't as bold as in figma, not sure how to update w/o fontWeight */}
+            <SmallText size={14} color="black">{props.text}</SmallText>
             {props.remove && 
             <TouchableOpacity onPress={props.remove} style={styles.close}>
-                <Ionicons name="close" size={16} color="white" />
+                <Ionicons name="close" size={16} color="black" />
             </TouchableOpacity>}
         </View>
     );
@@ -19,7 +20,7 @@ const styles = StyleSheet.create({
     tag: {
         justifyContent: 'center',
         flex: 0,
-        backgroundColor: 'black',
+        backgroundColor: '#D9D9D9',
         flexDirection: 'row',
         alignItems: 'center',
         margin: 2,

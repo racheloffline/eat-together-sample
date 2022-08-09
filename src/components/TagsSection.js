@@ -98,13 +98,14 @@ export default class TagsSection extends Component {
 
                 : <TouchableOpacity
                     onPress={() => {
-                        Keyboard.dismiss();
                         this.setState({
+                            focus: false,
                             item: "",
                             listItems: this.props.items
                         });
 
                         this.props.onItemSelect(item);
+                        Keyboard.dismiss();
                     }}
                     style={styles.item}>
                     <NormalText>{ item }</NormalText>
@@ -115,13 +116,15 @@ export default class TagsSection extends Component {
                 <TouchableOpacity
                     style={styles.item}
                     onPress={() => {
-                        this.setState({ item: item, focus: false });
-                        Keyboard.dismiss();
+                        this.setState({ item: item, focus: false, listItems: this.props.items });
                         this.props.onItemSelect(item);
+
                         if (this.props.resetValue) {
                             this.setState({ focus: true, item: "" });
                             this.input.focus();
                         }
+
+                        Keyboard.dismiss();
                     }}
                 >
                   <NormalText>{ item }</NormalText>
@@ -139,8 +142,7 @@ export default class TagsSection extends Component {
     const textInputProps = { ...this.props.textInputProps };
     const oldSupport = [
       { key: 'ref', val: e => (this.input = e) }, 
-      { key: 'onChangeText', val: (text) => { this.searchedItems(text) } }, 
-      { key: 'underlineColorAndroid', val: this.props.underlineColorAndroid }, 
+      { key: 'onChangeText', val: (text) => { this.searchedItems(text) } },
       { 
         key: 'onFocus', 
         val: () => {
