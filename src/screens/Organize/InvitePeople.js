@@ -117,7 +117,7 @@ export default function({ route, navigation }) {
     const [users, setUsers] = useState([]);
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [curSearch, setCurSearch] = useState("");
-    
+
     const [disabled, setDisabled] = useState(true);
     const [loading, setLoading] = useState(false);
 
@@ -243,7 +243,7 @@ export default function({ route, navigation }) {
                                 setLoading(false);
                             });
                         }
-                  }}/>
+                    }}/>
             </View>
         </Layout>
 
@@ -276,4 +276,3 @@ const styles = StyleSheet.create({
         flexDirection: "row"
     }
 });
-
