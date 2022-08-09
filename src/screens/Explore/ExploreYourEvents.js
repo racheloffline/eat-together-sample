@@ -1,7 +1,7 @@
 // Display your events
 
 import React, { useEffect, useState } from "react";
-import { StyleSheet, FlatList, View } from "react-native";
+import { View, ActivityIndicator, StyleSheet, FlatList } from "react-native";
 import { Layout } from "react-native-rapi-ui";
 
 import EventCard from "../../components/EventCard";
@@ -13,7 +13,6 @@ import Filter from "../../components/Filter";
 
 import getDate from "../../getDate";
 import { db, auth } from "../../provider/Firebase";
-import { ActivityIndicator } from "react-native";
 
 export default function ({ navigation }) {
   // Get current user
@@ -69,6 +68,8 @@ export default function ({ navigation }) {
                   });
 
                   setEvents(newEvents);
+                  console.log("the new events");
+                  console.log(newEvents);
                   setFilteredEvents(newEvents);
                   setLoading(false);
                 }

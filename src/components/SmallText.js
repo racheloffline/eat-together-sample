@@ -11,7 +11,7 @@ const SmallText = props => {
                 fontSize: props.size ? props.size : 10,
                 fontFamily: 'sans-serif',
                 color: props.color ? props.color : "black",
-                textAlign: props.center ? "center" : "auto"
+                textAlign: props.center ? "center" : "auto",
             }}>
                 {props.children}
             </Text>

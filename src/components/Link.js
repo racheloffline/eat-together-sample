@@ -1,11 +1,12 @@
 import React from "react";
 import { TouchableOpacity } from "react-native";
-import SmallText from "./SmallText";
+import NormalText from "./NormalText";
 
 const Link = props => {
     return (
         <TouchableOpacity onPress={props.onPress} disabled={props.disabled}>
-            <SmallText color="#0398fc" size={props.size ? props.size : null}>{props.children}</SmallText>
+            <NormalText color="#0398fc"
+                size={props.size ? props.size : null} center>{props.children}</NormalText>
         </TouchableOpacity>
     );
 }

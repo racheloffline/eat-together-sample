@@ -15,7 +15,7 @@ import Button from "../../components/Button";
 import EventCard from "../../components/EventCard";
 import NormalText from "../../components/NormalText";
 
-import { db, storage } from "../../provider/Firebase";
+import { db } from "../../provider/Firebase";
 import firebase from "firebase";
 
 const FullProfile = ({ route, navigation }) => {
@@ -34,20 +34,13 @@ const FullProfile = ({ route, navigation }) => {
       let thisData = doc.data();
       // Save some images
       if (thisData.hasImage) {
-        storage.ref("profilePictures/" + thisData.id).getDownloadURL().then(uri => {
-          setInviterImage(uri);
-        });
+        setInviterImage(thisData.image);
       }
+      
       let requestedUser = db.collection("Users").doc(route.params.person.id);
 
       requestedUser.get().then((doc) => {
         let data = doc.data();
-
-        if (data.hasImage) {
-          storage.ref("profilePictures/" + data.id).getDownloadURL().then(uri => {
-            setImage(uri);
-          });
-        }
 
         if (thisData.friendIDs.includes(data.id)) {
           setDisabled(true);
@@ -130,14 +123,16 @@ const FullProfile = ({ route, navigation }) => {
 
       <View style={styles.page}>
         <View style={styles.background}/>
-        <Image style={styles.image} source={image ? {uri: image} : require("../../../assets/logo.png")}/>
+        <Image style={styles.image} source={route.params.person.hasImage ? 
+          {uri: route.params.person.image} : require("../../../assets/logo.png")}/>
         
         <View style={styles.name}>
           <LargeText>
             {route.params.person.firstName + " " + route.params.person.lastName.substring(0, 1) + "."}
           </LargeText>
           <NormalText>
-          {route.params.person.attendedEventIDs.length + "/" + (route.params.person.attendedEventIDs.length+ route.params.person.attendingEventIDs.length) + " meals attended"}
+          {route.params.person.attendedEventIDs.length + "/" + 
+            (route.params.person.archivedEventIDs.length + route.params.person.attendingEventIDs.length) + " meals attended"}
           </NormalText>
           <MediumText>@{route.params.person.username}</MediumText>
 
@@ -158,7 +153,7 @@ const FullProfile = ({ route, navigation }) => {
         </View>
 
         <TagsList tags={route.params.person.tags}/>
-        <MediumText>"{route.params.person.quote}"</MediumText>
+        <MediumText>{route.params.person.bio}</MediumText>
         
       </View>
       <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
@@ -187,7 +182,8 @@ const styles = StyleSheet.create({
     height: 125,
     borderColor: "white",
     borderWidth: 3,
-    borderRadius: 125
+    borderRadius: 125,
+    backgroundColor: "white"
   },
 
   name: {
