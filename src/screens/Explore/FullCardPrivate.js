@@ -53,7 +53,7 @@ const FullCard = ({ route, navigation }) => {
   const user = auth.currentUser;
 
   useEffect(() => {
-    if (icebreakers.length === 0) {
+    if (icebreakers && icebreakers.length === 0) {
       fetchIcebreakers();
     }
 
@@ -103,7 +103,7 @@ const FullCard = ({ route, navigation }) => {
           .get()
           .then((doc) => {
             setIcebreakers(doc.data().ice);
-            console.log("icebreakers:");
+            console.log("da ice ice baby!:");
             console.log(doc.data().ice);
           });
     }
@@ -300,7 +300,7 @@ const FullCard = ({ route, navigation }) => {
             </NormalText>
           </View>
           <View style={styles.icebreakers}>
-            {openIcebreakers &&
+            {openIcebreakers && icebreakers &&
               icebreakers.map((ice, index) => (
                 <Icebreaker number={index + 1} icebreaker={ice} key={index} />
               ))}
