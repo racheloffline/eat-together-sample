@@ -11,19 +11,20 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Layout, TopNav } from "react-native-rapi-ui";
-import { Ionicons, Feather } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 
-import DarkContainer from "../../components/DarkContainer";
 import Attendance from "../../components/Attendance";
 import Icebreaker from "../../components/Icebreaker";
 import TagsList from "../../components/TagsList";
+import HorizontalRow from "../../components/HorizontalRow";
+import Button from "../../components/Button";
 
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
-import HorizontalRow from "../../components/HorizontalRow";
-import Button from "../../components/Button";
 
+import getDate from "../../getDate";
+import getTime from "../../getTime";
 import { db, storage, auth } from "../../provider/Firebase";
 import * as firebase from "firebase";
 import {
@@ -44,14 +45,9 @@ const FullCard = ({ route, navigation }) => {
   // For tracking opening and closing
   const [openAttendance, setOpenAttendance] = useState(false);
   const [openIcebreakers, setOpenIcebreakers] = useState(false);
-  const [image, setImage] = useState(""); // Background image
 
   // List of icebreaker questions
   const [icebreakers, setIcebreakers] = useState([]);
-
-  const [location, setLocation] = useState("");
-  const [date, setDate] = useState("");
-  const [time, setTime] = useState(0);
 
   // Get the current user
   const user = auth.currentUser;
@@ -64,53 +60,7 @@ const FullCard = ({ route, navigation }) => {
     if (route.params.event.hostID === user.uid) {
       getAttendees();
     }
-
-    if (location === "") {
-      assignEventDetails();
-    }
   }, []);
-
-  const assignEventDetails = () => {
-    console.log("assigning event details");
-    const eventID = route.params.event.id;
-
-    if (route.params.event.type === "private") {
-        db.collection("Private Events")
-          .doc(eventID)
-          .get()
-          .then((doc) => {
-            setLocation(doc.data().location);
-
-            // converts Date object to String object
-            const dateInfo = doc.data().date.toDate();
-            const eventDay = dateInfo.toDateString().substring(4);
-            const eventStartHour = parseInt(
-              dateInfo.toTimeString().substring(0, 2)
-            );
-
-            setDate(eventDay);
-            setTime(eventStartHour);
-          });
-    }
-    else {
-        db.collection("Public Events")
-          .doc(eventID)
-          .get()
-          .then((doc) => {
-            setLocation(doc.data().location);
-
-            // converts Date object to String object
-            const dateInfo = doc.data().date.toDate();
-            const eventDay = dateInfo.toDateString().substring(4);
-            const eventStartHour = parseInt(
-              dateInfo.toTimeString().substring(0, 2)
-            );
-
-            setDate(eventDay);
-            setTime(eventStartHour);
-          });
-    }
-  };
 
   // Mark an attendee absent or present
   const markAttendee = (index) => {
@@ -222,26 +172,6 @@ const FullCard = ({ route, navigation }) => {
     }
   }
 
-  //Archive the event
-  function archiveEvent() {
-    if (!loading) {
-      setLoading(true);
-      route.params.deleteEvent(route.params.event.id);
-
-      const storeID = {
-        type: route.params.event.type,
-        id: route.params.event.id,
-      };
-
-      db.collection("Users")
-        .doc(user.uid)
-        .update({
-          attendingEventIDs: firebase.firestore.FieldValue.arrayRemove(storeID),
-          archivedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
-        });
-    }
-  }
-
   //Reporting event function
   function reportEvent() {
     navigation.navigate("ReportEvent", {
@@ -274,12 +204,12 @@ const FullCard = ({ route, navigation }) => {
                 />
               </MenuTrigger>
               <MenuOptions>
-                <MenuOption onSelect={() => reportEvent()}>
+                {route.params.event.hostID !== user.uid && <MenuOption onSelect={() => reportEvent()}>
                   <NormalText size={18}>Report Event</NormalText>
-                </MenuOption>
-                <MenuOption onSelect={() => archiveEvent()}>
-                  <NormalText size={18}>Archive Event</NormalText>
-                </MenuOption>
+                </MenuOption>}
+                {route.params.event.hostID === user.uid && <MenuOption>
+                  <NormalText size={18}>Edit Event</NormalText>
+                </MenuOption>}
                 <MenuOption onSelect={() => withdraw()}>
                   <NormalText size={18} color="red">
                     Withdraw
@@ -291,7 +221,7 @@ const FullCard = ({ route, navigation }) => {
         }
       />
 
-      <ScrollView contentContainerStyle={styles.page}>
+      <ScrollView>
         <ImageBackground
           source={
             route.params.event.hasImage
@@ -302,17 +232,15 @@ const FullCard = ({ route, navigation }) => {
           resizeMode="cover"
         ></ImageBackground>
         <View style={styles.infoContainer}>
-          <MediumText
-            size={20}
-            textAlign="left"
-            marginBottom={10}
-            color="Black"
-          >
+          <LargeText size={20} marginBottom={10}>
             {route.params.event.name}
-          </MediumText>
+          </LargeText>
 
-          <NormalText color="black"> Hosted by {route.params.event.hostID === user.uid ?
-          "You" : (route.params.event.hostFirstName ? route.params.event.hostFirstName + " " + route.params.event.hostLastName.substring(0, 1) + "." : route.params.event.hostName)} </NormalText>
+          <NormalText color="black">Hosted by: {route.params.event.hostID === user.uid ? "You ;)"
+            : (route.params.event.hostFirstName ?
+            route.params.event.hostFirstName + " " + route.params.event.hostLastName.substring(0, 1) + "."
+            : route.params.event.hostName)}
+          </NormalText>
 
           {route.params.event.tags && <TagsList marginVertical={20} tags={route.params.event.tags}/>}
 
@@ -322,21 +250,21 @@ const FullCard = ({ route, navigation }) => {
             <View style={styles.row}>
               <Ionicons name="location-sharp" size={20} />
               <NormalText paddingHorizontal={10} color="black">
-                {location}
+                {route.params.event.location}
               </NormalText>
             </View>
 
             <View style={styles.row}>
               <Ionicons name="calendar-outline" size={20} />
               <NormalText paddingHorizontal={10} color="black">
-                {date}
+                {getDate(route.params.event.date.toDate())}
               </NormalText>
             </View>
 
             <View style={styles.row}>
               <Ionicons name="time-outline" size={20} />
               <NormalText paddingHorizontal={10} color="black">
-                {time % 12} {time < 12 ? "am" : "pm"}
+                {getTime(route.params.event.date.toDate())}
               </NormalText>
             </View>
           </View>
@@ -367,42 +295,45 @@ const FullCard = ({ route, navigation }) => {
           </View>
 
           {/* Attendance dropdown */}
-          <View style={styles.row}>
-            <TouchableOpacity
-              onPress={() => setOpenAttendance(!openAttendance)}
-            >
-              <Ionicons
-                name={
-                  !openAttendance ? "caret-forward-sharp" : "caret-down-sharp"
-                }
-                size={20}
-                color="black"
-              />
-            </TouchableOpacity>
+          {route.params.event.hostID === user.uid && <View>
+            <View style={styles.row}>
+              <TouchableOpacity
+                onPress={() => setOpenAttendance(!openAttendance)}
+              >
+                <Ionicons
+                  name={
+                    !openAttendance ? "caret-forward-sharp" : "caret-down-sharp"
+                  }
+                  size={20}
+                  color="black"
+                />
+              </TouchableOpacity>
 
-            <NormalText paddingHorizontal={7} size={17} color="black">
-              Attendance
-            </NormalText>
-          </View>
-          {openAttendance && (
-            <View style={{ marginTop: 10 }}>
-              {people.length === 0 ? (
-                <NormalText paddingHorizontal={25} size={17} color="black">
-                  {"Just yourself ;)"}
-                </NormalText>
-              ) : (
-                people.map((person, index) => (
-                  <Attendance
-                    size={17}
-                    person={person}
-                    key={person.id}
-                    attending={attendees[index]}
-                    onPress={() => markAttendee(index)}
-                  />
-                ))
-              )}
+              <NormalText paddingHorizontal={7} size={17} color="black">
+                Attendance
+              </NormalText>
             </View>
-          )}
+
+            {openAttendance && (
+              <View style={{ marginTop: 10 }}>
+                {people.length === 0 ? (
+                  <NormalText paddingHorizontal={25} size={17} color="black">
+                    {"Just yourself ;)"}
+                  </NormalText>
+                ) : (
+                  people.map((person, index) => (
+                    <Attendance
+                      size={17}
+                      person={person}
+                      key={person.id}
+                      attending={attendees[index]}
+                      onPress={() => markAttendee(index)}
+                    />
+                  ))
+                )}
+              </View>
+            )}
+          </View>}
         </View>
         {route.params.event.hostID === user.uid ?
         <View style={styles.buttonRow}>
@@ -418,13 +349,6 @@ const FullCard = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  page: {
-    //    appears to be contributing to large margin underneath image
-    //      flex: 1,
-    //      alignItems: "center",
-    justifyContent: "flex-start",
-  },
-
   infoContainer: {
     marginHorizontal: 30,
     marginBottom: 50
@@ -442,7 +366,7 @@ const styles = StyleSheet.create({
 
   imageBackground: {
     width: Dimensions.get("screen").width,
-    height: 130,
+    height: 150,
     marginBottom: 20,
   },
 
@@ -453,8 +377,7 @@ const styles = StyleSheet.create({
   },
 
   logistics: {
-    marginBottom: 15,
-    marginVertical: 5
+    marginVertical: 15,
   },
 });
 
