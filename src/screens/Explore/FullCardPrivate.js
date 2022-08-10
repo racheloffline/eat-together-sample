@@ -87,14 +87,26 @@ const FullCard = ({ route, navigation }) => {
   const fetchIcebreakers = () => {
     const eventID = route.params.event.id;
 
-    db.collection("Private Events")
-      .doc(eventID)
-      .get()
-      .then((doc) => {
-        setIcebreakers(doc.data().ice);
-        console.log("icebreakers:");
-        console.log(doc.data().ice);
-      });
+    if (route.params.event.type === "private") {
+        db.collection("Private Events")
+          .doc(eventID)
+          .get()
+          .then((doc) => {
+            setIcebreakers(doc.data().ice);
+            console.log("icebreakers:");
+            console.log(doc.data().ice);
+          });
+    }
+    else {
+        db.collection("Public Events")
+          .doc(eventID)
+          .get()
+          .then((doc) => {
+            setIcebreakers(doc.data().ice);
+            console.log("icebreakers:");
+            console.log(doc.data().ice);
+          });
+    }
   };
 
   // Fetch all attendees of this event
@@ -335,15 +347,15 @@ const FullCard = ({ route, navigation }) => {
             )}
           </View>}
         </View>
-        {route.params.event.hostID === user.uid ?
-        <View style={styles.buttonRow}>
-            <Button marginHorizontal={5} fontSize={15} backgroundColor="#D76161" >Cancel Event</Button>
-            <Button marginHorizontal={5} fontSize={15}>Edit Details</Button>
-        </View> :
-        <View style={styles.buttonRow}>
-            <Button width={350} fontSize={15} backgroundColor="#D76161"> Withdraw from Event </Button>
-        </View>}
       </ScrollView>
+      {route.params.event.hostID === user.uid ?
+      <View style={styles.buttonRow}>
+          <Button marginHorizontal={5} fontSize={15} backgroundColor="#D76161" >Cancel Event</Button>
+          <Button marginHorizontal={5} fontSize={15}>Edit Details</Button>
+      </View> :
+      <View style={styles.buttonRow}>
+          <Button width={350} fontSize={15} backgroundColor="#D76161"> Withdraw from Event </Button>
+      </View>}
     </Layout>
   );
 };
