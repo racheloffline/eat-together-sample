@@ -9,6 +9,7 @@ import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
 import TagsList from "../../components/TagsList";
 import EventCard from '../../components/EventCard';
+import Button from "../../components/Button";
 
 export default function ({ navigation }) {
     const user = auth.currentUser;
@@ -83,9 +84,17 @@ export default function ({ navigation }) {
                     <MediumText>@{userInfo.username}</MediumText>
                 </View>
                 <TagsList tags={userInfo.tags ? userInfo.tags : []}/>
+                <View style={styles.edit}>
+                    <Button onPress={function () {
+                        navigation.navigate("Edit Profile", {
+                            user: userInfo,
+                            image: userInfo.image,
+                            updateInfo
+                        });
+                    }} marginVertical={10}>Edit Profile</Button>
+                </View>
                 <MediumText center>{userInfo.bio}</MediumText>
             </View>
-
             <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
                 data={events} renderItem={({item}) =>
                 <EventCard event={item} disabled/>
@@ -131,5 +140,10 @@ const styles = StyleSheet.create({
       position: "absolute",
       right: 20,
       top: 20
+  },
+
+  edit: {
+    marginVertical: 20,
+    alignItems: "center"
   }
 });

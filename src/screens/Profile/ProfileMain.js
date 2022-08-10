@@ -5,6 +5,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Me from './Me';
 import Settings from './Settings';
 import Schedule from './Schedule'
+import Edit from './Edit'
 
 const profStack = createStackNavigator();
 
@@ -15,6 +16,7 @@ export default function ({ navigation }) {
                 <profStack.Screen name="Me" component={Me}  options={{headerShown: false}}/>
                 <profStack.Screen name="Settings" component={Settings}  options={{headerShown: false}}/>
                 <profStack.Screen name="Schedule" component={Schedule} options={{headerShown: false}}/>
+                <profStack.Screen name="Edit Profile" component={Edit} options={{headerShown: false}}/>
             </profStack.Navigator>
         </NavigationContainer>
     );
