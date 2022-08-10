@@ -16,6 +16,8 @@ import { Ionicons } from "@expo/vector-icons";
 import Attendance from "../../components/Attendance";
 import Icebreaker from "../../components/Icebreaker";
 import TagsList from "../../components/TagsList";
+import HorizontalRow from "../../components/HorizontalRow";
+import Button from "../../components/Button";
 
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
@@ -333,6 +335,14 @@ const FullCard = ({ route, navigation }) => {
             )}
           </View>}
         </View>
+        {route.params.event.hostID === user.uid ?
+        <View style={styles.buttonRow}>
+            <Button marginHorizontal={5} fontSize={15} backgroundColor="#D76161" >Cancel Event</Button>
+            <Button marginHorizontal={5} fontSize={15}>Edit Details</Button>
+        </View> :
+        <View style={styles.buttonRow}>
+            <Button width={350} fontSize={15} backgroundColor="#D76161"> Withdraw from Event </Button>
+        </View>}
       </ScrollView>
     </Layout>
   );
@@ -347,6 +357,11 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     marginVertical: 4,
+  },
+
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "center"
   },
 
   imageBackground: {
