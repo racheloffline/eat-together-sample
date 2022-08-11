@@ -70,7 +70,7 @@ const Name = props => {
           {image !== "" ? <Image style={styles.image} source={{uri: image}}/>
             : <Image style={styles.image} source={require("../../../../assets/logo.png")}/>}
           <TouchableOpacity style={styles.editImage} onPress={pickImage}>
-            <Feather name="edit-2" size={25} color="black"/>
+            <Feather name="edit-2" size={20} color="black"/>
           </TouchableOpacity>
         </View>
 
@@ -134,15 +134,15 @@ const styles = StyleSheet.create({
   },
 
   image: {
-    width: 125,
-    height: 125,
+    width: 100,
+    height: 100,
     borderRadius: 125
   },
 
   editImage: {
     left: 40,
     bottom: 40,
-    padding: 12,
+    padding: 10,
     backgroundColor: "#5DB075",
     borderRadius: 100
   },
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   },
 
   buttons: {
-    marginTop: 30,
+    marginTop: 50,
     display: "flex",
     flexDirection: "row",
     justifyContent: "center"
