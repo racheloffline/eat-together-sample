@@ -1,5 +1,4 @@
-// TODO: Josh | You will need to edit this file
-// hello
+// What your event will look like
 
 import React, { useState, useEffect } from "react";
 import {
@@ -16,7 +15,6 @@ import { Ionicons } from "@expo/vector-icons";
 import Attendance from "../../components/Attendance";
 import Icebreaker from "../../components/Icebreaker";
 import TagsList from "../../components/TagsList";
-import HorizontalRow from "../../components/HorizontalRow";
 import Button from "../../components/Button";
 
 import LargeText from "../../components/LargeText";
@@ -219,7 +217,7 @@ const FullCard = ({ route, navigation }) => {
                 {route.params.event.hostID !== user.uid && <MenuOption onSelect={() => reportEvent()}>
                   <NormalText size={18}>Report Event</NormalText>
                 </MenuOption>}
-                {route.params.event.hostID === user.uid && <MenuOption>
+                {route.params.event.hostID === user.uid && <MenuOption onSelect={() => navigation.navigate("EditEvent")}>
                   <NormalText size={18}>Edit Event</NormalText>
                 </MenuOption>}
                 <MenuOption onSelect={() => withdraw()}>
@@ -348,14 +346,6 @@ const FullCard = ({ route, navigation }) => {
           </View>}
         </View>
       </ScrollView>
-      {route.params.event.hostID === user.uid ?
-      <View style={styles.buttonRow}>
-          <Button marginHorizontal={5} fontSize={15} backgroundColor="#D76161" >Cancel Event</Button>
-          <Button marginHorizontal={5} fontSize={15}>Edit Details</Button>
-      </View> :
-      <View style={styles.buttonRow}>
-          <Button width={350} fontSize={15} backgroundColor="#D76161"> Withdraw from Event </Button>
-      </View>}
     </Layout>
   );
 };

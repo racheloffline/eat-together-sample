@@ -12,6 +12,7 @@ const MediumText = props => {
                 fontFamily: 'sans-serif',
                 color: props.color ? props.color : "black",
                 textAlign: props.center ? "center" : "auto",
+                paddingHorizontal: props.paddingHorizontal ? props.paddingHorizontal : 0,
                 marginBottom: props.marginBottom ? props.marginBottom : 0
             }}>
                 {props.children}
@@ -24,6 +25,7 @@ const MediumText = props => {
             fontFamily: 'Inter_600SemiBold',
             color: props.color ? props.color : "black",
             textAlign: props.center ? "center" : "auto",
+            paddingHorizontal: props.paddingHorizontal ? props.paddingHorizontal : 0,
             marginBottom: props.marginBottom ? props.marginBottom : 0
         }, props.style]}>
             {props.children}

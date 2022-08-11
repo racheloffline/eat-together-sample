@@ -7,7 +7,7 @@ import {
     ImageBackground,
     Dimensions,
 } from "react-native";
-import { Layout, TextInput } from "react-native-rapi-ui";
+import { TopNav, Layout, TextInput } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 import eventTags from "../../eventTags";
 
@@ -15,13 +15,12 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import RBSheet from "react-native-raw-bottom-sheet";
 import TagsSection from "../../components/TagsSection";
 
-import Header from "../../components/Header";
 import getDate from "../../getDate";
 import getTime from "../../getTime";
-import HorizontalSwitch from "../../components/HorizontalSwitch";
 import Button from "../../components/Button";
+
+import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
-import KeyboardAvoidingWrapper from "../../components/KeyboardAvoidingWrapper";
 
 import * as firebase from "firebase";
 import * as ImagePicker from "expo-image-picker";
@@ -41,7 +40,6 @@ export default function ({ navigation }) {
     const [additionalInfo, setAdditionalInfo] = useState("");
     const [tagsSelected, setTagsSelected] = useState([]);
     const [tagsValue, setTagsValue] = useState("");
-    const [icebreakers, setIcebreakers] = useState([]);
 
     // Other variables
     const [showDate, setShowDate] = useState(false);
@@ -55,22 +53,6 @@ export default function ({ navigation }) {
 
     // Loading notifications
     useEffect(() => {
-
-    //      picks icebreaker set from set of icebreakers randomly
-        const breakOptions = [];
-        db.collection("Icebreakers").onSnapshot((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-                breakOptions.push(doc.id);
-                console.log(doc.id);
-                console.log("IS THIS WORKING?????")
-            })
-            console.log(breakOptions);
-            var num = Math.floor(Math.random()*breakOptions.length);
-            db.collection("Icebreakers").doc(breakOptions[num]).get().then(doc => {
-                    console.log("please be working!!!!");
-                    setIcebreakers(doc.data().icebreakers);
-                })
-        });
         async function fetchData() {
             await db.collection("Users").doc(user.uid).onSnapshot((doc) => {
                 setUnread(doc.data().hasNotif);
@@ -145,7 +127,6 @@ export default function ({ navigation }) {
             location,
             date,
             additionalInfo,
-            ice: icebreakers,
             attendees: [user.uid], //ONLY start by putting the current user as an attendee
             hasImage,
             image,
@@ -174,8 +155,19 @@ export default function ({ navigation }) {
 
     return (
         <Layout>
-            <Header name="Organize" navigation={navigation} hasNotif = {unread}/>
-            <HorizontalSwitch left="Private" right="Public" current="right" press={(val) => navigation.navigate("OrganizePrivate")}/>
+            <TopNav
+                middleContent={
+                    <MediumText center>Edit Event</MediumText>
+                }
+                leftContent={
+                    <Ionicons
+                        name="chevron-back"
+                        color={loading ? "grey" : "black"}
+                        size={20}
+                    />
+                }
+                leftAction={() => navigation.goBack()}
+            />
 
             <TouchableOpacity onPress={() => handleChoosePhoto()}>
                 <ImageBackground source={{ uri: photo }} style={styles.image}>
@@ -279,7 +271,7 @@ export default function ({ navigation }) {
                         } else {
                             storeEvent(id, hasImage, "");
                         }
-                    }} marginVertical={20}>{loading ? "Posting ..." : "Post"}</Button>
+                    }} marginVertical={20}>{loading ? "Updating ..." : "Update"}</Button>
                 </ScrollView>
             </View>
 

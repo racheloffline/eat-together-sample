@@ -13,6 +13,7 @@ const NormalText = props => {
                 color: props.color ? props.color : "black",
                 textAlign: props.center ? "center" : "auto",
                 paddingHorizontal: props.paddingHorizontal ? props.paddingHorizontal : 0,
+                marginBottom: props.marginBottom ? props.marginBottom : 0
             }}>
                 {props.children}
             </Text>
@@ -24,7 +25,8 @@ const NormalText = props => {
             fontFamily: 'Inter_400Regular',
             color: props.color ? props.color : "black",
             textAlign: props.center ? "center" : "auto",
-            paddingHorizontal: props.paddingHorizontal ? props.paddingHorizontal : 0
+            paddingHorizontal: props.paddingHorizontal ? props.paddingHorizontal : 0,
+            marginBottom: props.marginBottom ? props.marginBottom : 0
         }}>
             {props.children}
         </Text>
