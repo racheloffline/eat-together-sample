@@ -41,6 +41,7 @@ export default function ({ navigation }) {
     const [additionalInfo, setAdditionalInfo] = useState("");
     const [tagsSelected, setTagsSelected] = useState([]);
     const [tagsValue, setTagsValue] = useState("");
+    const [icebreakers, setIcebreakers] = useState([]);
 
     // Other variables
     const [showDate, setShowDate] = useState(false);
@@ -54,6 +55,22 @@ export default function ({ navigation }) {
 
     // Loading notifications
     useEffect(() => {
+
+    //      picks icebreaker set from set of icebreakers randomly
+        const breakOptions = [];
+        db.collection("Icebreakers").onSnapshot((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                breakOptions.push(doc.id);
+                console.log(doc.id);
+                console.log("IS THIS WORKING?????")
+            })
+            console.log(breakOptions);
+            var num = Math.floor(Math.random()*breakOptions.length);
+            db.collection("Icebreakers").doc(breakOptions[num]).get().then(doc => {
+                    console.log("please be working!!!!");
+                    setIcebreakers(doc.data().icebreakers);
+                })
+        });
         async function fetchData() {
             await db.collection("Users").doc(user.uid).onSnapshot((doc) => {
                 setUnread(doc.data().hasNotif);
@@ -128,6 +145,7 @@ export default function ({ navigation }) {
             location,
             date,
             additionalInfo,
+            ice: icebreakers,
             attendees: [user.uid], //ONLY start by putting the current user as an attendee
             hasImage,
             image,

@@ -51,7 +51,7 @@ const FullCard = ({ route, navigation }) => {
   const user = auth.currentUser;
 
   useEffect(() => {
-    if (icebreakers.length === 0) {
+    if (icebreakers && icebreakers.length === 0) {
       fetchIcebreakers();
     }
 
@@ -85,14 +85,26 @@ const FullCard = ({ route, navigation }) => {
   const fetchIcebreakers = () => {
     const eventID = route.params.event.id;
 
-    db.collection("Private Events")
-      .doc(eventID)
-      .get()
-      .then((doc) => {
-        setIcebreakers(doc.data().ice);
-        console.log("icebreakers:");
-        console.log(doc.data().ice);
-      });
+    if (route.params.event.type === "private") {
+        db.collection("Private Events")
+          .doc(eventID)
+          .get()
+          .then((doc) => {
+            setIcebreakers(doc.data().ice);
+            console.log("icebreakers:");
+            console.log(doc.data().ice);
+          });
+    }
+    else {
+        db.collection("Public Events")
+          .doc(eventID)
+          .get()
+          .then((doc) => {
+            setIcebreakers(doc.data().ice);
+            console.log("da ice ice baby!:");
+            console.log(doc.data().ice);
+          });
+    }
   };
 
   // Fetch all attendees of this event
@@ -205,7 +217,7 @@ const FullCard = ({ route, navigation }) => {
                 {route.params.event.hostID !== user.uid && <MenuOption onSelect={() => reportEvent()}>
                   <NormalText size={18}>Report Event</NormalText>
                 </MenuOption>}
-                {route.params.event.hostID === user.uid && <MenuOption>
+                {route.params.event.hostID === user.uid && <MenuOption onSelect={() => navigation.navigate("EditEvent")}>
                   <NormalText size={18}>Edit Event</NormalText>
                 </MenuOption>}
                 <MenuOption onSelect={() => withdraw()}>
@@ -286,7 +298,7 @@ const FullCard = ({ route, navigation }) => {
             </NormalText>
           </View>
           <View style={styles.icebreakers}>
-            {openIcebreakers &&
+            {openIcebreakers && icebreakers &&
               icebreakers.map((ice, index) => (
                 <Icebreaker number={index + 1} icebreaker={ice} key={index} />
               ))}
@@ -333,17 +345,15 @@ const FullCard = ({ route, navigation }) => {
             )}
           </View>}
         </View>
-        {route.params.event.hostID === user.uid ?
-          <View style={styles.buttonRow}>
-              <Button marginHorizontal={5} fontSize={15} backgroundColor="#D76161" >Cancel Event</Button>
-              <Button marginHorizontal={5} fontSize={15} onPress={() => {
-                navigation.navigate("EditEvent");
-              }}>Edit Details</Button>
-          </View> :
-          <View style={styles.buttonRow}>
-              <Button width={350} fontSize={15} backgroundColor="#D76161"> Withdraw from Event </Button>
-          </View>}
       </ScrollView>
+      {route.params.event.hostID === user.uid ?
+      <View style={styles.buttonRow}>
+          <Button marginHorizontal={5} fontSize={15} backgroundColor="#D76161" >Cancel Event</Button>
+          <Button marginHorizontal={5} fontSize={15}>Edit Details</Button>
+      </View> :
+      <View style={styles.buttonRow}>
+          <Button width={350} fontSize={15} backgroundColor="#D76161"> Withdraw from Event </Button>
+      </View>}
     </Layout>
   );
 };
