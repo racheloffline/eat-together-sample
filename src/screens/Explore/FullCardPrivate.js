@@ -346,14 +346,6 @@ const FullCard = ({ route, navigation }) => {
           </View>}
         </View>
       </ScrollView>
-      {route.params.event.hostID === user.uid ?
-      <View style={styles.buttonRow}>
-          <Button marginHorizontal={5} fontSize={15} backgroundColor="#D76161" >Cancel Event</Button>
-          <Button marginHorizontal={5} fontSize={15}>Edit Details</Button>
-      </View> :
-      <View style={styles.buttonRow}>
-          <Button width={350} fontSize={15} backgroundColor="#D76161"> Withdraw from Event </Button>
-      </View>}
     </Layout>
   );
 };
