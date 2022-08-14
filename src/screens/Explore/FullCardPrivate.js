@@ -217,7 +217,9 @@ const FullCard = ({ route, navigation }) => {
                 {route.params.event.hostID !== user.uid && <MenuOption onSelect={() => reportEvent()}>
                   <NormalText size={18}>Report Event</NormalText>
                 </MenuOption>}
-                {route.params.event.hostID === user.uid && <MenuOption onSelect={() => navigation.navigate("EditEvent")}>
+                {route.params.event.hostID === user.uid && <MenuOption onSelect={() => navigation.navigate("EditEvent", {
+                  event: route.params.event
+                })}>
                   <NormalText size={18}>Edit Event</NormalText>
                 </MenuOption>}
                 <MenuOption onSelect={() => withdraw()}>
