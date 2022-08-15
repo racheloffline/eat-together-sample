@@ -237,7 +237,7 @@ export default function({ navigation }) {
     return (
       <Layout>
         <Header name="Explore" navigation = {navigation} hasNotif = {unread}/>
-        <HorizontalSwitch left="Your Events" right="Public" current="right"
+        <HorizontalSwitch left="Your Meals" right="Public" current="right"
           press={() => navigation.navigate("ExploreYourEvents")}/>
         <Searchbar placeholder="Search by name, location, date, or host name"
 				  value={searchQuery} onChangeText={onChangeText}/>

@@ -22,16 +22,12 @@ import Button from "../../components/Button";
 import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
 
-import * as firebase from "firebase";
 import * as ImagePicker from "expo-image-picker";
-import { db, auth, storage } from "../../provider/Firebase";
+import { db, storage } from "../../provider/Firebase";
 import { cloneDeep } from "lodash";
+import moment from "moment";
 
 export default function ({ route, navigation }) {
-    // Current user
-    const user = auth.currentUser;
-    const [userInfo, setUserInfo] = useState({});
-
     // State variables for the inputs
     const [photo, setPhoto] = useState("https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400");
     const [name, setName] = useState("");
@@ -45,30 +41,19 @@ export default function ({ route, navigation }) {
     const [showDate, setShowDate] = useState(false);
     const [mode, setMode] = useState("date");
     const [disabled, setDisabled] = useState(true);
-    const [unread, setUnread] = useState(false);
 
     const [loading, setLoading] = useState(false); // Disable button if event is being created in Firebase
 
     const refRBSheet = useRef(); // To toggle the bottom drawer on/off
 
-    // Loading notifications
+    // Get current event info
     useEffect(() => {
-
         setName(route.params.event.name);
         setLocation(route.params.event.location);
         setDate(route.params.event.date.toDate());
         setAdditionalInfo(route.params.event.additionalInfo);
         setTagsSelected(route.params.event.tags ? route.params.event.tags : []);
         setPhoto(route.params.event.image ? route.params.event.image : photo);
-
-        async function fetchData() {
-            await db.collection("Users").doc(user.uid).onSnapshot((doc) => {
-                setUnread(doc.data().hasNotif);
-                setUserInfo(doc.data());
-            });
-        }
-
-        fetchData();
     }, []);
 
     // Checks whether we should disable the Post button or not
@@ -124,40 +109,36 @@ export default function ({ route, navigation }) {
 
     // For posting the event
     const storeEvent = (id, hasImage, image) => {
-        db.collection("Public Events").doc(route.params.event.id).set({
+        const newEvent = {
             id,
             name,
-            hostID: user.uid,
-            hostFirstName: userInfo.firstName,
-            hostLastName: userInfo.lastName,
-            hasHostImage: userInfo.hasImage,
-            hostImage: userInfo.hasImage ? userInfo.image : "",
+            hostID: route.params.event.hostID,
+            hostFirstName: route.params.event.hostFirstName,
+            hostLastName: route.params.event.hostLastName,
+            hasHostImage: route.params.event.hasHostImage,
+            hostImage: route.params.event.hostImage,
             location,
             date,
             additionalInfo,
-            attendees: [user.uid], //ONLY start by putting the current user as an attendee
+            attendees: route.params.event.attendees,
+            ice: route.params.event.ice,
             hasImage,
-            image,
-            tags: tagsSelected
-        }).then(() => {
-            const storeID = {
-                type: "public",
-                id
-            };
+            image
+        };
 
-            db.collection("Users").doc(user.uid).update({
-                hostedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
-                attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
-                attendedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)
-            }).then(() => {
-                setName("");
-                setLocation("");
-                setDate(new Date());
-                setAdditionalInfo("");
-                setTagsSelected([]);
-                alert("Success!");
-                setLoading(false);
-            });
+        let table = "Private Events";
+
+        if (route.params.event.type === "public") {
+            newEvent.tags = tagsSelected;
+            table = "Public Events";
+        }
+
+        db.collection(table).doc(route.params.event.id).set(newEvent).then(() => {
+            newEvent.date = moment(date);
+            route.params.editEvent(newEvent);
+            route.params.editEvent2(newEvent);
+            navigation.navigate("FullCardPrivate");
+            alert("Meal updated!");
         });
     }
 
@@ -240,7 +221,8 @@ export default function ({ route, navigation }) {
                     </View>                        
 
                     <DateTimePickerModal isVisible={showDate} date={date}
-                        mode={mode} onConfirm={changeDate} onCancel={() => setShowDate(false)}/>
+                        mode={mode} onConfirm={changeDate} onCancel={() => setShowDate(false)}
+                        minimumDate={new Date()} maximumDate={moment().add(1, "months").toDate()}/>
 
                     <TextInput
                         placeholder="Additional Info"
@@ -253,7 +235,7 @@ export default function ({ route, navigation }) {
                         }
                     />
 
-                    <TouchableOpacity onPress={() => refRBSheet.current.open()}
+                    {route.params.event.type === "public" && <TouchableOpacity onPress={() => refRBSheet.current.open()}
                         style={styles.input}>
                         <TextInput
                             placeholder="Tags"
@@ -263,27 +245,26 @@ export default function ({ route, navigation }) {
                             }
                             editable={false}
                         />
-                    </TouchableOpacity>
+                    </TouchableOpacity>}
 
-                    <Button disabled={disabled || loading} onPress={function () {
+                    <Button disabled={disabled || loading} onPress={() => {
                         setLoading(true);
-                        const id = Date.now() + user.uid;
                         let hasImage = false;
                         if (photo !== "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400") {
                             hasImage = true;
-                            storeImage(photo, id).then(() => {
-                                fetchImage(id).then(uri => {
-                                    storeEvent(id, hasImage, uri);
+                            storeImage(photo, route.params.event.id).then(() => {
+                                fetchImage(route.params.event.id).then(uri => {
+                                    storeEvent(route.params.event.id, hasImage, uri);
                                 });
                             });
                         } else {
-                            storeEvent(id, hasImage, "");
+                            storeEvent(route.params.event.id, hasImage, "");
                         }
                     }} marginVertical={20}>{loading ? "Updating ..." : "Update"}</Button>
                 </ScrollView>
             </View>
 
-            <RBSheet
+            {route.params.event.type === "public" && <RBSheet
                 height={400}
                 ref={refRBSheet}
                 closeOnDragDown={true}
@@ -317,7 +298,7 @@ export default function ({ route, navigation }) {
                     chip={true}
                     resetValue={false}
                 />
-            </RBSheet>
+            </RBSheet>}
         </Layout>
     );
 }

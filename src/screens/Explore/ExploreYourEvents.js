@@ -172,11 +172,26 @@ export default function ({ navigation }) {
     setPublicEvents(false);
   };
 
+  // Replace event with new event details
+  const editEvent = newEvent => {
+    const newEvents = events.map(e => {
+      if (e.id === newEvent.id) {
+        return newEvent;
+      }
+      return e;
+    }).sort((a, b) => {
+      return a.date.seconds - b.date.seconds;
+    }).reverse();
+
+    setEvents(newEvents);
+    setFilteredEvents(newEvents);
+  }
+
   return (
     <Layout>
       <Header name="Explore" navigation={navigation} hasNotif={unread} />
       <HorizontalSwitch
-        left="Your Events"
+        left="Your Meals"
         right="Public"
         current="left"
         press={() => navigation.navigate("Explore")}
@@ -191,12 +206,12 @@ export default function ({ navigation }) {
         <Filter
           checked={publicEvents}
           onPress={publicOnly}
-          text="Public events"
+          text="Public"
         />
         <Filter
           checked={privateEvents}
           onPress={privateOnly}
-          text="Private events"
+          text="Private"
         />
       </HorizontalRow>
 
@@ -213,6 +228,7 @@ export default function ({ navigation }) {
                 navigation.navigate("FullCardPrivate", {
                   event: item,
                   deleteEvent,
+                  editEvent
                 });
               }}
             />
