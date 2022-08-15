@@ -8,6 +8,7 @@ import {
   ImageBackground,
   Dimensions,
   TouchableOpacity,
+  Alert
 } from "react-native";
 import { Layout, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
@@ -15,7 +16,6 @@ import { Ionicons } from "@expo/vector-icons";
 import Attendance from "../../components/Attendance";
 import Icebreaker from "../../components/Icebreaker";
 import TagsList from "../../components/TagsList";
-import Button from "../../components/Button";
 
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
@@ -33,6 +33,9 @@ import {
 } from "react-native-popup-menu";
 
 const FullCard = ({ route, navigation }) => {
+  // Event details
+  const [event, setEvent] = useState(route.params.event);
+
   // Data for the attendees
   const [attendees, setAttendees] = useState(
     new Array(route.params.event.attendees.length).fill(false)
@@ -44,17 +47,10 @@ const FullCard = ({ route, navigation }) => {
   const [openAttendance, setOpenAttendance] = useState(false);
   const [openIcebreakers, setOpenIcebreakers] = useState(false);
 
-  // List of icebreaker questions
-  const [icebreakers, setIcebreakers] = useState([]);
-
   // Get the current user
   const user = auth.currentUser;
 
   useEffect(() => {
-    if (icebreakers && icebreakers.length === 0) {
-      fetchIcebreakers();
-    }
-
     if (route.params.event.hostID === user.uid) {
       getAttendees();
     }
@@ -78,33 +74,6 @@ const FullCard = ({ route, navigation }) => {
           ? firebase.firestore.FieldValue.arrayUnion(storeID)
           : firebase.firestore.FieldValue.arrayRemove(storeID),
       });
-  };
-
-  // TODO: JOSH | Randomize this
-  // Fetch icebreaker questions from FIREBASE
-  const fetchIcebreakers = () => {
-    const eventID = route.params.event.id;
-
-    if (route.params.event.type === "private") {
-        db.collection("Private Events")
-          .doc(eventID)
-          .get()
-          .then((doc) => {
-            setIcebreakers(doc.data().ice);
-            console.log("icebreakers:");
-            console.log(doc.data().ice);
-          });
-    }
-    else {
-        db.collection("Public Events")
-          .doc(eventID)
-          .get()
-          .then((doc) => {
-            setIcebreakers(doc.data().ice);
-            console.log("da ice ice baby!:");
-            console.log(doc.data().ice);
-          });
-    }
   };
 
   // Fetch all attendees of this event
@@ -164,7 +133,7 @@ const FullCard = ({ route, navigation }) => {
                 attendees: firebase.firestore.FieldValue.arrayRemove(user.uid),
               })
               .then(() => {
-                alert("You withdrew from the event");
+                alert("You withdrew from the meal :(");
                 navigation.goBack();
               });
           } else {
@@ -174,7 +143,7 @@ const FullCard = ({ route, navigation }) => {
                 attendees: firebase.firestore.FieldValue.arrayRemove(user.uid),
               })
               .then(() => {
-                alert("You withdrew from the event");
+                alert("You withdrew from the meal :(");
                 navigation.goBack();
               });
           }
@@ -185,15 +154,37 @@ const FullCard = ({ route, navigation }) => {
   //Reporting event function
   function reportEvent() {
     navigation.navigate("ReportEvent", {
-      eventID: route.params.event.id,
+      eventID: event.id,
     });
+  }
+
+  // Replace event with new details (for editing)
+  const editEvent = newEvent => {
+    setEvent(newEvent);
+  }
+
+  // Alert the user if they want to withdraw from the event or not
+  const withdrawAlert = () => {
+    Alert.alert(
+      "Withdraw",
+      "Are you sure you want to withdraw from this meal?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        { text: "OK", onPress: () => withdraw() },
+      ],
+      { cancelable: false }
+    );
   }
 
   return (
     <Layout>
       <TopNav
         middleContent={
-          <MediumText center>{route.params.event.name}</MediumText>
+          <MediumText center>{event.name}</MediumText>
         }
         leftContent={
           <Ionicons
@@ -214,15 +205,17 @@ const FullCard = ({ route, navigation }) => {
                 />
               </MenuTrigger>
               <MenuOptions>
-                {route.params.event.hostID !== user.uid && <MenuOption onSelect={() => reportEvent()}>
+                {event.hostID !== user.uid && <MenuOption onSelect={() => reportEvent()}>
                   <NormalText size={18}>Report Event</NormalText>
                 </MenuOption>}
-                {route.params.event.hostID === user.uid && <MenuOption onSelect={() => navigation.navigate("EditEvent", {
-                  event: route.params.event
+                {event.hostID === user.uid && <MenuOption onSelect={() => navigation.navigate("EditEvent", {
+                  event,
+                  editEvent,
+                  editEvent2: route.params.editEvent
                 })}>
                   <NormalText size={18}>Edit Event</NormalText>
                 </MenuOption>}
-                <MenuOption onSelect={() => withdraw()}>
+                <MenuOption onSelect={() => withdrawAlert()}>
                   <NormalText size={18} color="red">
                     Withdraw
                   </NormalText>
@@ -236,8 +229,8 @@ const FullCard = ({ route, navigation }) => {
       <ScrollView>
         <ImageBackground
           source={
-            route.params.event.hasImage
-              ? { uri: route.params.event.image }
+            event.hasImage
+              ? { uri: event.image }
               : require("../../../assets/foodBackground.png")
           }
           style={styles.imageBackground}
@@ -245,16 +238,16 @@ const FullCard = ({ route, navigation }) => {
         ></ImageBackground>
         <View style={styles.infoContainer}>
           <LargeText size={20} marginBottom={10}>
-            {route.params.event.name}
+            {event.name}
           </LargeText>
 
-          <NormalText color="black">Hosted by: {route.params.event.hostID === user.uid ? "You ;)"
-            : (route.params.event.hostFirstName ?
-            route.params.event.hostFirstName + " " + route.params.event.hostLastName.substring(0, 1) + "."
-            : route.params.event.hostName)}
+          <NormalText color="black">Hosted by: {event.hostID === user.uid ? "You ;)"
+            : (event.hostFirstName ?
+            event.hostFirstName + " " + event.hostLastName.substring(0, 1) + "."
+            : event.hostName)}
           </NormalText>
 
-          {route.params.event.tags && <TagsList marginVertical={20} tags={route.params.event.tags}/>}
+          {event.tags && <TagsList marginVertical={20} tags={event.tags}/>}
 
           {/* 3 event details (location, date, time} are below */}
 
@@ -262,24 +255,28 @@ const FullCard = ({ route, navigation }) => {
             <View style={styles.row}>
               <Ionicons name="location-sharp" size={20} />
               <NormalText paddingHorizontal={10} color="black">
-                {route.params.event.location}
+                {event.location}
               </NormalText>
             </View>
 
             <View style={styles.row}>
               <Ionicons name="calendar-outline" size={20} />
               <NormalText paddingHorizontal={10} color="black">
-                {getDate(route.params.event.date.toDate())}
+                {getDate(event.date.toDate())}
               </NormalText>
             </View>
 
             <View style={styles.row}>
               <Ionicons name="time-outline" size={20} />
               <NormalText paddingHorizontal={10} color="black">
-                {getTime(route.params.event.date.toDate())}
+                {getTime(event.date.toDate())}
               </NormalText>
             </View>
           </View>
+
+          <NormalText marginBottom={20} color="black">
+            {event.additionalInfo}
+          </NormalText>
 
           {/* Icebreakers dropdown */}
 
@@ -300,14 +297,14 @@ const FullCard = ({ route, navigation }) => {
             </NormalText>
           </View>
           <View style={styles.icebreakers}>
-            {openIcebreakers && icebreakers &&
-              icebreakers.map((ice, index) => (
+            {openIcebreakers && event.ice &&
+              event.ice.map((ice, index) => (
                 <Icebreaker number={index + 1} icebreaker={ice} key={index} />
               ))}
           </View>
 
           {/* Attendance dropdown */}
-          {route.params.event.hostID === user.uid && <View>
+          {event.hostID === user.uid && <View>
             <View style={styles.row}>
               <TouchableOpacity
                 onPress={() => setOpenAttendance(!openAttendance)}

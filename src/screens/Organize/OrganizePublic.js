@@ -21,12 +21,12 @@ import getTime from "../../getTime";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
 import Button from "../../components/Button";
 import NormalText from "../../components/NormalText";
-import KeyboardAvoidingWrapper from "../../components/KeyboardAvoidingWrapper";
 
 import * as firebase from "firebase";
 import * as ImagePicker from "expo-image-picker";
 import { db, auth, storage } from "../../provider/Firebase";
 import { cloneDeep } from "lodash";
+import moment from "moment";
 
 export default function ({ navigation }) {
     // Current user
@@ -240,7 +240,8 @@ export default function ({ navigation }) {
                     </View>                        
 
                     <DateTimePickerModal isVisible={showDate} date={date}
-                        mode={mode} onConfirm={changeDate} onCancel={() => setShowDate(false)}/>
+                        mode={mode} onConfirm={changeDate} onCancel={() => setShowDate(false)}
+                        minimumDate={new Date()} maximumDate={moment().add(1, "months").toDate()}/>
 
                     <TextInput
                         placeholder="Additional Info"

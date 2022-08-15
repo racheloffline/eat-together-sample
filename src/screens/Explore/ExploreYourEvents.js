@@ -11,6 +11,8 @@ import HorizontalSwitch from "../../components/HorizontalSwitch";
 import HorizontalRow from "../../components/HorizontalRow";
 import Filter from "../../components/Filter";
 
+import MediumText from "../../components/MediumText";
+
 import getDate from "../../getDate";
 import { db, auth } from "../../provider/Firebase";
 
@@ -169,11 +171,27 @@ export default function ({ navigation }) {
     setPrivateEvents(!privateEvents);
     setPublicEvents(false);
   };
+
+  // Replace event with new event details
+  const editEvent = newEvent => {
+    const newEvents = events.map(e => {
+      if (e.id === newEvent.id) {
+        return newEvent;
+      }
+      return e;
+    }).sort((a, b) => {
+      return a.date.seconds - b.date.seconds;
+    }).reverse();
+
+    setEvents(newEvents);
+    setFilteredEvents(newEvents);
+  }
+
   return (
     <Layout>
       <Header name="Explore" navigation={navigation} hasNotif={unread} />
       <HorizontalSwitch
-        left="Your Events"
+        left="Your Meals"
         right="Public"
         current="left"
         press={() => navigation.navigate("Explore")}
@@ -188,16 +206,17 @@ export default function ({ navigation }) {
         <Filter
           checked={publicEvents}
           onPress={publicOnly}
-          text="Public events"
+          text="Public"
         />
         <Filter
           checked={privateEvents}
           onPress={privateOnly}
-          text="Private events"
+          text="Private"
         />
       </HorizontalRow>
 
-      {!loading ? (
+      {!loading ? 
+        filteredEvents.length > 0 ? (
         <FlatList
           contentContainerStyle={styles.cards}
           keyExtractor={(item) => item.id}
@@ -209,12 +228,17 @@ export default function ({ navigation }) {
                 navigation.navigate("FullCardPrivate", {
                   event: item,
                   deleteEvent,
+                  editEvent
                 });
               }}
             />
           )}
         />
       ) : (
+        <View style={{ flex: 1, justifyContent: "center" }}>
+          <MediumText center>No meals yet!</MediumText>
+        </View>)
+      : (
         <View style={{ flex: 1, justifyContent: "center" }}>
           <ActivityIndicator size={100} color="#5DB075" />
         </View>

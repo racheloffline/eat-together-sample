@@ -20,6 +20,7 @@ import Button from "../../components/Button";
 
 import * as ImagePicker from 'expo-image-picker';
 import { db, auth } from "../../provider/Firebase";
+import moment from "moment";
 
 export default function ({ navigation }) {
     // State variables for the inputs
@@ -144,7 +145,8 @@ export default function ({ navigation }) {
                     </View>
 
                     <DateTimePickerModal isVisible={showDate} date={date}
-                        mode={mode} onConfirm={changeDate} onCancel={() => setShowDate(false)}/>
+                        mode={mode} onConfirm={changeDate} onCancel={() => setShowDate(false)}
+                        minimumDate={new Date()} maximumDate={moment().add(1, "months").toDate()}/>
 
                     <TextInput
                         placeholder="Additional Info"

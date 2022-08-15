@@ -13,6 +13,8 @@ import HorizontalRow from "../../components/HorizontalRow";
 import Filter from "../../components/Filter";
 import Link from "../../components/Link";
 
+import MediumText from "../../components/MediumText";
+
 import getDate from "../../getDate";
 import { getTimeOfDay } from "../../methods";
 import { auth, db } from "../../provider/Firebase";
@@ -235,7 +237,7 @@ export default function({ navigation }) {
     return (
       <Layout>
         <Header name="Explore" navigation = {navigation} hasNotif = {unread}/>
-        <HorizontalSwitch left="Your Events" right="Public" current="right"
+        <HorizontalSwitch left="Your Meals" right="Public" current="right"
           press={() => navigation.navigate("ExploreYourEvents")}/>
         <Searchbar placeholder="Search by name, location, date, or host name"
 				  value={searchQuery} onChangeText={onChangeText}/>
@@ -341,18 +343,26 @@ export default function({ navigation }) {
         </RBSheet>
 
         <View style={{ flex: 1 }}>
-          {!loading ? <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
-            data={filteredEvents} renderItem={({item}) =>
-              <EventCard event={item} click={() => {
-                  //ampInstance.logEvent('BUTTON_CLICKED'); // EXPERIMENT
-                navigation.navigate("FullCard", {
-                  event: item,
-                  public: true
-                });
-              }}/>
-            }/> : <View style={{ flex: 1, justifyContent: "center" }}>
-              <ActivityIndicator size={100} color="#5DB075"/>
-            </View>}
+          {!loading ? 
+            filteredEvents.length > 0 ? (
+            <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
+              data={filteredEvents} renderItem={({item}) =>
+                <EventCard event={item} click={() => {
+                    //ampInstance.logEvent('BUTTON_CLICKED'); // EXPERIMENT
+                  navigation.navigate("FullCard", {
+                    event: item,
+                    public: true
+                  });
+                }}/>
+            }/>
+            ) : (
+              <View style={{ flex: 1, justifyContent: "center" }}>
+                <MediumText center>No meals yet!</MediumText>
+              </View>) : (
+              <View style={{ flex: 1, justifyContent: "center" }}>
+                <ActivityIndicator size={100} color="#5DB075"/>
+              </View>
+          )}
         </View>
       </Layout>
     );
