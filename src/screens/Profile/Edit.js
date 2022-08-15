@@ -29,6 +29,7 @@ export default function ({ route, navigation }) {
     const [loading, setLoading] = useState(false); // Disabling button if user profile is being updated
 
     useEffect(() => {
+
         setFirstName(route.params.user.firstName);
         setLastName(route.params.user.lastName);
         setBio(route.params.user.bio);
@@ -51,6 +52,7 @@ export default function ({ route, navigation }) {
 
     // Upload image to firebase
     const updateImage = async () => {
+        if(!image) return;
         const response = await fetch(image);
         const blob = await response.blob();
 
@@ -65,24 +67,38 @@ export default function ({ route, navigation }) {
     }
 
     // Update user profile in Firebase
-    const updateUser = async (uri) => {
+    const updateUser = async () => {
+
         route.params.updateInfo(firstName, lastName, bio, tags, image);
-                        
-        db.collection("Users").doc(route.params.user.id).update({
-            firstName,
-            lastName,
-            bio,
-            tags,
-            hasImage: image !== "",
-            image: uri
-        }).then(() => {
-            if (image !== "") {
-                updateImage();
-            }
-            
+
+        if (image !== "") {
+            await updateImage().then(() => {
+                fetchImage().then((uri) => {
+                    db.collection("Users").doc(route.params.user.id).update({
+                        firstName,
+                        lastName,
+                        bio,
+                        tags,
+                        hasImage: !(!image),
+                        image: uri
+                    }).then(() => {
+                        console.log("image: " + image)
+                        console.log("uri: " + uri)
+                    })
+                })
+            })
             alert("Profile updated!");
             setLoading(false);
-        });
+        } else {
+            await db.collection("Users").doc(route.params.user.id).update({
+                firstName,
+                lastName,
+                bio,
+                tags
+            })
+            alert("Profile updated!");
+            setLoading(false);
+        }
     }
 
     //Sign out, and remove this push token from the list of acceptable push tokens
@@ -176,16 +192,9 @@ export default function ({ route, navigation }) {
                             || tags.length < 3 || tags.length > 6 || loading}
                         style={firstName === "" || lastName === "" || bio === "" || tags.length < 3
                             || tags.length > 6 ? styles.saveDisabled : styles.save} 
-                        onPress={() => {
+                        onPress={async () => {
                             setLoading(true);
-
-                            if (image !== "") {
-                                updateImage().then(() => {
-                                    fetchImage().then(uri => {
-                                        updateUser(uri);
-                                    })
-                                });
-                            }
+                            await updateUser();
                         }}>
                         <MediumText color="#5DB075">{loading ? "Updating ..." : "Update Profile"}</MediumText>
                     </TouchableOpacity>

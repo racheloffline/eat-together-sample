@@ -60,7 +60,8 @@ export default function ({ navigation }) {
             tags: newTags
         }));
 
-        setUserInfo({...userInfo, image: newImage});
+        if(newImage) setUserInfo({...userInfo, image: newImage});
+
     }
 
     return (
