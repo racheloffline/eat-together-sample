@@ -27,7 +27,7 @@ import * as ImagePicker from "expo-image-picker";
 import { db, auth, storage } from "../../provider/Firebase";
 import { cloneDeep } from "lodash";
 
-export default function ({ navigation }) {
+export default function ({ route, navigation }) {
     // Current user
     const user = auth.currentUser;
     const [userInfo, setUserInfo] = useState({});
@@ -53,6 +53,14 @@ export default function ({ navigation }) {
 
     // Loading notifications
     useEffect(() => {
+
+        setName(route.params.event.name);
+        setLocation(route.params.event.location);
+        setDate(route.params.event.date.toDate());
+        setAdditionalInfo(route.params.event.additionalInfo);
+        setTagsSelected(route.params.event.tags ? route.params.event.tags : []);
+        setPhoto(route.params.event.image ? route.params.event.image : photo);
+
         async function fetchData() {
             await db.collection("Users").doc(user.uid).onSnapshot((doc) => {
                 setUnread(doc.data().hasNotif);
@@ -116,7 +124,7 @@ export default function ({ navigation }) {
 
     // For posting the event
     const storeEvent = (id, hasImage, image) => {
-        db.collection("Public Events").doc(id).set({
+        db.collection("Public Events").doc(route.params.event.id).set({
             id,
             name,
             hostID: user.uid,
