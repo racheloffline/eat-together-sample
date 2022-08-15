@@ -11,6 +11,8 @@ import HorizontalSwitch from "../../components/HorizontalSwitch";
 import HorizontalRow from "../../components/HorizontalRow";
 import Filter from "../../components/Filter";
 
+import MediumText from "../../components/MediumText";
+
 import getDate from "../../getDate";
 import { db, auth } from "../../provider/Firebase";
 
@@ -169,6 +171,7 @@ export default function ({ navigation }) {
     setPrivateEvents(!privateEvents);
     setPublicEvents(false);
   };
+
   return (
     <Layout>
       <Header name="Explore" navigation={navigation} hasNotif={unread} />
@@ -197,7 +200,8 @@ export default function ({ navigation }) {
         />
       </HorizontalRow>
 
-      {!loading ? (
+      {!loading ? 
+        filteredEvents.length > 0 ? (
         <FlatList
           contentContainerStyle={styles.cards}
           keyExtractor={(item) => item.id}
@@ -215,6 +219,10 @@ export default function ({ navigation }) {
           )}
         />
       ) : (
+        <View style={{ flex: 1, justifyContent: "center" }}>
+          <MediumText center>No meals yet!</MediumText>
+        </View>)
+      : (
         <View style={{ flex: 1, justifyContent: "center" }}>
           <ActivityIndicator size={100} color="#5DB075" />
         </View>
