@@ -96,7 +96,7 @@ const FullProfile = ({ route, navigation }) => {
       db.collection("Users").doc(user.uid).get().then((curUser) => {
         let userData = curUser.data();
         db.collection("User Invites").doc(data.id).collection("Connections").doc(user.uid).set({
-          name: userData.name,
+          name: (userData.firstName + " " + userData.lastName),
           username: userData.username,
           profile: inviterImage
         }).then(() => {
