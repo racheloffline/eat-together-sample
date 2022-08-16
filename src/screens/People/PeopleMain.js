@@ -4,6 +4,8 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 import People from './People';
 import FullProfile from "./FullProfile";
+import FullCard from './FullCard';
+
 import Invite from "../Invite/Invite";
 import InviteFull from "../Invite/InviteFull";
 import Connections from "../Profile/Connections";
@@ -25,6 +27,9 @@ export default class PeopleMain extends React.PureComponent {
                     </Stack.Screen>
                     <Stack.Screen name="FullProfile" options={{headerShown: false}}>
                         {props => <FullProfile {...props}/>}
+                    </Stack.Screen>
+                    <Stack.Screen name="FullCard" options={{headerShown: false}}>
+                        {props => <FullCard {...props}/>}
                     </Stack.Screen>
                     {/*<Stack.Screen name="InviteMain" options={{headerShown: false}} component={InviteMain}/>*/}
                     <Stack.Screen name="Invite" component={Invite} options={{headerShown: false}}/>

@@ -70,19 +70,20 @@ export default function({ navigation }) {
 	const search = text => {
 		let newPeople = people.filter(p => isMatch(p, text));
 		setFilteredPeople(newPeople);
+
+		// Reset all filters
+		setSimilarInterests(false);
+		setMutualFriends(false);
 	}
 
 	// Determines if a person matches the search query or not
 	const isMatch = (person, text) => {
-		if (person.name.toLowerCase().includes(text.toLowerCase())) { // Name
+		if (person.firstName.toLowerCase().includes(text.toLowerCase())
+			|| person.lastName.toLowerCase().includes(text.toLowerCase())) { // Name
 			return true;
 		}
 
 		if (person.username.toLowerCase().includes(text.toLowerCase())) { // Username
-			return true;
-		}
-
-		if (person.quote.toLowerCase().includes(text.toLowerCase())) { // Quote
 			return true;
 		}
 
@@ -130,6 +131,7 @@ export default function({ navigation }) {
 		
 		setSimilarInterests(!similarInterests);
 		setMutualFriends(false);
+		setSearchQuery("");
 	}
 
 	// Get a list of everyone's tags
@@ -156,23 +158,28 @@ export default function({ navigation }) {
 		setLoading(false);
 		setMutualFriends(!mutualFriends);
 		setSimilarInterests(false);
+		setSearchQuery("");
 	}
 
 	return (
 		<Layout>
 			<Header name="People" navigation = {navigation} hasNotif = {unread}/>
-			<Searchbar placeholder="Search by name, username, quote, or tags"
-				value={searchQuery} onChangeText={onChangeText}/>
 
-			<HorizontalRow>
-				<Filter checked={similarInterests}
-					onPress={sortBySimilarInterests} text="Sort by similar interests"/>
-				<Filter checked={mutualFriends}
-					onPress={filterByMutualFriends} text="Mutual friends"/>
-			</HorizontalRow>
+			<View style={{ paddingHorizontal: 20 }}>
+				<Searchbar placeholder="Search by name, username, or tags"
+					value={searchQuery} onChangeText={onChangeText}/>
+
+				<HorizontalRow>
+					<Filter checked={similarInterests}
+						onPress={sortBySimilarInterests} text="Sort by similar interests"/>
+					<Filter checked={mutualFriends}
+						onPress={filterByMutualFriends} text="Mutual friends"/>
+				</HorizontalRow>
+			</View>
 
 			<View style={{ flex: 1, alignItems: "center" }}>
 				{!loading ? <FlatList keyExtractor={item => item.id}
+					contentContainerStyle={{ borderTopColor: "black", borderTopWidth: 1 }}
 					data={filteredPeople} renderItem={({item}) =>
 						<ProfileBubble person={item} click={() => {
 							navigation.navigate("FullProfile", {

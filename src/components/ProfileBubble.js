@@ -8,9 +8,9 @@ import Tag from "./Tag";
 
 const ProfileBubble = props => {
     return (
-        <View style={[styles.card, {borderTopColor: generateColor()}]}>
+        <View style={[styles.card, {borderBottomColor: generateColor()}]}>
             <TouchableOpacity onPress={props.click}>
-                <MediumText>{props.person.firstName + " " + props.person.lastName.substring(0, 1) + "."}</MediumText>
+                <MediumText>{props.person.bio}</MediumText>
                 <View style={styles.row}>
                     <NormalText>
                         - {props.person.firstName + " " + props.person.lastName.substring(0, 1) + "."}
@@ -18,7 +18,7 @@ const ProfileBubble = props => {
 
                     <ScrollView horizontal={true} style={{ marginLeft: 10 }}>
                         <View onStartShouldSetResponder={() => true} style={{ flexDirection: "row" }}>
-                            {props.person.tags.slice(0, 4).map(tag => <Tag text={tag} key={tag}/>)}
+                            {props.person.tags.slice(0, 2).map(tag => <Tag text={tag} key={tag}/>)}
                         </View>
                     </ScrollView>
                 </View>
@@ -29,9 +29,10 @@ const ProfileBubble = props => {
 
 const styles = StyleSheet.create({
     card: {
-        padding: 10,
+        paddingVertical: 10,
+        paddingHorizontal: 15,
         width: Dimensions.get('screen').width,
-        borderTopWidth: 1
+        borderBottomWidth: 1
     },
 
     row: {

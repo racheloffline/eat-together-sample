@@ -1,17 +1,18 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import SmallText from "./SmallText";
+import NormalText from './NormalText';
 
 const Tag = props => {
     return (
         <View style={styles.tag}>
         {/*tag text isn't as bold as in figma, not sure how to update w/o fontWeight */}
-            <SmallText size={14} color="black">{props.text}</SmallText>
+            <NormalText size={14} color="black">{props.text}</NormalText>
             {props.remove && 
-            <TouchableOpacity onPress={props.remove} style={styles.close}>
-                <Ionicons name="close" size={16} color="black" />
-            </TouchableOpacity>}
+                <TouchableOpacity onPress={props.remove} style={styles.close}>
+                    <Ionicons name="close" size={16} color="black" />
+                </TouchableOpacity>
+            }
         </View>
     );
 }

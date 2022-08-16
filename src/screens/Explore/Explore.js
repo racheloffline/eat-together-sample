@@ -15,7 +15,6 @@ import Link from "../../components/Link";
 
 import MediumText from "../../components/MediumText";
 
-import getDate from "../../getDate";
 import { getTimeOfDay } from "../../methods";
 import { auth, db } from "../../provider/Firebase";
 
@@ -30,7 +29,6 @@ export default function({ navigation }) {
 
     // Filters
     const [popularity, setPopularity] = useState(false);
-    //const [closeness, setCloseness] = useState(false);
     const [fromFriends, setFromFriends] = useState(false);
     const [friendsAttending, setFriendsAttending] = useState(false);
     const [similarInterests, setSimilarInterests] = useState(false);
@@ -48,14 +46,16 @@ export default function({ navigation }) {
     useEffect(() => { // updates stuff right after React makes changes to the DOM
         async function fetchData() {
             await db.collection("Users").doc(user.uid).get().then(doc => {
-              setUserInfo(doc.data());
+                setUserInfo(doc.data());
             });
 
             const ref = db.collection("Public Events");
             await ref.onSnapshot((query) => {
                 let newEvents = [];
                 query.forEach((doc) => {
-                    newEvents.push(doc.data());
+                    if (doc.data().date.toDate() > new Date()) {
+                        newEvents.push(doc.data());
+                    }
                 });
                 
                 // Sort events by date
@@ -85,7 +85,6 @@ export default function({ navigation }) {
 
         if (similarInterests) {
           newEvents = await sortBySimilarInterests(newEvents);
-          console.log(newEvents);
         }
 
         if (popularity) {
@@ -116,6 +115,7 @@ export default function({ navigation }) {
       }
 
       setLoading(true);
+      setSearchQuery("");
       filter().then(() => setLoading(false));
     }, [similarInterests, popularity, fromFriends, friendsAttending, morning, afternoon, evening]);
     
@@ -131,26 +131,39 @@ export default function({ navigation }) {
     // Method to filter out events
     const search = text => {
       setLoading(true);
-      let newEvents = filteredEvents.filter(e => isMatch(e, text));
+      let newEvents = events.filter(e => isMatch(e, text));
       setFilteredEvents(newEvents);
       setLoading(false);
+
+      // Reset all filters
+      setMorning(false);
+      setAfternoon(false);
+      setEvening(false);
+      setSimilarInterests(false);
+      setPopularity(false);
+      setFromFriends(false);
+      setFriendsAttending(false);
     }
 
     // Determines if an event matches search query or not
-    const isMatch = (event, text) => {
-      if (event.name.toLowerCase().includes(text.toLowerCase())) { // Name
+    const isMatch = (event, text) => {      
+      // Name
+      if (event.name.toLowerCase().includes(text.toLowerCase())) {
         return true;
       }
 
-      if (event.location.toLowerCase().includes(text.toLowerCase())) { // Location
+      // Tags
+      if (event.tags.some(tag => tag.toLowerCase().includes(text.toLowerCase()))) {
         return true;
       }
 
-      if (getDate(event.date.toDate()).toLowerCase().includes(text.toLowerCase())) { // Date
-        return true;
+      // Host
+      if (event.hostName) {
+        return event.hostName.toLowerCase().includes(text.toLowerCase());
       }
-
-      return event.hostName.toLowerCase().includes(text.toLowerCase()); // Host
+      
+      return event.hostFirstName.toLowerCase().includes(text.toLowerCase())
+        || event.hostLastName.toLowerCase().includes(text.toLowerCase());
     }
 
     // Method called when a new query is typed in/deleted
@@ -239,8 +252,11 @@ export default function({ navigation }) {
         <Header name="Explore" navigation = {navigation} hasNotif = {unread}/>
         <HorizontalSwitch left="Your Meals" right="Public" current="right"
           press={() => navigation.navigate("ExploreYourEvents")}/>
-        <Searchbar placeholder="Search by name, location, date, or host name"
-				  value={searchQuery} onChangeText={onChangeText}/>
+
+        <View style={{ paddingHorizontal: 20 }}>
+          <Searchbar placeholder="Search by name, tags, or host name"
+            value={searchQuery} onChangeText={onChangeText}/>
+        </View>
 
         <HorizontalRow>
           <Filter checked={morning || afternoon || evening}
@@ -357,7 +373,7 @@ export default function({ navigation }) {
             }/>
             ) : (
               <View style={{ flex: 1, justifyContent: "center" }}>
-                <MediumText center>No meals yet!</MediumText>
+                <MediumText center>Empty 🍽️</MediumText>
               </View>) : (
               <View style={{ flex: 1, justifyContent: "center" }}>
                 <ActivityIndicator size={100} color="#5DB075"/>

@@ -1,7 +1,7 @@
 //Functionality TDB, most likely to be used to implement ice-breaker games
 
 import React, {useEffect, useState} from "react";
-import {View, StyleSheet, Image, Dimensions, FlatList} from "react-native";
+import {View, StyleSheet, Image, Dimensions, ScrollView} from "react-native";
 import {
   Layout,
   TopNav,
@@ -77,7 +77,8 @@ const FullProfile = ({ route, navigation }) => {
       let list = [];
       db.collection("Public Events").onSnapshot(query => {
         query.forEach(doc => {
-          if (doc.data().hostID === route.params.person.id) {
+          if (doc.data().hostID === route.params.person.id
+            && doc.data().date.toDate() > new Date()) {
             list.push(doc.data());
           }
         });
@@ -111,7 +112,7 @@ const FullProfile = ({ route, navigation }) => {
   return (
     <Layout>
       <TopNav middleContent={
-          <MediumText center>User Profile</MediumText>
+          <MediumText center>View Profile</MediumText>
         }
         leftContent={
           <Ionicons
@@ -121,7 +122,7 @@ const FullProfile = ({ route, navigation }) => {
         } leftAction={() => navigation.goBack()}
       />
 
-      <View style={styles.page}>
+      <ScrollView contentContainerStyle={styles.page}>
         <View style={styles.background}/>
         <Image style={styles.image} source={route.params.person.hasImage ? 
           {uri: route.params.person.image} : require("../../../assets/logo.png")}/>
@@ -130,13 +131,9 @@ const FullProfile = ({ route, navigation }) => {
           <LargeText>
             {route.params.person.firstName + " " + route.params.person.lastName.substring(0, 1) + "."}
           </LargeText>
-          <NormalText>
-          {route.params.person.attendedEventIDs.length + "/" + 
-            (route.params.person.archivedEventIDs.length + route.params.person.attendingEventIDs.length) + " meals attended"}
-          </NormalText>
-          <MediumText>@{route.params.person.username}</MediumText>
+          <MediumText size={16}>@{route.params.person.username}</MediumText>
 
-          <View style={{flexDirection: "row", marginTop: 10}}>
+          <View style={{flexDirection: "row", marginVertical: 10}}>
             <Button disabled={disabled} onPress={connect} backgroundColor={color}
               paddingVertical={5} paddingHorizontal={15} fontSize={14}>
               {status}
@@ -150,15 +147,24 @@ const FullProfile = ({ route, navigation }) => {
               Report
             </Button>
           </View>
+
+          <NormalText>
+          {route.params.person.attendedEventIDs.length + "/" + 
+            (route.params.person.archivedEventIDs.length + route.params.person.attendingEventIDs.length) + " meals attended"}
+          </NormalText>
         </View>
 
         <TagsList tags={route.params.person.tags}/>
         <MediumText>{route.params.person.bio}</MediumText>
-        
-      </View>
-      <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
-        data={events} renderItem={({item}) => <EventCard event={item} disabled/>
-      }/>
+
+        <View style={styles.cards}>
+          {events.map((event) => <EventCard event={event} key={event.id} click={() => {
+            navigation.navigate("FullCard", {
+              event
+            });
+          }}/>)}
+        </View>
+      </ScrollView>
     </Layout>
   );
 }
@@ -188,7 +194,8 @@ const styles = StyleSheet.create({
 
   name: {
     alignItems: "center",
-    marginVertical: 20
+    marginTop: 20,
+    marginBottom: 10
   },
 
   cards: {
