@@ -8,14 +8,14 @@ import {
 } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 
-import LargeText from "../../components/LargeText";
-import MediumText from "../../components/MediumText";
-import TagsList from "../../components/TagsList";
-import Button from "../../components/Button";
-import EventCard from "../../components/EventCard";
-import NormalText from "../../components/NormalText";
+import LargeText from "../../../components/LargeText";
+import MediumText from "../../../components/MediumText";
+import TagsList from "../../../components/TagsList";
+import Button from "../../../components/Button";
+import EventCard from "../../../components/EventCard";
+import NormalText from "../../../components/NormalText";
 
-import { db } from "../../provider/Firebase";
+import { db } from "../../../provider/Firebase";
 import firebase from "firebase";
 
 const FullProfile = ({ route, navigation }) => {
