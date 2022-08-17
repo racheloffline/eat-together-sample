@@ -108,7 +108,6 @@ export default function ({ navigation }) {
             // sort display by time
             temp.sort((a, b) => {
 
-              console.log(`A: ${a.time}, B:${b.time}`)
               return b.time- a.time;
             })
             setGroups(temp);

@@ -83,7 +83,6 @@ export default function({ navigation }) {
 
         if (similarInterests) {
           newEvents = await sortBySimilarInterests(newEvents);
-          console.log(newEvents);
         }
 
         if (popularity) {

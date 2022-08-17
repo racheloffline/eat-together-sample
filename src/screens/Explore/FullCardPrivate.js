@@ -90,8 +90,6 @@ const FullCard = ({ route, navigation }) => {
       .get()
       .then((doc) => {
         setIcebreakers(doc.data().ice);
-        console.log("icebreakers:");
-        console.log(doc.data().ice);
       });
   };
 
