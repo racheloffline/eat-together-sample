@@ -124,7 +124,7 @@ const FullProfile = ({ route, navigation }) => {
       <View style={styles.page}>
         <View style={styles.background}/>
         <Image style={styles.image} source={route.params.person.hasImage ? 
-          {uri: route.params.person.image} : require("../../../assets/logo.png")}/>
+          {uri: route.params.person.image} : require("../../../../assets/logo.png")}/>
         
         <View style={styles.name}>
           <LargeText>

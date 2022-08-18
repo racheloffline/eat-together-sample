@@ -4,13 +4,13 @@ import React, {useEffect, useState} from "react";
 import { FlatList, View, ActivityIndicator } from "react-native";
 import { Layout } from "react-native-rapi-ui";
 
-import Searchbar from "../../components/Searchbar";
-import ProfileBubble from "../../components/ProfileBubble";
-import Header from "../../components/Header";
-import HorizontalRow from "../../components/HorizontalRow";
-import Filter from "../../components/Filter";
+import Searchbar from "../../../components/Searchbar";
+import ProfileBubble from "../../../components/ProfileBubble";
+import Header from "../../../components/Header";
+import HorizontalRow from "../../../components/HorizontalRow";
+import Filter from "../../../components/Filter";
 
-import { db, auth } from "../../provider/Firebase";
+import { db, auth } from "../../../provider/Firebase";
 
 export default function({ navigation }) {
 	// Fetch current user

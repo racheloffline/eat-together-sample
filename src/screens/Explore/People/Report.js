@@ -8,11 +8,9 @@ import {
     useTheme,
     Button, TextInput
 } from "react-native-rapi-ui";
-import LargeText from "../../components/LargeText";
-import MediumText from "../../components/MediumText";
-import NormalText from "../../components/NormalText";
+import LargeText from "../../../components/LargeText";
+import MediumText from "../../../components/MediumText";
 import {FontAwesome, Ionicons} from "@expo/vector-icons";
-import getDate from "../../getDate";
 import admin from "firebase";
 import firebase from "firebase";
 

@@ -12,7 +12,7 @@ import ProfilePic from "../components/ProfilePic";
 
 //Screens (Make sure to import if ever adding new screen!)
 import OrganizeMain from "../screens/Organize/OrganizeMain";
-import PeopleMain from "../screens/People/PeopleMain";
+import PeopleMain from "../screens/Explore/People/PeopleMain";
 import ExploreMain from "../screens/Explore/ExploreMain";
 import Loading from "../screens/utils/Loading";
 

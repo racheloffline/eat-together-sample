@@ -4,14 +4,14 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 import People from './People';
 import FullProfile from "./FullProfile";
-import Invite from "../Invite/Invite";
-import InviteFull from "../Invite/InviteFull";
-import Connections from "../Profile/Connections";
-import Requests from "../Profile/Requests";
+import Invite from "../../Invite/Invite";
+import InviteFull from "../../Invite/InviteFull";
+import Connections from "../../Profile/Connections";
+import Requests from "../../Profile/Requests";
 import Report from "./Report";
 //import InviteMain from "../Invite/InviteMain";
-import Chats from "../Invite/Chats";
-import ChatRoom from "../Invite/ChatRoom";
+import Chats from "../../Invite/Chats";
+import ChatRoom from "../../Invite/ChatRoom";
 
 const Stack = createStackNavigator();
 
