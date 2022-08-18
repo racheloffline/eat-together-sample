@@ -173,8 +173,8 @@ const FullCard = ({ route, navigation }) => {
   //Reporting event function
   function reportEvent() {
     navigation.navigate("ReportEvent", {
-      eventID: route.params.event.id,
-    });
+      eventID: route.params.event.id
+    })
   }
 
   return (
