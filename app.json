@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "Eat Together",
+    "name": "Eat Together!",
     "owner": "eat-together-team",
-    "slug": "eat-together-mvp",
+    "slug": "eat-together-softlaunch",
     "description": "Connecting students through shared meals.",
-    "version": "0.2.0",
+    "version": "0.1.0",
     "orientation": "portrait",
-    "icon": "./assets/logo.png",
+    "icon": "./assets/big_logo.png",
     "splash": {
-      "image": "./assets/logo.png",
+      "image": "./assets/big_logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -20,7 +20,7 @@
     ],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.eattogether.eattogethermvp"
+      "bundleIdentifier": "com.eattogether.eattogethersoftlaunch"
     },
     "web": {
       "favicon": "./assets/logo.png"
@@ -33,6 +33,12 @@
           "photosPermission": "The app accesses your photos to let you pick a profile image."
         }
       ]
-    ]
+    ],
+    "android": {
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.eattogether.eattogethersoftlaunch"
+    }
   }
 }
