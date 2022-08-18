@@ -6,6 +6,7 @@ import SmallText from './SmallText';
 
 import getDate from "../getDate";
 import getTime from "../getTime";
+import NormalText from './NormalText';
 
 const EventCard = props => {    
     return (
@@ -15,17 +16,13 @@ const EventCard = props => {
                     : {uri: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400"}}/>
 
                 <SectionContent>
-                    <View style={styles.details}>
-                        <Image style={styles.profile} source={props.event.hasHostImage ? {uri: props.event.hostImage}
-                            : require("../../assets/logo.png")}/>
-                            
-                        <View style={styles.text}>
-                            <MediumText>{props.event.name}</MediumText>
-                            <SmallText size={12}>
-                                {props.event.location} | {getDate(props.event.date.toDate())} | {getTime(props.event.date.toDate())}
-                            </SmallText>
-                        </View>
-                    </View>
+                    <MediumText center>{props.event.name}</MediumText>
+                    <NormalText center>By { props.event.hostName ? props.event.hostName
+                        : props.event.hostFirstName + " " + props.event.hostLastName.substring(0, 1) + "."
+                    }</NormalText>
+                    <SmallText size={12} center>
+                        {props.event.location} | {getDate(props.event.date.toDate())} | {getTime(props.event.date.toDate())}
+                    </SmallText>
                 </SectionContent>
             </TouchableOpacity>
         </Section>
@@ -51,27 +48,6 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 15,
         borderTopRightRadius: 15,
     },
-
-    details: {
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center"
-    },
-
-    profile: {
-        backgroundColor: "#5DB075",
-        borderWidth: 2,
-        borderColor: "#5DB075",
-        width: 60,
-        height: 60,
-        borderRadius: 30,
-        marginRight: 10
-    },
-
-    text: {
-        flexDirection: "column",
-        maxWidth: Dimensions.get('window').width - 150
-    }
 })
 
 export default EventCard;

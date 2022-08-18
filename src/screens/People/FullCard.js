@@ -1,7 +1,14 @@
 // Full event page
 
 import React, { useState, useEffect } from "react";
-import { View, ScrollView, StyleSheet, ImageBackground, Dimensions } from "react-native";
+import { 
+  View,
+  ScrollView,
+  StyleSheet,
+  ImageBackground,
+  Dimensions,
+  Image
+} from "react-native";
 import { Layout, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -103,11 +110,15 @@ const FullCard = ({ route, navigation }) => {
             {route.params.event.name}
           </LargeText>
 
-          <NormalText color="black">Hosted by: {route.params.event.hostID === user.uid ? "You ;)"
-            : (route.params.event.hostFirstName ?
-              route.params.event.hostFirstName + " " + route.params.event.hostLastName.substring(0, 1) + "."
-            : route.params.event.hostName)}
-          </NormalText>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Image source={route.params.event.hasHostImage ? { uri: route.params.event.hostImage}
+              : require("../../../assets/logo.png")} style={styles.profileImg}/>
+            <MediumText size={18}>{route.params.event.hostID === user.uid ? "You ;)"
+              : (route.params.event.hostFirstName ?
+                route.params.event.hostFirstName + " " + route.params.event.hostLastName
+              : route.params.event.hostName)}
+            </MediumText>
+          </View>
 
           {route.params.event.tags && <TagsList marginVertical={20} tags={route.params.event.tags}/>}
 
@@ -161,6 +172,16 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     marginVertical: 4,
+  },
+
+  profileImg: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    borderColor: "#5DB075",
+    borderWidth: 1,
+    backgroundColor: "white",
+    marginRight: 3
   },
 
   buttonRow: {

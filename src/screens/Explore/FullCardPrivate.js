@@ -8,7 +8,8 @@ import {
   ImageBackground,
   Dimensions,
   TouchableOpacity,
-  Alert
+  Alert,
+  Image
 } from "react-native";
 import { Layout, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
@@ -241,11 +242,15 @@ const FullCard = ({ route, navigation }) => {
             {event.name}
           </LargeText>
 
-          <NormalText color="black">Hosted by: {event.hostID === user.uid ? "You ;)"
-            : (event.hostFirstName ?
-            event.hostFirstName + " " + event.hostLastName.substring(0, 1) + "."
-            : event.hostName)}
-          </NormalText>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Image source={route.params.event.hasHostImage ? { uri: route.params.event.hostImage}
+              : require("../../../assets/logo.png")} style={styles.profileImg}/>
+            <MediumText size={18}>{route.params.event.hostID === user.uid ? "You ;)"
+              : (route.params.event.hostFirstName ?
+                route.params.event.hostFirstName + " " + route.params.event.hostLastName
+              : route.params.event.hostName)}
+            </MediumText>
+          </View>
 
           {event.tags && <TagsList marginVertical={20} tags={event.tags}/>}
 
@@ -358,6 +363,16 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     marginVertical: 4,
+  },
+
+  profileImg: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    borderColor: "#5DB075",
+    borderWidth: 1,
+    backgroundColor: "white",
+    marginRight: 3
   },
 
   buttonRow: {

@@ -179,7 +179,6 @@ export default function({ navigation }) {
 
 			<View style={{ flex: 1, alignItems: "center" }}>
 				{!loading ? <FlatList keyExtractor={item => item.id}
-					contentContainerStyle={{ borderTopColor: "black", borderTopWidth: 1 }}
 					data={filteredPeople} renderItem={({item}) =>
 						<ProfileBubble person={item} click={() => {
 							navigation.navigate("FullProfile", {

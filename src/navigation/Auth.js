@@ -8,6 +8,7 @@ import ForgetPassword from "../screens/auth/ForgetPassword";
 // Sign-up pages
 import Name from "../screens/auth/Registration/Name";
 import Email from "../screens/auth/Registration/Email";
+import Tags from "../screens/auth/Registration/Tags";
 import Availabilities from "../screens/auth/Registration/Availabilities";
 import Password from "../screens/auth/Registration/Password";
 
@@ -31,6 +32,11 @@ const Auth = () => {
     const [bio, setBio] = useState("");
     const [image, setImage] = useState("");
     const [tags, setTags] = useState([]);
+
+    // Tags.js
+    const [schoolTags, setSchoolTags] = useState([]);
+    const [hobbyTags, setHobbyTags] = useState([]);
+    const [foodTags, setFoodTags] = useState([]);
 
     // Email.js
     const [email, setEmail] = useState("");
@@ -164,9 +170,14 @@ const Auth = () => {
                 setLastName={setLastName} bio={bio} setBio={setBio} image={image} setImage={setImage}
                 tags={tags} setTags={setTags}/>}
         </Stack.Screen>
+        <Stack.Screen name="Tags" options={{headerShown: false}}>
+            {props => <Tags {...props} schoolTags={schoolTags} setSchoolTags={setSchoolTags}
+                hobbyTags={hobbyTags} setHobbyTags={setHobbyTags} foodTags={foodTags} setFoodTags={setFoodTags}/>}
+        </Stack.Screen>
         <Stack.Screen name="Email" options={{headerShown: false}}>
             {props => <Email {...props} email={email} setEmail={setEmail}/>}
         </Stack.Screen>
+        
         <Stack.Screen name="Availabilities" options={{headerShown: false}} component={Availabilities}/>
         <Stack.Screen name="Monday" options={{headerShown: false}}>
             {props => <Monday {...props} times={monday} setTimes={setMonday}/>}

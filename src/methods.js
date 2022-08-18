@@ -8,8 +8,8 @@ Generates a random color.
 Returns: Hex value of random color.
  */
 export const generateColor = () => {
-    const colors = ["#e83a69", "#e0a575", "#8476a8", "#3861ec", "#e075b4", "#266c26", "#da721e", "#7e63ff", "#850D52", "#6abedc", "#73bd73", "#ffbe4a", "#FEB144", "#FF6663"];
-    let random = Math.floor(Math.random() * 14);
+    const colors = ["#5DB075", "#6DE2BF", "#62E286", "#31B87F", "#71D8AC", "#3DD671"];
+    let random = Math.floor(Math.random() * colors.length);
     return colors[random];
 };
 

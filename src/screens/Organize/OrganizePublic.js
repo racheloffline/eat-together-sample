@@ -307,7 +307,6 @@ export default function ({ navigation }) {
                     multi={true}
                     selectedItems={tagsSelected}
                     onItemSelect={(item) => {
-                        console.log("Select");
                         setTagsSelected([...tagsSelected, item]);
                     }}
                     onRemoveItem={(item, index) => {

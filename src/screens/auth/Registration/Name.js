@@ -1,7 +1,7 @@
 // First page of registration
 
 import React, { useState } from "react";
-import { View, StyleSheet, Dimensions, Image, TouchableOpacity, KeyboardAvoidingView } from "react-native";
+import { View, StyleSheet, Dimensions, Image, TouchableOpacity } from "react-native";
 import { TextInput } from "react-native-rapi-ui";
 import { Feather, FontAwesome } from '@expo/vector-icons';
 
@@ -42,7 +42,7 @@ const Name = props => {
       props.setBio(bio);
       props.setImage(image);
       props.setTags(tags);
-      props.navigation.navigate("Email");
+      props.navigation.navigate("Tags");
     }
   }
 
@@ -70,7 +70,7 @@ const Name = props => {
           {image !== "" ? <Image style={styles.image} source={{uri: image}}/>
             : <Image style={styles.image} source={require("../../../../assets/logo.png")}/>}
           <TouchableOpacity style={styles.editImage} onPress={pickImage}>
-            <Feather name="edit-2" size={20} color="black"/>
+            <Feather name="edit-2" size={24} color="black"/>
           </TouchableOpacity>
         </View>
 
@@ -84,34 +84,14 @@ const Name = props => {
               leftContent={<FontAwesome name="user" size={18}/>} autoComplete="name"/>
           </View>
 
-          <TextInput placeholder="Bio (max. 100 characters)" value={bio} maxLength={100}
-            onChangeText={val => setBio(val)} containerStyle={{marginBottom: 30}}
+          <TextInput placeholder="Fun fact (10 to 100 characters)" value={bio} maxLength={100}
+            onChangeText={val => setBio(val)} containerStyle={{marginTop: 20}}
             leftContent={<FontAwesome name="quote-left" size={18}/>}/>
-    
-          <MediumText>Describe yourself with tags!</MediumText>
-          <SmallText>Note: must have between 3 and 6 tags (inclusive).</SmallText>
-          <View style={styles.tagInput}>
-            <TagsSection
-              multi={true}
-              selectedItems={tags}
-              onItemSelect={(item) => {
-                setTags([...tags, item]);
-              }}
-              onRemoveItem={(item, index) => {
-                const newTags = tags.filter((tag, i) => i !== index);
-                setTags(newTags);
-              }}
-              inline={true}
-              items={cloneDeep(allTags)}
-              chip={true}
-              resetValue={false}
-            />
-          </View>
 
           <View style={styles.buttons}>
             <Button onPress={() => props.navigation.goBack()}
               marginHorizontal={10}>Back</Button>
-            <Button disabled={firstName === "" || lastName === "" || bio === "" || tags.length < 3 || tags.length > 6}
+            <Button disabled={firstName === "" || lastName === "" || bio.length < 10}
               onPress={goNext}
               marginHorizontal={10}>Next</Button>
           </View>    
@@ -134,15 +114,15 @@ const styles = StyleSheet.create({
   },
 
   image: {
-    width: 100,
-    height: 100,
+    width: 150,
+    height: 150,
     borderRadius: 125
   },
 
   editImage: {
-    left: 40,
-    bottom: 40,
-    padding: 10,
+    left: 50,
+    bottom: 50,
+    padding: 15,
     backgroundColor: "#5DB075",
     borderRadius: 100
   },
@@ -170,7 +150,7 @@ const styles = StyleSheet.create({
   },
 
   buttons: {
-    marginTop: 50,
+    marginTop: "40%",
     display: "flex",
     flexDirection: "row",
     justifyContent: "center"
