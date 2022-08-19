@@ -32,7 +32,7 @@ import {
   MenuTrigger,
 } from "react-native-popup-menu";
 
-const FullCard = ({ route, navigation }) => {
+const WhileYouEat = ({ route, navigation }) => {
   // Data for the attendees
   const [attendees, setAttendees] = useState(
     new Array(route.params.event.attendees.length).fill(false)
@@ -90,8 +90,6 @@ const FullCard = ({ route, navigation }) => {
       .get()
       .then((doc) => {
         setIcebreakers(doc.data().ice);
-        console.log("icebreakers:");
-        console.log(doc.data().ice);
       });
   };
 
@@ -202,12 +200,16 @@ const FullCard = ({ route, navigation }) => {
                 />
               </MenuTrigger>
               <MenuOptions>
-                {route.params.event.hostID !== user.uid && <MenuOption onSelect={() => reportEvent()}>
-                  <NormalText size={18}>Report Event</NormalText>
-                </MenuOption>}
-                {route.params.event.hostID === user.uid && <MenuOption>
-                  <NormalText size={18}>Edit Event</NormalText>
-                </MenuOption>}
+                {route.params.event.hostID !== user.uid && (
+                  <MenuOption onSelect={() => reportEvent()}>
+                    <NormalText size={18}>Report Event</NormalText>
+                  </MenuOption>
+                )}
+                {route.params.event.hostID === user.uid && (
+                  <MenuOption>
+                    <NormalText size={18}>Edit Event</NormalText>
+                  </MenuOption>
+                )}
                 <MenuOption onSelect={() => withdraw()}>
                   <NormalText size={18} color="red">
                     Withdraw
@@ -234,13 +236,21 @@ const FullCard = ({ route, navigation }) => {
             {route.params.event.name}
           </LargeText>
 
-          <NormalText color="black">Hosted by: {route.params.event.hostID === user.uid ? "You ;)"
-            : (route.params.event.hostFirstName ?
-            route.params.event.hostFirstName + " " + route.params.event.hostLastName.substring(0, 1) + "."
-            : route.params.event.hostName)}
+          <NormalText color="black">
+            Hosted by:{" "}
+            {route.params.event.hostID === user.uid
+              ? "You ;)"
+              : route.params.event.hostFirstName
+              ? route.params.event.hostFirstName +
+                " " +
+                route.params.event.hostLastName.substring(0, 1) +
+                "."
+              : route.params.event.hostName}
           </NormalText>
 
-          {route.params.event.tags && <TagsList marginVertical={20} tags={route.params.event.tags}/>}
+          {route.params.event.tags && (
+            <TagsList marginVertical={20} tags={route.params.event.tags} />
+          )}
 
           {/* 3 event details (location, date, time} are below */}
 
@@ -293,45 +303,49 @@ const FullCard = ({ route, navigation }) => {
           </View>
 
           {/* Attendance dropdown */}
-          {route.params.event.hostID === user.uid && <View>
-            <View style={styles.row}>
-              <TouchableOpacity
-                onPress={() => setOpenAttendance(!openAttendance)}
-              >
-                <Ionicons
-                  name={
-                    !openAttendance ? "caret-forward-sharp" : "caret-down-sharp"
-                  }
-                  size={20}
-                  color="black"
-                />
-              </TouchableOpacity>
+          {route.params.event.hostID === user.uid && (
+            <View>
+              <View style={styles.row}>
+                <TouchableOpacity
+                  onPress={() => setOpenAttendance(!openAttendance)}
+                >
+                  <Ionicons
+                    name={
+                      !openAttendance
+                        ? "caret-forward-sharp"
+                        : "caret-down-sharp"
+                    }
+                    size={20}
+                    color="black"
+                  />
+                </TouchableOpacity>
 
-              <NormalText paddingHorizontal={7} size={17} color="black">
-                Attendance
-              </NormalText>
-            </View>
-
-            {openAttendance && (
-              <View style={{ marginTop: 10 }}>
-                {people.length === 0 ? (
-                  <NormalText paddingHorizontal={25} size={17} color="black">
-                    {"Just yourself ;)"}
-                  </NormalText>
-                ) : (
-                  people.map((person, index) => (
-                    <Attendance
-                      size={17}
-                      person={person}
-                      key={person.id}
-                      attending={attendees[index]}
-                      onPress={() => markAttendee(index)}
-                    />
-                  ))
-                )}
+                <NormalText paddingHorizontal={7} size={17} color="black">
+                  Attendance
+                </NormalText>
               </View>
-            )}
-          </View>}
+
+              {openAttendance && (
+                <View style={{ marginTop: 10 }}>
+                  {people.length === 0 ? (
+                    <NormalText paddingHorizontal={25} size={17} color="black">
+                      {"Just yourself ;)"}
+                    </NormalText>
+                  ) : (
+                    people.map((person, index) => (
+                      <Attendance
+                        size={17}
+                        person={person}
+                        key={person.id}
+                        attending={attendees[index]}
+                        onPress={() => markAttendee(index)}
+                      />
+                    ))
+                  )}
+                </View>
+              )}
+            </View>
+          )}
         </View>
       </ScrollView>
     </Layout>
@@ -341,7 +355,7 @@ const FullCard = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   infoContainer: {
     marginHorizontal: 30,
-    marginBottom: 50
+    marginBottom: 50,
   },
 
   row: {
@@ -366,4 +380,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FullCard;
+export default WhileYouEat;

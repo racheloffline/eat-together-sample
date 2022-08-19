@@ -1,20 +1,24 @@
-import React from 'react';
-import {Ionicons} from "@expo/vector-icons";
+import React from "react";
+import { Ionicons } from "@expo/vector-icons";
 
-const NotifIcon = props => {
+const NotifIcon = (props) => {
+  let iconName;
 
-    let iconName;
+  //Choose either regular mail or mail with notif
+  if (props.hasNotif) {
+    iconName = "mail-unread-outline";
+  } else {
+    iconName = "mail-outline";
+  }
 
-    //Choose either regular mail or mail with notif
-    if(props.hasNotif) {
-        iconName = "mail-unread-outline";
-    } else {
-        iconName = "mail-outline"
-    }
-
-    return(
-        <Ionicons name={iconName} size={40} color="black" style={{marginRight: 10}}/>
-    );
-}
+  return (
+    <Ionicons
+      name={iconName}
+      size={40}
+      color="black"
+      style={{ marginRight: 10 }}
+    />
+  );
+};
 
 export default NotifIcon;

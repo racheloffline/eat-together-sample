@@ -18,6 +18,8 @@
     "axios": "^0.26.1",
     "dotenv": "^16.0.1",
     "eas-cli": "^0.60.0",
+    "eslint": "^8.22.0",
+    "eslint-config-rallycoding": "^3.2.0",
     "expo": "^45.0.0",
     "expo-app-loading": "~2.0.0",
     "expo-cli": "^6.0.1",

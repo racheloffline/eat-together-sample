@@ -1,24 +1,29 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
+import Me from "./Me";
+import Edit from "./Edit";
+import Connections from "./Connections";
+import Requests from "./Requests";
+import Schedule from "./Schedule";
+import Settings from "./Settings";
 
-import Me from './Me';
-import Settings from './Settings';
-import Schedule from './Schedule'
-import Edit from './Edit'
+const Stack = createStackNavigator();
 
-const profStack = createStackNavigator();
-
-export default function ({ navigation }) {
-    return (
-        <NavigationContainer independent={true}>
-            <profStack.Navigator initialRouteName="Explore" >
-                <profStack.Screen name="Me" component={Me}  options={{headerShown: false}}/>
-                <profStack.Screen name="Settings" component={Settings}  options={{headerShown: false}}/>
-                <profStack.Screen name="Schedule" component={Schedule} options={{headerShown: false}}/>
-                <profStack.Screen name="Edit Profile" component={Edit} options={{headerShown: false}}/>
-            </profStack.Navigator>
-        </NavigationContainer>
-    );
+export default function () {
+  return (
+    <Stack.Navigator
+      initialRouteName="Me"
+      screenOptions={{
+        headerShown: false,
+        animationEnabled: false,
+      }}
+    >
+      <Stack.Screen name="Me" component={Me} />
+      <Stack.Screen name="Edit" component={Edit} />
+      <Stack.Screen name="Connections" component={Connections} />
+      <Stack.Screen name="Requests" component={Requests} />
+      <Stack.Screen name="Schedule" component={Schedule} />
+      <Stack.Screen name="Settings" component={Settings} />
+    </Stack.Navigator>
+  );
 }
-

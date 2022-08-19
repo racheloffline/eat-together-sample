@@ -5,7 +5,7 @@ import { StyleSheet, FlatList, View, ActivityIndicator } from "react-native";
 import { Layout } from "react-native-rapi-ui";
 import RBSheet from "react-native-raw-bottom-sheet";
 
-import EventCard from '../../components/EventCard';
+import EventCard from "../../components/EventCard";
 import Header from "../../components/Header";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
 import Searchbar from "../../components/Searchbar";
@@ -17,345 +17,439 @@ import getDate from "../../getDate";
 import { getTimeOfDay } from "../../methods";
 import { auth, db } from "../../provider/Firebase";
 
-export default function({ navigation }) {
-    // Fetch current user
-    const user = auth.currentUser;
-    const [userInfo, setUserInfo] = useState({});
+export default function ({ navigation }) {
+  // Fetch current user
+  const user = auth.currentUser;
+  const [userInfo, setUserInfo] = useState({});
 
-    const [events, setEvents] = useState([]);
-    const [filteredEvents, setFilteredEvents] = useState([]);
-    const [searchQuery, setSearchQuery] = useState("");
+  const [events, setEvents] = useState([]);
+  const [filteredEvents, setFilteredEvents] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
-    // Filters
-    const [popularity, setPopularity] = useState(false);
-    //const [closeness, setCloseness] = useState(false);
-    const [fromFriends, setFromFriends] = useState(false);
-    const [friendsAttending, setFriendsAttending] = useState(false);
-    const [similarInterests, setSimilarInterests] = useState(false);
-    const [morning, setMorning] = useState(false);
-    const [afternoon, setAfternoon] = useState(false);
-    const [evening, setEvening] = useState(false);
+  // Filters
+  const [popularity, setPopularity] = useState(false);
+  //const [closeness, setCloseness] = useState(false);
+  const [fromFriends, setFromFriends] = useState(false);
+  const [friendsAttending, setFriendsAttending] = useState(false);
+  const [similarInterests, setSimilarInterests] = useState(false);
+  const [morning, setMorning] = useState(false);
+  const [afternoon, setAfternoon] = useState(false);
+  const [evening, setEvening] = useState(false);
 
-    // Display a bottom drawer showing more filters
-    const showSortFilterRef = useRef();
-    const showTimeFilterRef = useRef();
+  // Display a bottom drawer showing more filters
+  const showSortFilterRef = useRef();
+  const showTimeFilterRef = useRef();
 
-    const [unread, setUnread] = useState(false); // See if we need to display unread notif icon
-    const [loading, setLoading] = useState(true); // State variable to show loading screen when fetching data
+  const [unread, setUnread] = useState(false); // See if we need to display unread notif icon
+  const [loading, setLoading] = useState(true); // State variable to show loading screen when fetching data
 
-    useEffect(() => { // updates stuff right after React makes changes to the DOM
-        async function fetchData() {
-            await db.collection("Users").doc(user.uid).get().then(doc => {
-              setUserInfo(doc.data());
-            });
-
-            const ref = db.collection("Public Events");
-            await ref.onSnapshot((query) => {
-                let newEvents = [];
-                query.forEach((doc) => {
-                    newEvents.push(doc.data());
-                });
-                
-                // Sort events by date
-                newEvents = newEvents.sort((a, b) => {
-                    return b.date.seconds - a.date.seconds;
-                });
-                setEvents(newEvents);
-                setFilteredEvents(newEvents);
-            });
-
-            //See if there's a new notif
-            await db.collection("Users").doc(user.uid).onSnapshot((doc) => {
-                let data = doc.data();
-                setUnread(data.hasNotif);
-            });
-        }
-
-        fetchData().then(() => {
-          setLoading(false);
+  useEffect(() => {
+    // updates stuff right after React makes changes to the DOM
+    async function fetchData() {
+      await db
+        .collection("Users")
+        .doc(user.uid)
+        .get()
+        .then((doc) => {
+          setUserInfo(doc.data());
         });
-    }, []);
 
-    // For filters
-    useEffect(() => {
-      async function filter() {
-        let newEvents = [...events];
+      const ref = db.collection("Public Events");
+      await ref.onSnapshot((query) => {
+        let newEvents = [];
+        query.forEach((doc) => {
+          newEvents.push(doc.data());
+        });
 
-        if (similarInterests) {
-          newEvents = await sortBySimilarInterests(newEvents);
-          console.log(newEvents);
-        }
-
-        if (popularity) {
-          newEvents = sortByPopularity(newEvents);
-        }
-
-        if (fromFriends) {
-          newEvents = filterByFriendsHosting(newEvents);
-        }
-
-        if (friendsAttending) {
-          newEvents = filterByFriendsAttending(newEvents);
-        }
-
-        if (morning) {
-          newEvents = filterByTime("morning", newEvents);
-        }
-
-        if (afternoon) {
-          newEvents = filterByTime("afternoon", newEvents);
-        }
-
-        if (evening) {
-          newEvents = filterByTime("evening", newEvents);
-        }
-        
+        // Sort events by date
+        newEvents = newEvents.sort((a, b) => {
+          return b.date.seconds - a.date.seconds;
+        });
+        setEvents(newEvents);
         setFilteredEvents(newEvents);
-      }
-
-      setLoading(true);
-      filter().then(() => setLoading(false));
-    }, [similarInterests, popularity, fromFriends, friendsAttending, morning, afternoon, evening]);
-    
-    //Check to see if we should display the "No Events" placeholder text
-    function shouldDisplayPlaceholder(list) {
-        if(list == null || list.length === 0) {
-            return "No events available at this time."
-        } else {
-            return ""
-        }
-    }
-
-    // Method to filter out events
-    const search = text => {
-      setLoading(true);
-      let newEvents = filteredEvents.filter(e => isMatch(e, text));
-      setFilteredEvents(newEvents);
-      setLoading(false);
-    }
-
-    // Determines if an event matches search query or not
-    const isMatch = (event, text) => {
-      if (event.name.toLowerCase().includes(text.toLowerCase())) { // Name
-        return true;
-      }
-
-      if (event.location.toLowerCase().includes(text.toLowerCase())) { // Location
-        return true;
-      }
-
-      if (getDate(event.date.toDate()).toLowerCase().includes(text.toLowerCase())) { // Date
-        return true;
-      }
-
-      return event.hostName.toLowerCase().includes(text.toLowerCase()); // Host
-    }
-
-    // Method called when a new query is typed in/deleted
-    const onChangeText = text => {
-      setLoading(true);
-      setSearchQuery(text);
-      search(text);
-      setLoading(false);
-    }
-
-    // Sort events by popularity
-    const sortByPopularity = (newEvents) => {
-      newEvents = newEvents.sort((a, b) => b.attendees.length - a.attendees.length);
-      return newEvents;
-    }
-
-    // Display events that friends are hosting
-    const filterByFriendsHosting = (newEvents) => {
-      newEvents = newEvents.filter(e => userInfo.friendIDs.includes(e.hostID));
-      return newEvents;
-    }
-
-    // Display events that friends are attending
-    const filterByFriendsAttending = (newEvents) => {
-      newEvents = newEvents.filter(e => {
-        let included = false;
-
-        e.attendees.forEach(a => {
-          if (userInfo.friendIDs.includes(a)) {
-            included = true;
-            return;
-          }
-        });
-
-        return included;
       });
-      
-      return newEvents;
+
+      //See if there's a new notif
+      await db
+        .collection("Users")
+        .doc(user.uid)
+        .onSnapshot((doc) => {
+          let data = doc.data();
+          setUnread(data.hasNotif);
+        });
     }
 
-    // Display events in descending order of similar tags
-    const sortBySimilarInterests = async (newEvents) => {
-      let result;
+    fetchData().then(() => {
+      setLoading(false);
+    });
+  }, []);
 
-      await fetch("https://eat-together-match.uw.r.appspot.com/find_similarity", {
-        method: "POST",
-        body: JSON.stringify({
-          "currTags": userInfo.tags,
-          "otherTags": getEventTags()
-        }),
-      }).then(res => res.json()).then(res => {
+  // For filters
+  useEffect(() => {
+    async function filter() {
+      let newEvents = [...events];
+
+      if (similarInterests) {
+        newEvents = await sortBySimilarInterests(newEvents);
+      }
+
+      if (popularity) {
+        newEvents = sortByPopularity(newEvents);
+      }
+
+      if (fromFriends) {
+        newEvents = filterByFriendsHosting(newEvents);
+      }
+
+      if (friendsAttending) {
+        newEvents = filterByFriendsAttending(newEvents);
+      }
+
+      if (morning) {
+        newEvents = filterByTime("morning", newEvents);
+      }
+
+      if (afternoon) {
+        newEvents = filterByTime("afternoon", newEvents);
+      }
+
+      if (evening) {
+        newEvents = filterByTime("evening", newEvents);
+      }
+
+      setFilteredEvents(newEvents);
+    }
+
+    setLoading(true);
+    filter().then(() => setLoading(false));
+  }, [
+    similarInterests,
+    popularity,
+    fromFriends,
+    friendsAttending,
+    morning,
+    afternoon,
+    evening,
+  ]);
+
+  //Check to see if we should display the "No Events" placeholder text
+  function shouldDisplayPlaceholder(list) {
+    if (list == null || list.length === 0) {
+      return "No events available at this time.";
+    } else {
+      return "";
+    }
+  }
+
+  // Method to filter out events
+  const search = (text) => {
+    setLoading(true);
+    let newEvents = filteredEvents.filter((e) => isMatch(e, text));
+    setFilteredEvents(newEvents);
+    setLoading(false);
+  };
+
+  // Determines if an event matches search query or not
+  const isMatch = (event, text) => {
+    if (event.name.toLowerCase().includes(text.toLowerCase())) {
+      // Name
+      return true;
+    }
+
+    if (event.location.toLowerCase().includes(text.toLowerCase())) {
+      // Location
+      return true;
+    }
+
+    if (
+      getDate(event.date.toDate()).toLowerCase().includes(text.toLowerCase())
+    ) {
+      // Date
+      return true;
+    }
+
+    return event.hostName.toLowerCase().includes(text.toLowerCase()); // Host
+  };
+
+  // Method called when a new query is typed in/deleted
+  const onChangeText = (text) => {
+    setLoading(true);
+    setSearchQuery(text);
+    search(text);
+    setLoading(false);
+  };
+
+  // Sort events by popularity
+  const sortByPopularity = (newEvents) => {
+    newEvents = newEvents.sort(
+      (a, b) => b.attendees.length - a.attendees.length
+    );
+    return newEvents;
+  };
+
+  // Display events that friends are hosting
+  const filterByFriendsHosting = (newEvents) => {
+    newEvents = newEvents.filter((e) => userInfo.friendIDs.includes(e.hostID));
+    return newEvents;
+  };
+
+  // Display events that friends are attending
+  const filterByFriendsAttending = (newEvents) => {
+    newEvents = newEvents.filter((e) => {
+      let included = false;
+
+      e.attendees.forEach((a) => {
+        if (userInfo.friendIDs.includes(a)) {
+          included = true;
+          return;
+        }
+      });
+
+      return included;
+    });
+
+    return newEvents;
+  };
+
+  // Display events in descending order of similar tags
+  const sortBySimilarInterests = async (newEvents) => {
+    let result;
+
+    await fetch("https://eat-together-match.uw.r.appspot.com/find_similarity", {
+      method: "POST",
+      body: JSON.stringify({
+        currTags: userInfo.tags,
+        otherTags: getEventTags(),
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
         let i = 0;
-        newEvents.forEach(e => {
+        newEvents.forEach((e) => {
           e.similarity = res[i];
           i++;
         });
 
         newEvents = newEvents.sort((a, b) => b.similarity - a.similarity);
         result = newEvents;
-      }).catch(e => { // If error, alert the user
+      })
+      .catch((e) => {
+        // If error, alert the user
         alert("An error occured, try again later :(");
         result = events;
       });
 
-      return result;
-    }
-    
-    // Get a list of all the events' tags
-    const getEventTags = () => {
-      let tags = [];
-      events.forEach(e => {
-        tags.push(e.tags);
-      });
+    return result;
+  };
 
-      return tags;
-    }
+  // Get a list of all the events' tags
+  const getEventTags = () => {
+    let tags = [];
+    events.forEach((e) => {
+      tags.push(e.tags);
+    });
 
-    // Filter events by time of day
-    const filterByTime = (time, newEvents) => {
-      newEvents = newEvents.filter(e => getTimeOfDay(e.date.toDate()) === time);
-      return newEvents;
-    }
+    return tags;
+  };
 
-    return (
-      <Layout>
-        <Header name="Explore" navigation = {navigation} hasNotif = {unread}/>
-        <HorizontalSwitch left="Your Events" right="Public" current="right"
-          press={() => navigation.navigate("ExploreYourEvents")}/>
-        <Searchbar placeholder="Search by name, location, date, or host name"
-				  value={searchQuery} onChangeText={onChangeText}/>
+  // Filter events by time of day
+  const filterByTime = (time, newEvents) => {
+    newEvents = newEvents.filter((e) => getTimeOfDay(e.date.toDate()) === time);
+    return newEvents;
+  };
 
-        <HorizontalRow>
-          <Filter checked={morning || afternoon || evening}
-            onPress={() => showTimeFilterRef.current.open()}
-            text={morning ? "Morning" : 
-              afternoon ? "Afternoon" : 
-              evening ? "Evening" :"Time of day"}/>
-          <Filter checked={similarInterests || popularity}
-            onPress={() => showSortFilterRef.current.open()}
-            text={similarInterests ? "Similar interests"
-              : popularity ? "Popularity" : "Sort by"}/>
-          <Filter checked={fromFriends}
-            onPress={() => setFromFriends(!fromFriends)} text="From friends"/>
-          <Filter checked={friendsAttending}
-            onPress={() => setFriendsAttending(!friendsAttending)} text="Friends attending"/>
-        </HorizontalRow>
+  return (
+    <Layout>
+      <Header name="Explore" navigation={navigation} hasNotif={unread} />
+      <HorizontalSwitch
+        left="Events"
+        right="People"
+        current="left"
+        press={() => navigation.navigate("People")}
+      />
+      <Searchbar
+        placeholder="Search by name, location, date, or host name"
+        value={searchQuery}
+        onChangeText={onChangeText}
+      />
 
-        <RBSheet
-          height={400}
-          ref={showTimeFilterRef}
-          closeOnDragDown={true}
-          closeOnPressMask={false}
-          customStyles={{
-              wrapper: {
-                  backgroundColor: "rgba(0,0,0,0.5)",
-              },
-              draggableIcon: {
-                  backgroundColor: "black"
-              },
-              container: {
-                  borderTopLeftRadius: 20,
-                  borderTopRightRadius: 20,
-                  padding: 10
-              }
-          }}>
-          <Filter checked={morning} text="Morning" marginBottom={5}
-            onPress={() => {
-              setMorning(!morning);
-              setAfternoon(false);
-              setEvening(false);
-              showTimeFilterRef.current.close();
-            }}/>
-          <Filter checked={afternoon} text="Afternoon" marginBottom={5}
-            onPress={() => {
-              setAfternoon(!afternoon);
-              setMorning(false);
-              setEvening(false);
-              showTimeFilterRef.current.close();
-            }}/>
-          <Filter checked={evening} text="Evening" marginBottom={20}
-            onPress={() => {
-              setEvening(!evening);
-              setMorning(false);
-              setAfternoon(false);
-              showTimeFilterRef.current.close();
-            }}/>
-          <Link onPress={() => {
+      <HorizontalRow>
+        <Filter
+          checked={morning || afternoon || evening}
+          onPress={() => showTimeFilterRef.current.open()}
+          text={
+            morning
+              ? "Morning"
+              : afternoon
+              ? "Afternoon"
+              : evening
+              ? "Evening"
+              : "Time of day"
+          }
+        />
+        <Filter
+          checked={similarInterests || popularity}
+          onPress={() => showSortFilterRef.current.open()}
+          text={
+            similarInterests
+              ? "Similar interests"
+              : popularity
+              ? "Popularity"
+              : "Sort by"
+          }
+        />
+        <Filter
+          checked={fromFriends}
+          onPress={() => setFromFriends(!fromFriends)}
+          text="From friends"
+        />
+        <Filter
+          checked={friendsAttending}
+          onPress={() => setFriendsAttending(!friendsAttending)}
+          text="Friends attending"
+        />
+      </HorizontalRow>
+
+      <RBSheet
+        height={400}
+        ref={showTimeFilterRef}
+        closeOnDragDown={true}
+        closeOnPressMask={false}
+        customStyles={{
+          wrapper: {
+            backgroundColor: "rgba(0,0,0,0.5)",
+          },
+          draggableIcon: {
+            backgroundColor: "black",
+          },
+          container: {
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+            padding: 10,
+          },
+        }}
+      >
+        <Filter
+          checked={morning}
+          text="Morning"
+          marginBottom={5}
+          onPress={() => {
+            setMorning(!morning);
+            setAfternoon(false);
+            setEvening(false);
+            showTimeFilterRef.current.close();
+          }}
+        />
+        <Filter
+          checked={afternoon}
+          text="Afternoon"
+          marginBottom={5}
+          onPress={() => {
+            setAfternoon(!afternoon);
+            setMorning(false);
+            setEvening(false);
+            showTimeFilterRef.current.close();
+          }}
+        />
+        <Filter
+          checked={evening}
+          text="Evening"
+          marginBottom={20}
+          onPress={() => {
+            setEvening(!evening);
+            setMorning(false);
+            setAfternoon(false);
+            showTimeFilterRef.current.close();
+          }}
+        />
+        <Link
+          onPress={() => {
             setMorning(false);
             setAfternoon(false);
             setEvening(false);
             showTimeFilterRef.current.close();
-          }}>Clear</Link>
-        </RBSheet>
-        
-        <RBSheet
-          height={400}
-          ref={showSortFilterRef}
-          closeOnDragDown={true}
-          closeOnPressMask={false}
-          customStyles={{
-              wrapper: {
-                  backgroundColor: "rgba(0,0,0,0.5)",
-              },
-              draggableIcon: {
-                  backgroundColor: "black"
-              },
-              container: {
-                  borderTopLeftRadius: 20,
-                  borderTopRightRadius: 20,
-                  padding: 10
-              }
-          }}>
-          <Filter checked={similarInterests} text="Similar interests" marginBottom={5}
-            onPress={() => {
-              setSimilarInterests(!similarInterests);
-              setPopularity(false);
-              showTimeFilterRef.current.close();
-            }}/>
-          <Filter checked={popularity} text="Popularity" marginBottom={20}
-            onPress={() => {
-              setPopularity(!popularity);
-              setSimilarInterests(false);
-              showTimeFilterRef.current.close();
-            }}/>
-          <Link onPress={() => {
+          }}
+        >
+          Clear
+        </Link>
+      </RBSheet>
+
+      <RBSheet
+        height={400}
+        ref={showSortFilterRef}
+        closeOnDragDown={true}
+        closeOnPressMask={false}
+        customStyles={{
+          wrapper: {
+            backgroundColor: "rgba(0,0,0,0.5)",
+          },
+          draggableIcon: {
+            backgroundColor: "black",
+          },
+          container: {
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+            padding: 10,
+          },
+        }}
+      >
+        <Filter
+          checked={similarInterests}
+          text="Similar interests"
+          marginBottom={5}
+          onPress={() => {
+            setSimilarInterests(!similarInterests);
+            setPopularity(false);
+            showTimeFilterRef.current.close();
+          }}
+        />
+        <Filter
+          checked={popularity}
+          text="Popularity"
+          marginBottom={20}
+          onPress={() => {
+            setPopularity(!popularity);
+            setSimilarInterests(false);
+            showTimeFilterRef.current.close();
+          }}
+        />
+        <Link
+          onPress={() => {
             setSimilarInterests(false);
             setPopularity(false);
             showTimeFilterRef.current.close();
-          }}>Clear</Link>
-        </RBSheet>
+          }}
+        >
+          Clear
+        </Link>
+      </RBSheet>
 
-        <View style={{ flex: 1 }}>
-          {!loading ? <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
-            data={filteredEvents} renderItem={({item}) =>
-              <EventCard event={item} click={() => {
-                  //ampInstance.logEvent('BUTTON_CLICKED'); // EXPERIMENT
-                navigation.navigate("FullCard", {
-                  event: item,
-                  public: true
-                });
-              }}/>
-            }/> : <View style={{ flex: 1, justifyContent: "center" }}>
-              <ActivityIndicator size={100} color="#5DB075"/>
-            </View>}
-        </View>
-      </Layout>
-    );
+      <View style={{ flex: 1 }}>
+        {!loading ? (
+          <FlatList
+            contentContainerStyle={styles.cards}
+            keyExtractor={(item) => item.id}
+            data={filteredEvents}
+            renderItem={({ item }) => (
+              <EventCard
+                event={item}
+                click={() => {
+                  navigation.navigate("FullCard", {
+                    event: item,
+                    public: true,
+                  });
+                }}
+              />
+            )}
+          />
+        ) : (
+          <View style={{ flex: 1, justifyContent: "center" }}>
+            <ActivityIndicator size={100} color="#5DB075" />
+          </View>
+        )}
+      </View>
+    </Layout>
+  );
 }
 
 const styles = StyleSheet.create({

@@ -11,192 +11,230 @@ import Email from "../screens/auth/Registration/Email";
 import Availabilities from "../screens/auth/Registration/Availabilities";
 import Password from "../screens/auth/Registration/Password";
 
-import Monday from '../screens/auth/Registration/Days/Monday';
-import Tuesday from '../screens/auth/Registration/Days/Tuesday';
-import Wednesday from '../screens/auth/Registration/Days/Wednesday';
-import Thursday from '../screens/auth/Registration/Days/Thursday';
-import Friday from '../screens/auth/Registration/Days/Friday';
-import Saturday from '../screens/auth/Registration/Days/Saturday';
-import Sunday from '../screens/auth/Registration/Days/Sunday';
-import timeSlots from '../screens/auth/Registration/Days/timeSlots';
+import Monday from "../screens/auth/Registration/Days/Monday";
+import Tuesday from "../screens/auth/Registration/Days/Tuesday";
+import Wednesday from "../screens/auth/Registration/Days/Wednesday";
+import Thursday from "../screens/auth/Registration/Days/Thursday";
+import Friday from "../screens/auth/Registration/Days/Friday";
+import Saturday from "../screens/auth/Registration/Days/Saturday";
+import Sunday from "../screens/auth/Registration/Days/Sunday";
+import timeSlots from "../screens/auth/Registration/Days/timeSlots";
 
 import { cloneDeep } from "lodash";
-import {db, auth, storage} from "../provider/Firebase";
+import { db, auth, storage } from "../provider/Firebase";
 
 const Stack = createStackNavigator();
 const Auth = () => {
-    // Name.js
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [bio, setBio] = useState("");
-    const [image, setImage] = useState("");
-    const [tags, setTags] = useState([]);
+  // Name.js
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [bio, setBio] = useState("");
+  const [image, setImage] = useState("");
+  const [tags, setTags] = useState([]);
 
-    // Email.js
-    const [email, setEmail] = useState("");
+  // Email.js
+  const [email, setEmail] = useState("");
 
-    // Days
-    const [monday, setMonday] = useState(cloneDeep(timeSlots));
-    const [tuesday, setTuesday] = useState(cloneDeep(timeSlots));
-    const [wednesday, setWednesday] = useState(cloneDeep(timeSlots));
-    const [thursday, setThursday] = useState(cloneDeep(timeSlots));
-    const [friday, setFriday] = useState(cloneDeep(timeSlots));
-    const [saturday, setSaturday] = useState(cloneDeep(timeSlots));
-    const [sunday, setSunday] = useState(cloneDeep(timeSlots));
+  // Days
+  const [monday, setMonday] = useState(cloneDeep(timeSlots));
+  const [tuesday, setTuesday] = useState(cloneDeep(timeSlots));
+  const [wednesday, setWednesday] = useState(cloneDeep(timeSlots));
+  const [thursday, setThursday] = useState(cloneDeep(timeSlots));
+  const [friday, setFriday] = useState(cloneDeep(timeSlots));
+  const [saturday, setSaturday] = useState(cloneDeep(timeSlots));
+  const [sunday, setSunday] = useState(cloneDeep(timeSlots));
 
-    // Password
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const [loading, setLoading] = useState(false);
+  // Password
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-    const [usernames, setUsernames] = useState([]); // List of all usernames
+  const [usernames, setUsernames] = useState([]); // List of all usernames
 
-    useEffect(() => {
-        db.collection("Usernames").get().then(querySnapshot => {
-            let usernameList = [];
+  useEffect(() => {
+    db.collection("Usernames")
+      .get()
+      .then((querySnapshot) => {
+        let usernameList = [];
 
-            querySnapshot.forEach(doc => {
-                usernameList.push(doc.id);
+        querySnapshot.forEach((doc) => {
+          usernameList.push(doc.id);
+        });
+
+        setUsernames(usernameList);
+      });
+  }, []);
+
+  const createUser = async () => {
+    setLoading(true);
+
+    if (usernames.includes(username)) {
+      setLoading(false);
+      alert("Your username has already been picked, choose another one :(");
+    } else {
+      try {
+        const response = await auth.createUserWithEmailAndPassword(
+          email,
+          password
+        );
+
+        if (response.user.uid) {
+          const { uid } = response.user;
+
+          if (image !== "") {
+            storeImage(image, uid).then(() => {
+              fetchImage(uid).then((uri) => {
+                makeUser(uid, image).then(() => {
+                  response.user.sendEmailVerification();
+                });
+              });
             });
-
-            setUsernames(usernameList);
-        });
-    }, []);
-
-    const createUser = async () => {
-        setLoading(true);
-
-        if (usernames.includes(username)) {
-            setLoading(false);
-            alert("Your username has already been picked, choose another one :(");
-        } else {
-            try {
-                const response = await auth.createUserWithEmailAndPassword(email, password);
-    
-                if (response.user.uid) {
-                    const { uid } = response.user;
-
-                    if (image !== "") {
-                        storeImage(image, uid).then(() => {
-                            fetchImage(uid).then(uri => {
-                                makeUser(uid, image).then(() => {
-                                    response.user.sendEmailVerification();
-                                });
-                            });
-                        });
-                    } else {
-                        makeUser(uid, "").then(() => {
-                            response.user.sendEmailVerification();
-                        });
-                    }
-                }
-            } catch (error) {
-                alert(error.message);
-                setLoading(false);
-            }
+          } else {
+            makeUser(uid, "").then(() => {
+              response.user.sendEmailVerification();
+            });
+          }
         }
+      } catch (error) {
+        alert(error.message);
+        setLoading(false);
+      }
     }
+  };
 
-    const makeUser = async (uid, image) => {
-        const userData = {
-            id: uid,
-            firstName,
-            lastName,
-            username,
-            email,
-            hasImage: image !== "",
-            image,
-            tags,
-            bio,
-            hostedEventIDs: [],
-            attendingEventIDs: [],
-            attendedEventIDs: [],
-            archivedEventIDs: [],
-            friendIDs: [],
-            groupIDs: [],
-            availabilites: {
-                monday,
-                tuesday,
-                wednesday,
-                thursday,
-                friday,
-                saturday,
-                sunday
-            },
-            settings: {
-                notifications: true
-            },
-            verified: false
-        }
-        
-        await db.collection("Users").doc(`${uid}`).set(userData);
-        await db.collection("Usernames").doc(userData.username).set({
-            id: uid
-        });
-    }
+  const makeUser = async (uid, image) => {
+    const userData = {
+      id: uid,
+      firstName,
+      lastName,
+      username,
+      email,
+      hasImage: image !== "",
+      image,
+      tags,
+      bio,
+      hostedEventIDs: [],
+      attendingEventIDs: [],
+      attendedEventIDs: [],
+      archivedEventIDs: [],
+      friendIDs: [],
+      groupIDs: [],
+      availabilites: {
+        monday,
+        tuesday,
+        wednesday,
+        thursday,
+        friday,
+        saturday,
+        sunday,
+      },
+      settings: {
+        notifications: true,
+      },
+      verified: false,
+    };
 
-    // Stores image in Firebase Storage
-    const storeImage = async (uri, id) => {
-        const response = await fetch(uri);
-        const blob = await response.blob();
+    await db.collection("Users").doc(`${uid}`).set(userData);
+    await db.collection("Usernames").doc(userData.username).set({
+      id: uid,
+    });
+  };
 
-        var ref = storage.ref().child("profilePictures/" + id);
-        return ref.put(blob);
-    }
+  // Stores image in Firebase Storage
+  const storeImage = async (uri, id) => {
+    const response = await fetch(uri);
+    const blob = await response.blob();
 
-    // Fetches image from Firebase Storage
-    const fetchImage = async (id) => {
-        let ref = storage.ref().child("eventPictures/" + id);
-        return ref.getDownloadURL();
-    }
+    var ref = storage.ref().child("profilePictures/" + id);
+    return ref.put(blob);
+  };
 
-    return (
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-        }}
-      initialRouteName="Login">
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="ForgetPassword" component={ForgetPassword} />
+  // Fetches image from Firebase Storage
+  const fetchImage = async (id) => {
+    let ref = storage.ref().child("eventPictures/" + id);
+    return ref.getDownloadURL();
+  };
 
-        <Stack.Screen name="Name" options={{headerShown: false}}>
-            {props => <Name {...props} firstName={firstName} lastName={lastName} setFirstName={setFirstName}
-                setLastName={setLastName} bio={bio} setBio={setBio} image={image} setImage={setImage}
-                tags={tags} setTags={setTags}/>}
-        </Stack.Screen>
-        <Stack.Screen name="Email" options={{headerShown: false}}>
-            {props => <Email {...props} email={email} setEmail={setEmail}/>}
-        </Stack.Screen>
-        <Stack.Screen name="Availabilities" options={{headerShown: false}} component={Availabilities}/>
-        <Stack.Screen name="Monday" options={{headerShown: false}}>
-            {props => <Monday {...props} times={monday} setTimes={setMonday}/>}
-        </Stack.Screen>
-        <Stack.Screen name="Tuesday" options={{headerShown: false}}>
-            {props => <Tuesday {...props} times={tuesday} setTimes={setTuesday}/>}
-        </Stack.Screen>
-        <Stack.Screen name="Wednesday" options={{headerShown: false}}>
-            {props => <Wednesday {...props} times={wednesday} setTimes={setWednesday}/>}
-        </Stack.Screen>
-        <Stack.Screen name="Thursday" options={{headerShown: false}}>
-            {props => <Thursday {...props} times={thursday} setTimes={setThursday}/>}
-        </Stack.Screen>
-        <Stack.Screen name="Friday" options={{headerShown: false}}>
-            {props => <Friday {...props} times={friday} setTimes={setFriday}/>}
-        </Stack.Screen>
-        <Stack.Screen name="Saturday" options={{headerShown: false}}>
-            {props => <Saturday {...props} times={saturday} setTimes={setSaturday}/>}
-        </Stack.Screen>
-        <Stack.Screen name="Sunday" options={{headerShown: false}}>
-            {props => <Sunday {...props} times={sunday} setTimes={setSunday}/>}
-        </Stack.Screen>
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+      initialRouteName="Login"
+    >
+      <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="ForgetPassword" component={ForgetPassword} />
 
-        <Stack.Screen name="Password" options={{headerShown: false}}>
-            {props => <Password {...props} username={username} setUsername={setUsername}
-                password={password} setPassword={setPassword} createUser={createUser}
-                loading={loading}/>}
-        </Stack.Screen>
-      </Stack.Navigator>
-    );
+      <Stack.Screen name="Name" options={{ headerShown: false }}>
+        {(props) => (
+          <Name
+            {...props}
+            firstName={firstName}
+            lastName={lastName}
+            setFirstName={setFirstName}
+            setLastName={setLastName}
+            bio={bio}
+            setBio={setBio}
+            image={image}
+            setImage={setImage}
+            tags={tags}
+            setTags={setTags}
+          />
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="Email" options={{ headerShown: false }}>
+        {(props) => <Email {...props} email={email} setEmail={setEmail} />}
+      </Stack.Screen>
+      <Stack.Screen
+        name="Availabilities"
+        options={{ headerShown: false }}
+        component={Availabilities}
+      />
+      <Stack.Screen name="Monday" options={{ headerShown: false }}>
+        {(props) => <Monday {...props} times={monday} setTimes={setMonday} />}
+      </Stack.Screen>
+      <Stack.Screen name="Tuesday" options={{ headerShown: false }}>
+        {(props) => (
+          <Tuesday {...props} times={tuesday} setTimes={setTuesday} />
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="Wednesday" options={{ headerShown: false }}>
+        {(props) => (
+          <Wednesday {...props} times={wednesday} setTimes={setWednesday} />
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="Thursday" options={{ headerShown: false }}>
+        {(props) => (
+          <Thursday {...props} times={thursday} setTimes={setThursday} />
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="Friday" options={{ headerShown: false }}>
+        {(props) => <Friday {...props} times={friday} setTimes={setFriday} />}
+      </Stack.Screen>
+      <Stack.Screen name="Saturday" options={{ headerShown: false }}>
+        {(props) => (
+          <Saturday {...props} times={saturday} setTimes={setSaturday} />
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="Sunday" options={{ headerShown: false }}>
+        {(props) => <Sunday {...props} times={sunday} setTimes={setSunday} />}
+      </Stack.Screen>
+
+      <Stack.Screen name="Password" options={{ headerShown: false }}>
+        {(props) => (
+          <Password
+            {...props}
+            username={username}
+            setUsername={setUsername}
+            password={password}
+            setPassword={setPassword}
+            createUser={createUser}
+            loading={loading}
+          />
+        )}
+      </Stack.Screen>
+    </Stack.Navigator>
+  );
 };
 
 export default Auth;
