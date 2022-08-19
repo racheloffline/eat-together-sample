@@ -179,12 +179,12 @@ export default function ({ navigation }) {
 
   return (
     <Layout>
-      <Header name="People" navigation={navigation} hasNotif={unread} />
+      <Header name="Explore" navigation={navigation} hasNotif={unread} />
       <HorizontalSwitch
         left="Events"
         right="People"
         current="right"
-        press={() => navigation.navigate("Events")}
+        press={() => navigation.navigate("Explore")}
       />
       <Searchbar
         placeholder="Search by name, username, quote, or tags"

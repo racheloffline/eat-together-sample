@@ -12,10 +12,11 @@ import ProfilePic from "../components/ProfilePic";
 
 //Screens (Make sure to import if ever adding new screen!)
 import OrganizeMain from "../screens/Organize/OrganizeMain";
-import Chats from "../screens/Chat/Chats";
+import ChatMain from "../screens/Chat/ChatMain";
 import ExploreMain from "../screens/Explore/ExploreMain";
-import Home from "../screens/Home/Home";
-
+import HomeMain from "../screens/Home/HomeMain";
+import ProfileMain from "../screens/Profile/ProfileMain";
+import NotificationsMain from "../screens/Notifications/NotificationsMain";
 import Loading from "../screens/utils/Loading";
 
 //Auth screens
@@ -24,7 +25,6 @@ import { AuthContext } from "../provider/AuthProvider";
 
 //Screen for if the user hasn't verified their email
 import VerifyEmail from "../screens/VerifyEmail";
-import ProfileMain from "../screens/Profile/ProfileMain";
 import firebase from "firebase";
 import { db } from "../provider/Firebase";
 
@@ -66,6 +66,7 @@ const Main = () => {
       }}
     >
       <MainStack.Screen name="MainTabs">{() => <MainTabs />}</MainStack.Screen>
+      <MainStack.Screen name="Notifications" component={NotificationsMain} />
     </MainStack.Navigator>
   );
 };
@@ -85,7 +86,7 @@ const MainTabs = () => {
     >
       <Tabs.Screen
         name="Home"
-        component={Home}
+        component={HomeMain}
         options={{
           tabBarIcon: ({ focused }) => (
             <TabBarIcon focused={focused} icon={"home-outline"} title="Home" />
@@ -120,7 +121,7 @@ const MainTabs = () => {
       />
       <Tabs.Screen
         name="Chat"
-        component={Chats}
+        component={ChatMain}
         options={{
           tabBarLabel: ({ focused }) => (
             <TabBarText focused={focused} title="Chat" />

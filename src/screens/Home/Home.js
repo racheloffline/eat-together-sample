@@ -201,7 +201,7 @@ export default function ({ navigation }) {
             <EventCard
               event={item}
               click={() => {
-                navigation.navigate("FullCardPrivate", {
+                navigation.navigate("WhileYouEat", {
                   event: item,
                   deleteEvent,
                 });
