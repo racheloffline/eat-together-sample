@@ -1,13 +1,7 @@
 //View invites to private events
 
 import React, { useEffect, useState } from "react";
-import {
-  FlatList,
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Dimensions,
-} from "react-native";
+import { FlatList, View, StyleSheet } from "react-native";
 import { Layout, TopNav } from "react-native-rapi-ui";
 import NormalText from "../../components/NormalText";
 import { Ionicons } from "@expo/vector-icons";
@@ -86,57 +80,50 @@ export default function ({ navigation }) {
       <TopNav
         middleContent={<MediumText center>Notifications</MediumText>}
         leftContent={<Ionicons name="chevron-back" size={20} />}
-        rightContent={<Ionicons name="person-add" size={20} />}
         leftAction={() => navigation.goBack()}
-        rightAction={() => navigation.navigate("Connections")}
       />
-      <View style={styles.switchView}>
-        <HorizontalSwitch
-          left="Invites"
-          right="Chats"
-          current="left"
-          press={(val) => navigation.navigate("Chats")}
+      <View style={{ padding: 20 }}>
+        <View style={styles.noInvitesView}>
+          <NormalText center={"center"}>
+            {shouldDisplayPlaceholder(invites)}
+          </NormalText>
+        </View>
+        <FlatList
+          contentContainerStyle={styles.cards}
+          keyExtractor={(item) => item.id}
+          data={invites}
+          renderItem={({ item }) => (
+            <EventCard
+              event={item}
+              click={() => {
+                let inviteToSend = {
+                  id: item.docID,
+                  name: item.name,
+                  image: item.image,
+                  hasImage: item.hasImage,
+                  location: item.location,
+                  date: item.date.toDate().toDateString(),
+                  time: item.date.toDate().toLocaleTimeString("en-US", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }),
+                  details: item.description,
+                  hostID: item.hostID,
+                  hostName: item.hostName,
+                  hostImage: item.hostImage,
+                  accepted: item.accepted,
+                  inviteID: item.inviteID,
+                };
+                navigation.navigate("NotificationFull", {
+                  invite: inviteToSend,
+                  hasPassed:
+                    item.date.toDate().getTime() < new Date().getTime(),
+                });
+              }}
+            />
+          )}
         />
       </View>
-      <View style={styles.noInvitesView}>
-        <NormalText center={"center"}>
-          {shouldDisplayPlaceholder(invites)}
-        </NormalText>
-      </View>
-      <FlatList
-        contentContainerStyle={styles.cards}
-        keyExtractor={(item) => item.id}
-        data={invites}
-        renderItem={({ item }) => (
-          <EventCard
-            event={item}
-            click={() => {
-              let inviteToSend = {
-                id: item.docID,
-                name: item.name,
-                image: item.image,
-                hasImage: item.hasImage,
-                location: item.location,
-                date: item.date.toDate().toDateString(),
-                time: item.date.toDate().toLocaleTimeString("en-US", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                }),
-                details: item.description,
-                hostID: item.hostID,
-                hostName: item.hostName,
-                hostImage: item.hostImage,
-                accepted: item.accepted,
-                inviteID: item.inviteID,
-              };
-              navigation.navigate("InviteFull", {
-                invite: inviteToSend,
-                hasPassed: item.date.toDate().getTime() < new Date().getTime(),
-              });
-            }}
-          />
-        )}
-      />
     </Layout>
   );
 }
@@ -149,9 +136,6 @@ const styles = StyleSheet.create({
   },
   headingText: {
     fontSize: 50,
-  },
-  switchView: {
-    marginVertical: 10,
   },
   noInvitesView: {
     marginVertical: -20,
