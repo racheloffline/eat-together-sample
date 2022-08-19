@@ -54,7 +54,7 @@ async function registerForPushNotificationsAsync() {
 
 //The experience of logged in user!!
 const MainStack = createStackNavigator();
-const Main = (props) => {
+const Main = () => {
   return (
     <MainStack.Navigator
       screenOptions={{
@@ -63,7 +63,7 @@ const Main = (props) => {
       }}
     >
       <MainStack.Screen name="MainTabs">
-        {() => <MainTabs profileImageUri={props.profileImageUri} />}
+        {() => <MainTabs/>}
       </MainStack.Screen>
       <MainStack.Screen name="Schedule" component={Schedule} />
       <MainStack.Screen name="OrganizeMain" component={OrganizeMain} />
@@ -73,7 +73,8 @@ const Main = (props) => {
 
 //Controls the screens connected to the bottom navigation bar
 const Tabs = createBottomTabNavigator();
-const MainTabs = (props) => {
+const MainTabs = () => {
+  const profileImageUri = useContext(AuthContext).profileImageUri;
   return (
     <Tabs.Navigator
       tabBarOptions={{
@@ -142,7 +143,7 @@ const MainTabs = (props) => {
         }}
         options={{
           tabBarIcon: () => (
-            <ProfilePic size={38} uri={props.profileImageUri} />
+            <ProfilePic size={38} uri={profileImageUri} />
           ),
         }}
       />
@@ -154,9 +155,6 @@ export default () => {
   const auth = useContext(AuthContext);
   const user = auth.user;
   const currUser = auth.currUser;
-  const [profileImageUri, setProfileImageUri] = useState(
-    "https://static.wixstatic.com/media/d58e38_29c96d2ee659418489aec2315803f5f8~mv2.png"
-  );
 
   async function getUser() {
     const token = await registerForPushNotificationsAsync();
@@ -187,19 +185,9 @@ export default () => {
       });
   }
 
-  // Function to get profile image for bottom bar icon
-  function getProfilePicture(uid) {
-    db.collection("Users").doc(uid).get().then(doc => {
-      if (doc.data().hasImage) {
-        setProfileImageUri(doc.data().image);
-      }
-    });
-  }
-
   // Prevent unecessary reloads of data
   useEffect(() => {
     getUser();
-    getProfilePicture(currUser.uid);
   }, []);
 
   return (
@@ -214,7 +202,7 @@ export default () => {
       currUser.email !== "argharib@uw.edu" ? (
         <VerifyEmail />
       ) : (
-        user === true && <Main profileImageUri={profileImageUri} />
+        user === true && <Main/>
       )}
     </NavigationContainer>
   );

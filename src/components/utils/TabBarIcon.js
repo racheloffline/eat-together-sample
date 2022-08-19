@@ -7,7 +7,7 @@ import { Ionicons } from "@expo/vector-icons";
 export default (props) => {
   const { isDarkmode } = useTheme();
   return (
-    <Layout style={{justifyContent: "space-between", margin: 2, alignItems: "center"}}>
+    <Layout style={{justifyContent: "space-between", margin: 2, alignItems: "center"}} backgroundColor="white">
       <Ionicons
         name={props.icon}
         style={{ marginBottom: -7 }}
