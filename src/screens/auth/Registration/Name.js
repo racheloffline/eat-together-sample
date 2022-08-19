@@ -22,9 +22,9 @@ const Name = props => {
   // Input fields
   const [firstName, setFirstName] = useState(props.firstName);
   const [lastName, setLastName] = useState(props.lastName);
+  const [pronouns, setPronouns] = useState(props.pronouns);
   const [bio, setBio] = useState(props.bio);
   const [image, setImage] = useState(props.image);
-  const [tags, setTags] = useState(props.tags);
 
   const badWords = cloneDeep(profaneWords); // List of profane words
 
@@ -34,14 +34,14 @@ const Name = props => {
   }
 
   const goNext = () => {
-    if (checkProfanity(firstName) || checkProfanity(lastName) || checkProfanity(bio)) {
+    if (checkProfanity(firstName) || checkProfanity(lastName)
+        || checkProfanity(pronouns) || checkProfanity(bio)) {
       alert("Inappropriate words used >:(");
     } else {
       props.setFirstName(firstName);
       props.setLastName(lastName);
       props.setBio(bio);
       props.setImage(image);
-      props.setTags(tags);
       props.navigation.navigate("Tags");
     }
   }
@@ -84,14 +84,18 @@ const Name = props => {
               leftContent={<FontAwesome name="user" size={18}/>} autoComplete="name"/>
           </View>
 
-          <TextInput placeholder="Fun fact (10 to 100 characters)" value={bio} maxLength={100}
-            onChangeText={val => setBio(val)} containerStyle={{marginTop: 20}}
+          <TextInput placeholder="Pronouns (he/him, she/her, etc.)" value={pronouns}
+            onChangeText={val => setPronouns(val)} containerStyle={{marginTop: 10}}
             leftContent={<FontAwesome name="quote-left" size={18}/>}/>
+
+          <TextInput placeholder="Fun fact (10 to 100 characters)" value={bio} maxLength={100}
+            onChangeText={val => setBio(val)} containerStyle={{marginTop: 10}}
+            leftContent={<FontAwesome name="exclamation" size={18}/>}/>
 
           <View style={styles.buttons}>
             <Button onPress={() => props.navigation.goBack()}
               marginHorizontal={10}>Back</Button>
-            <Button disabled={firstName === "" || lastName === "" || bio.length < 10}
+            <Button disabled={firstName === "" || lastName === "" || pronouns === "" || bio.length < 10}
               onPress={goNext}
               marginHorizontal={10}>Next</Button>
           </View>    
@@ -136,7 +140,6 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 10
   },
 
   tagInput: {
@@ -150,7 +153,7 @@ const styles = StyleSheet.create({
   },
 
   buttons: {
-    marginTop: "40%",
+    marginTop: "30%",
     display: "flex",
     flexDirection: "row",
     justifyContent: "center"

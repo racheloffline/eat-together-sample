@@ -69,7 +69,16 @@ export default function({ navigation }) {
             //See if there's a new notif
             await db.collection("Users").doc(user.uid).onSnapshot((doc) => {
                 let data = doc.data();
-                setUnread(data.hasNotif);
+                if (data.hasNotif !== null) {
+                    setUnread(data.hasNotif);
+                }
+                
+                // Verify the user if it's their very first time logging in
+                if (user.emailVerified && !data.verified) {
+                    db.collection("Users").doc(user.uid).update({
+                        verified: true
+                    });
+                }
             });
         }
 

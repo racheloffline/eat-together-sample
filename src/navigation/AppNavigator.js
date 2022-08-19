@@ -137,12 +137,13 @@ export default () => {
   const auth = useContext(AuthContext);
   const user = auth.user;
   const currUser = auth.currUser;
+
   useEffect(() => {
       async function getUser() {
           const token = await registerForPushNotificationsAsync();
           DeviceToken.setToken(token);
     
-          if (currUser && (currUser.emailVerified || currUser.email === "rachelhu@uw.edu" || currUser.email === "elaine@uw.edu" || currUser.email === "argharib@uw.edu")) {
+          if (currUser && currUser.emailVerified) {
               await db.collection("Users").doc(currUser.uid).update({
                   verified: true,
                   pushTokens: firebase.firestore.FieldValue.arrayUnion(token)
@@ -162,7 +163,7 @@ export default () => {
     <NavigationContainer>
       {user === null && <Loading/>}
       {user === false && <Auth/>}
-      {(user === true && currUser && !currUser.emailVerified && currUser.email !== "rachelhu@uw.edu" && currUser.email !== "elaine@uw.edu" && currUser.email !== "argharib@uw.edu") ? <VerifyEmail/>
+      {(user === true && currUser && !currUser.emailVerified) ? <VerifyEmail/>
         : user === true && <Main/>}
     </NavigationContainer>
   );

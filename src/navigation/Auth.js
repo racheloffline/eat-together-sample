@@ -29,9 +29,9 @@ const Auth = () => {
     // Name.js
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
+    const [pronouns, setPronouns] = useState("");
     const [bio, setBio] = useState("");
     const [image, setImage] = useState("");
-    const [tags, setTags] = useState([]);
 
     // Tags.js
     const [schoolTags, setSchoolTags] = useState([]);
@@ -85,7 +85,7 @@ const Auth = () => {
                     if (image !== "") {
                         storeImage(image, uid).then(() => {
                             fetchImage(uid).then(uri => {
-                                makeUser(uid, image).then(() => {
+                                makeUser(uid, uri).then(() => {
                                     response.user.sendEmailVerification();
                                 });
                             });
@@ -104,6 +104,30 @@ const Auth = () => {
     }
 
     const makeUser = async (uid, image) => {
+        // Create new objects for each tag
+        let tags = [];
+        schoolTags.forEach(tag => {
+            tags.push({
+                tag: tag,
+                type: "school"
+            });
+        });
+
+        hobbyTags.forEach(tag => {
+            tags.push({
+                tag: tag,
+                type: "hobby"
+            });
+        });
+        
+        foodTags.forEach(tag => {
+            tags.push({
+                tag: tag,
+                type: "food"
+            });
+        });
+
+        // Initialize user data
         const userData = {
             id: uid,
             firstName,
@@ -132,8 +156,12 @@ const Auth = () => {
             settings: {
                 notifications: true
             },
+            hasNotif: false,
+            pushTokens: [],
             verified: false
         }
+
+        console.log(userData);
         
         await db.collection("Users").doc(`${uid}`).set(userData);
         await db.collection("Usernames").doc(userData.username).set({
@@ -152,7 +180,7 @@ const Auth = () => {
 
     // Fetches image from Firebase Storage
     const fetchImage = async (id) => {
-        let ref = storage.ref().child("eventPictures/" + id);
+        let ref = storage.ref().child("profilePictures/" + id);
         return ref.getDownloadURL();
     }
 
@@ -168,7 +196,7 @@ const Auth = () => {
         <Stack.Screen name="Name" options={{headerShown: false}}>
             {props => <Name {...props} firstName={firstName} lastName={lastName} setFirstName={setFirstName}
                 setLastName={setLastName} bio={bio} setBio={setBio} image={image} setImage={setImage}
-                tags={tags} setTags={setTags}/>}
+                pronouns={pronouns} setPronouns={setPronouns}/>}
         </Stack.Screen>
         <Stack.Screen name="Tags" options={{headerShown: false}}>
             {props => <Tags {...props} schoolTags={schoolTags} setSchoolTags={setSchoolTags}

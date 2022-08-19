@@ -33,8 +33,10 @@ export default function({ navigation }) {
 	useEffect(() => { // updates stuff right after React makes changes to the DOM
 		async function fetchData() {
 			const ref = db.collection("Users");
+			let userData;
 
 			await ref.doc(user.uid).get().then(doc => {
+				userData = doc.data();
 				setUserInfo(doc.data());
 				doc.data().friendIDs.forEach(id => {
 					db.collection("Users").doc(id).get().then(doc => {
@@ -49,7 +51,9 @@ export default function({ navigation }) {
 				let users = [];
 				query.forEach((doc) => {
 					if (doc.data().id !== user.uid && doc.data().verified) {
-						users.push(doc.data());
+						let data = doc.data();
+						data.inCommon = getCommonTags(userData, data);
+						users.push(data);
 					}
 				});
 				setPeople(users);
@@ -65,6 +69,20 @@ export default function({ navigation }) {
 			setLoading(false);
 		});
 	}, []);
+
+	// Get tags in common with current user and user being compared to
+	const getCommonTags = (currUser, otherUser) => {
+		let commonTags = [];
+		const otherTags = otherUser.tags.map(tag => tag.tag);
+		
+		currUser.tags.forEach(tag => {
+			if (otherTags.includes(tag.tag)) {
+				commonTags.push(tag);
+			}
+		});
+
+		return commonTags;
+	}
 
 	// Method to filter out people based on name, username, or tags
 	const search = text => {
@@ -87,7 +105,7 @@ export default function({ navigation }) {
 			return true;
 		}
 
-		return person.tags.some(tag => tag.toLowerCase().includes(text.toLowerCase())); // Tags
+		return person.tags.some(tag => tag.tag.toLowerCase().includes(text.toLowerCase())); // Tags
 	}
 
 	// Method called when a new query is typed in/deleted
@@ -106,7 +124,7 @@ export default function({ navigation }) {
 		  	fetch("https://eat-together-match.uw.r.appspot.com/find_similarity", {
 				method: "POST",
 				body: JSON.stringify({
-			  		"currTags": userInfo.tags,
+			  		"currTags": userInfo.tags.map(t => t.tag),
 			  		"otherTags": getPeopleTags()
 				}),
 		  	}).then(res => res.json()).then(res => {
@@ -138,7 +156,7 @@ export default function({ navigation }) {
     const getPeopleTags = () => {
 		let tags = [];
 		people.forEach(p => {
-		  	tags.push(p.tags);
+			tags.push(p.tags.map(t => t.tag));
 		});
   
 		return tags;

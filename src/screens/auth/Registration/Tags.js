@@ -13,14 +13,16 @@ import NormalText from "../../../components/NormalText";
 import TagsSection from "../../../components/TagsSection";
 import Button from "../../../components/Button";
 
-import allTags from "../../../allTags";
+import schoolTags from "../../../schoolTags";
+import hobbyTags from "../../../hobbyTags";
+import foodTags from "../../../foodTags";
 import { cloneDeep } from "lodash";
 
 const Tags = props => {
   // Tags
-  const [schoolTags, setSchoolTags] = useState(props.schoolTags);
-  const [hobbyTags, setHobbyTags] = useState(props.hobbyTags);
-  const [foodTags, setFoodTags] = useState(props.foodTags);
+  const [schoolTagsSelected, setSchoolTagsSelected] = useState(props.schoolTags);
+  const [hobbyTagsSelected, setHobbyTagsSelected] = useState(props.hobbyTags);
+  const [foodTagsSelected, setFoodTagsSelected] = useState(props.foodTags);
   const [schoolTagsValue, setSchoolTagsValue] = useState("");
   const [hobbyTagsValue, setHobbyTagsValue] = useState("");
   const [foodTagsValue, setFoodTagsValue] = useState("");
@@ -35,47 +37,47 @@ const Tags = props => {
   // Determines text to display for tags
   useEffect(() => {
       let tags = "";
-      if (schoolTags.length > 0) {
-          tags += schoolTags[0];
+      if (schoolTagsSelected.length > 0) {
+          tags += schoolTagsSelected[0];
       }
 
-      for (let i = 1; i < schoolTags.length; i++) {
-          tags += ", " + schoolTags[i];
+      for (let i = 1; i < schoolTagsSelected.length; i++) {
+          tags += ", " + schoolTagsSelected[i];
       }
 
       setSchoolTagsValue(tags);
-  }, [schoolTags]);
+  }, [schoolTagsSelected]);
 
   useEffect(() => {
       let tags = "";
-      if (hobbyTags.length > 0) {
-          tags += hobbyTags[0];
+      if (hobbyTagsSelected.length > 0) {
+          tags += hobbyTagsSelected[0];
       }
 
-      for (let i = 1; i < hobbyTags.length; i++) {
-          tags += ", " + hobbyTags[i];
+      for (let i = 1; i < hobbyTagsSelected.length; i++) {
+          tags += ", " + hobbyTagsSelected[i];
       }
 
       setHobbyTagsValue(tags);
-  }, [hobbyTags]);
+  }, [hobbyTagsSelected]);
 
   useEffect(() => {
       let tags = "";
-      if (foodTags.length > 0) {
-          tags += foodTags[0];
+      if (foodTagsSelected.length > 0) {
+          tags += foodTagsSelected[0];
       }
 
-      for (let i = 1; i < foodTags.length; i++) {
-          tags += ", " + foodTags[i];
+      for (let i = 1; i < foodTagsSelected.length; i++) {
+          tags += ", " + foodTagsSelected[i];
       }
 
       setFoodTagsValue(tags);
-  }, [foodTags]);
+  }, [foodTagsSelected]);
 
   return (
     <Layout style={styles.page}>
         <LargeText center>Next, add some tags!</LargeText>
-        <NormalText center size={12} marginBottom={30}>Note: between 1 and 3 tags are required per category.</NormalText>
+        <NormalText center size={12} marginBottom={30}>Note: each category must contain between 1 to 3 tags.</NormalText>
 
         <View style={styles.tagSection}>
             <MediumText center marginBottom={5}>School</MediumText>
@@ -139,8 +141,15 @@ const Tags = props => {
 
         <View style={styles.buttons}>
             <Button onPress={() => props.navigation.goBack()}
-              marginHorizontal={10}>Back</Button>
-            <Button onPress={() => props.navigation.navigate("Email")}
+                marginHorizontal={10}>Back</Button>
+            <Button onPress={() => {
+                props.setSchoolTags(schoolTagsSelected);
+                props.setHobbyTags(hobbyTagsSelected);
+                props.setFoodTags(foodTagsSelected);
+                props.navigation.navigate("Email");
+            }}
+              disabled={schoolTagsSelected.length < 1 || schoolTagsSelected.length > 3 || hobbyTagsSelected.length < 1
+                || hobbyTagsSelected.length > 3 || foodTagsSelected.length < 1 || foodTagsSelected.length > 3}
               marginHorizontal={10}>Next</Button>
         </View>
 
@@ -168,15 +177,15 @@ const Tags = props => {
                 <NormalText center marginBottom={5}>E.g. year, major</NormalText>
                 <TagsSection
                     multi={true}
-                    selectedItems={schoolTags}
+                    selectedItems={schoolTagsSelected}
                     onItemSelect={(item) => {
-                        setSchoolTags([...schoolTags, item]);
+                        setSchoolTagsSelected([...schoolTagsSelected, item]);
                     }}
                     onRemoveItem={(item, index) => {
-                        const newTags = schoolTags.filter((tag, i) => i !== index);
-                        setSchoolTags(newTags);
+                        const newTags = schoolTagsSelected.filter((tag, i) => i !== index);
+                        setSchoolTagsSelected(newTags);
                     }}
-                    items={cloneDeep(allTags)}
+                    items={cloneDeep(schoolTags)}
                     chip={true}
                     resetValue={false}
                 />
@@ -187,15 +196,15 @@ const Tags = props => {
                 <NormalText center marginBottom={5}>E.g. sports, reading</NormalText>
                 <TagsSection
                     multi={true}
-                    selectedItems={hobbyTags}
+                    selectedItems={hobbyTagsSelected}
                     onItemSelect={(item) => {
-                        setHobbyTags([...hobbyTags, item]);
+                        setHobbyTagsSelected([...hobbyTagsSelected, item]);
                     }}
                     onRemoveItem={(item, index) => {
-                        const newTags = hobbyTags.filter((tag, i) => i !== index);
-                        setHobbyTags(newTags);
+                        const newTags = hobbyTagsSelected.filter((tag, i) => i !== index);
+                        setHobbyTagsSelected(newTags);
                     }}
-                    items={cloneDeep(allTags)}
+                    items={cloneDeep(hobbyTags)}
                     chip={true}
                     resetValue={false}
                 />
@@ -206,15 +215,15 @@ const Tags = props => {
                 <NormalText center marginBottom={5}>E.g. favorite dishes, favorite cuisine</NormalText>
                 <TagsSection
                     multi={true}
-                    selectedItems={foodTags}
+                    selectedItems={foodTagsSelected}
                     onItemSelect={(item) => {
-                        setFoodTags([...foodTags, item]);
+                        setFoodTagsSelected([...foodTagsSelected, item]);
                     }}
                     onRemoveItem={(item, index) => {
-                        const newTags = foodTags.filter((tag, i) => i !== index);
-                        setFoodTags(newTags);
+                        const newTags = foodTagsSelected.filter((tag, i) => i !== index);
+                        setFoodTagsSelected(newTags);
                     }}
-                    items={cloneDeep(allTags)}
+                    items={cloneDeep(foodTags)}
                     chip={true}
                     resetValue={false}
                 />

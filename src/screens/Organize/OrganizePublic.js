@@ -111,7 +111,11 @@ export default function ({ navigation }) {
 
     // For selecting a photo
     const handleChoosePhoto = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({});
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            quality: 1,
+        });
         if (!result.cancelled) {
             setPhoto(result.uri);
         }
