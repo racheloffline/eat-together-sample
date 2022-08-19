@@ -6,6 +6,8 @@ import Me from './Me';
 import Settings from './Settings';
 import Schedule from './Schedule'
 import Edit from './Edit'
+import ReportBug from "./ReportBug";
+import SuggestIdea from "./SuggestIdea";
 
 const profStack = createStackNavigator();
 
@@ -17,6 +19,8 @@ export default function ({ navigation }) {
                 <profStack.Screen name="Settings" component={Settings}  options={{headerShown: false}}/>
                 <profStack.Screen name="Schedule" component={Schedule} options={{headerShown: false}}/>
                 <profStack.Screen name="Edit Profile" component={Edit} options={{headerShown: false}}/>
+                <profStack.Screen name="Report Bug" component={ReportBug} options={{headerShown: false}}/>
+                <profStack.Screen name="Suggest Idea" component={SuggestIdea} options={{headerShown: false}}/>
             </profStack.Navigator>
         </NavigationContainer>
     );

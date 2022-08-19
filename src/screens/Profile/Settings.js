@@ -7,7 +7,7 @@ import {
     TouchableOpacity,
     KeyboardAvoidingView,
     FlatList,
-    Alert
+    Alert, Linking
 } from 'react-native';
 import { Layout, TopNav, TextInput } from "react-native-rapi-ui";
 import { Ionicons, Feather } from '@expo/vector-icons';
@@ -75,7 +75,9 @@ export default function ({ route, navigation }) {
                     text: "Yes",
                     onPress: () => {
                         user.delete().catch((error) => {
-                            signOut()
+                            signOut().then(() => {
+                                alert("You need to sign in again to proceed.");
+                            })
                         })
                     },
                     style: "destructive"
@@ -87,21 +89,42 @@ export default function ({ route, navigation }) {
     const buttons = [
         {
             name: "Notification Preferences",
+            icon: "notifications",
             func: () => changeNotifSettings()
         },
         {
+            name: "Privacy Policy",
+            icon: "hand-left",
+            func: () => {Linking.openURL("https://www.eat-together.tech/privacy-policy")}
+        },
+        {
+            name: "Report a Bug",
+            icon: "bug",
+            func: () => {navigation.navigate("Report Bug")}
+        },
+        {
+            name: "Suggest an Idea",
+            icon: "bulb",
+            func: () => {navigation.navigate("Suggest Idea")}
+        },
+        {
             name: "Log Out",
+            icon: "log-out",
             func: () => signOut()
         },
         {
             name: "Delete Account",
+            icon: "trash",
             func: () => deleteAccount()
         }
     ]
 
     const renderButton = ({ item }) => (
         <TouchableOpacity onPress={item.func} style={styles.listItem}>
-            <MediumText>{item.name}</MediumText>
+            <View style={styles.listView}>
+                <Ionicons name = {item.icon} size = {25}/>
+                <MediumText style={styles.text}>{item.name}</MediumText>
+            </View>
         </TouchableOpacity>
     )
     return(
@@ -118,15 +141,23 @@ export default function ({ route, navigation }) {
                 }
                 leftAction={() => navigation.goBack()}
             />
-            <FlatList data={buttons} renderItem={renderButton} style={styles.flatlist}/>
+            <FlatList data={buttons} renderItem={renderButton} style={styles.flatlist} scrollEnabled={false}/>
         </Layout>
     );
 }
 const styles = StyleSheet.create({
     flatlist: {
-        marginVertical: 10
+        marginVertical: 10,
+        marginHorizontal: 10
     },
     listItem: {
-        marginVertical: 10
+        marginVertical: 5
+    },
+    listView: {
+        flexDirection: "row",
+        width: Dimensions.get("screen").width - 20
+    },
+    text: {
+        marginHorizontal: 8
     }
 });
