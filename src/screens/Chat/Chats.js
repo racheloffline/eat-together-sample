@@ -1,16 +1,19 @@
 //Chat with users you have already connected with
 
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, FlatList, TouchableOpacity, Dimensions } from "react-native";
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
 import { Button, Layout, TopNav } from "react-native-rapi-ui";
-import { Ionicons } from "@expo/vector-icons";
-import HorizontalSwitch from "../../components/HorizontalSwitch";
-import MediumText from "../../components/MediumText";
+import Header from "../../components/Header";
 import { db } from "../../provider/Firebase";
 import firebase from "firebase";
 import ChatPreview from "../../components/ChatPreview";
 import SearchableDropdown from "react-native-searchable-dropdown";
-import moment from "moment";
 
 export default function ({ navigation }) {
   const [selectedUsers, setSelectedUsers] = useState([]);
@@ -89,10 +92,9 @@ export default function ({ navigation }) {
                 ? data.messages[data.messages.length - 1].sentAt
                 : "";
             // Get rid of your own name and all the ways it can be formatted in group title
-            let name = data.name
-              .replace(nameCurrent + ", ", "")
+            let name = data.name.replace(nameCurrent + ", ", "");
             if (name.endsWith(", " + nameCurrent)) {
-              name = name.slice(0, -1*(nameCurrent.length + 2));
+              name = name.slice(0, -1 * (nameCurrent.length + 2));
             }
             temp.push({
               groupID: groupID,
@@ -107,9 +109,8 @@ export default function ({ navigation }) {
           .then(() => {
             // sort display by time
             temp.sort((a, b) => {
-
-              return b.time- a.time;
-            })
+              return b.time - a.time;
+            });
             setGroups(temp);
           });
       });
@@ -138,20 +139,8 @@ export default function ({ navigation }) {
 
   return (
     <Layout>
-      <TopNav
-        middleContent={<MediumText center>Notifications</MediumText>}
-        leftContent={<Ionicons name="chevron-back" size={20} />}
-        rightContent={<Ionicons name="person-add" size={20} />}
-        leftAction={() => navigation.goBack()}
-        rightAction={() => navigation.navigate("Connections")}
-      />
-      <View style={styles.switchView}>
-        <HorizontalSwitch
-          left="Invites"
-          right="Chats"
-          current="right"
-          press={() => navigation.navigate("Invite")}
-        />
+      <View style={{ padding: 20 }}>
+        <Header name="Chat" navigation={navigation} hasNotif={true} />
       </View>
       <View style={styles.content}>
         <View style={styles.searchArea}>
@@ -161,7 +150,7 @@ export default function ({ navigation }) {
             onItemSelect={(item) => {
               setSelectedUsers([...selectedUsers, item]);
             }}
-            containerStyle={{ padding: 0, width: 300}}
+            containerStyle={{ padding: 0, width: 300 }}
             onRemoveItem={(item) => {
               const items = selectedUsers.filter(
                 (sitem) => sitem.id !== item.id
@@ -174,7 +163,7 @@ export default function ({ navigation }) {
               backgroundColor: "#ddd",
               borderColor: "#bbb",
               borderWidth: 1,
-              borderRadius: 5
+              borderRadius: 5,
             }}
             itemTextStyle={{ color: "#222" }}
             itemsContainerStyle={{ maxHeight: 140 }}
@@ -242,7 +231,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   content: {
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
   },
   searchArea: {
     flexDirection: "row",

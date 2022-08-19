@@ -12,14 +12,14 @@ import ProfilePic from "../components/ProfilePic";
 
 //Screens (Make sure to import if ever adding new screen!)
 import OrganizeMain from "../screens/Organize/OrganizeMain";
-import PeopleMain from "../screens/Explore/People/PeopleMain";
+import Chats from "../screens/Chat/Chats";
 import ExploreMain from "../screens/Explore/ExploreMain";
-import Home from "../screens/Home/Home"
+import Home from "../screens/Home/Home";
+
 import Loading from "../screens/utils/Loading";
 
 //Auth screens
 import Auth from "./Auth";
-import Schedule from "../screens/Profile/Schedule";
 import { AuthContext } from "../provider/AuthProvider";
 
 //Screen for if the user hasn't verified their email
@@ -29,17 +29,19 @@ import firebase from "firebase";
 import { db } from "../provider/Firebase";
 
 //Push notifications functions and imports
-import * as Notifications from "expo-notifications";
+import * as NotificationFunctions from "expo-notifications";
+
 import DeviceToken from "../screens/utils/DeviceToken";
 
 async function registerForPushNotificationsAsync() {
   let token;
 
-  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  const { status: existingStatus } =
+    await NotificationFunctions.getPermissionsAsync();
   let finalStatus = existingStatus;
 
   if (existingStatus !== "granted") {
-    const { status } = await Notifications.requestPermissionsAsync();
+    const { status } = await NotificationFunctions.requestPermissionsAsync();
     finalStatus = status;
   }
 
@@ -48,7 +50,7 @@ async function registerForPushNotificationsAsync() {
     return;
   }
 
-  token = (await Notifications.getExpoPushTokenAsync()).data;
+  token = (await NotificationFunctions.getExpoPushTokenAsync()).data;
 
   return token;
 }
@@ -63,11 +65,7 @@ const Main = () => {
         animationEnabled: false,
       }}
     >
-      <MainStack.Screen name="MainTabs">
-        {() => <MainTabs/>}
-      </MainStack.Screen>
-      <MainStack.Screen name="Schedule" component={Schedule} />
-      <MainStack.Screen name="OrganizeMain" component={OrganizeMain} />
+      <MainStack.Screen name="MainTabs">{() => <MainTabs />}</MainStack.Screen>
     </MainStack.Navigator>
   );
 };
@@ -122,7 +120,7 @@ const MainTabs = () => {
       />
       <Tabs.Screen
         name="Chat"
-        component={PeopleMain}
+        component={Chats}
         options={{
           tabBarLabel: ({ focused }) => (
             <TabBarText focused={focused} title="Chat" />
@@ -143,9 +141,7 @@ const MainTabs = () => {
           showLabel: false,
         }}
         options={{
-          tabBarIcon: () => (
-            <ProfilePic size={38} uri={profileImageUri} />
-          ),
+          tabBarIcon: () => <ProfilePic size={38} uri={profileImageUri} />,
         }}
       />
     </Tabs.Navigator>
@@ -203,7 +199,7 @@ export default () => {
       currUser.email !== "argharib@uw.edu" ? (
         <VerifyEmail />
       ) : (
-        user === true && <Main/>
+        user === true && <Main />
       )}
     </NavigationContainer>
   );
