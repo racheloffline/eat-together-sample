@@ -10,122 +10,140 @@ import firebase from "firebase";
 
 import MediumText from "../../components/MediumText";
 import InvitePerson from "../../components/InvitePerson";
-import {getProfileRecs} from "../../methods";
 import Searchbar from "../../components/Searchbar";
-import getDate from "../../getDate";
-import {generateColor} from "../../methods";
+import { generateColor } from "../../methods";
 
 // Stores image in Firebase Storage
 const storeImage = async (uri, event_id) => {
-    const response = await fetch(uri);
-    const blob = await response.blob();
+  const response = await fetch(uri);
+  const blob = await response.blob();
 
-    let ref = storage.ref().child("eventPictures/" + event_id);
-    return ref.put(blob);
+  let ref = storage.ref().child("eventPictures/" + event_id);
+  return ref.put(blob);
 };
 
 // Fetches image from Firebase Storage
 const fetchImage = async (id) => {
-    let ref = storage.ref().child("eventPictures/" + id);
-    return ref.getDownloadURL();
-}
-
-async function sendInvites (attendees, invite, navigation, user, id, image, icebreakers) {
-    //Send invites to each of the selected users
-    async function sendInvitations(ref) {
-        ref.collection("Invites").add({
-            date: invite.date,
-            description: invite.additionalInfo,
-            hostID: user.id,
-            hostName: user.firstName + " " + user.lastName,
-            hasImage: invite.hasImage,
-            image: invite.image,
-            location: invite.location,
-            name: invite.name,
-            inviteID: id
-        }).then(r => {
-            invite.clearAll();
-            navigation.navigate("OrganizePrivate");
-        });
-    }
-
-    await db.collection("Private Events").doc(id).set({
-        id,
-        name: invite.name,
-        hostID: user.id,
-        hostFirstName: user.firstName,
-        hostLastName: user.lastName,
-        hasHostImage: user.hasImage,
-        hostImage: user.image,
-        location: invite.location,
-        date: invite.date,
-        additionalInfo: invite.additionalInfo,
-        ice: icebreakers,
-        attendees: [user.id], //ONLY start by putting the current user as an attendee
-        hasImage: invite.hasImage,
-        image
-    }).then(async docRef => {
-        await attendees.forEach((attendee) => {
-            const ref = db.collection("User Invites").doc(attendee);
-            ref.get().then(async (docRef) => {
-                if (attendee !== user.id) {
-                    await sendInvitations(ref)
-                }
-            });
-        });
-
-        const storeID = {
-            type: "private",
-            id
-        };
-
-        await db.collection("Users").doc(user.id).update({
-            hostedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
-            attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
-            attendedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)
-        });
-
-        alert("Invitations sent!");
-
-    });
+  let ref = storage.ref().child("eventPictures/" + id);
+  return ref.getDownloadURL();
 };
 
+async function sendInvites(
+  attendees,
+  invite,
+  navigation,
+  user,
+  id,
+  image,
+  icebreakers
+) {
+  //Send invites to each of the selected users
+  async function sendInvitations(ref) {
+    ref
+      .collection("Invites")
+      .add({
+        date: invite.date,
+        description: invite.additionalInfo,
+        hostID: user.id,
+        hostName: user.firstName + " " + user.lastName,
+        hasImage: invite.hasImage,
+        image: invite.image,
+        location: invite.location,
+        name: invite.name,
+        inviteID: id,
+      })
+      .then((r) => {
+        invite.clearAll();
+        navigation.navigate("OrganizePrivate");
+      });
+  }
 
-const isMatch = (user, text) => {
-    if (user.name.toLowerCase().includes(text.toLowerCase())) { // Name
-        return true;
-    }
+  await db
+    .collection("Private Events")
+    .doc(id)
+    .set({
+      id,
+      name: invite.name,
+      hostID: user.id,
+      hostFirstName: user.firstName,
+      hostLastName: user.lastName,
+      hasHostImage: user.hasImage,
+      hostImage: user.image,
+      location: invite.location,
+      date: invite.date,
+      additionalInfo: invite.additionalInfo,
+      ice: icebreakers,
+      attendees: [user.id], //ONLY start by putting the current user as an attendee
+      hasImage: invite.hasImage,
+      image,
+    })
+    .then(async (docRef) => {
+      await attendees.forEach((attendee) => {
+        const ref = db.collection("User Invites").doc(attendee);
+        ref.get().then(async (docRef) => {
+          if (attendee !== user.id) {
+            await sendInvitations(ref);
+          }
+        });
+      });
 
-    if (user.username.toLowerCase().includes(text.toLowerCase())) { // Location
-        return true;
-    }
+      const storeID = {
+        type: "private",
+        id,
+      };
 
-    if (user.quote.toLowerCase().includes(text.toLowerCase())) { // Date
-        return true;
-    }
+      await db
+        .collection("Users")
+        .doc(user.id)
+        .update({
+          hostedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
+          attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
+          attendedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
+        });
 
-    return false;
+      alert("Invitations sent!");
+    });
 }
 
-export default function({ route, navigation }) {
-    // Current user
-    const user = auth.currentUser;
-    const [userInfo, setUserInfo] = useState([]);
+const isMatch = (user, text) => {
+  if (user.name.toLowerCase().includes(text.toLowerCase())) {
+    // Name
+    return true;
+  }
 
-    const attendees = route.params.attendees;
+  if (user.username.toLowerCase().includes(text.toLowerCase())) {
+    // Location
+    return true;
+  }
 
-    const [users, setUsers] = useState([]);
-    const [filteredUsers, setFilteredUsers] = useState([]);
-    const [curSearch, setCurSearch] = useState("");
+  if (user.quote.toLowerCase().includes(text.toLowerCase())) {
+    // Date
+    return true;
+  }
 
-    const [disabled, setDisabled] = useState(true);
-    const [loading, setLoading] = useState(false);
+  return false;
+};
 
-    const [icebreakers, setIcebreakers] = useState([]);
+export default function ({ route, navigation }) {
+  // Current user
+  const user = auth.currentUser;
+  const [userInfo, setUserInfo] = useState([]);
 
-    useEffect(() => { // updates stuff right after React makes changes to the DOM
-        //LINKING ELAINE'S ALGO
-        /*
+  const attendees = route.params.attendees;
+
+  const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [curSearch, setCurSearch] = useState("");
+
+  const [disabled, setDisabled] = useState(true);
+  const [loading, setLoading] = useState(false);
+
+  const [icebreakers, setIcebreakers] = useState([]);
+
+  useEffect(() => {
+    // updates stuff right after React makes changes to the DOM
+    //LINKING ELAINE'S ALGO
+    /*
         let bestUsers = getProfileRecs();
         const ref = db.collection("Users");
         const list = [];
@@ -144,131 +162,159 @@ export default function({ route, navigation }) {
             });
         });
          */
-        // COMMENT THIS AREA OUT WHEN READY (START)
-//      picks icebreaker set from set of icebreakers randomly
-        const breakOptions = [];
-        db.collection("Icebreakers").onSnapshot((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-                breakOptions.push(doc.id);
-            })
-            var num = Math.floor(Math.random()*breakOptions.length);
-            db.collection("Icebreakers").doc(breakOptions[num]).get().then(doc => {
-                    setIcebreakers(doc.data().icebreakers);
-                })
+    // COMMENT THIS AREA OUT WHEN READY (START)
+    //      picks icebreaker set from set of icebreakers randomly
+    const breakOptions = [];
+    db.collection("Icebreakers").onSnapshot((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        breakOptions.push(doc.id);
+      });
+      var num = Math.floor(Math.random() * breakOptions.length);
+      db.collection("Icebreakers")
+        .doc(breakOptions[num])
+        .get()
+        .then((doc) => {
+          setIcebreakers(doc.data().icebreakers);
         });
+    });
 
-        const ref = db.collection("Users");
-        ref.onSnapshot((query) => {
-            const list = [];
-            query.forEach((doc) => {
-                let data = doc.data();
-                if (data.verified && data.id !== user.uid) {
-                    list.push({
-                        id: doc.id,
-                        username: data.username,
-                        personID: data.id,
-                        name: data.name,
-                        quote: data.quote,
-                        hasImage: data.hasImage,
-                        attendees: data.attendees,
-                        tags: data.tags,
-                        attendedEventIDs: data.attendedEventIDs,
-                        attendingEventIDs: data.attendingEventIDs
-                    });
-                } else if (data.id === user.uid) {
-                    setUserInfo(data);
-                }
-            });
-            setFilteredUsers(list);
-            setUsers(list);
-        });
-        // COMMENT THIS AREA OUT WHEN READY (END)
-    }, []);
+    const ref = db.collection("Users");
+    ref.onSnapshot((query) => {
+      const list = [];
+      query.forEach((doc) => {
+        let data = doc.data();
+        if (data.verified && data.id !== user.uid) {
+          list.push({
+            id: doc.id,
+            username: data.username,
+            personID: data.id,
+            name: data.name,
+            quote: data.quote,
+            hasImage: data.hasImage,
+            attendees: data.attendees,
+            tags: data.tags,
+            attendedEventIDs: data.attendedEventIDs,
+            attendingEventIDs: data.attendingEventIDs,
+          });
+        } else if (data.id === user.uid) {
+          setUserInfo(data);
+        }
+      });
+      setFilteredUsers(list);
+      setUsers(list);
+    });
+    // COMMENT THIS AREA OUT WHEN READY (END)
+  }, []);
 
-    const onChangeText = (text) => {
-        setCurSearch(text);
-        search(curSearch);
-    }
+  const onChangeText = (text) => {
+    setCurSearch(text);
+    search(curSearch);
+  };
 
-    const search = (text) => {
-        let newEvents = users.filter(e => isMatch(e, text));
-        setFilteredUsers(newEvents);
-    }
+  const search = (text) => {
+    let newEvents = users.filter((e) => isMatch(e, text));
+    setFilteredUsers(newEvents);
+  };
 
-    return (
-        <Layout style={{flex:1}}>
-            <TopNav
-                middleContent={
-                    <MediumText center>Suggested People</MediumText>
-                }
-                leftContent={
-                    <Ionicons
-                        name="chevron-back"
-                        size={20}
-                    />
-                }
-                leftAction={() => navigation.goBack()}
-            />
+  return (
+    <Layout style={{ flex: 1 }}>
+      <TopNav
+        middleContent={<MediumText center>Suggested People</MediumText>}
+        leftContent={<Ionicons name="chevron-back" size={20} />}
+        leftAction={() => navigation.goBack()}
+      />
 
-            <Searchbar placeholder="Search by name"
-                value={curSearch} onChangeText={onChangeText}/>
-            <FlatList contentContainerStyle={styles.invites} keyExtractor={item => item.id}
-                data={filteredUsers} renderItem={({item}) =>
-                    <InvitePerson navigation={navigation} person={item}
-                        attendees={attendees} color={generateColor()}
-                        disable={() => setDisabled(true)}
-                        undisable={() => setDisabled(false)}/>
-                }/>
+      <Searchbar
+        placeholder="Search by name"
+        value={curSearch}
+        onChangeText={onChangeText}
+      />
+      <FlatList
+        contentContainerStyle={styles.invites}
+        keyExtractor={(item) => item.id}
+        data={filteredUsers}
+        renderItem={({ item }) => (
+          <InvitePerson
+            navigation={navigation}
+            person={item}
+            attendees={attendees}
+            color={generateColor()}
+            disable={() => setDisabled(true)}
+            undisable={() => setDisabled(false)}
+          />
+        )}
+      />
 
-            <View style={styles.buttons}>
-                <Button text={loading ? "Sending ..." : "Send Invites"} width={Dimensions.get('screen').width}
-                    disabled={disabled || loading} color="#5DB075" size="lg" onPress={() => {
-                        setLoading(true);
-                        const id = Date.now() + user.uid; // Generate a unique ID for the event
+      <View style={styles.buttons}>
+        <Button
+          text={loading ? "Sending ..." : "Send Invites"}
+          width={Dimensions.get("screen").width}
+          disabled={disabled || loading}
+          color="#5DB075"
+          size="lg"
+          onPress={() => {
+            setLoading(true);
+            const id = Date.now() + user.uid; // Generate a unique ID for the event
 
-                        if (route.params.hasImage) {
-                            storeImage(route.params.image, id).then(() => {
-                                fetchImage(id).then(uri => {
-                                    sendInvites(attendees, route.params, navigation, userInfo, id, uri, icebreakers).then(() => {
-                                        setLoading(false);
-                                    });
-                                });
-                            });
-                        } else {
-                            sendInvites(attendees, route.params, navigation, userInfo, id, "", icebreakers).then(() => {
-                                setLoading(false);
-                            });
-                        }
-                    }}/>
-            </View>
-        </Layout>
-
-    );
+            if (route.params.hasImage) {
+              storeImage(route.params.image, id).then(() => {
+                fetchImage(id).then((uri) => {
+                  sendInvites(
+                    attendees,
+                    route.params,
+                    navigation,
+                    userInfo,
+                    id,
+                    uri,
+                    icebreakers
+                  ).then(() => {
+                    setLoading(false);
+                  });
+                });
+              });
+            } else {
+              sendInvites(
+                attendees,
+                route.params,
+                navigation,
+                userInfo,
+                id,
+                "",
+                icebreakers
+              ).then(() => {
+                setLoading(false);
+              });
+            }
+          }}
+        />
+      </View>
+    </Layout>
+  );
 }
 
 const styles = StyleSheet.create({
-    invites: {
-        alignItems: "center",
-        padding: 30
-    },
-    submit: {
-        position: 'absolute',
-        bottom:0,
-    },
-    tagInput: {
-        width: "100%",
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "center",
-        marginVertical: 10
-    },
+  invites: {
+    alignItems: "center",
+    padding: 30,
+  },
+  submit: {
+    position: "absolute",
+    bottom: 0,
+  },
+  tagInput: {
+    width: "100%",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    marginVertical: 10,
+  },
 
-    input: {
-        width: Dimensions.get('screen').width/1.5,
-        marginRight: 10
-    },
-    buttons: {
-        justifyContent: "center",
-        flexDirection: "row"
-    }
+  input: {
+    width: Dimensions.get("screen").width / 1.5,
+    marginRight: 10,
+  },
+  buttons: {
+    justifyContent: "center",
+    flexDirection: "row",
+  },
 });

@@ -7,7 +7,6 @@ import { Layout } from "react-native-rapi-ui";
 import EventCard from "../../components/EventCard";
 import Header from "../../components/Header";
 import Searchbar from "../../components/Searchbar";
-import HorizontalSwitch from "../../components/HorizontalSwitch";
 import HorizontalRow from "../../components/HorizontalRow";
 import Filter from "../../components/Filter";
 
@@ -171,13 +170,9 @@ export default function ({ navigation }) {
   };
   return (
     <Layout>
-      <Header name="Explore" navigation={navigation} hasNotif={unread} />
-      <HorizontalSwitch
-        left="Your Events"
-        right="Public"
-        current="left"
-        press={() => navigation.navigate("Explore")}
-      />
+      <View style={{ padding: 20 }}>
+        <Header name="Your Events" navigation={navigation} hasNotif={unread} />
+      </View>
       <Searchbar
         placeholder="Search by name, location, date, or host name"
         value={searchQuery}

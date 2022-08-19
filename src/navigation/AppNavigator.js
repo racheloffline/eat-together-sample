@@ -14,6 +14,7 @@ import ProfilePic from "../components/ProfilePic";
 import OrganizeMain from "../screens/Organize/OrganizeMain";
 import PeopleMain from "../screens/Explore/People/PeopleMain";
 import ExploreMain from "../screens/Explore/ExploreMain";
+import Home from "../screens/Home/Home"
 import Loading from "../screens/utils/Loading";
 
 //Auth screens
@@ -86,7 +87,7 @@ const MainTabs = () => {
     >
       <Tabs.Screen
         name="Home"
-        component={ExploreMain}
+        component={Home}
         options={{
           tabBarIcon: ({ focused }) => (
             <TabBarIcon focused={focused} icon={"home-outline"} title="Home" />
