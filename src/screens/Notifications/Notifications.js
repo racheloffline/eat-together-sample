@@ -8,26 +8,12 @@ import { Ionicons } from "@expo/vector-icons";
 import MediumText from "../../components/MediumText";
 import { db } from "../../provider/Firebase";
 import firebase from "firebase";
-import HorizontalSwitch from "../../components/HorizontalSwitch";
 import EventCard from "../../components/EventCard";
 
 export default function ({ navigation }) {
   //Get a list of current invites from Firebase up here
   const user = firebase.auth().currentUser;
   const [invites, setInvites] = useState([]); // initial state, function used for updating initial state
-
-  //check to see which text to display for accepted status
-  function checkAccepted(item) {
-    if (item.accepted == null) {
-      return "New invite!";
-    } else if (item.accepted === "accepted") {
-      return "You have accepted this invite!";
-    } else if (item.accepted === "declined") {
-      return "You have declined this invite.";
-    } else {
-      return "ERROR";
-    }
-  }
 
   //Check to see if we should display the "No Invites" placeholder text
   function shouldDisplayPlaceholder(list) {
@@ -58,7 +44,6 @@ export default function ({ navigation }) {
             image: data.image,
             hasImage: data.hasImage,
             location: data.location,
-            //date: DateTimeConverter.getDate(DateTimeConverter.toDate(data.date)), // Fix this, add time back?
             date: data.date,
             details: data.description,
             hostID: data.hostID,
@@ -78,7 +63,7 @@ export default function ({ navigation }) {
   return (
     <Layout>
       <TopNav
-        middleContent={<MediumText center>Notifications</MediumText>}
+        middleContent={<MediumText center>Invites</MediumText>}
         leftContent={<Ionicons name="chevron-back" size={20} />}
         leftAction={() => navigation.goBack()}
       />

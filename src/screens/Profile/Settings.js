@@ -2,32 +2,22 @@ import React, { useState, useEffect } from "react";
 import {
     View,
     StyleSheet,
-    Image,
     Dimensions,
     TouchableOpacity,
-    KeyboardAvoidingView,
     FlatList,
     Alert, Linking
 } from 'react-native';
-import { Layout, TopNav, TextInput } from "react-native-rapi-ui";
-import { Ionicons, Feather } from '@expo/vector-icons';
+import { Layout, TopNav } from "react-native-rapi-ui";
+import { Ionicons } from '@expo/vector-icons';
 
-import * as ImagePicker from 'expo-image-picker';
-import { db, auth, storage } from "../../provider/Firebase";
+import { db, auth } from "../../provider/Firebase";
 import firebase from "firebase";
 import "firebase/firestore"
 
-import { cloneDeep } from "lodash";
-import allTags from "../../allTags";
-
-import TagsSection from "../../components/TagsSection";
-import Button from "../../components/Button";
 import MediumText from "../../components/MediumText";
-import SmallText from "../../components/SmallText";
 import DeviceToken from "../utils/DeviceToken";
-import KeyboardAvoidingWrapper from "../../components/KeyboardAvoidingWrapper";
 
-export default function ({ route, navigation }) {
+export default function ({ navigation }) {
     let user = auth.currentUser;
     function changeNotifSettings() {
         Alert.alert(
