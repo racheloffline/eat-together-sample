@@ -1,5 +1,4 @@
-// TODO: Josh | You will need to edit this file
-// hello
+// What your event will look like
 
 import React, { useState, useEffect } from "react";
 import {
@@ -9,6 +8,8 @@ import {
   ImageBackground,
   Dimensions,
   TouchableOpacity,
+  Alert,
+  Image
 } from "react-native";
 import { Layout, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
@@ -33,6 +34,9 @@ import {
 } from "react-native-popup-menu";
 
 const WhileYouEat = ({ route, navigation }) => {
+  // Event details
+  const [event, setEvent] = useState(route.params.event);
+
   // Data for the attendees
   const [attendees, setAttendees] = useState(
     new Array(route.params.event.attendees.length).fill(false)
@@ -44,17 +48,10 @@ const WhileYouEat = ({ route, navigation }) => {
   const [openAttendance, setOpenAttendance] = useState(false);
   const [openIcebreakers, setOpenIcebreakers] = useState(false);
 
-  // List of icebreaker questions
-  const [icebreakers, setIcebreakers] = useState([]);
-
   // Get the current user
   const user = auth.currentUser;
 
   useEffect(() => {
-    if (icebreakers.length === 0) {
-      fetchIcebreakers();
-    }
-
     if (route.params.event.hostID === user.uid) {
       getAttendees();
     }
@@ -77,19 +74,6 @@ const WhileYouEat = ({ route, navigation }) => {
         attendedEventIDs: newAttendees[index]
           ? firebase.firestore.FieldValue.arrayUnion(storeID)
           : firebase.firestore.FieldValue.arrayRemove(storeID),
-      });
-  };
-
-  // TODO: JOSH | Randomize this
-  // Fetch icebreaker questions from FIREBASE
-  const fetchIcebreakers = () => {
-    const eventID = route.params.event.id;
-
-    db.collection("Private Events")
-      .doc(eventID)
-      .get()
-      .then((doc) => {
-        setIcebreakers(doc.data().ice);
       });
   };
 
@@ -150,7 +134,7 @@ const WhileYouEat = ({ route, navigation }) => {
                 attendees: firebase.firestore.FieldValue.arrayRemove(user.uid),
               })
               .then(() => {
-                alert("You withdrew from the event");
+                alert("You withdrew from the meal :(");
                 navigation.goBack();
               });
           } else {
@@ -160,7 +144,7 @@ const WhileYouEat = ({ route, navigation }) => {
                 attendees: firebase.firestore.FieldValue.arrayRemove(user.uid),
               })
               .then(() => {
-                alert("You withdrew from the event");
+                alert("You withdrew from the meal :(");
                 navigation.goBack();
               });
           }
@@ -171,15 +155,37 @@ const WhileYouEat = ({ route, navigation }) => {
   //Reporting event function
   function reportEvent() {
     navigation.navigate("ReportEvent", {
-      eventID: route.params.event.id,
+      eventID: event.id,
     });
+  }
+
+  // Replace event with new details (for editing)
+  const editEvent = newEvent => {
+    setEvent(newEvent);
+  }
+
+  // Alert the user if they want to withdraw from the event or not
+  const withdrawAlert = () => {
+    Alert.alert(
+      "Withdraw",
+      "Are you sure you want to withdraw from this meal?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        { text: "OK", onPress: () => withdraw() },
+      ],
+      { cancelable: false }
+    );
   }
 
   return (
     <Layout>
       <TopNav
         middleContent={
-          <MediumText center>{route.params.event.name}</MediumText>
+          <MediumText center>{event.name}</MediumText>
         }
         leftContent={
           <Ionicons
@@ -200,17 +206,17 @@ const WhileYouEat = ({ route, navigation }) => {
                 />
               </MenuTrigger>
               <MenuOptions>
-                {route.params.event.hostID !== user.uid && (
-                  <MenuOption onSelect={() => reportEvent()}>
-                    <NormalText size={18}>Report Event</NormalText>
-                  </MenuOption>
-                )}
-                {route.params.event.hostID === user.uid && (
-                  <MenuOption>
-                    <NormalText size={18}>Edit Event</NormalText>
-                  </MenuOption>
-                )}
-                <MenuOption onSelect={() => withdraw()}>
+                {event.hostID !== user.uid && <MenuOption onSelect={() => reportEvent()}>
+                  <NormalText size={18}>Report Event</NormalText>
+                </MenuOption>}
+                {event.hostID === user.uid && <MenuOption onSelect={() => navigation.navigate("EditEvent", {
+                  event,
+                  editEvent,
+                  editEvent2: route.params.editEvent
+                })}>
+                  <NormalText size={18}>Edit Event</NormalText>
+                </MenuOption>}
+                <MenuOption onSelect={() => withdrawAlert()}>
                   <NormalText size={18} color="red">
                     Withdraw
                   </NormalText>
@@ -224,8 +230,8 @@ const WhileYouEat = ({ route, navigation }) => {
       <ScrollView>
         <ImageBackground
           source={
-            route.params.event.hasImage
-              ? { uri: route.params.event.image }
+            event.hasImage
+              ? { uri: event.image }
               : require("../../../assets/foodBackground.png")
           }
           style={styles.imageBackground}
@@ -233,24 +239,20 @@ const WhileYouEat = ({ route, navigation }) => {
         ></ImageBackground>
         <View style={styles.infoContainer}>
           <LargeText size={20} marginBottom={10}>
-            {route.params.event.name}
+            {event.name}
           </LargeText>
 
-          <NormalText color="black">
-            Hosted by:{" "}
-            {route.params.event.hostID === user.uid
-              ? "You ;)"
-              : route.params.event.hostFirstName
-              ? route.params.event.hostFirstName +
-                " " +
-                route.params.event.hostLastName.substring(0, 1) +
-                "."
-              : route.params.event.hostName}
-          </NormalText>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Image source={route.params.event.hasHostImage ? { uri: route.params.event.hostImage}
+              : require("../../../assets/logo.png")} style={styles.profileImg}/>
+            <MediumText size={18}>{route.params.event.hostID === user.uid ? "You ;)"
+              : (route.params.event.hostFirstName ?
+                route.params.event.hostFirstName + " " + route.params.event.hostLastName
+              : route.params.event.hostName)}
+            </MediumText>
+          </View>
 
-          {route.params.event.tags && (
-            <TagsList marginVertical={20} tags={route.params.event.tags} />
-          )}
+          {event.tags && <TagsList marginVertical={20} tags={event.tags}/>}
 
           {/* 3 event details (location, date, time} are below */}
 
@@ -258,24 +260,28 @@ const WhileYouEat = ({ route, navigation }) => {
             <View style={styles.row}>
               <Ionicons name="location-sharp" size={20} />
               <NormalText paddingHorizontal={10} color="black">
-                {route.params.event.location}
+                {event.location}
               </NormalText>
             </View>
 
             <View style={styles.row}>
               <Ionicons name="calendar-outline" size={20} />
               <NormalText paddingHorizontal={10} color="black">
-                {getDate(route.params.event.date.toDate())}
+                {getDate(event.date.toDate())}
               </NormalText>
             </View>
 
             <View style={styles.row}>
               <Ionicons name="time-outline" size={20} />
               <NormalText paddingHorizontal={10} color="black">
-                {getTime(route.params.event.date.toDate())}
+                {getTime(event.date.toDate())}
               </NormalText>
             </View>
           </View>
+
+          <NormalText marginBottom={20} color="black">
+            {event.additionalInfo}
+          </NormalText>
 
           {/* Icebreakers dropdown */}
 
@@ -296,56 +302,52 @@ const WhileYouEat = ({ route, navigation }) => {
             </NormalText>
           </View>
           <View style={styles.icebreakers}>
-            {openIcebreakers &&
-              icebreakers.map((ice, index) => (
+            {openIcebreakers && event.ice &&
+              event.ice.map((ice, index) => (
                 <Icebreaker number={index + 1} icebreaker={ice} key={index} />
               ))}
           </View>
 
           {/* Attendance dropdown */}
-          {route.params.event.hostID === user.uid && (
-            <View>
-              <View style={styles.row}>
-                <TouchableOpacity
-                  onPress={() => setOpenAttendance(!openAttendance)}
-                >
-                  <Ionicons
-                    name={
-                      !openAttendance
-                        ? "caret-forward-sharp"
-                        : "caret-down-sharp"
-                    }
-                    size={20}
-                    color="black"
-                  />
-                </TouchableOpacity>
+          {event.hostID === user.uid && <View>
+            <View style={styles.row}>
+              <TouchableOpacity
+                onPress={() => setOpenAttendance(!openAttendance)}
+              >
+                <Ionicons
+                  name={
+                    !openAttendance ? "caret-forward-sharp" : "caret-down-sharp"
+                  }
+                  size={20}
+                  color="black"
+                />
+              </TouchableOpacity>
 
-                <NormalText paddingHorizontal={7} size={17} color="black">
-                  Attendance
-                </NormalText>
-              </View>
-
-              {openAttendance && (
-                <View style={{ marginTop: 10 }}>
-                  {people.length === 0 ? (
-                    <NormalText paddingHorizontal={25} size={17} color="black">
-                      {"Just yourself ;)"}
-                    </NormalText>
-                  ) : (
-                    people.map((person, index) => (
-                      <Attendance
-                        size={17}
-                        person={person}
-                        key={person.id}
-                        attending={attendees[index]}
-                        onPress={() => markAttendee(index)}
-                      />
-                    ))
-                  )}
-                </View>
-              )}
+              <NormalText paddingHorizontal={7} size={17} color="black">
+                Attendance
+              </NormalText>
             </View>
-          )}
+
+            {openAttendance && (
+              <View style={{ marginTop: 10 }}>
+                {people.length === 0 ? (
+                  <NormalText paddingHorizontal={25} size={17} color="black">
+                    {"Just yourself ;)"}
+                  </NormalText>
+                ) : (
+                  people.map((person, index) => (
+                    <Attendance
+                      size={17}
+                      person={person}
+                      key={person.id}
+                      attending={attendees[index]}
+                      onPress={() => markAttendee(index)}
+                    />
+                  ))
+                )}
+              </View>
+            )}
+          </View>}
         </View>
       </ScrollView>
     </Layout>
@@ -355,12 +357,27 @@ const WhileYouEat = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   infoContainer: {
     marginHorizontal: 30,
-    marginBottom: 50,
+    marginBottom: 50
   },
 
   row: {
     flexDirection: "row",
     marginVertical: 4,
+  },
+
+  profileImg: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    borderColor: "#5DB075",
+    borderWidth: 1,
+    backgroundColor: "white",
+    marginRight: 3
+  },
+
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "center"
   },
 
   imageBackground: {

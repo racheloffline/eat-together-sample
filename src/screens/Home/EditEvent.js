@@ -7,7 +7,7 @@ import {
     ImageBackground,
     Dimensions,
 } from "react-native";
-import { Layout, TextInput } from "react-native-rapi-ui";
+import { TopNav, Layout, TextInput } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 import eventTags from "../../eventTags";
 
@@ -15,24 +15,19 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import RBSheet from "react-native-raw-bottom-sheet";
 import TagsSection from "../../components/TagsSection";
 
-import Header from "../../components/Header";
 import getDate from "../../getDate";
 import getTime from "../../getTime";
-import HorizontalSwitch from "../../components/HorizontalSwitch";
 import Button from "../../components/Button";
+
+import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
 
-import * as firebase from "firebase";
 import * as ImagePicker from "expo-image-picker";
-import { db, auth, storage } from "../../provider/Firebase";
+import { db, storage } from "../../provider/Firebase";
 import { cloneDeep } from "lodash";
 import moment from "moment";
 
-export default function ({ navigation }) {
-    // Current user
-    const user = auth.currentUser;
-    const [userInfo, setUserInfo] = useState({});
-
+export default function ({ route, navigation }) {
     // State variables for the inputs
     const [photo, setPhoto] = useState("https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400");
     const [name, setName] = useState("");
@@ -41,44 +36,24 @@ export default function ({ navigation }) {
     const [additionalInfo, setAdditionalInfo] = useState("");
     const [tagsSelected, setTagsSelected] = useState([]);
     const [tagsValue, setTagsValue] = useState("");
-    const [icebreakers, setIcebreakers] = useState([]);
 
     // Other variables
     const [showDate, setShowDate] = useState(false);
     const [mode, setMode] = useState("date");
     const [disabled, setDisabled] = useState(true);
-    const [unread, setUnread] = useState(false);
 
     const [loading, setLoading] = useState(false); // Disable button if event is being created in Firebase
 
     const refRBSheet = useRef(); // To toggle the bottom drawer on/off
 
-    // Loading notifications
+    // Get current event info
     useEffect(() => {
-
-    //      picks icebreaker set from set of icebreakers randomly
-        const breakOptions = [];
-        db.collection("Icebreakers").onSnapshot((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-                breakOptions.push(doc.id);
-                console.log(doc.id);
-                console.log("IS THIS WORKING?????")
-            })
-            console.log(breakOptions);
-            var num = Math.floor(Math.random()*breakOptions.length);
-            db.collection("Icebreakers").doc(breakOptions[num]).get().then(doc => {
-                    console.log("please be working!!!!");
-                    setIcebreakers(doc.data().icebreakers);
-                })
-        });
-        async function fetchData() {
-            await db.collection("Users").doc(user.uid).onSnapshot((doc) => {
-                setUnread(doc.data().hasNotif);
-                setUserInfo(doc.data());
-            });
-        }
-
-        fetchData();
+        setName(route.params.event.name);
+        setLocation(route.params.event.location);
+        setDate(route.params.event.date.toDate());
+        setAdditionalInfo(route.params.event.additionalInfo);
+        setTagsSelected(route.params.event.tags ? route.params.event.tags : []);
+        setPhoto(route.params.event.image ? route.params.event.image : photo);
     }, []);
 
     // Checks whether we should disable the Post button or not
@@ -138,48 +113,54 @@ export default function ({ navigation }) {
 
     // For posting the event
     const storeEvent = (id, hasImage, image) => {
-        db.collection("Public Events").doc(id).set({
+        const newEvent = {
             id,
             name,
-            hostID: user.uid,
-            hostFirstName: userInfo.firstName,
-            hostLastName: userInfo.lastName,
-            hasHostImage: userInfo.hasImage,
-            hostImage: userInfo.hasImage ? userInfo.image : "",
+            hostID: route.params.event.hostID,
+            hostFirstName: route.params.event.hostFirstName,
+            hostLastName: route.params.event.hostLastName,
+            hasHostImage: route.params.event.hasHostImage,
+            hostImage: route.params.event.hostImage,
             location,
             date,
             additionalInfo,
-            ice: icebreakers,
-            attendees: [user.uid], //ONLY start by putting the current user as an attendee
+            attendees: route.params.event.attendees,
+            ice: route.params.event.ice,
             hasImage,
-            image,
-            tags: tagsSelected
-        }).then(() => {
-            const storeID = {
-                type: "public",
-                id
-            };
+            image
+        };
 
-            db.collection("Users").doc(user.uid).update({
-                hostedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
-                attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
-                attendedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)
-            }).then(() => {
-                setName("");
-                setLocation("");
-                setDate(new Date());
-                setAdditionalInfo("");
-                setTagsSelected([]);
-                alert("Success!");
-                setLoading(false);
-            });
+        let table = "Private Events";
+
+        if (route.params.event.type === "public") {
+            newEvent.tags = tagsSelected;
+            table = "Public Events";
+        }
+
+        db.collection(table).doc(route.params.event.id).set(newEvent).then(() => {
+            newEvent.date = moment(date);
+            route.params.editEvent(newEvent);
+            route.params.editEvent2(newEvent);
+            navigation.goBack();
+            alert("Meal updated!");
         });
     }
 
     return (
         <Layout>
-            <Header name="Organize"/>
-            <HorizontalSwitch left="Private" right="Public" current="right" press={(val) => navigation.navigate("OrganizePrivate")}/>
+            <TopNav
+                middleContent={
+                    <MediumText center>Edit Event</MediumText>
+                }
+                leftContent={
+                    <Ionicons
+                        name="chevron-back"
+                        color={loading ? "grey" : "black"}
+                        size={20}
+                    />
+                }
+                leftAction={() => navigation.goBack()}
+            />
 
             <TouchableOpacity onPress={() => handleChoosePhoto()}>
                 <ImageBackground source={{ uri: photo }} style={styles.image}>
@@ -258,7 +239,7 @@ export default function ({ navigation }) {
                         }
                     />
 
-                    <TouchableOpacity onPress={() => refRBSheet.current.open()}
+                    {route.params.event.type === "public" && <TouchableOpacity onPress={() => refRBSheet.current.open()}
                         style={styles.input}>
                         <TextInput
                             placeholder="Tags"
@@ -268,27 +249,26 @@ export default function ({ navigation }) {
                             }
                             editable={false}
                         />
-                    </TouchableOpacity>
+                    </TouchableOpacity>}
 
-                    <Button disabled={disabled || loading} onPress={function () {
+                    <Button disabled={disabled || loading} onPress={() => {
                         setLoading(true);
-                        const id = Date.now() + user.uid;
                         let hasImage = false;
                         if (photo !== "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400") {
                             hasImage = true;
-                            storeImage(photo, id).then(() => {
-                                fetchImage(id).then(uri => {
-                                    storeEvent(id, hasImage, uri);
+                            storeImage(photo, route.params.event.id).then(() => {
+                                fetchImage(route.params.event.id).then(uri => {
+                                    storeEvent(route.params.event.id, hasImage, uri);
                                 });
                             });
                         } else {
-                            storeEvent(id, hasImage, "");
+                            storeEvent(route.params.event.id, hasImage, "");
                         }
-                    }} marginVertical={20}>{loading ? "Posting ..." : "Post"}</Button>
+                    }} marginVertical={20}>{loading ? "Updating ..." : "Update"}</Button>
                 </ScrollView>
             </View>
 
-            <RBSheet
+            {route.params.event.type === "public" && <RBSheet
                 height={400}
                 ref={refRBSheet}
                 closeOnDragDown={true}
@@ -311,6 +291,7 @@ export default function ({ navigation }) {
                     multi={true}
                     selectedItems={tagsSelected}
                     onItemSelect={(item) => {
+                        console.log("Select");
                         setTagsSelected([...tagsSelected, item]);
                     }}
                     onRemoveItem={(item, index) => {
@@ -321,7 +302,7 @@ export default function ({ navigation }) {
                     chip={true}
                     resetValue={false}
                 />
-            </RBSheet>
+            </RBSheet>}
         </Layout>
     );
 }

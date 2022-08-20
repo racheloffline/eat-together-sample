@@ -9,10 +9,12 @@ const NormalText = props => {
         return (
             <Text style={{
                 fontSize: props.size ? props.size : 14,
+                fontWeight: props.weight ? props.weight : "normal",
                 fontFamily: 'sans-serif',
                 color: props.color ? props.color : "black",
                 textAlign: props.center ? "center" : "auto",
                 paddingHorizontal: props.paddingHorizontal ? props.paddingHorizontal : 0,
+                marginBottom: props.marginBottom ? props.marginBottom : 0
             }}>
                 {props.children}
             </Text>
@@ -21,10 +23,12 @@ const NormalText = props => {
     return (
         <Text style={{
             fontSize: props.size ? props.size : 14,
+            fontWeight: props.weight ? props.weight : "normal",
             fontFamily: 'Inter_400Regular',
             color: props.color ? props.color : "black",
             textAlign: props.center ? "center" : "auto",
-            paddingHorizontal: props.paddingHorizontal ? props.paddingHorizontal : 0
+            paddingHorizontal: props.paddingHorizontal ? props.paddingHorizontal : 0,
+            marginBottom: props.marginBottom ? props.marginBottom : 0
         }}>
             {props.children}
         </Text>

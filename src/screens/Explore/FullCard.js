@@ -1,7 +1,7 @@
-//Functionality TDB, most likely to be used to implement ice-breaker games
+// Full event page
 
 import React, { useState, useEffect } from "react";
-import { View, ScrollView, StyleSheet, ImageBackground } from "react-native";
+import { View, ScrollView, StyleSheet, ImageBackground, Dimensions, Image } from "react-native";
 import { Layout, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -10,14 +10,12 @@ import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
 import Button from "../../components/Button";
 import TagsList from "../../components/TagsList";
-import DarkContainer from "../../components/DarkContainer";
 
 import getDate from "../../getDate";
 import getTime from "../../getTime";
 
 import {db, auth} from "../../provider/Firebase";
 import * as firebase from "firebase";
-
 
 const FullCard = ({ route, navigation }) => {
   const user = auth.currentUser;
@@ -89,58 +87,110 @@ const FullCard = ({ route, navigation }) => {
         }
         leftAction={() => navigation.goBack()}
       />
-      <ScrollView contentContainerStyle={styles.page}>
-        <LargeText center>{route.params.event.name}</LargeText>
-        <MediumText center>Hosted by: {route.params.event.hostFirstName ? 
-          route.params.event.hostFirstName + " " + route.params.event.hostLastName.substring(0, 1) + "."
-          : route.params.event.hostName}</MediumText>
+      
+      <ScrollView>
+        <ImageBackground
+          source={
+            route.params.event.hasImage
+              ? { uri: route.params.event.image }
+              : require("../../../assets/foodBackground.png")
+          }
+          style={styles.imageBackground}
+          resizeMode="cover"
+        ></ImageBackground>
+        <View style={styles.infoContainer}>
+          <LargeText size={24} marginBottom={10}>
+            {route.params.event.name}
+          </LargeText>
+          
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Image source={route.params.event.hasHostImage ? { uri: route.params.event.hostImage}
+              : require("../../../assets/logo.png")} style={styles.profileImg}/>
+            <MediumText size={18}>{route.params.event.hostID === user.uid ? "You ;)"
+              : (route.params.event.hostFirstName ?
+                route.params.event.hostFirstName + " " + route.params.event.hostLastName
+              : route.params.event.hostName)}
+            </MediumText>
+          </View>
 
-        {route.params.event.tags && <TagsList tags={route.params.event.tags}/>}
+          {route.params.event.tags && <TagsList marginVertical={20} tags={route.params.event.tags}/>}
 
-        <ImageBackground style={styles.image} imageStyle={{ borderRadius: 10 }}
-          source={route.params.event.hasImage ? {uri: route.params.event.image}
-            : {uri: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400"}}>
+          {/* 3 event details (location, date, time} are below */}
 
           <View style={styles.logistics}>
-            <DarkContainer align="flex-start">
-              <NormalText color="white">{getDate(route.params.event.date.toDate())}</NormalText>
-              <NormalText color="white">{getTime(route.params.event.date.toDate())}</NormalText>
-              <NormalText color="white">{route.params.event.location}</NormalText>
-            </DarkContainer>
-          </View>
-        </ImageBackground>
+            <View style={styles.row}>
+              <Ionicons name="location-sharp" size={20} />
+              <NormalText paddingHorizontal={10} color="black">
+                {route.params.event.location}
+              </NormalText>
+            </View>
 
-        <NormalText>{route.params.event.additionalInfo}</NormalText>
-        <Button onPress={attending ? withdraw : attend} disabled={route.params.event.hostID === user.uid}
-        marginVertical={20} backgroundColor={loading ? "grey" : attending && 
-          route.params.event.hostID !== user.uid ? "red" : false}>
-          {loading ? "Loading ..." : route.params.event.hostID === user.uid ? "Your event :)" :
-            attending ? "Withdraw :(" : "Attend!"}
-        </Button>
+            <View style={styles.row}>
+              <Ionicons name="calendar-outline" size={20} />
+              <NormalText paddingHorizontal={10} color="black">
+                {getDate(route.params.event.date.toDate())}
+              </NormalText>
+            </View>
+
+            <View style={styles.row}>
+              <Ionicons name="time-outline" size={20} />
+              <NormalText paddingHorizontal={10} color="black">
+                {getTime(route.params.event.date.toDate())}
+              </NormalText>
+            </View>
+          </View>
+
+          <NormalText marginBottom={20} color="black">
+            {route.params.event.additionalInfo}
+          </NormalText>
+
+          <Button onPress={attending ? withdraw : attend} disabled={route.params.event.hostID === user.uid}
+            marginVertical={20} backgroundColor={loading ? "grey" : attending && 
+              route.params.event.hostID !== user.uid ? "red" : false}>
+              {loading ? "Loading ..." : route.params.event.hostID === user.uid ? "Your event :)" :
+                attending ? "Withdraw :(" : "Attend!"}
+          </Button>
+        </View>        
       </ScrollView>
     </Layout>
   );
 }
 
 const styles = StyleSheet.create({
-    page: {
-      alignItems: "center",
-      justifyContent: "center",
-      paddingHorizontal: 10
-    },
+  infoContainer: {
+    marginHorizontal: 30,
+    marginBottom: 50
+  },
 
-    image: {
-      width: 300,
-      height: 350,
-      marginVertical: 20
-    },
+  row: {
+    flexDirection: "row",
+    marginVertical: 4,
+  },
 
-    logistics: {
-      position: "absolute",
-      bottom: 10,
-      left: 10,
-      maxWidth: 150,
-    }
+  profileImg: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    borderColor: "#5DB075",
+    borderWidth: 1,
+    backgroundColor: "white",
+    marginRight: 3
+  },
+
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "center"
+  },
+
+  imageBackground: {
+    width: Dimensions.get("screen").width,
+    height: 150,
+    marginBottom: 20,
+  },
+
+  logistics: {
+    marginVertical: 15,
+  },
 });
 
 export default FullCard;

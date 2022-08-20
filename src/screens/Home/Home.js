@@ -10,7 +10,8 @@ import Searchbar from "../../components/Searchbar";
 import HorizontalRow from "../../components/HorizontalRow";
 import Filter from "../../components/Filter";
 
-import getDate from "../../getDate";
+import MediumText from "../../components/MediumText";
+
 import { db, auth } from "../../provider/Firebase";
 
 export default function ({ navigation }) {
@@ -30,22 +31,16 @@ export default function ({ navigation }) {
 
   useEffect(() => {
     // updates stuff right after React makes changes to the DOM
-    let newEvents = [];
-    let userInfo;
-
     async function fetchEvents() {
       await db
         .collection("Users")
         .doc(user.uid)
-        .get()
-        .then((doc) => {
+        .onSnapshot((doc) => {
+          let newEvents = [];
           setUnread(doc.data().hasNotif);
-          userInfo = doc.data();
-        })
-        .then(() => {
-          let eventsLength = userInfo.attendingEventIDs.length;
+          let eventsLength = doc.data().attendingEventIDs.length;
 
-          userInfo.attendingEventIDs.forEach((e) => {
+          doc.data().attendingEventIDs.forEach((e) => {
             let type = "Private Events";
             if (e.type === "public") {
               type = "Public Events";
@@ -70,6 +65,17 @@ export default function ({ navigation }) {
                   setFilteredEvents(newEvents);
                   setLoading(false);
                 }
+              }).catch(e => {
+                alert("There was an error fetching some of your meals :( try again later");
+
+                eventsLength--;
+                newEvents = newEvents.sort((a, b) => {
+                  return a.date.seconds - b.date.seconds;
+                });
+
+                setEvents(newEvents);
+                setFilteredEvents(newEvents);
+                setLoading(false);
               });
           });
         });
@@ -95,29 +101,34 @@ export default function ({ navigation }) {
     let newEvents = events.filter((e) => isMatch(e, text));
     setFilteredEvents(newEvents);
     setLoading(false);
+
+    // Reset all filters
+    setPublicEvents(false);
+    setPrivateEvents(false);
   };
 
-  // Determines if an event
-  const isMatch = (event, text) => {
+  // Determines if an event matches search query or not
+  const isMatch = (event, text) => {    
+    // Name
     if (event.name.toLowerCase().includes(text.toLowerCase())) {
-      // Name
       return true;
     }
 
-    if (event.location.toLowerCase().includes(text.toLowerCase())) {
-      // Location
-      return true;
+    // Tags
+    if (event.tags) {
+      if (event.tags.some(tag => tag.toLowerCase().includes(text.toLowerCase()))) {
+        return true;
+      }
     }
-
-    if (
-      getDate(event.date.toDate()).toLowerCase().includes(text.toLowerCase())
-    ) {
-      // Date
-      return true;
+    
+    // Host
+    if (event.hostName) {
+      return event.hostName.toLowerCase().includes(text.toLowerCase());
     }
-
-    return event.hostName.toLowerCase().includes(text.toLowerCase()); // Host
-  };
+    
+    const fullName = event.hostFirstName + " " + event.hostLastName;
+    return fullName.toLowerCase().includes(text.toLowerCase());
+  }
 
   // Method called when a new query is typed in/deleted
   const onChangeText = (text) => {
@@ -155,6 +166,7 @@ export default function ({ navigation }) {
 
     setPublicEvents(!publicEvents);
     setPrivateEvents(false);
+    setSearchQuery("");
   };
 
   // Display private events only
@@ -167,32 +179,61 @@ export default function ({ navigation }) {
 
     setPrivateEvents(!privateEvents);
     setPublicEvents(false);
+    setSearchQuery("");
   };
+
+  // Replace event with new event details
+  const editEvent = newEvent => {
+    const newEvents = events.map(e => {
+      if (e.id === newEvent.id) {
+        return newEvent;
+      }
+      return e;
+    }).sort((a, b) => {
+      return a.date.seconds - b.date.seconds;
+    }).reverse();
+
+    setEvents(newEvents);
+    setFilteredEvents(newEvents);
+  }
+
+  // Add new event to this page after creating it in "Organize"
+  const addEvent = newEvent => {
+    const newEvents = [...events, newEvent].sort((a, b) => {
+      return a.date.seconds - b.date.seconds;
+    }).reverse();
+
+    setEvents(newEvents);
+    setFilteredEvents(newEvents);
+  }
+
   return (
     <Layout>
-      <View style={{ padding: 20 }}>
-        <Header name="Your Events" navigation={navigation} hasNotif={unread} />
+      <Header name="Your Events" navigation={navigation} hasNotif={unread} />
+
+      <View style={{ marginTop: 20, paddingHorizontal: 20 }}>
+        <Searchbar
+          placeholder="Search by name, tags, or host name"
+          value={searchQuery}
+          onChangeText={onChangeText}
+        />
+
+        <HorizontalRow>
+          <Filter
+            checked={publicEvents}
+            onPress={publicOnly}
+            text="Public"
+          />
+          <Filter
+            checked={privateEvents}
+            onPress={privateOnly}
+            text="Private"
+          />
+        </HorizontalRow>
       </View>
-      <Searchbar
-        placeholder="Search by name, location, date, or host name"
-        value={searchQuery}
-        onChangeText={onChangeText}
-      />
 
-      <HorizontalRow>
-        <Filter
-          checked={publicEvents}
-          onPress={publicOnly}
-          text="Public events"
-        />
-        <Filter
-          checked={privateEvents}
-          onPress={privateOnly}
-          text="Private events"
-        />
-      </HorizontalRow>
-
-      {!loading ? (
+      {!loading ? 
+        filteredEvents.length > 0 ? (
         <FlatList
           contentContainerStyle={styles.cards}
           keyExtractor={(item) => item.id}
@@ -204,12 +245,17 @@ export default function ({ navigation }) {
                 navigation.navigate("WhileYouEat", {
                   event: item,
                   deleteEvent,
+                  editEvent
                 });
               }}
             />
           )}
         />
       ) : (
+        <View style={{ flex: 1, justifyContent: "center" }}>
+          <MediumText center>Empty 🍽️</MediumText>
+        </View>)
+      : (
         <View style={{ flex: 1, justifyContent: "center" }}>
           <ActivityIndicator size={100} color="#5DB075" />
         </View>

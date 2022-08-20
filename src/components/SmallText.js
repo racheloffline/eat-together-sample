@@ -12,6 +12,8 @@ const SmallText = props => {
                 fontFamily: 'sans-serif',
                 color: props.color ? props.color : "black",
                 textAlign: props.center ? "center" : "auto",
+                paddingHorizontal: props.paddingHorizontal ? props.paddingHorizontal : 0,
+                marginBottom: props.marginBottom ? props.marginBottom : 0
             }}>
                 {props.children}
             </Text>
@@ -22,7 +24,9 @@ const SmallText = props => {
             fontSize: props.size ? props.size : 10,
             fontFamily: 'Inter_200ExtraLight',
             color: props.color ? props.color : "black",
-            textAlign: props.center ? "center" : "auto"
+            textAlign: props.center ? "center" : "auto",
+            paddingHorizontal: props.paddingHorizontal ? props.paddingHorizontal : 0,
+            marginBottom: props.marginBottom ? props.marginBottom : 0
         }}>
             {props.children}
         </Text>

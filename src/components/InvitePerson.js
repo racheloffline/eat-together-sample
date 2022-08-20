@@ -10,17 +10,18 @@ const InvitePerson = props => {
     const [attendees, setAttendees] = React.useState(props.attendees);
     const [checkBox, setCheckbox] = React.useState(false);
     const [image, setImage] = React.useState("");
-    const [quote, setQuote] = React.useState("");
+    const [bio, setBio] = React.useState("");
+
     useEffect(() => {
         if (props.person.hasImage) {
             storage.ref("profilePictures/" + props.person.personID).getDownloadURL().then(uri => {
                 setImage(uri);
             });
         }
-        if (props.person.quote.length > 31) {
-            setQuote(props.person.quote.substr(0, 28) + "...");
+        if (props.person.bio.length > 31) {
+            setBio(props.person.bio.substr(0, 28) + "...");
         } else {
-            setQuote(props.person.quote);
+            setBio(props.person.bio);
         }
     })
     return (
@@ -65,7 +66,7 @@ const InvitePerson = props => {
                 </View>
             </View>
             <View style={[styles.body, {backgroundColor: props.color}]}>
-                <MediumText>"{quote}"</MediumText>
+                <MediumText>"{bio}"</MediumText>
             </View>
         </View>
     );

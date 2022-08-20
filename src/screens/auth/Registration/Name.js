@@ -1,7 +1,7 @@
 // First page of registration
 
 import React, { useState } from "react";
-import { View, StyleSheet, Dimensions, Image, TouchableOpacity, KeyboardAvoidingView } from "react-native";
+import { View, StyleSheet, Dimensions, Image, TouchableOpacity } from "react-native";
 import { TextInput } from "react-native-rapi-ui";
 import { Feather, FontAwesome } from '@expo/vector-icons';
 
@@ -22,9 +22,9 @@ const Name = props => {
   // Input fields
   const [firstName, setFirstName] = useState(props.firstName);
   const [lastName, setLastName] = useState(props.lastName);
+  const [pronouns, setPronouns] = useState(props.pronouns);
   const [bio, setBio] = useState(props.bio);
   const [image, setImage] = useState(props.image);
-  const [tags, setTags] = useState(props.tags);
 
   const badWords = cloneDeep(profaneWords); // List of profane words
 
@@ -34,15 +34,15 @@ const Name = props => {
   }
 
   const goNext = () => {
-    if (checkProfanity(firstName) || checkProfanity(lastName) || checkProfanity(bio)) {
+    if (checkProfanity(firstName) || checkProfanity(lastName)
+        || checkProfanity(pronouns) || checkProfanity(bio)) {
       alert("Inappropriate words used >:(");
     } else {
       props.setFirstName(firstName);
       props.setLastName(lastName);
       props.setBio(bio);
       props.setImage(image);
-      props.setTags(tags);
-      props.navigation.navigate("Email");
+      props.navigation.navigate("Tags");
     }
   }
 
@@ -70,7 +70,7 @@ const Name = props => {
           {image !== "" ? <Image style={styles.image} source={{uri: image}}/>
             : <Image style={styles.image} source={require("../../../../assets/logo.png")}/>}
           <TouchableOpacity style={styles.editImage} onPress={pickImage}>
-            <Feather name="edit-2" size={25} color="black"/>
+            <Feather name="edit-2" size={24} color="black"/>
           </TouchableOpacity>
         </View>
 
@@ -84,34 +84,18 @@ const Name = props => {
               leftContent={<FontAwesome name="user" size={18}/>} autoComplete="name"/>
           </View>
 
-          <TextInput placeholder="Bio (max. 100 characters)" value={bio} maxLength={100}
-            onChangeText={val => setBio(val)} containerStyle={{marginBottom: 30}}
+          <TextInput placeholder="Pronouns (he/him, she/her, etc.)" value={pronouns}
+            onChangeText={val => setPronouns(val)} containerStyle={{marginTop: 10}}
             leftContent={<FontAwesome name="quote-left" size={18}/>}/>
-    
-          <MediumText>Describe yourself with tags!</MediumText>
-          <SmallText>Note: must have between 3 and 6 tags (inclusive).</SmallText>
-          <View style={styles.tagInput}>
-            <TagsSection
-              multi={true}
-              selectedItems={tags}
-              onItemSelect={(item) => {
-                setTags([...tags, item]);
-              }}
-              onRemoveItem={(item, index) => {
-                const newTags = tags.filter((tag, i) => i !== index);
-                setTags(newTags);
-              }}
-              inline={true}
-              items={cloneDeep(allTags)}
-              chip={true}
-              resetValue={false}
-            />
-          </View>
+
+          <TextInput placeholder="Fun fact (10 to 100 characters)" value={bio} maxLength={100}
+            onChangeText={val => setBio(val)} containerStyle={{marginTop: 10}}
+            leftContent={<FontAwesome name="exclamation" size={18}/>}/>
 
           <View style={styles.buttons}>
             <Button onPress={() => props.navigation.goBack()}
               marginHorizontal={10}>Back</Button>
-            <Button disabled={firstName === "" || lastName === "" || bio === "" || tags.length < 3 || tags.length > 6}
+            <Button disabled={firstName === "" || lastName === "" || pronouns === "" || bio.length < 10}
               onPress={goNext}
               marginHorizontal={10}>Next</Button>
           </View>    
@@ -134,15 +118,15 @@ const styles = StyleSheet.create({
   },
 
   image: {
-    width: 125,
-    height: 125,
+    width: 150,
+    height: 150,
     borderRadius: 125
   },
 
   editImage: {
-    left: 40,
-    bottom: 40,
-    padding: 12,
+    left: 50,
+    bottom: 50,
+    padding: 15,
     backgroundColor: "#5DB075",
     borderRadius: 100
   },
@@ -156,7 +140,6 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 10
   },
 
   tagInput: {
@@ -170,7 +153,7 @@ const styles = StyleSheet.create({
   },
 
   buttons: {
-    marginTop: 30,
+    marginTop: "30%",
     display: "flex",
     flexDirection: "row",
     justifyContent: "center"
