@@ -1,7 +1,5 @@
 import {db} from "./provider/Firebase";
 import firebase from "firebase";
-import { intersection } from "lodash";
-import * as ImagePicker from "expo-image-picker";
 
 /*
 Generates a random color.

@@ -12,17 +12,17 @@ import Tags from "../screens/auth/Registration/Tags";
 import Availabilities from "../screens/auth/Registration/Availabilities";
 import Password from "../screens/auth/Registration/Password";
 
-import Monday from '../screens/auth/Registration/Days/Monday';
-import Tuesday from '../screens/auth/Registration/Days/Tuesday';
-import Wednesday from '../screens/auth/Registration/Days/Wednesday';
-import Thursday from '../screens/auth/Registration/Days/Thursday';
-import Friday from '../screens/auth/Registration/Days/Friday';
-import Saturday from '../screens/auth/Registration/Days/Saturday';
-import Sunday from '../screens/auth/Registration/Days/Sunday';
-import timeSlots from '../screens/auth/Registration/Days/timeSlots';
+import Monday from "../screens/auth/Registration/Days/Monday";
+import Tuesday from "../screens/auth/Registration/Days/Tuesday";
+import Wednesday from "../screens/auth/Registration/Days/Wednesday";
+import Thursday from "../screens/auth/Registration/Days/Thursday";
+import Friday from "../screens/auth/Registration/Days/Friday";
+import Saturday from "../screens/auth/Registration/Days/Saturday";
+import Sunday from "../screens/auth/Registration/Days/Sunday";
+import timeSlots from "../screens/auth/Registration/Days/timeSlots";
 
 import { cloneDeep } from "lodash";
-import {db, auth, storage} from "../provider/Firebase";
+import { db, auth, storage } from "../provider/Firebase";
 
 const Stack = createStackNavigator();
 const Auth = () => {

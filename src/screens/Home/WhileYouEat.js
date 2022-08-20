@@ -33,7 +33,7 @@ import {
   MenuTrigger,
 } from "react-native-popup-menu";
 
-const FullCard = ({ route, navigation }) => {
+const WhileYouEat = ({ route, navigation }) => {
   // Event details
   const [event, setEvent] = useState(route.params.event);
 
@@ -397,4 +397,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FullCard;
+export default WhileYouEat;

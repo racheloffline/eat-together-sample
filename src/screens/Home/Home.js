@@ -7,7 +7,6 @@ import { Layout } from "react-native-rapi-ui";
 import EventCard from "../../components/EventCard";
 import Header from "../../components/Header";
 import Searchbar from "../../components/Searchbar";
-import HorizontalSwitch from "../../components/HorizontalSwitch";
 import HorizontalRow from "../../components/HorizontalRow";
 import Filter from "../../components/Filter";
 
@@ -32,22 +31,16 @@ export default function ({ navigation }) {
 
   useEffect(() => {
     // updates stuff right after React makes changes to the DOM
-    let newEvents = [];
-    let userInfo;
-
     async function fetchEvents() {
       await db
         .collection("Users")
         .doc(user.uid)
-        .get()
-        .then((doc) => {
+        .onSnapshot((doc) => {
+          let newEvents = [];
           setUnread(doc.data().hasNotif);
-          userInfo = doc.data();
-        })
-        .then(() => {
-          let eventsLength = userInfo.attendingEventIDs.length;
+          let eventsLength = doc.data().attendingEventIDs.length;
 
-          userInfo.attendingEventIDs.forEach((e) => {
+          doc.data().attendingEventIDs.forEach((e) => {
             let type = "Private Events";
             if (e.type === "public") {
               type = "Public Events";
@@ -133,8 +126,8 @@ export default function ({ navigation }) {
       return event.hostName.toLowerCase().includes(text.toLowerCase());
     }
     
-    return event.hostFirstName.toLowerCase().includes(text.toLowerCase())
-      || event.hostLastName.toLowerCase().includes(text.toLowerCase());
+    const fullName = event.hostFirstName + " " + event.hostLastName;
+    return fullName.toLowerCase().includes(text.toLowerCase());
   }
 
   // Method called when a new query is typed in/deleted
@@ -204,17 +197,21 @@ export default function ({ navigation }) {
     setFilteredEvents(newEvents);
   }
 
+  // Add new event to this page after creating it in "Organize"
+  const addEvent = newEvent => {
+    const newEvents = [...events, newEvent].sort((a, b) => {
+      return a.date.seconds - b.date.seconds;
+    }).reverse();
+
+    setEvents(newEvents);
+    setFilteredEvents(newEvents);
+  }
+
   return (
     <Layout>
-      <Header name="Explore" navigation={navigation} hasNotif={unread} />
-      <HorizontalSwitch
-        left="Your Meals"
-        right="Public"
-        current="left"
-        press={() => navigation.navigate("Explore")}
-      />
+      <Header name="Your Events" navigation={navigation} hasNotif={unread} />
 
-      <View style={{ paddingHorizontal: 20 }}>
+      <View style={{ marginTop: 20, paddingHorizontal: 20 }}>
         <Searchbar
           placeholder="Search by name, tags, or host name"
           value={searchQuery}
@@ -245,7 +242,7 @@ export default function ({ navigation }) {
             <EventCard
               event={item}
               click={() => {
-                navigation.navigate("FullCardPrivate", {
+                navigation.navigate("WhileYouEat", {
                   event: item,
                   deleteEvent,
                   editEvent

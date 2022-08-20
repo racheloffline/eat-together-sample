@@ -71,7 +71,7 @@ export default function ({ route, navigation }) {
 
         route.params.updateInfo(firstName, lastName, bio, tags, image);
 
-        if (image !== "") {
+        if (image) {
             await updateImage().then(() => {
                 fetchImage().then((uri) => {
                     db.collection("Users").doc(route.params.user.id).update({
