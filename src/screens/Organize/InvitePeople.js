@@ -112,12 +112,12 @@ const isMatch = (user, text) => {
   }
 
   if (user.username.toLowerCase().includes(text.toLowerCase())) {
-    // Location
+    // Username
     return true;
   }
 
-  if (user.quote.toLowerCase().includes(text.toLowerCase())) {
-    // Date
+  if (user.bio.toLowerCase().includes(text.toLowerCase())) {
+    // Bio
     return true;
   }
 
@@ -141,28 +141,6 @@ export default function ({ route, navigation }) {
   const [icebreakers, setIcebreakers] = useState([]);
 
   useEffect(() => {
-    // updates stuff right after React makes changes to the DOM
-    //LINKING ELAINE'S ALGO
-    /*
-        let bestUsers = getProfileRecs();
-        const ref = db.collection("Users");
-        const list = [];
-        bestUsers.forEach((user) => {
-            ref.doc(user).get().then((doc) => {
-                let data = doc.data();
-                list.push({
-                    id: doc.id,
-                    hostID: data.id,
-                    name: data.name,
-                    quote: data.quote,
-                    profile: "https://e3.365dm.com/16/07/768x432/rtr3cltb-1_3679323.jpg?20160706114211",
-                    attendees: data.attendees
-                });
-                setUsers(list);
-            });
-        });
-         */
-    // COMMENT THIS AREA OUT WHEN READY (START)
     //      picks icebreaker set from set of icebreakers randomly
     const breakOptions = [];
     db.collection("Icebreakers").onSnapshot((querySnapshot) => {
@@ -178,6 +156,7 @@ export default function ({ route, navigation }) {
         });
     });
 
+    // Fetch all users
     const ref = db.collection("Users");
     ref.onSnapshot((query) => {
       const list = [];
@@ -188,8 +167,8 @@ export default function ({ route, navigation }) {
             id: doc.id,
             username: data.username,
             personID: data.id,
-            name: data.name,
-            quote: data.quote,
+            name: data.firstName + " " + data.lastName,
+            bio: data.bio,
             hasImage: data.hasImage,
             attendees: data.attendees,
             tags: data.tags,
@@ -225,7 +204,7 @@ export default function ({ route, navigation }) {
       />
 
       <Searchbar
-        placeholder="Search by name"
+        placeholder="Search by name, username, or fun fact"
         value={curSearch}
         onChangeText={onChangeText}
       />

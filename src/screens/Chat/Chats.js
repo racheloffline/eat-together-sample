@@ -139,9 +139,8 @@ export default function ({ navigation }) {
 
   return (
     <Layout>
-      <View style={{ padding: 20 }}>
-        <Header name="Chat" navigation={navigation} hasNotif={true} />
-      </View>
+      <Header name="Chat"/>
+
       <View style={styles.content}>
         <View style={styles.searchArea}>
           <SearchableDropdown
@@ -150,7 +149,7 @@ export default function ({ navigation }) {
             onItemSelect={(item) => {
               setSelectedUsers([...selectedUsers, item]);
             }}
-            containerStyle={{ padding: 0, width: 300 }}
+            containerStyle={{ padding: 0, width: "70%" }}
             onRemoveItem={(item) => {
               const items = selectedUsers.filter(
                 (sitem) => sitem.id !== item.id

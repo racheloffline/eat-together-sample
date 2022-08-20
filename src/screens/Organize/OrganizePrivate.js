@@ -83,7 +83,7 @@ export default function ({ navigation }) {
 
     return (
         <Layout>
-            <Header name="Organize" navigation={navigation} hasNotif = {unread}/>
+            <Header name="Organize"/>
             <HorizontalSwitch left="Private" right="Public" current="left" press={(val) => navigation.navigate("OrganizePublic")}/>
             
             <TouchableOpacity onPress={() => handleChoosePhoto()}>

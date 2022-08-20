@@ -35,13 +35,15 @@ export default function ({ navigation }) {
     // updates stuff right after React makes changes to the DOM
     async function fetchData() {
       const ref = db.collection("Users");
+      let userData;
       // This is causing the page to crash, needs fix ASAP
-      /*
       await ref
         .doc(user.uid)
         .get()
         .then((doc) => {
           setUserInfo(doc.data());
+          userData = doc.data();
+
           doc.data().friendIDs.forEach((id) => {
             db.collection("Users")
               .doc(id)
@@ -53,17 +55,19 @@ export default function ({ navigation }) {
               });
           });
         });
-		*/
+
       await ref.onSnapshot((query) => {
         let users = [];
         query.forEach((doc) => {
           if (doc.data().id !== user.uid && doc.data().verified) {
-            users.push(doc.data());
+            let data = doc.data();
+						data.inCommon = getCommonTags(userData, data);
+						users.push(data);
           }
         });
+
         setPeople(users);
-        // Also causing a crash
-        // setFilteredPeople(users);
+        setFilteredPeople(users);
       });
 
       await ref.doc(user.uid).onSnapshot((doc) => {
@@ -76,32 +80,45 @@ export default function ({ navigation }) {
     });
   }, []);
 
+  // Get tags in common with current user and user being compared to
+	const getCommonTags = (currUser, otherUser) => {
+		let commonTags = [];
+		const otherTags = otherUser.tags.map(tag => tag.tag);
+		
+		currUser.tags.forEach(tag => {
+			if (otherTags.includes(tag.tag)) {
+				commonTags.push(tag);
+			}
+		});
+ 
+		return commonTags;
+	}
+
   // Method to filter out people based on name, username, or tags
   const search = (text) => {
     let newPeople = people.filter((p) => isMatch(p, text));
     setFilteredPeople(newPeople);
+    
+    // Reset all filters
+    setSimilarInterests(false);
+    setMutualFriends(false);
   };
 
   // Determines if a person matches the search query or not
   const isMatch = (person, text) => {
-    if (person.name.toLowerCase().includes(text.toLowerCase())) {
-      // Name
+    // Name
+    const fullName = person.firstName + " " + person.lastName;
+    if (fullName.toLowerCase().includes(text.toLowerCase())) {
       return true;
     }
 
-    if (person.username.toLowerCase().includes(text.toLowerCase())) {
-      // Username
-      return true;
-    }
+    // Username
+		if (person.username.toLowerCase().includes(text.toLowerCase())) {
+			return true;
+		}
 
-    if (person.quote.toLowerCase().includes(text.toLowerCase())) {
-      // Quote
-      return true;
-    }
-
-    return person.tags.some((tag) =>
-      tag.toLowerCase().includes(text.toLowerCase())
-    ); // Tags
+    // Tags
+		return person.tags.some(tag => tag.tag.toLowerCase().includes(text.toLowerCase()));
   };
 
   // Method called when a new query is typed in/deleted
@@ -120,8 +137,8 @@ export default function ({ navigation }) {
       fetch("https://eat-together-match.uw.r.appspot.com/find_similarity", {
         method: "POST",
         body: JSON.stringify({
-          currTags: userInfo.tags,
-          otherTags: getPeopleTags(),
+          "currTags": userInfo.tags.map(t => t.tag),
+			  	"otherTags": getPeopleTags()
         }),
       })
         .then((res) => res.json())
@@ -149,17 +166,18 @@ export default function ({ navigation }) {
 
     setSimilarInterests(!similarInterests);
     setMutualFriends(false);
+    setSearchQuery("");
   };
 
   // Get a list of everyone's tags
   const getPeopleTags = () => {
-    let tags = [];
-    people.forEach((p) => {
-      tags.push(p.tags);
-    });
-
-    return tags;
-  };
+		let tags = [];
+		people.forEach(p => {
+			tags.push(p.tags.map(t => t.tag));
+		});
+  
+		return tags;
+	}
 
   // Display people who are mutual friends
   const filterByMutualFriends = () => {
@@ -175,35 +193,39 @@ export default function ({ navigation }) {
     setLoading(false);
     setMutualFriends(!mutualFriends);
     setSimilarInterests(false);
+    setSearchQuery("");
   };
 
   return (
     <Layout>
-      <Header name="Explore" navigation={navigation} hasNotif={unread} />
+      <Header name="Explore"/>
       <HorizontalSwitch
-        left="Events"
+        left="Meals"
         right="People"
         current="right"
         press={() => navigation.navigate("Explore")}
       />
-      <Searchbar
-        placeholder="Search by name, username, quote, or tags"
-        value={searchQuery}
-        onChangeText={onChangeText}
-      />
 
-      <HorizontalRow>
-        <Filter
-          checked={similarInterests}
-          onPress={sortBySimilarInterests}
-          text="Sort by similar interests"
+      <View style={{ paddingHorizontal: 20 }}>
+        <Searchbar
+          placeholder="Search by name, username, or tags"
+          value={searchQuery}
+          onChangeText={onChangeText}
         />
-        <Filter
-          checked={mutualFriends}
-          onPress={filterByMutualFriends}
-          text="Mutual friends"
-        />
-      </HorizontalRow>
+
+        <HorizontalRow>
+          <Filter
+            checked={similarInterests}
+            onPress={sortBySimilarInterests}
+            text="Sort by similar interests"
+          />
+          <Filter
+            checked={mutualFriends}
+            onPress={filterByMutualFriends}
+            text="Mutual friends"
+          />
+        </HorizontalRow>
+      </View>
 
       <View style={{ flex: 1, alignItems: "center" }}>
         {!loading ? (

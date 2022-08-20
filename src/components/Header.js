@@ -8,20 +8,21 @@ const Header = (props) => {
   return (
     <View style={styles.header}>
       <LargeText>{props.name}</LargeText>
-      <TouchableOpacity
+      {props.navigation && <TouchableOpacity
         onPress={() => {
           props.navigation.navigate("Notifications");
         }}
       >
         <NotifIcon hasNotif={props.hasNotif == null ? false : props.hasNotif} />
-      </TouchableOpacity>
+      </TouchableOpacity>}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   header: {
-    padding: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",

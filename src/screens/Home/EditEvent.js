@@ -141,7 +141,7 @@ export default function ({ route, navigation }) {
             newEvent.date = moment(date);
             route.params.editEvent(newEvent);
             route.params.editEvent2(newEvent);
-            navigation.navigate("FullCardPrivate");
+            navigation.goBack();
             alert("Meal updated!");
         });
     }
