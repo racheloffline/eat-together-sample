@@ -8,9 +8,9 @@
     "orientation": "portrait",
     "icon": "./assets/big_logo.png",
     "splash": {
-      "image": "./assets/big_logo.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#73AE7B"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
