@@ -50,7 +50,11 @@ export default function ({ navigation }) {
               .get()
               .then((doc) => {
                 if (doc) {
-                  setMutuals((mutuals) => mutuals.concat(doc.data().friendIDs));
+                  if (doc.data().friendIDs) {
+                    setMutuals((mutuals) =>
+                      mutuals.concat(doc.data().friendIDs)
+                    );
+                  }
                 }
               });
           });
@@ -61,8 +65,8 @@ export default function ({ navigation }) {
         query.forEach((doc) => {
           if (doc.data().id !== user.uid && doc.data().verified) {
             let data = doc.data();
-						data.inCommon = getCommonTags(userData, data);
-						users.push(data);
+            data.inCommon = getCommonTags(userData, data);
+            users.push(data);
           }
         });
 
@@ -81,24 +85,24 @@ export default function ({ navigation }) {
   }, []);
 
   // Get tags in common with current user and user being compared to
-	const getCommonTags = (currUser, otherUser) => {
-		let commonTags = [];
-		const otherTags = otherUser.tags.map(tag => tag.tag);
-		
-		currUser.tags.forEach(tag => {
-			if (otherTags.includes(tag.tag)) {
-				commonTags.push(tag);
-			}
-		});
- 
-		return commonTags;
-	}
+  const getCommonTags = (currUser, otherUser) => {
+    let commonTags = [];
+    const otherTags = otherUser.tags.map((tag) => tag.tag);
+
+    currUser.tags.forEach((tag) => {
+      if (otherTags.includes(tag.tag)) {
+        commonTags.push(tag);
+      }
+    });
+
+    return commonTags;
+  };
 
   // Method to filter out people based on name, username, or tags
   const search = (text) => {
     let newPeople = people.filter((p) => isMatch(p, text));
     setFilteredPeople(newPeople);
-    
+
     // Reset all filters
     setSimilarInterests(false);
     setMutualFriends(false);
@@ -113,12 +117,14 @@ export default function ({ navigation }) {
     }
 
     // Username
-		if (person.username.toLowerCase().includes(text.toLowerCase())) {
-			return true;
-		}
+    if (person.username.toLowerCase().includes(text.toLowerCase())) {
+      return true;
+    }
 
     // Tags
-		return person.tags.some(tag => tag.tag.toLowerCase().includes(text.toLowerCase()));
+    return person.tags.some((tag) =>
+      tag.tag.toLowerCase().includes(text.toLowerCase())
+    );
   };
 
   // Method called when a new query is typed in/deleted
@@ -137,8 +143,8 @@ export default function ({ navigation }) {
       fetch("https://eat-together-match.uw.r.appspot.com/find_similarity", {
         method: "POST",
         body: JSON.stringify({
-          "currTags": userInfo.tags.map(t => t.tag),
-			  	"otherTags": getPeopleTags()
+          currTags: userInfo.tags.map((t) => t.tag),
+          otherTags: getPeopleTags(),
         }),
       })
         .then((res) => res.json())
@@ -171,13 +177,13 @@ export default function ({ navigation }) {
 
   // Get a list of everyone's tags
   const getPeopleTags = () => {
-		let tags = [];
-		people.forEach(p => {
-			tags.push(p.tags.map(t => t.tag));
-		});
-  
-		return tags;
-	}
+    let tags = [];
+    people.forEach((p) => {
+      tags.push(p.tags.map((t) => t.tag));
+    });
+
+    return tags;
+  };
 
   // Display people who are mutual friends
   const filterByMutualFriends = () => {
@@ -198,7 +204,7 @@ export default function ({ navigation }) {
 
   return (
     <Layout>
-      <Header name="Explore"/>
+      <Header name="Explore" />
       <HorizontalSwitch
         left="Meals"
         right="People"

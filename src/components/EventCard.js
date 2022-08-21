@@ -1,53 +1,75 @@
-import React from 'react';
-import { View, StyleSheet, Image, Dimensions, TouchableOpacity } from 'react-native';
-import { Section, SectionContent, SectionImage } from 'react-native-rapi-ui';
-import MediumText from './MediumText';
-import SmallText from './SmallText';
+import React from "react";
+import {
+  View,
+  StyleSheet,
+  Image,
+  Dimensions,
+  TouchableOpacity,
+} from "react-native";
+import { Section, SectionContent, SectionImage } from "react-native-rapi-ui";
+import MediumText from "./MediumText";
+import SmallText from "./SmallText";
 
 import getDate from "../getDate";
 import getTime from "../getTime";
-import NormalText from './NormalText';
+import NormalText from "./NormalText";
 
-const EventCard = props => {    
-    return (
-        <Section style={styles.card} borderRadius={30}>
-            <TouchableOpacity onPress={props.click} disabled={props.disabled}>
-                <SectionImage source={props.event.hasImage ? {uri: props.event.image}
-                    : {uri: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400"}}/>
+const EventCard = (props) => {
+  return (
+    <Section style={styles.card} borderRadius={30}>
+      <TouchableOpacity onPress={props.click} disabled={props.disabled}>
+        <SectionImage
+          source={
+            props.event.hasImage
+              ? { uri: props.event.image }
+              : {
+                  uri: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400",
+                }
+          }
+        />
 
-                <SectionContent>
-                    <MediumText center>{props.event.name}</MediumText>
-                    <NormalText center>By { props.event.hostName ? props.event.hostName
-                        : props.event.hostFirstName + " " + props.event.hostLastName.substring(0, 1) + "."
-                    }</NormalText>
-                    <SmallText size={12} center>
-                        {props.event.location} | {getDate(props.event.date.toDate())} | {getTime(props.event.date.toDate())}
-                    </SmallText>
-                </SectionContent>
-            </TouchableOpacity>
-        </Section>
-    );
-}
+        <SectionContent>
+          <MediumText center>{props.event.name}</MediumText>
+          <NormalText center>
+            By{" "}
+            {props.event.hostName
+              ? props.event.hostName
+              : props.event.hostFirstName
+              ? props.event.hostFirstName +
+                " " +
+                props.event.hostLastName.substring(0, 1) +
+                "."
+              : ""}
+          </NormalText>
+          <SmallText size={12} center>
+            {props.event.location} | {getDate(props.event.date.toDate())} |{" "}
+            {getTime(props.event.date.toDate())}
+          </SmallText>
+        </SectionContent>
+      </TouchableOpacity>
+    </Section>
+  );
+};
 
 const styles = StyleSheet.create({
-    card: {
-        shadowColor: "#000000",
-        shadowOpacity: 0.25,
-        shadowOffset: {
-            width: 0,
-            height: 4
-        },
-        elevation: 20,
-        width: Dimensions.get('window').width - 50,
-        marginBottom: 10,
+  card: {
+    shadowColor: "#000000",
+    shadowOpacity: 0.25,
+    shadowOffset: {
+      width: 0,
+      height: 4,
     },
+    elevation: 20,
+    width: Dimensions.get("window").width - 50,
+    marginBottom: 10,
+  },
 
-    image: {
-        width: Dimensions.get('window').width - 50,
-        height: 150,
-        borderTopLeftRadius: 15,
-        borderTopRightRadius: 15,
-    },
-})
+  image: {
+    width: Dimensions.get("window").width - 50,
+    height: 150,
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
+  },
+});
 
 export default EventCard;
