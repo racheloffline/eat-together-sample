@@ -34,7 +34,7 @@ const EventCard = (props) => {
             By{" "}
             {props.event.hostName
               ? props.event.hostName
-              : props.event.hostFirstName
+              : props.event.hostFirstName // TODO FIX: Not all docs have hostFirstName OR hostName
               ? props.event.hostFirstName +
                 " " +
                 props.event.hostLastName.substring(0, 1) +

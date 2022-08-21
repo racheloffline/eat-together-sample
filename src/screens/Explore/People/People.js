@@ -51,6 +51,7 @@ export default function ({ navigation }) {
               .then((doc) => {
                 if (doc) {
                   if (doc.data().friendIDs) {
+                    // TODO FIX: Not all docs have friendIDs in db
                     setMutuals((mutuals) =>
                       mutuals.concat(doc.data().friendIDs)
                     );
