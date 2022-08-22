@@ -139,7 +139,7 @@ const FullProfile = ({ route, navigation }) => {
               {status}
             </Button>
             <Button onPress={() => {
-              navigation.navigate("Report", {
+              navigation.navigate("ReportPerson", {
                 user: route.params.person
               });
             }} backgroundColor="red" paddingVertical={5} 
