@@ -209,7 +209,7 @@ export default function ({ navigation }) {
 
   return (
     <Layout>
-      <Header name="Your Events" navigation={navigation} hasNotif={unread} />
+      <Header name="Your Meals" navigation={navigation} hasNotif={unread} />
 
       <View style={{ marginTop: 20, paddingHorizontal: 20 }}>
         <Searchbar

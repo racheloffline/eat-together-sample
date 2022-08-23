@@ -101,6 +101,7 @@ export default function ({ route, navigation }) {
                         alert("Profile updated!");
                         setLoading(false);
                         navigation.goBack();
+                        updateEventsPfp(uri);
                     });
                 });
             });
@@ -117,6 +118,21 @@ export default function ({ route, navigation }) {
             });
         }
     }
+
+    // Update profile pic in each event user is hosting
+    const updateEventsPfp = image => {
+        route.params.user.hostedEventIDs.forEach(id => {
+            let table = "Public Events";
+            if (id.type == "private") {
+                table = "Private Events";
+            }
+
+            db.collection(table).doc(id.id).update({
+                hasHostImage: true,
+                hostImage: image
+            });
+        });
+    } 
 
     // Update tags after editing them
     const updateTags = (schoolTags, hobbyTags, foodTags) => {
@@ -258,8 +274,8 @@ const styles = StyleSheet.create({
     },
     
     editImage: {
-        left: 40,
-        bottom: 40,
+        left: 45,
+        bottom: 45,
         padding: 12,
         backgroundColor: "#5DB075",
         borderRadius: 100
