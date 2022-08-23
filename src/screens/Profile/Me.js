@@ -110,7 +110,7 @@ export default function ({ navigation }) {
             }}
           ></Ionicons>
         </View>
-
+        
         <Image
           style={styles.image}
           source={
@@ -119,6 +119,22 @@ export default function ({ navigation }) {
               : require("../../../assets/logo.png")
           }
         />
+
+        <View style={styles.connections}>
+          <Ionicons
+          name = "list-circle"
+          size={35}
+          color="gray"
+              onPress={() => {
+                navigation.navigate("Connections", {
+                  user: userInfo,
+                  image: userInfo.image,
+                  updateInfo,
+                });
+              }}>
+          </Ionicons>
+        </View>
+
         <View style={styles.name}>
           <LargeText>{userInfo.firstName + " " + userInfo.lastName}</LargeText>
           <NormalText>
@@ -200,4 +216,10 @@ const styles = StyleSheet.create({
     right: "10%",
     top: 0,
   },
+
+  connections: {
+    position: "absolute", 
+    right: 130,
+    top: 172
+  }
 });

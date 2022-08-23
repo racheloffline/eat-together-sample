@@ -14,6 +14,7 @@ import { db } from "../../provider/Firebase";
 import firebase from "firebase";
 import ChatPreview from "../../components/ChatPreview";
 import SearchableDropdown from "react-native-searchable-dropdown";
+import LargeText from "../../components/LargeText";
 
 export default function ({ navigation }) {
   const [selectedUsers, setSelectedUsers] = useState([]);
@@ -136,7 +137,15 @@ export default function ({ navigation }) {
       });
     });
   }, []);
-
+  /*
+  return (
+    <View style={{ flexGrow: 1, justifyContent: "center", margin: 40 }}>
+      <LargeText center={true}>
+        Our devs are working hard on this feature! Sit tight.
+      </LargeText>
+    </View>
+  );
+*/
   return (
     <Layout>
       <Header name="Chat"/>

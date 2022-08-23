@@ -8,6 +8,8 @@ import Requests from "./Requests";
 import Schedule from "./Schedule";
 import Settings from "./Settings";
 import FullCard from "./FullCard";
+import ReportBug from "./ReportBug";
+import SuggestIdea from "./SuggestIdea";
 
 const Stack = createStackNavigator();
 
@@ -28,6 +30,8 @@ export default function () {
       <Stack.Screen name="Schedule" component={Schedule} />
       <Stack.Screen name="Settings" component={Settings} />
       <Stack.Screen name="FullCard" component={FullCard} />
+      <Stack.Screen name="Report Bug" component={ReportBug} />
+      <Stack.Screen name="Suggest Idea" component={SuggestIdea} />
     </Stack.Navigator>
   );
 }

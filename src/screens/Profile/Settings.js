@@ -1,108 +1,127 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Image, Dimensions, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
-import { Layout, TopNav, TextInput } from "react-native-rapi-ui";
-import { Ionicons, Feather } from '@expo/vector-icons';
+import {
+    View,
+    StyleSheet,
+    Dimensions,
+    TouchableOpacity,
+    FlatList,
+    Alert, Linking
+} from 'react-native';
+import { Layout, TopNav } from "react-native-rapi-ui";
+import { Ionicons } from '@expo/vector-icons';
 
-import * as ImagePicker from 'expo-image-picker';
-import { db, storage } from "../../provider/Firebase";
+import { db, auth } from "../../provider/Firebase";
 import firebase from "firebase";
 import "firebase/firestore"
 
-import { cloneDeep } from "lodash";
-import allTags from "../../allTags";
-
-import TagsSection from "../../components/TagsSection";
-import Button from "../../components/Button";
 import MediumText from "../../components/MediumText";
-import SmallText from "../../components/SmallText";
 import DeviceToken from "../utils/DeviceToken";
-import KeyboardAvoidingWrapper from "../../components/KeyboardAvoidingWrapper";
 
-export default function ({ route, navigation }) {
-    // Input fields
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [bio, setBio] = useState('');
-    const [image, setImage] = useState('');
-    const [tags, setTags] = useState([]);
-
-    const [loading, setLoading] = useState(false); // Disabling button if user profile is being updated
-
-    useEffect(() => {
-        setFirstName(route.params.user.firstName);
-        setLastName(route.params.user.lastName);
-        setBio(route.params.user.bio);
-        setImage(route.params.image);
-        setTags(route.params.user.tags);
-    }, []);
-
-    // Select image from library
-    const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,
-            quality: 1,
-        });
-
-        if (!result.cancelled) {
-            setImage(result.uri);
-        }
-    };
-
-    // Upload image to firebase
-    const updateImage = async () => {
-        const response = await fetch(image);
-        const blob = await response.blob();
-
-        var ref = storage.ref().child("profilePictures/" + route.params.user.id);
-        return ref.put(blob);
+export default function ({ navigation }) {
+    let user = auth.currentUser;
+    function changeNotifSettings() {
+        Alert.alert(
+            "Update Notification Settings",
+            "Would you like to receive push notifications from Eat Together?",
+            [
+                {
+                    text: "Yes",
+                    onPress: async () => {
+                        await db.collection("Users").doc(user.uid).update({
+                            "settings.notifications": true
+                        })
+                    }
+                },
+                {
+                    text: "No",
+                    onPress: async () => {
+                        await db.collection("Users").doc(user.uid).update({
+                            "settings.notifications": false
+                        })
+                    }
+                }
+            ]
+        );
     }
 
-    // Fetches image from Firebase Storage
-    const fetchImage = async () => {
-        let ref = storage.ref().child("profilePictures/" + route.params.user.id);
-        return ref.getDownloadURL();
-    }
-
-    // Update user profile in Firebase
-    const updateUser = async (uri) => {
-        route.params.updateInfo(firstName, lastName, bio, tags, image);
-                        
-        db.collection("Users").doc(route.params.user.id).update({
-            firstName,
-            lastName,
-            bio,
-            tags,
-            hasImage: image !== "",
-            image: uri
-        }).then(() => {
-            if (image !== "") {
-                updateImage();
-            }
-            
-            alert("Profile updated!");
-            setLoading(false);
-        });
-    }
-
-    //Sign out, and remove this push token from the list of acceptable push tokens
-    const signOut = async () => {
-        // let currentToken;
-        // await db.collection("Users").doc(route.params.user.id).get().then((ss) => {
-        //     currentToken = ss.data().currentToken;
-        // })
-
-        await db.collection("Users").doc(route.params.user.id).update({
+    async function signOut () {
+        await db.collection("Users").doc(user.uid).update({
             pushTokens: firebase.firestore.FieldValue.arrayRemove(DeviceToken.getToken())
         })
         await firebase.auth().signOut()
     }
 
-    return (
-        <Layout style = {styles.page}>
+    function deleteAccount () {
+        Alert.alert(
+            "Are you sure?",
+            "Deleting your account cannot be reversed. Are you sure you want to continue?",
+            [
+                {
+                    text: "No",
+                    onPress: () => {},
+                    style: "cancel"
+                },
+                {
+                    text: "Yes",
+                    onPress: () => {
+                        user.delete().catch((error) => {
+                            signOut().then(() => {
+                                alert("You need to sign in again to proceed.");
+                            })
+                        })
+                    },
+                    style: "destructive"
+                }
+            ]
+        );
+    }
+
+    const buttons = [
+        {
+            name: "Notification Preferences",
+            icon: "notifications",
+            func: () => changeNotifSettings()
+        },
+        {
+            name: "Privacy Policy",
+            icon: "hand-left",
+            func: () => {Linking.openURL("https://www.eat-together.tech/privacy-policy")}
+        },
+        {
+            name: "Report a Bug",
+            icon: "bug",
+            func: () => {navigation.navigate("Report Bug")}
+        },
+        {
+            name: "Suggest an Idea",
+            icon: "bulb",
+            func: () => {navigation.navigate("Suggest Idea")}
+        },
+        {
+            name: "Log Out",
+            icon: "log-out",
+            func: () => signOut()
+        },
+        {
+            name: "Delete Account",
+            icon: "trash",
+            func: () => deleteAccount()
+        }
+    ]
+
+    const renderButton = ({ item }) => (
+        <TouchableOpacity onPress={item.func} style={styles.listItem}>
+            <View style={styles.listView}>
+                <Ionicons name = {item.icon} size = {25}/>
+                <MediumText style={styles.text}>{item.name}</MediumText>
+            </View>
+        </TouchableOpacity>
+    )
+    return(
+        <Layout>
             <TopNav
                 middleContent={
-                    <MediumText>Settings</MediumText>
+                    <MediumText center>Settings</MediumText>
                 }
                 leftContent={
                     <Ionicons
@@ -112,142 +131,23 @@ export default function ({ route, navigation }) {
                 }
                 leftAction={() => navigation.goBack()}
             />
-
-            <KeyboardAvoidingWrapper>
-                <View style={{ paddingHorizontal: 20 }}>
-                    <View style={styles.imageContainer}>
-                        <Image style={styles.image} source={image ? {uri: image} : require("../../../assets/logo.png")}/>
-                        <TouchableOpacity style={styles.editImage} onPress={pickImage}>
-                            <Feather name="edit-2" size={25} color="black"/>
-                        </TouchableOpacity>
-                    </View>
-                    
-                    <View style={styles.name}>
-                        <TextInput
-                            placeholder="First name"
-                            onChangeText={(val) => setFirstName(val)}
-                            leftContent={
-                                <Ionicons name="person-circle-outline" size={20} />
-                            }
-                            value={firstName}
-                            containerStyle={{ width: "47%" }}
-                        />
-                        <TextInput
-                            placeholder="Last name"
-                            onChangeText={(val) => setLastName(val)}
-                            leftContent={
-                                <Ionicons name="person-circle-outline" size={20} />
-                            }
-                            value={lastName}
-                            containerStyle={{ width: "47%" }}
-                        />
-                    </View>
-                    
-
-                    <TextInput
-                        placeholder="Bio"
-                        onChangeText={(val) => setBio(val)}
-                        leftContent={
-                            <Ionicons name="chatbox-ellipses-outline" size={20}/>
-                        }
-                        value={bio}
-                        containerStyle={{ marginBottom: 10 }}
-                    />
-
-                    <TagsSection
-                        multi={true}
-                        selectedItems={tags}
-                        onItemSelect={(tag) => {
-                            setTags([...tags, tag]);
-                        }}
-                        onRemoveItem={(item, index) => {
-                            const newTags = tags.filter((tag, i) => i !== index);
-                            setTags(newTags);
-                        }}
-                        inline={true}
-                        items={cloneDeep(allTags)}
-                        chip={true}
-                        resetValue={false}
-                    />
-
-                    <SmallText center>Note: must have between 3 and 6 tags (inclusive).</SmallText>
-
-                    <TouchableOpacity disabled={firstName === "" || lastName === "" || bio === ""
-                            || tags.length < 3 || tags.length > 6 || loading}
-                        style={firstName === "" || lastName === "" || bio === "" || tags.length < 3
-                            || tags.length > 6 ? styles.saveDisabled : styles.save} 
-                        onPress={() => {
-                            setLoading(true);
-
-                            if (image !== "") {
-                                updateImage().then(() => {
-                                    fetchImage().then(uri => {
-                                        updateUser(uri);
-                                    })
-                                });
-                            }
-                        }}>
-                        <MediumText color="#5DB075">{loading ? "Updating ..." : "Update Profile"}</MediumText>
-                    </TouchableOpacity>
-
-                    <Button onPress={() => signOut()}
-                        marginVertical={20}>Log Out</Button>
-                </View>
-            </KeyboardAvoidingWrapper>
+            <FlatList data={buttons} renderItem={renderButton} style={styles.flatlist} scrollEnabled={false}/>
         </Layout>
     );
 }
 const styles = StyleSheet.create({
-    image: {
-        width: 150,
-        height: 150,
-        borderColor: "white",
-        borderWidth: 3,
-        borderRadius: 100,
-        alignItems: 'center'
-    },
-
-    tagInput: {
-        width: "100%",
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "center",
-        marginVertical: 10
-    },
-
-    input: {
-        width: Dimensions.get('screen').width/1.5,
-        marginRight: 10
-    },
-
-    imageContainer: {
-        marginTop: 30,
-        alignItems: "center"
-    },
-    
-    editImage: {
-        left: 40,
-        bottom: 40,
-        padding: 12,
-        backgroundColor: "#5DB075",
-        borderRadius: 100
-    },
-
-    name: {
-        width: "100%",
-        flexDirection: "row",
-        justifyContent: "space-between",
-        marginBottom: 10
-    },
-
-    save: {
-        alignItems: 'center',
-        marginVertical: 10
-    },
-
-    saveDisabled: {
-        alignItems: 'center',
+    flatlist: {
         marginVertical: 10,
-        opacity: 0.7
+        marginHorizontal: 10
+    },
+    listItem: {
+        marginVertical: 5
+    },
+    listView: {
+        flexDirection: "row",
+        width: Dimensions.get("screen").width - 20
+    },
+    text: {
+        marginHorizontal: 8
     }
 });
