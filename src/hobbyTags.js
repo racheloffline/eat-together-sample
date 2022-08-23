@@ -33,6 +33,8 @@ const hobbyTags = [
     'Swimming',
     'Skating',
     'Fishing',
+    'Biking',
+    'Skateboarding',
     'Scuba diving',
     'Sailing',
     'Painting',

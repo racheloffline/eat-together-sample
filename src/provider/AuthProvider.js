@@ -46,7 +46,8 @@ const AuthProvider = (props) => {
       value={{
         user,
         currUser,
-		profileImageUri
+		    profileImageUri,
+        updateProfileImg: image => setProfileImageUri(image)
       }}
     >
       {props.children}

@@ -1,15 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Image, Dimensions, FlatList, TouchableOpacity } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Image,
+  Dimensions,
+  ScrollView,
+  TouchableOpacity
+} from "react-native";
 import { Layout } from "react-native-rapi-ui";
-import { Ionicons } from "@expo/vector-icons";
-import { db, auth, storage } from "../../provider/Firebase";
+import { Ionicons, Feather } from "@expo/vector-icons";
+import { db, auth } from "../../provider/Firebase";
 
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
 import TagsList from "../../components/TagsList";
 import EventCard from "../../components/EventCard";
-import Button from "../../components/Button";
 
 export default function ({ navigation }) {
   const user = auth.currentUser;
@@ -34,28 +40,40 @@ export default function ({ navigation }) {
           );
 
           let newEvents = [];
-          doc.data().archivedEventIDs.forEach((e) => {
-            if (e.type === "public") {
-              db.collection("Public Events")
-                .doc(e.id)
-                .get()
-                .then((event) => {
-                  let data = event.data();
-                  data.type = e.type;
-                  newEvents.unshift(data);
-                  setEvents(newEvents);
-                });
-            } else {
-              db.collection("Private Events")
-                .doc(e.id)
-                .get()
-                .then((event) => {
-                  let data = event.data();
-                  data.type = e.type;
-                  newEvents.unshift(data);
-                  setEvents(newEvents);
-                });
+          let eventsLength = doc.data().archivedEventIDs.length;
+
+          doc.data().archivedEventIDs.forEach(async (e) => {
+            let table = "Public Events";
+            if (e.type === "private") {
+              table = "Private Events";
             }
+
+            await db.collection(table)
+                .doc(e.id)
+                .get()
+                .then((event) => {
+                  let data = event.data();
+                  newEvents.push(data);
+                  eventsLength--;
+                  
+                  if (eventsLength === 0) {
+                    // Sort events by date
+                    newEvents = newEvents.sort((a, b) => {
+                      return a.date.seconds - b.date.seconds;
+                    });
+                    
+                    setEvents(newEvents);
+                  }
+                }).catch(e => {
+                  alert("There was an error fetching some of your meals :( try again later");
+
+                  eventsLength--;
+                  newEvents = newEvents.sort((a, b) => {
+                    return a.date.seconds - b.date.seconds;
+                  });
+
+                  setEvents(newEvents);
+                });
           });
         });
     }
@@ -70,14 +88,13 @@ export default function ({ navigation }) {
       lastName: newLastName,
       bio: newBio,
       tags: newTags,
+      image: newImage
     }));
-
-    if (newImage) setUserInfo({ ...userInfo, image: newImage });
   };
 
   return (
     <Layout>
-      <View style={styles.page}>
+      <ScrollView contentContainerStyle={styles.page}>
         <View style={styles.background} />
         <View style={styles.settings}>
           <Ionicons
@@ -124,30 +141,32 @@ export default function ({ navigation }) {
             {mealsAttended + "/" + mealsSignedUp + " meals attended"}
           </NormalText>
           <MediumText>@{userInfo.username}</MediumText>
-        </View>
-        <TagsList tags={userInfo.tags ? userInfo.tags : []} />
-        <View style={styles.edit}>
-          <Button
+
+          <TouchableOpacity
+            style={styles.edit}
             onPress={function () {
               navigation.navigate("Edit", {
                 user: userInfo,
-                image: userInfo.image,
                 updateInfo,
               });
             }}
             marginVertical={10}
           >
-            Edit Profile
-          </Button>
+            <Feather name="edit-2" size={30}/>
+          </TouchableOpacity>
         </View>
+
+        <TagsList tags={userInfo.tags ? userInfo.tags : []} />
         <MediumText center>{userInfo.bio}</MediumText>
-      </View>
-      <FlatList
-        contentContainerStyle={styles.cards}
-        keyExtractor={(item) => item.id}
-        data={events}
-        renderItem={({ item }) => <EventCard event={item} disabled />}
-      />
+
+        <View style={styles.cards}>
+          {events && events.map((event) => <EventCard event={event} key={event.id} click={() => {
+            navigation.navigate("FullCard", {
+              event
+            });
+          }}/>)}
+        </View>
+      </ScrollView>
     </Layout>
   );
 }
@@ -181,6 +200,7 @@ const styles = StyleSheet.create({
   },
 
   name: {
+    width: "100%",
     marginVertical: 20,
     alignItems: "center",
   },
@@ -192,8 +212,9 @@ const styles = StyleSheet.create({
   },
 
   edit: {
-    marginVertical: 20,
-    alignItems: "center",
+    position: "absolute",
+    right: "10%",
+    top: 0,
   },
 
   connections: {
