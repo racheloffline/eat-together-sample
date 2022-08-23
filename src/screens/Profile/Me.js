@@ -105,7 +105,7 @@ export default function ({ navigation }) {
 
         <View style={styles.connections}>
           <Ionicons
-          name = "add-circle-sharp"
+          name = "list-circle"
           size={35}
           color="gray"
               onPress={() => {
@@ -199,6 +199,6 @@ const styles = StyleSheet.create({
   connections: {
     position: "absolute", 
     right: 130,
-    top: 165
+    top: 172
   }
 });
