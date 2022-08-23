@@ -137,6 +137,7 @@ export default function ({ navigation }) {
       });
     });
   }, []);
+  /*
   return (
     <View style={{ flexGrow: 1, justifyContent: "center", margin: 40 }}>
       <LargeText center={true}>
@@ -144,7 +145,7 @@ export default function ({ navigation }) {
       </LargeText>
     </View>
   );
-  /*
+*/
   return (
     <Layout>
       <Header name="Chat"/>
@@ -231,7 +232,6 @@ export default function ({ navigation }) {
       </View>
     </Layout>
   );
-  */
 }
 
 const styles = StyleSheet.create({
