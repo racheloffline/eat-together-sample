@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Image, Dimensions, FlatList } from "react-native";
+import { View, StyleSheet, Image, Dimensions, FlatList, TouchableOpacity } from "react-native";
 import { Layout } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 import { db, auth, storage } from "../../provider/Firebase";
@@ -93,7 +93,7 @@ export default function ({ navigation }) {
             }}
           ></Ionicons>
         </View>
-
+        
         <Image
           style={styles.image}
           source={
@@ -102,6 +102,22 @@ export default function ({ navigation }) {
               : require("../../../assets/logo.png")
           }
         />
+
+        <View style={styles.connections}>
+          <Ionicons
+          name = "add-circle-sharp"
+          size={35}
+          color="gray"
+              onPress={() => {
+                navigation.navigate("Connections", {
+                  user: userInfo,
+                  image: userInfo.image,
+                  updateInfo,
+                });
+              }}>
+          </Ionicons>
+        </View>
+
         <View style={styles.name}>
           <LargeText>{userInfo.firstName + " " + userInfo.lastName}</LargeText>
           <NormalText>
@@ -179,4 +195,10 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     alignItems: "center",
   },
+
+  connections: {
+    position: "absolute", 
+    right: 130,
+    top: 165
+  }
 });
