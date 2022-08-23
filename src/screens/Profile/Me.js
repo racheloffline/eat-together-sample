@@ -70,9 +70,8 @@ export default function ({ navigation }) {
       lastName: newLastName,
       bio: newBio,
       tags: newTags,
+      image: newImage
     }));
-
-    if (newImage) setUserInfo({ ...userInfo, image: newImage });
   };
 
   return (
@@ -115,7 +114,6 @@ export default function ({ navigation }) {
             onPress={function () {
               navigation.navigate("Edit", {
                 user: userInfo,
-                image: userInfo.image,
                 updateInfo,
               });
             }}
