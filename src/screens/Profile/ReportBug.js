@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {View, StyleSheet, Image, Dimensions} from "react-native";
+import {View, StyleSheet, Image, Dimensions, ScrollView} from "react-native";
 import {
     Layout,
     TopNav,
@@ -32,9 +32,9 @@ const ReportBug = ({ route, navigation }) => {
                 }
                 leftAction={() => navigation.goBack()}
             />
-            <View style={styles.page}>
+            <ScrollView contentContainerStyle={styles.page} scrollEnabled={false}>
                 <View style={styles.header}>
-                    <LargeText style={{marginVertical: 50, marginHorizontal: 20}} center>We're sorry for your unfortunate experience. Please describe the issue.</LargeText>
+                    <LargeText style={{padding: 20}} center>We're sorry for your unfortunate experience. Please describe the issue.</LargeText>
                 </View>
                 <TextInput multiline={true} containerStyle={{paddingBottom: 70}} placeholder="Enter explanation here" value={report} onChangeText={val => setReport(val)}/>
                 <Button style={{marginTop: 20}} text="Report" status="danger" onPress={() => {
@@ -53,7 +53,7 @@ const ReportBug = ({ route, navigation }) => {
                             navigation.goBack();
                         });
                 }}/>
-            </View>
+            </ScrollView>
         </Layout>
     );
 }
