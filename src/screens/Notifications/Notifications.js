@@ -35,7 +35,7 @@ export default function ({ navigation }) {
         .doc(user.uid)
         .collection("Invites");
       ref.onSnapshot((query) => {
-        const list = [];
+        let list = [];
         query.forEach((doc) => {
           let data = doc.data();
           list.push({
@@ -53,6 +53,9 @@ export default function ({ navigation }) {
             inviteID: data.inviteID,
             id: data.inviteID,
           });
+        });
+        list = list.sort((a, b) => {
+          return a.date.seconds - b.date.seconds;
         });
         setInvites(list);
       });
