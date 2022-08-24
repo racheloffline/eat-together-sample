@@ -62,7 +62,7 @@ const Main = () => {
     <MainStack.Navigator
       screenOptions={{
         headerShown: false,
-        animationEnabled: false,
+        animationEnabled: true,
       }}
     >
       <MainStack.Screen name="MainTabs">{() => <MainTabs />}</MainStack.Screen>

@@ -12,7 +12,7 @@ export default function () {
       initialRouteName="OrganizePrivate"
       screenOptions={{
         headerShown: false,
-        animationEnabled: false,
+        animationEnabled: true,
       }}
     >
       <Stack.Screen name="OrganizePrivate" component={OrganizePrivate} />
