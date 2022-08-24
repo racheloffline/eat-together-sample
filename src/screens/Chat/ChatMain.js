@@ -11,7 +11,7 @@ export default function () {
       initialRouteName="Chats"
       screenOptions={{
         headerShown: false,
-        animationEnabled: false,
+        animationEnabled: true,
       }}
     >
       <Stack.Screen name="Chats" component={Chats} />
