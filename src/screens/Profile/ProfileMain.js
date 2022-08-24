@@ -10,6 +10,8 @@ import Settings from "./Settings";
 import FullCard from "./FullCard";
 import ReportBug from "./ReportBug";
 import SuggestIdea from "./SuggestIdea";
+import FullProfile from "../Explore/People/FullProfile";
+import ReportPerson from "../Explore/People/ReportPerson";
 
 const Stack = createStackNavigator();
 
@@ -32,6 +34,8 @@ export default function () {
       <Stack.Screen name="FullCard" component={FullCard} />
       <Stack.Screen name="Report Bug" component={ReportBug} />
       <Stack.Screen name="Suggest Idea" component={SuggestIdea} />
+      <Stack.Screen name="FullProfile" component={FullProfile} />
+      <Stack.Screen name="ReportPerson" component={ReportPerson} />
     </Stack.Navigator>
   );
 }

@@ -18,7 +18,7 @@ export default function ({ navigation }) {
     //Check to see if we should display the "No Connections" placeholder text
     function shouldDisplayPlaceholder(list) {
         if(list == null ||list.length === 0) {
-            return "No connections. Meet friends on the People page!"
+            return "No connections. Meet friends on the Explore page!"
         } else {
             return ""
         }
@@ -58,7 +58,7 @@ export default function ({ navigation }) {
                         size={20}
                     />
                 }
-                leftAction={() => navigation.navigate("Invite")}
+                leftAction={() => navigation.navigate("Me")}
             />
             <View style = {styles.switchView}>
                 <HorizontalSwitch left="Connections" right="Requests" current="left" press={(val) => navigation.navigate("Requests")}/>
