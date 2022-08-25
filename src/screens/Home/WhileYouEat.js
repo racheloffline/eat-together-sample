@@ -38,9 +38,7 @@ const WhileYouEat = ({ route, navigation }) => {
   const [event, setEvent] = useState(route.params.event);
 
   // Data for the attendees
-  const [attendees, setAttendees] = useState(
-    new Array(route.params.event.attendees.length).fill(false)
-  );
+  const [attendees, setAttendees] = useState([]);
   const [people, setPeople] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -79,25 +77,23 @@ const WhileYouEat = ({ route, navigation }) => {
 
   // Fetch all attendees of this event
   const getAttendees = () => {
-    route.params.event.attendees.forEach((attendee, index) => {
+    route.params.event.attendees.forEach((attendee) => {
       if (attendee !== user.uid) {
         db.collection("Users")
           .doc(attendee)
           .get()
           .then((doc) => {
             const data = doc.data();
+            let attended = false;
             const ids = data.attendedEventIDs.map((e) => e.id);
 
             if (ids.includes(route.params.event.id)) {
-              let newAttendees = [...attendees];
-              newAttendees[index] = true;
-              setAttendees(newAttendees);
+              attended = true;
             }
 
             setPeople(people => [...people, data]);
+            setAttendees(attendees => [...attendees, attended]);
           });
-      } else {
-        setPeople(people => [...people, { id: user.uid}]);
       }
     });
   };

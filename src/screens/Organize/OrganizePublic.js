@@ -61,15 +61,12 @@ export default function ({ navigation }) {
         db.collection("Icebreakers").onSnapshot((querySnapshot) => {
             querySnapshot.forEach((doc) => {
                 breakOptions.push(doc.id);
-                console.log(doc.id);
-                console.log("IS THIS WORKING?????")
-            })
-            console.log(breakOptions);
+            });
+
             var num = Math.floor(Math.random()*breakOptions.length);
             db.collection("Icebreakers").doc(breakOptions[num]).get().then(doc => {
-                    console.log("please be working!!!!");
-                    setIcebreakers(doc.data().icebreakers);
-                })
+                setIcebreakers(doc.data().icebreakers);
+            });
         });
         async function fetchData() {
             await db.collection("Users").doc(user.uid).onSnapshot((doc) => {
