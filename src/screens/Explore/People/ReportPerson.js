@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, StyleSheet, Image, Dimensions } from "react-native";
+import {View, StyleSheet, Image, Dimensions, ScrollView} from "react-native";
 import {
   Layout,
   TopNav,
@@ -24,10 +24,10 @@ const ReportPerson = ({ route, navigation }) => {
         leftContent={<Ionicons name="chevron-back" size={20} />}
         leftAction={() => navigation.goBack()}
       />
-      <View style={styles.page}>
+      <ScrollView contentContainerStyle={styles.page} scrollEnabled={false}>
         <View style={styles.header}>
           <LargeText
-            style={{ marginVertical: 50, marginHorizontal: 20 }}
+            style={{ padding: 20 }}
             center
           >
             We're sorry for your unfortunate experience. Please describe the
@@ -68,7 +68,7 @@ const ReportPerson = ({ route, navigation }) => {
               });
           }}
         />
-      </View>
+      </ScrollView>
     </Layout>
   );
 };

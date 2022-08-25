@@ -6,6 +6,7 @@ import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
 import firebase from "firebase";
 import {db, storage} from "../../provider/Firebase";
+import {Menu, MenuOption, MenuOptions, MenuTrigger} from "react-native-popup-menu";
 
 export default function ({ route, navigation}) {
     //Save the invite as a shorter name
@@ -37,6 +38,12 @@ export default function ({ route, navigation}) {
         return route.params.hasPassed ? "red" : "black";
     }
 
+    function reportInvite() {
+        navigation.navigate("ReportInvite", {
+            inviteID: invite.id,
+        });
+    }
+
     return (
         <Layout>
             <TopNav
@@ -48,6 +55,23 @@ export default function ({ route, navigation}) {
                         name="chevron-back"
                         size={20}
                     />
+                }
+                rightContent={
+                    <View>
+                        <Menu>
+                            <MenuTrigger>
+                                <Ionicons
+                                    name="ellipsis-horizontal"
+                                    size={20}
+                                />
+                            </MenuTrigger>
+                            <MenuOptions>
+                                <MenuOption onSelect={() => reportInvite()}>
+                                    <NormalText size={18} color="red">Report Event</NormalText>
+                                </MenuOption>
+                            </MenuOptions>
+                        </Menu>
+                    </View>
                 }
                 leftAction={() => navigation.goBack()}
             />

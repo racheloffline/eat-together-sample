@@ -13,12 +13,14 @@ export default function () {
       initialRouteName="Explore"
       screenOptions={{
         headerShown: false,
-        animationEnabled: false,
+        animationEnabled: true,
       }}
     >
       <Stack.Screen name="Explore" component={Explore} />
       <Stack.Screen name="FullCard" component={FullCard} />
-      <Stack.Screen name="People" component={PeopleMain} />
+      <Stack.Screen name="People" component={PeopleMain} screenOptions={{
+        animationEnabled: false,
+      }} />
     </Stack.Navigator>
   );
 }
