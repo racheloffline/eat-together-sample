@@ -283,23 +283,23 @@ export default function({ navigation }) {
         <View style={{ paddingHorizontal: 20 }}>
           <Searchbar placeholder="Search by name, tags, or host name"
             value={searchQuery} onChangeText={onChangeText}/>
+          
+          <HorizontalRow>
+            <Filter checked={morning || afternoon || evening}
+              onPress={() => showTimeFilterRef.current.open()}
+              text={morning ? "Morning" : 
+                afternoon ? "Afternoon" : 
+                evening ? "Evening" :"Time of day"}/>
+            <Filter checked={similarInterests || popularity}
+              onPress={() => showSortFilterRef.current.open()}
+              text={similarInterests ? "Similar interests"
+                : popularity ? "Popularity" : "Sort by"}/>
+            <Filter checked={fromFriends}
+              onPress={() => setFromFriends(!fromFriends)} text="From friends"/>
+            <Filter checked={friendsAttending}
+              onPress={() => setFriendsAttending(!friendsAttending)} text="Friends attending"/>
+          </HorizontalRow>
         </View>
-
-        <HorizontalRow>
-          <Filter checked={morning || afternoon || evening}
-            onPress={() => showTimeFilterRef.current.open()}
-            text={morning ? "Morning" : 
-              afternoon ? "Afternoon" : 
-              evening ? "Evening" :"Time of day"}/>
-          <Filter checked={similarInterests || popularity}
-            onPress={() => showSortFilterRef.current.open()}
-            text={similarInterests ? "Similar interests"
-              : popularity ? "Popularity" : "Sort by"}/>
-          <Filter checked={fromFriends}
-            onPress={() => setFromFriends(!fromFriends)} text="From friends"/>
-          <Filter checked={friendsAttending}
-            onPress={() => setFriendsAttending(!friendsAttending)} text="Friends attending"/>
-        </HorizontalRow>
 
         <RBSheet
           height={400}
@@ -377,7 +377,7 @@ export default function({ navigation }) {
           onPress={() => {
             setSimilarInterests(!similarInterests);
             setPopularity(false);
-            showTimeFilterRef.current.close();
+            showSortFilterRef.current.close();
           }}
         />
         <Filter
@@ -387,14 +387,14 @@ export default function({ navigation }) {
           onPress={() => {
             setPopularity(!popularity);
             setSimilarInterests(false);
-            showTimeFilterRef.current.close();
+            showSortFilterRef.current.close();
           }}
         />
         <Link
           onPress={() => {
             setSimilarInterests(false);
             setPopularity(false);
-            showTimeFilterRef.current.close();
+            showSortFilterRef.current.close();
           }}>Clear</Link>
         </RBSheet>
 

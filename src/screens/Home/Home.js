@@ -17,6 +17,7 @@ import { db, auth } from "../../provider/Firebase";
 export default function ({ navigation }) {
   // Get current user
   const user = auth.currentUser;
+  const [userInfo, setUserInfo] = useState(null);
 
   const [events, setEvents] = useState([]); // initial state, function used for updating initial state
   const [filteredEvents, setFilteredEvents] = useState([]);
@@ -25,6 +26,8 @@ export default function ({ navigation }) {
   // Filters
   const [publicEvents, setPublicEvents] = useState(false);
   const [privateEvents, setPrivateEvents] = useState(false);
+  const [fromFriends, setFromFriends] = useState(false);
+  const [friendsAttending, setFriendsAttending] = useState(false);
 
   const [unread, setUnread] = useState(false); // See if we need to display unread notif icon
   const [loading, setLoading] = useState(true); // State variable to show loading screen when fetching data
@@ -37,6 +40,7 @@ export default function ({ navigation }) {
         .doc(user.uid)
         .onSnapshot((doc) => {
           let newEvents = [];
+          setUserInfo(doc.data());
           setUnread(doc.data().hasNotif);
           let eventsLength = doc.data().attendingEventIDs.length;
 
@@ -85,6 +89,29 @@ export default function ({ navigation }) {
       setLoading(false);
     });
   }, []);
+
+  // For filters
+  useEffect(() => {
+    let newEvents = [...events];
+
+    if (publicEvents) {
+      newEvents = newEvents.filter((e) => e.type === "public");
+    }
+
+    if (privateEvents) {
+      newEvents = newEvents.filter((e) => e.type === "private");
+    }
+
+    if (fromFriends) {
+      newEvents = filterByFriendsHosting(newEvents);
+    }
+
+    if (friendsAttending) {
+      newEvents = filterByFriendsAttending(newEvents);
+    }
+
+    setFilteredEvents(newEvents);
+  }, [publicEvents, privateEvents, fromFriends, friendsAttending]);
 
   //Check to see if we should display the "No Events" placeholder text
   function shouldDisplayPlaceholder(list) {
@@ -158,12 +185,6 @@ export default function ({ navigation }) {
 
   // Display public events only
   const publicOnly = () => {
-    if (!publicEvents) {
-      setFilteredEvents(events.filter((e) => e.type === "public"));
-    } else {
-      setFilteredEvents(events);
-    }
-
     setPublicEvents(!publicEvents);
     setPrivateEvents(false);
     setSearchQuery("");
@@ -171,15 +192,33 @@ export default function ({ navigation }) {
 
   // Display private events only
   const privateOnly = () => {
-    if (!privateEvents) {
-      setFilteredEvents(events.filter((e) => e.type === "private"));
-    } else {
-      setFilteredEvents(events);
-    }
-
     setPrivateEvents(!privateEvents);
     setPublicEvents(false);
     setSearchQuery("");
+  };
+
+  // Display events that friends are hosting
+  const filterByFriendsHosting = (newEvents) => {
+    newEvents = newEvents.filter((e) => userInfo.friendIDs.includes(e.hostID));
+    return newEvents;
+  };
+
+  // Display events that friends are attending
+  const filterByFriendsAttending = (newEvents) => {
+    newEvents = newEvents.filter((e) => {
+      let included = false;
+
+      e.attendees.forEach((a) => {
+        if (userInfo.friendIDs.includes(a)) {
+          included = true;
+          return;
+        }
+      });
+
+      return included;
+    });
+
+    return newEvents;
   };
 
   // Replace event with new event details
@@ -190,16 +229,6 @@ export default function ({ navigation }) {
       }
       return e;
     }).sort((a, b) => {
-      return a.date.seconds - b.date.seconds;
-    }).reverse();
-
-    setEvents(newEvents);
-    setFilteredEvents(newEvents);
-  }
-
-  // Add new event to this page after creating it in "Organize"
-  const addEvent = newEvent => {
-    const newEvents = [...events, newEvent].sort((a, b) => {
       return a.date.seconds - b.date.seconds;
     }).reverse();
 
@@ -228,6 +257,16 @@ export default function ({ navigation }) {
             checked={privateEvents}
             onPress={privateOnly}
             text="Private"
+          />
+          <Filter
+            checked={fromFriends}
+            onPress={() => setFromFriends(!fromFriends)}
+            text="From friends"
+          />
+          <Filter
+            checked={friendsAttending}
+            onPress={() => setFriendsAttending(!friendsAttending)}
+            text="Friends attending"
           />
         </HorizontalRow>
       </View>
