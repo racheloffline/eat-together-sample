@@ -7,7 +7,7 @@ import { View } from "react-native";
 
 export default (props) => {
   return (
-    <View style={{justifyContent: "center", alignItems: "center"}}>
+    <View style={{justifyContent: "center", alignItems: "center", backgroundColor: "white"}}>
       <Ionicons
         name={props.icon}
         size={24}
