@@ -3,12 +3,13 @@
 import React, { useEffect, useState } from "react";
 import { FlatList, View, StyleSheet } from "react-native";
 import { Layout, TopNav } from "react-native-rapi-ui";
-import NormalText from "../../components/NormalText";
 import { Ionicons } from "@expo/vector-icons";
+
 import MediumText from "../../components/MediumText";
+import EventCard from "../../components/EventCard";
+
 import { db } from "../../provider/Firebase";
 import firebase from "firebase";
-import EventCard from "../../components/EventCard";
 
 export default function ({ navigation }) {
   //Get a list of current invites from Firebase up here
@@ -39,19 +40,8 @@ export default function ({ navigation }) {
         query.forEach((doc) => {
           let data = doc.data();
           list.push({
+            ...data,
             docID: doc.id,
-            name: data.name,
-            image: data.image,
-            hasImage: data.hasImage,
-            location: data.location,
-            date: data.date,
-            details: data.description,
-            hostID: data.hostID,
-            hostName: data.hostName,
-            hostImage: data.hostImage,
-            accepted: data.accepted,
-            inviteID: data.inviteID,
-            id: data.inviteID,
           });
         });
         list = list.sort((a, b) => {
@@ -70,11 +60,11 @@ export default function ({ navigation }) {
         leftContent={<Ionicons name="chevron-back" size={20} />}
         leftAction={() => navigation.goBack()}
       />
-      <View style={{ padding: 20 }}>
+      <View style={{ paddingTop: 30 }}>
         <View style={styles.noInvitesView}>
-          <NormalText center={"center"}>
+          <MediumText center={"center"}>
             {shouldDisplayPlaceholder(invites)}
-          </NormalText>
+          </MediumText>
         </View>
         <FlatList
           contentContainerStyle={styles.cards}
@@ -85,22 +75,8 @@ export default function ({ navigation }) {
               event={item}
               click={() => {
                 let inviteToSend = {
+                  ...item,
                   id: item.docID,
-                  name: item.name,
-                  image: item.image,
-                  hasImage: item.hasImage,
-                  location: item.location,
-                  date: item.date.toDate().toDateString(),
-                  time: item.date.toDate().toLocaleTimeString("en-US", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  }),
-                  details: item.description,
-                  hostID: item.hostID,
-                  hostName: item.hostName,
-                  hostImage: item.hostImage,
-                  accepted: item.accepted,
-                  inviteID: item.inviteID,
                 };
                 navigation.navigate("NotificationFull", {
                   invite: inviteToSend,
@@ -117,14 +93,6 @@ export default function ({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    padding: 40,
-    display: "flex",
-    marginBottom: -20,
-  },
-  headingText: {
-    fontSize: 50,
-  },
   noInvitesView: {
     marginVertical: -20,
   },

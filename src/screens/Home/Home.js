@@ -1,6 +1,6 @@
 // Display your events
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { View, ActivityIndicator, StyleSheet, FlatList } from "react-native";
 import { Layout } from "react-native-rapi-ui";
 
@@ -13,6 +13,7 @@ import Filter from "../../components/Filter";
 import MediumText from "../../components/MediumText";
 
 import { db, auth } from "../../provider/Firebase";
+import { AuthContext } from "../../provider/AuthProvider";
 
 export default function ({ navigation }) {
   // Get current user
@@ -32,6 +33,8 @@ export default function ({ navigation }) {
   const [unread, setUnread] = useState(false); // See if we need to display unread notif icon
   const [loading, setLoading] = useState(true); // State variable to show loading screen when fetching data
 
+  const updateProfileImg = useContext(AuthContext).updateProfileImg;
+
   useEffect(() => {
     // updates stuff right after React makes changes to the DOM
     async function fetchEvents() {
@@ -41,6 +44,7 @@ export default function ({ navigation }) {
         .onSnapshot((doc) => {
           let newEvents = [];
           setUserInfo(doc.data());
+          updateProfileImg(doc.data().image);
           setUnread(doc.data().hasNotif);
           let eventsLength = doc.data().attendingEventIDs.length;
 
