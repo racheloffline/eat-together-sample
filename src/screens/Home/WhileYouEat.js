@@ -38,9 +38,7 @@ const WhileYouEat = ({ route, navigation }) => {
   const [event, setEvent] = useState(route.params.event);
 
   // Data for the attendees
-  const [attendees, setAttendees] = useState(
-    new Array(route.params.event.attendees.length).fill(false)
-  );
+  const [attendees, setAttendees] = useState([]);
   const [people, setPeople] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -79,32 +77,22 @@ const WhileYouEat = ({ route, navigation }) => {
 
   // Fetch all attendees of this event
   const getAttendees = () => {
-    route.params.event.attendees.forEach((attendee, index) => {
+    route.params.event.attendees.forEach((attendee) => {
       if (attendee !== user.uid) {
         db.collection("Users")
           .doc(attendee)
           .get()
           .then((doc) => {
             const data = doc.data();
-
+            let attended = false;
             const ids = data.attendedEventIDs.map((e) => e.id);
+
             if (ids.includes(route.params.event.id)) {
-              let newAttendees = attendees;
-              newAttendees[index] = true;
-              setAttendees(newAttendees);
+              attended = true;
             }
 
-            if (data.hasImage) {
-              storage
-                .ref("profilePictures/" + data.id)
-                .getDownloadURL()
-                .then((uri) => {
-                  data.image = uri;
-                })
-                .then(() => setPeople((people) => [...people, data]));
-            } else {
-              setPeople((people) => [...people, data]);
-            }
+            setPeople(people => [...people, data]);
+            setAttendees(attendees => [...attendees, attended]);
           });
       }
     });
@@ -125,6 +113,7 @@ const WhileYouEat = ({ route, navigation }) => {
         .doc(user.uid)
         .update({
           attendingEventIDs: firebase.firestore.FieldValue.arrayRemove(storeID),
+          attendedEventIDs: firebase.firestore.FieldValue.arrayRemove(storeID),
         })
         .then(() => {
           if (route.params.event.type === "private") {
@@ -202,21 +191,21 @@ const WhileYouEat = ({ route, navigation }) => {
                 <Ionicons
                   name="ellipsis-horizontal"
                   color={loading ? "grey" : "black"}
-                  size={20}
+                  size={25}
                 />
               </MenuTrigger>
               <MenuOptions>
-                {event.hostID !== user.uid && <MenuOption onSelect={() => reportEvent()}>
+                {event.hostID !== user.uid && <MenuOption onSelect={() => reportEvent()} style={styles.option}>
                   <NormalText size={18}>Report Event</NormalText>
                 </MenuOption>}
                 {event.hostID === user.uid && <MenuOption onSelect={() => navigation.navigate("EditEvent", {
                   event,
                   editEvent,
                   editEvent2: route.params.editEvent
-                })}>
+                })}  style={styles.option}>
                   <NormalText size={18}>Edit Event</NormalText>
                 </MenuOption>}
-                <MenuOption onSelect={() => withdrawAlert()}>
+                <MenuOption onSelect={() => withdrawAlert()}  style={styles.option}>
                   <NormalText size={18} color="red">
                     Withdraw
                   </NormalText>
@@ -252,7 +241,7 @@ const WhileYouEat = ({ route, navigation }) => {
             </MediumText>
           </View>
 
-          {event.tags && <TagsList marginVertical={20} tags={event.tags}/>}
+          {event.tags && <TagsList marginVertical={20} tags={event.tags} left/>}
 
           {/* 3 event details (location, date, time} are below */}
 
@@ -335,15 +324,19 @@ const WhileYouEat = ({ route, navigation }) => {
                     {"Just yourself ;)"}
                   </NormalText>
                 ) : (
-                  people.map((person, index) => (
-                    <Attendance
-                      size={17}
-                      person={person}
-                      key={person.id}
-                      attending={attendees[index]}
-                      onPress={() => markAttendee(index)}
-                    />
-                  ))
+                  people.map((person, index) => {
+                    if (person.id !== user.uid) {
+                      return (
+                        <Attendance
+                          size={17}
+                          person={person}
+                          key={person.id}
+                          attending={attendees[index]}
+                          onPress={() => markAttendee(index)}
+                        />
+                      );
+                    }
+                  })
                 )}
               </View>
             )}
@@ -358,6 +351,10 @@ const styles = StyleSheet.create({
   infoContainer: {
     marginHorizontal: 30,
     marginBottom: 50
+  },
+
+  option: {
+    padding: 10
   },
 
   row: {

@@ -120,21 +120,6 @@ export default function ({ navigation }) {
           }
         />
 
-        <View style={styles.connections}>
-          <Ionicons
-          name = "list-circle"
-          size={35}
-          color="gray"
-              onPress={() => {
-                navigation.navigate("Connections", {
-                  user: userInfo,
-                  image: userInfo.image,
-                  updateInfo,
-                });
-              }}>
-          </Ionicons>
-        </View>
-
         <View style={styles.name}>
           <LargeText>{userInfo.firstName + " " + userInfo.lastName}</LargeText>
           <NormalText>
@@ -143,8 +128,23 @@ export default function ({ navigation }) {
           <MediumText>@{userInfo.username}</MediumText>
 
           <TouchableOpacity
+            style={styles.connections}
+            onPress={() => {
+              navigation.navigate("Connections", {
+                user: userInfo,
+                image: userInfo.image,
+                updateInfo,
+              });
+            }}
+            marginVertical={10}
+          >
+            <Ionicons name="list-circle" size={20} color="#4C6FB1"/>
+            <NormalText color="#4C6FB1"> Connections</NormalText>
+          </TouchableOpacity>
+
+          <TouchableOpacity
             style={styles.edit}
-            onPress={function () {
+            onPress={() => {
               navigation.navigate("Edit", {
                 user: userInfo,
                 updateInfo,
@@ -152,7 +152,8 @@ export default function ({ navigation }) {
             }}
             marginVertical={10}
           >
-            <Feather name="edit-2" size={30}/>
+            <Feather name="edit-2" size={20} color="#4C6FB1"/>
+            <NormalText color="#4C6FB1"> Edit Profile</NormalText>
           </TouchableOpacity>
         </View>
 
@@ -211,15 +212,19 @@ const styles = StyleSheet.create({
     top: 20,
   },
 
-  edit: {
+  connections: {
     position: "absolute",
-    right: "10%",
-    top: 0,
+    left: "2%",
+    top: -25,
+    flexDirection: "row",
+    alignItems: "center",
   },
 
-  connections: {
-    position: "absolute", 
-    right: 130,
-    top: 172
-  }
+  edit: {
+    position: "absolute",
+    right: "2%",
+    top: -25,
+    flexDirection: "row",
+    alignItems: "center",
+  },
 });
