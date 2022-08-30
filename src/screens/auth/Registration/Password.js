@@ -12,6 +12,7 @@ import KeyboardAvoidingWrapper from "../../../components/KeyboardAvoidingWrapper
 
 const Password = props => {
   const [username, setUsername] = useState(props.username);
+  const [usernameValid, setUsernameValid] = useState(false);
   const [email, setEmail] = useState(props.email);
   const [password, setPassword] = useState(props.password);
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -22,10 +23,16 @@ const Password = props => {
   const [showConfirmPass, setShowConfirmPass] = useState(false);
 
   useEffect(() => {
-    props.setUsername(username);
+    if (!props.usernames.includes(username)) {
+      setUsernameValid(true);
+      props.setUsername(username);
+    } else {
+      setUsernameValid(false);
+    }
+    
     props.setEmail(email);
 
-    if (password === confirmPassword && password !== "") {
+    if (password === confirmPassword && password.length >= 8) {
       setConfirmed(true);
       props.setPassword(password);
     } else {
@@ -45,13 +52,17 @@ const Password = props => {
         <LargeText center>Finally, set your username, email, and password!</LargeText>
 
         <TextInput placeholder="Username (at least 4 characters)" value={username}
-            onChangeText={val => setUsername(val.replace(/\s+/g, ''))} containerStyle={{marginTop: 30}}
+            onChangeText={val => setUsername(val.replace(/\s+/g, ''))} containerStyle={{marginTop: 30, marginBottom: 10}}
             leftContent={<FontAwesome name="user" size={18}/>}/>
+        
+        {username.length >= 4 && <SmallText color={!usernameValid ? "red" : "#5DB075"} marginBottom={10}>
+          {!usernameValid ? "Username taken :(" : "Username valid!"}
+        </SmallText>}
         
         <TextInput placeholder="Email" value={email}
             onChangeText={val => {
               setEmail(val);
-            }} containerStyle={{marginTop: 10}}
+            }}
             autoComplete="email" keyboardType="email-address"
             leftContent={<Ionicons name="mail" size={18}/>}/>
             
@@ -78,11 +89,9 @@ const Password = props => {
         <View style={styles.buttons}>
             <Button onPress={() => props.navigation.goBack()}
               marginHorizontal={10}>Back</Button>
-            <Button disabled={props.loading || !checkEmail(email) || 
-              username.length < 4 || password.length < 8 || !confirmed}
-              onPress={() => {
-                props.createUser();
-              }}
+            <Button disabled={props.loading || !checkEmail(email) || !usernameValid
+              || username.length < 4 || password.length < 8 || !confirmed}
+              onPress={() => props.createUser()}
               marginHorizontal={10}>Finish!</Button>
         </View>
       </View>

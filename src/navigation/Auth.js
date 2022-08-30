@@ -231,7 +231,7 @@ const Auth = () => {
         </Stack.Screen>
 
         <Stack.Screen name="Password" options={{headerShown: false}}>
-            {props => <Password {...props} username={username} setUsername={setUsername}
+            {props => <Password {...props} username={username} setUsername={setUsername} usernames={usernames}
                 password={password} setPassword={setPassword} createUser={createUser}
                 loading={loading} email={email} setEmail={setEmail}/>}
         </Stack.Screen>
