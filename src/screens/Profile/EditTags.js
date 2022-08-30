@@ -77,7 +77,7 @@ const EditTags = props => {
   return (
     <Layout style={styles.page}>
         <LargeText center>Edit your tags!</LargeText>
-        <NormalText center size={12} marginBottom={30}>Note: each category must contain between 1 to 3 tags.</NormalText>
+        <NormalText center size={12} marginBottom={30}>Note: each category must contain between 1 to 4 tags.</NormalText>
 
         <View style={styles.tagSection}>
             <MediumText center marginBottom={5}>School</MediumText>
@@ -145,10 +145,10 @@ const EditTags = props => {
             <Button onPress={() => {
                 props.route.params.updateTags(schoolTagsSelected, hobbyTagsSelected, foodTagsSelected);
                 props.navigation.goBack();
-                alert("Tags saved!");
+                alert("Tags saved! Click on 'Update Profile' to update your profile.");
             }}
-              disabled={schoolTagsSelected.length < 1 || schoolTagsSelected.length > 3 || hobbyTagsSelected.length < 1
-                || hobbyTagsSelected.length > 3 || foodTagsSelected.length < 1 || foodTagsSelected.length > 3}
+              disabled={schoolTagsSelected.length < 1 || schoolTagsSelected.length > 4 || hobbyTagsSelected.length < 1
+                || hobbyTagsSelected.length > 4 || foodTagsSelected.length < 1 || foodTagsSelected.length > 4}
               marginHorizontal={10}>Save</Button>
         </View>
 

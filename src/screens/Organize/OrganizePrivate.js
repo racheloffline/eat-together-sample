@@ -21,6 +21,7 @@ import Button from "../../components/Button";
 import * as ImagePicker from 'expo-image-picker';
 import { db, auth } from "../../provider/Firebase";
 import moment from "moment";
+import { checkProfanity } from "../../methods";
 
 export default function ({ navigation }) {
     // State variables for the inputs
@@ -97,7 +98,7 @@ export default function ({ navigation }) {
             <View style={{ flex: 1 }}>
                 <ScrollView style={styles.content}>
                     <TextInput
-                        placeholder="Event Name"
+                        placeholder="Meal Name"
                         value={name}
                         onChangeText={(val) => {
                             setName(val);
@@ -162,21 +163,29 @@ export default function ({ navigation }) {
                             <Ionicons name="document-text-outline" size={20}/>
                         }
                     />
-                    <Button disabled={disabled} onPress={function () {
-                        let hasImage = false;
-                        if (photo !== "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400") {
-                            hasImage = true;
+                    <Button disabled={disabled} onPress={() => {
+                        if (checkProfanity(name)) {
+                            alert("Name has inappropriate words >:(");
+                        } else if (checkProfanity(location)) {
+                            alert("Location has inappropriate words >:(");
+                        } else if (checkProfanity(additionalInfo)) {
+                            alert("Additional info has inappropriate words >:(");
+                        } else {
+                            let hasImage = false;
+                            if (photo !== "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400") {
+                                hasImage = true;
+                            }
+                            navigation.navigate("InvitePeople", {
+                                name,
+                                location,
+                                date,
+                                additionalInfo: additionalInfo,
+                                attendees: [],
+                                hasImage: hasImage,
+                                image: hasImage ? photo : "",
+                                clearAll
+                            });
                         }
-                        navigation.navigate("InvitePeople", {
-                            name,
-                            location,
-                            date,
-                            additionalInfo: additionalInfo,
-                            attendees: [],
-                            hasImage: hasImage,
-                            image: hasImage ? photo : "",
-                            clearAll
-                        });
                     }} marginVertical={20}>See people available!</Button>
                 </ScrollView>
             </View>

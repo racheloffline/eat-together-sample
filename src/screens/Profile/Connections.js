@@ -32,13 +32,7 @@ export default function ({ navigation }) {
             let list = [];
             friends.forEach((uid) => {
                 db.collection("Users").doc(uid).get().then((doc) => {
-                    let data = doc.data()
-                    list.push({
-                        id: data.id,
-                        username: data.username,
-                        name: data.name,
-                        hasImage: data.hasImage
-                    })
+                    list.push(doc.data());
                 }).then(() => {
                     setUsers(list);
                 });
@@ -70,10 +64,8 @@ export default function ({ navigation }) {
                 <FlatList contentContainerStyle={styles.invites} keyExtractor={item => item.id}
                           data={users} renderItem={({item}) =>
                     <PeopleList person={item} color={generateColor()} click={() => {
-                        db.collection("Users").doc(item.id).get().then((doc) => {
-                            navigation.navigate("FullProfile", {
-                                person: doc.data()
-                            });
+                        navigation.navigate("FullProfile", {
+                            person: item
                         });
                     }}/>
                 }/>

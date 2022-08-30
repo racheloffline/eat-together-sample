@@ -36,6 +36,7 @@ export default function ({ navigation }) {
     async function fetchData() {
       const ref = db.collection("Users");
       let userData;
+
       // This is causing the page to crash, needs fix ASAP
       await ref
         .doc(user.uid)
@@ -49,13 +50,11 @@ export default function ({ navigation }) {
               .doc(id)
               .get()
               .then((doc) => {
-                if (doc) {
-                  if (doc.data().friendIDs) {
-                    // TODO FIX: Not all docs have friendIDs in db
-                    setMutuals((mutuals) =>
-                      mutuals.concat(doc.data().friendIDs)
-                    );
-                  }
+                if (doc && doc.data().friendIDs) {
+                  // TODO FIX: Not all docs have friendIDs in db
+                  setMutuals((mutuals) =>
+                    mutuals.concat(doc.data().friendIDs)
+                  );
                 }
               });
           });
@@ -65,11 +64,10 @@ export default function ({ navigation }) {
         let users = [];
         query.forEach((doc) => {
           let data = doc.data();
-          if (data.id !== user.uid && data.verified) {
-            if (!userInfo.blockIDs || !userInfo.blockedIDs.includes(doc.data().id)) {
-              data.inCommon = getCommonTags(userData, data);
-              users.push(data);
-            }
+          if (data.id !== user.uid && data.verified && !userData.blockedIDs.includes(doc.data().id)
+            && !doc.data().blockedIDs.includes(user.uid)) { // Only show verified + unblocked users
+            data.inCommon = getCommonTags(userData, data);
+            users.push(data);
           }
         });
 
