@@ -3,7 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import OrganizePrivate from "./OrganizePrivate";
 import OrganizePublic from "./OrganizePublic";
 import InvitePeople from "./InvitePeople";
-import FullProfile from "./FullProfile";
+import FullProfile from "../Explore/People/FullProfile";
 
 const Stack = createStackNavigator();
 

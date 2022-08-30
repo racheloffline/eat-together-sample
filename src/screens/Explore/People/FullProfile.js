@@ -25,14 +25,13 @@ import {
   MenuTrigger,
 } from "react-native-popup-menu";
 
-import { db } from "../../../provider/Firebase";
+import { db, auth } from "../../../provider/Firebase";
 import firebase from "firebase";
 
 const blockPerson = (uid, navigation) => {
   Alert.alert("Block", "Are you sure you want to block this user?", [
     {
       text: "Cancel",
-      onPress: () => console.log("Cancel Pressed"),
       style: "cancel",
     },
     { text: "YES", onPress: () => databaseStoreBlockAction(uid, navigation) },
@@ -41,7 +40,7 @@ const blockPerson = (uid, navigation) => {
 
 const databaseStoreBlockAction = (uid, navigation) => {
   alert("This user has been blocked.");
-  const user = firebase.auth().currentUser;
+  const user = auth.currentUser;
   // update user's blacklist & remove from friends
   db.collection("Users")
     .doc(user.uid)
@@ -231,6 +230,7 @@ const FullProfile = ({ route, navigation }) => {
           <LargeText>
             {route.params.person.firstName + " " + route.params.person.lastName}
           </LargeText>
+          <NormalText marginBottom={5}>({route.params.person.pronouns})</NormalText>
           <MediumText size={16}>@{route.params.person.username}</MediumText>
 
           <View style={{ flexDirection: "row", marginVertical: 10 }}>

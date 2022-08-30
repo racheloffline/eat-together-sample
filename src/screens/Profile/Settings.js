@@ -84,14 +84,15 @@ export default function ({ navigation }) {
                 },
                 {
                     text: "Yes",
-                    onPress: async () => {
-                        await db.collection("Users").doc(user.uid).delete();
-                        
-                        await user.delete().catch((error) => {
+                    onPress: async () => {                        
+                        await user.delete().then(() => {
+                            alert("Account deleted successfully. Sorry to see you go :(");
+                            db.collection("Users").doc(uid).delete();
+                        }).catch((error) => {
                             signOut().then(() => {
                                 alert("You need to sign in again to proceed.");
-                            })
-                        })
+                            });
+                        });
                     },
                     style: "destructive"
                 }

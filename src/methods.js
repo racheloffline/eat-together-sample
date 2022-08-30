@@ -1,5 +1,6 @@
 import {db} from "./provider/Firebase";
 import firebase from "firebase";
+import profaneWords from "./profaneWords";
 
 /*
 Generates a random color.
@@ -101,4 +102,12 @@ export const getTimeOfDay = (time) => {
     } else {
         return "evening";
     }
+}
+/*
+Check whether inappropriate words are used.
+Returns: true if inappropriate words are used, false otherwise.
+ */
+export const checkProfanity = word => {
+    const profane = profaneWords.some(w => word.toLowerCase().includes(w));
+    return profane;
 }

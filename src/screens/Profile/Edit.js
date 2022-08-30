@@ -12,11 +12,13 @@ import DeviceToken from "../utils/DeviceToken";
 import KeyboardAvoidingWrapper from "../../components/KeyboardAvoidingWrapper";
 
 import { AuthContext } from "../../provider/AuthProvider";
+import { checkProfanity } from "../../methods";
 
 export default function ({ route, navigation }) {
     // Input fields
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
+    const [pronouns, setPronouns] = useState('');
     const [bio, setBio] = useState('');
     const [tags, setTags] = useState([]);
     const [tagText, setTagText] = useState('');
@@ -32,6 +34,7 @@ export default function ({ route, navigation }) {
     useEffect(() => {
         setFirstName(route.params.user.firstName);
         setLastName(route.params.user.lastName);
+        setPronouns(route.params.user.pronouns);
         setBio(route.params.user.bio);
         setOldImage(route.params.user.image);
         setImage(route.params.user.image);
@@ -84,38 +87,46 @@ export default function ({ route, navigation }) {
 
     // Update user profile in Firebase
     const updateUser = async () => {
-        route.params.updateInfo(firstName, lastName, bio, tags, image);
+        if (checkProfanity(firstName) || checkProfanity(lastName)) {
+            alert("Name has inappropriate words >:(");
+        } else if (checkProfanity(pronouns)) {
+            alert("Pronouns have inappropriate words >:(");
+        } else if (checkProfanity(bio)) {
+            alert("Fun fact has inappropriate words >:(");
+        } else {
+            route.params.updateInfo(firstName, lastName, pronouns, bio, tags, image);
 
-        if (image !== oldImage) {
-            await updateImage().then(() => {
-                fetchImage().then((uri) => {
-                    updateProfileImg(uri);
-                    db.collection("Users").doc(route.params.user.id).update({
-                        firstName,
-                        lastName,
-                        bio,
-                        tags,
-                        hasImage: !(!image),
-                        image: uri
-                    }).then(() => {
-                        alert("Profile updated!");
-                        setLoading(false);
-                        navigation.goBack();
-                        updateEventsPfp(uri);
+            if (image !== oldImage) {
+                await updateImage().then(() => {
+                    fetchImage().then((uri) => {
+                        updateProfileImg(uri);
+                        db.collection("Users").doc(route.params.user.id).update({
+                            firstName,
+                            lastName,
+                            pronouns,
+                            bio,
+                            tags,
+                            hasImage: !(!image),
+                            image: uri
+                        }).then(() => {
+                            alert("Profile updated!");
+                            navigation.goBack();
+                            updateEventsPfp(uri);
+                        });
                     });
                 });
-            });
-        } else {
-            await db.collection("Users").doc(route.params.user.id).update({
-                firstName,
-                lastName,
-                bio,
-                tags
-            }).then(() => {
-                alert("Profile updated!");
-                setLoading(false);
-                navigation.goBack();
-            });
+            } else {
+                await db.collection("Users").doc(route.params.user.id).update({
+                    firstName,
+                    lastName,
+                    pronouns,
+                    bio,
+                    tags
+                }).then(() => {
+                    alert("Profile updated!");
+                    navigation.goBack();
+                });
+            }
         }
     }
 
@@ -204,9 +215,18 @@ export default function ({ route, navigation }) {
                         />
                     </View>
                     
+                    <TextInput
+                        placeholder="Pronouns (he/him, she/her, etc.)"
+                        onChangeText={(val) => setPronouns(val)}
+                        leftContent={
+                            <FontAwesome name="quote-left" size={20}/>
+                        }
+                        value={pronouns}
+                        containerStyle={{ marginBottom: 10 }}
+                    />
 
                     <TextInput
-                        placeholder="Bio"
+                        placeholder="Fun fact (10 to 100 characters)"
                         onChangeText={(val) => setBio(val)}
                         leftContent={
                             <FontAwesome name="exclamation" size={20}/>
@@ -237,6 +257,7 @@ export default function ({ route, navigation }) {
                         onPress={async () => {
                             setLoading(true);
                             await updateUser();
+                            setLoading(false);
                         }}>
                         {loading ? "Updating ..." : "Update Profile"}
                     </Button>

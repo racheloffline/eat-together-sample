@@ -150,6 +150,7 @@ export default function ({ route, navigation }) {
 
   // Filters
   const [curSearch, setCurSearch] = useState("");
+  const [friendsOnly, setFriendsOnly] = useState(false);
   const [similarInterests, setSimilarInterests] = useState(false);
   const [mutualFriends, setMutualFriends] = useState(false);
 
@@ -173,34 +174,43 @@ export default function ({ route, navigation }) {
           });
       });
 
-      // Fetch all users
+      // Fetch users
       const ref = db.collection("Users");
+
+      // Current user
+      let currUser;
+      await ref.doc(user.uid).get().then((doc) => {
+        currUser = doc.data();
+        setUserInfo(currUser);
+
+        currUser.friendIDs.forEach((id) => { // Fetching mutual friends
+          db.collection("Users")
+            .doc(id)
+            .get()
+            .then((doc) => {
+              if (doc) {
+                if (doc.data().friendIDs) {
+                  // TODO FIX: Not all docs have friendIDs in db
+                  setMutuals((mutuals) =>
+                    mutuals.concat(doc.data().friendIDs)
+                  );
+                }
+              }
+            });
+        });
+      });
+
+      // Fetch other users
       await ref.onSnapshot((query) => {
         const list = [];
         query.forEach((doc) => {
           let data = doc.data();
-          if (data.verified && data.id !== user.uid) {
+          if (data.verified && data.id !== user.uid && !currUser.blockedIDs.includes(data.id)
+            && !data.blockedIDs.includes(user.uid)) { // Only show verified + unblocked users
             list.push(data);
-          } else if (data.id === user.uid) {
-            setUserInfo(data);
-
-            data.friendIDs.forEach((id) => {
-              db.collection("Users")
-                .doc(id)
-                .get()
-                .then((doc) => {
-                  if (doc) {
-                    if (doc.data().friendIDs) {
-                      // TODO FIX: Not all docs have friendIDs in db
-                      setMutuals((mutuals) =>
-                        mutuals.concat(doc.data().friendIDs)
-                      );
-                    }
-                  }
-                });
-            });
           }
         });
+
         setFilteredUsers(list);
         setUsers(list);
       });
@@ -218,9 +228,28 @@ export default function ({ route, navigation }) {
   const search = (text) => {
     let newEvents = users.filter((e) => isMatch(e, text));
     setFilteredUsers(newEvents);
+    setFriendsOnly(false);
     setSimilarInterests(false);
     setMutualFriends(false);
   };
+
+  // Display friends only
+  const filterByFriendsOnly = () => {
+    setLoading(true);
+
+    if (!friendsOnly) {
+      const newUsers = users.filter(u => userInfo.friendIDs.includes(u.id));
+      setFilteredUsers(newUsers);
+    } else {
+      setFilteredUsers(users);
+    }
+
+    setLoading(false);
+    setFriendsOnly(!friendsOnly);
+    setSimilarInterests(false);
+    setMutualFriends(false);
+    setCurSearch("");
+  }
 
   // Display people in descending order of similar tags
   const sortBySimilarInterests = () => {
@@ -259,6 +288,7 @@ export default function ({ route, navigation }) {
     }
 
     setSimilarInterests(!similarInterests);
+    setFriendsOnly(false);
     setMutualFriends(false);
     setCurSearch("");
   };
@@ -286,6 +316,7 @@ export default function ({ route, navigation }) {
 
     setLoadingScreen(false);
     setMutualFriends(!mutualFriends);
+    setFriendsOnly(false);
     setSimilarInterests(false);
     setCurSearch("");
   };
@@ -306,6 +337,11 @@ export default function ({ route, navigation }) {
         />
 
         <HorizontalRow>
+          <Filter
+            checked={friendsOnly}
+            onPress={filterByFriendsOnly}
+            text="Friends only"
+          />
           <Filter
             checked={similarInterests}
             onPress={sortBySimilarInterests}

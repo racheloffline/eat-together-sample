@@ -81,11 +81,12 @@ export default function ({ navigation }) {
     fetchData();
   }, []);
 
-  const updateInfo = (newFirstName, newLastName, newBio, newTags, newImage) => {
+  const updateInfo = (newFirstName, newLastName, newPronouns, newBio, newTags, newImage) => {
     setUserInfo((prev) => ({
       ...prev,
       firstName: newFirstName,
       lastName: newLastName,
+      pronouns: newPronouns,
       bio: newBio,
       tags: newTags,
       image: newImage
@@ -122,6 +123,7 @@ export default function ({ navigation }) {
 
         <View style={styles.name}>
           <LargeText>{userInfo.firstName + " " + userInfo.lastName}</LargeText>
+          <NormalText marginBottom={5}>({userInfo.pronouns})</NormalText>
           <NormalText>
             {mealsAttended + "/" + mealsSignedUp + " meals attended"}
           </NormalText>
