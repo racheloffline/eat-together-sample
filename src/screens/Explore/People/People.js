@@ -64,10 +64,12 @@ export default function ({ navigation }) {
       await ref.onSnapshot((query) => {
         let users = [];
         query.forEach((doc) => {
-          if (doc.data().id !== user.uid && doc.data().verified) {
-            let data = doc.data();
-            data.inCommon = getCommonTags(userData, data);
-            users.push(data);
+          let data = doc.data();
+          if (data.id !== user.uid && data.verified) {
+            if (!userInfo.blockIDs || !userInfo.blockedIDs.includes(doc.data().id)) {
+              data.inCommon = getCommonTags(userData, data);
+              users.push(data);
+            }
           }
         });
 
