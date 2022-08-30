@@ -25,8 +25,9 @@ export default function ({ navigation }) {
             paddingHorizontal: 20,
             justifyContent: "center"
         }}>
-            <LargeText center>Check your email inbox to verify your account!</LargeText>
-            <View style={{marginBottom: 50, marginTop: 20}}>
+            <LargeText center marginBottom={10}>Check your email inbox to verify your account!</LargeText>
+            <NormalText center>Once verified, log out of here and then log back in. Make sure to check your spam too if you can't find your verification.</NormalText>
+            <View style={{marginBottom: 40, marginTop: 30}}>
                 <Button onPress={resend} marginVertical={5}>Resend Verification</Button>
                 {resent && <NormalText color="#5DB075" center>Sent!</NormalText>}
             </View>

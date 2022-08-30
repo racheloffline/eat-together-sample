@@ -137,6 +137,7 @@ const Auth = () => {
             hasImage: image !== "",
             image,
             tags,
+            pronouns,
             bio,
             hostedEventIDs: [],
             attendingEventIDs: [],
@@ -232,7 +233,7 @@ const Auth = () => {
         <Stack.Screen name="Password" options={{headerShown: false}}>
             {props => <Password {...props} username={username} setUsername={setUsername}
                 password={password} setPassword={setPassword} createUser={createUser}
-                loading={loading}/>}
+                loading={loading} email={email} setEmail={setEmail}/>}
         </Stack.Screen>
       </Stack.Navigator>
     );
