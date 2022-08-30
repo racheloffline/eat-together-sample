@@ -18,7 +18,8 @@ import MediumText from "../../components/MediumText";
 import DeviceToken from "../utils/DeviceToken";
 
 export default function ({ navigation }) {
-    let user = auth.currentUser;
+    const user = auth.currentUser;
+    const uid = user.uid;
     let [notifs, setNotifs] = useState(false);
     let [logoutDisabled, setLogoutDisabled] = useState(false); // Prevent the user from logging out "more than once"
 

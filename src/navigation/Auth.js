@@ -275,10 +275,13 @@ const Auth = () => {
             {...props}
             username={username}
             setUsername={setUsername}
+            usernames={usernames}
             password={password}
             setPassword={setPassword}
             createUser={createUser}
             loading={loading}
+            email={email}
+            setEmail={setEmail}
           />
         )}
       </Stack.Screen>

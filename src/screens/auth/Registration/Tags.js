@@ -146,7 +146,7 @@ const Tags = props => {
                 props.setSchoolTags(schoolTagsSelected);
                 props.setHobbyTags(hobbyTagsSelected);
                 props.setFoodTags(foodTagsSelected);
-                props.navigation.navigate("Email");
+                props.navigation.navigate("Password");
             }}
               disabled={schoolTagsSelected.length < 1 || schoolTagsSelected.length > 3 || hobbyTagsSelected.length < 1
                 || hobbyTagsSelected.length > 3 || foodTagsSelected.length < 1 || foodTagsSelected.length > 3}

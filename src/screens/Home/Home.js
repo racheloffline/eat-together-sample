@@ -43,28 +43,41 @@ export default function ({ navigation }) {
         .doc(user.uid)
         .onSnapshot((doc) => {
           let newEvents = [];
-          setUserInfo(doc.data());
-          updateProfileImg(doc.data().image);
-          setUnread(doc.data().hasNotif);
-          let eventsLength = doc.data().attendingEventIDs.length;
+          if (doc.data()) {
+            setUserInfo(doc.data());
+            updateProfileImg(doc.data().image);
+            setUnread(doc.data().hasNotif);
+            let eventsLength = doc.data().attendingEventIDs.length;
 
-          doc.data().attendingEventIDs.forEach((e) => {
-            let type = "Private Events";
-            if (e.type === "public") {
-              type = "Public Events";
-            }
+            doc.data().attendingEventIDs.forEach((e) => {
+              let type = "Private Events";
+              if (e.type === "public") {
+                type = "Public Events";
+              }
 
-            db.collection(type)
-              .doc(e.id)
-              .get()
-              .then((event) => {
-                let data = event.data();
-                data.type = e.type;
-                newEvents.push(data);
-                eventsLength--;
+              db.collection(type)
+                .doc(e.id)
+                .get()
+                .then((event) => {
+                  let data = event.data();
+                  data.type = e.type;
+                  newEvents.push(data);
+                  eventsLength--;
 
-                if (eventsLength === 0) {
-                  // Sort events by date
+                  if (eventsLength === 0) {
+                    // Sort events by date
+                    newEvents = newEvents.sort((a, b) => {
+                      return a.date.seconds - b.date.seconds;
+                    });
+
+                    setEvents(newEvents);
+                    setFilteredEvents(newEvents);
+                    setLoading(false);
+                  }
+                }).catch(e => {
+                  alert("There was an error fetching some of your meals :( try again later");
+
+                  eventsLength--;
                   newEvents = newEvents.sort((a, b) => {
                     return a.date.seconds - b.date.seconds;
                   });
@@ -72,20 +85,11 @@ export default function ({ navigation }) {
                   setEvents(newEvents);
                   setFilteredEvents(newEvents);
                   setLoading(false);
-                }
-              }).catch(e => {
-                alert("There was an error fetching some of your meals :( try again later");
-
-                eventsLength--;
-                newEvents = newEvents.sort((a, b) => {
-                  return a.date.seconds - b.date.seconds;
                 });
-
-                setEvents(newEvents);
-                setFilteredEvents(newEvents);
-                setLoading(false);
-              });
-          });
+            });
+          }
+        }).catch(e => {
+          console.log(e.message);
         });
     }
 
