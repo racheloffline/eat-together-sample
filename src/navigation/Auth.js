@@ -142,6 +142,7 @@ const Auth = () => {
       hasImage: image !== "",
       image,
       tags,
+      pronouns,
       bio,
       hostedEventIDs: [],
       attendingEventIDs: [],

@@ -45,7 +45,9 @@ export default function({ navigation }) {
 
     useEffect(() => { // updates stuff right after React makes changes to the DOM
         async function fetchData() {
-            await db.collection("Users").doc(user.uid).get().then(doc => {
+            let userData;
+            await db.collection("Users").doc(user.uid).onSnapshot(doc => {
+                userData = doc.data();
                 setUserInfo(doc.data());
             });
 
@@ -53,7 +55,8 @@ export default function({ navigation }) {
             await ref.onSnapshot((query) => {
                 let newEvents = [];
                 query.forEach((doc) => {
-                    if (doc.data().date.toDate() > new Date()) {
+                    if (doc.data().date.toDate() > new Date() && 
+                      !userData.blockedIDs.includes(doc.data().hostID)) {
                         newEvents.push(doc.data());
                     }
                 });

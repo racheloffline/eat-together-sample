@@ -9,7 +9,14 @@ import NormalText from '../components/NormalText';
 export default function ({ navigation }) {
     const user = auth.currentUser;
     const uid = user.uid;
+    const [userInfo, setUserInfo] = useState({});
     const [resent, setResent] = useState(false);
+
+    useEffect(() => {
+        db.collection('Users').doc(uid).onSnapshot(doc => {
+            setUserInfo(doc.data());
+        });
+    }, []);
 
     const resend = () => {
         user.sendEmailVerification();
@@ -32,6 +39,7 @@ export default function ({ navigation }) {
                         await user.delete().then(() => {
                             alert("Account deleted successfully. Sorry to see you go :(");
                             db.collection("Users").doc(uid).delete();
+                            db.collection("Usernames").doc(userInfo.username).delete();
                         }).catch((error) => {
                             signOut().then(() => {
                                 alert("You need to sign in again to proceed.");
