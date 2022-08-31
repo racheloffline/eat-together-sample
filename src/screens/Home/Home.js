@@ -88,8 +88,6 @@ export default function ({ navigation }) {
                 });
             });
           }
-        }).catch(e => {
-          console.log(e.message);
         });
     }
 
