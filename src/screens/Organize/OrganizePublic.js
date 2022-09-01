@@ -48,7 +48,6 @@ export default function ({ navigation }) {
     const [showDate, setShowDate] = useState(false);
     const [mode, setMode] = useState("date");
     const [disabled, setDisabled] = useState(true);
-    const [unread, setUnread] = useState(false);
 
     const [loading, setLoading] = useState(false); // Disable button if event is being created in Firebase
 
@@ -71,7 +70,6 @@ export default function ({ navigation }) {
         });
         async function fetchData() {
             await db.collection("Users").doc(user.uid).onSnapshot((doc) => {
-                setUnread(doc.data().hasNotif);
                 setUserInfo(doc.data());
             });
         }

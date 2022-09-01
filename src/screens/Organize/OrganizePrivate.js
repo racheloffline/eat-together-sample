@@ -35,25 +35,14 @@ export default function ({ navigation }) {
     const [showDate, setShowDate] = useState(false);
     const [mode, setMode] = useState("date");
     const [disabled, setDisabled] = useState(true);
-    const [unread, setUnread] = useState(false);
-
-    const uid = auth.currentUser.uid; //Current user's uid (to get notif)
 
     // Checks whether we should disable the Post button or not
     useEffect(() => {
-        async function fetchData() {
-            // Disable button or not
-            if (name === "" || location == "") {
-                setDisabled(true);
-            } else {
-                setDisabled(false);
-            }
-
-            await db.collection("Users").doc(uid).onSnapshot((doc) => {
-                setUnread(doc.data().hasNotif);
-            })
+        if (name === "" || location == "") {
+            setDisabled(true);
+        } else {
+            setDisabled(false);
         }
-        fetchData();
     }, [name, location]);
 
     // For selecting a date and time

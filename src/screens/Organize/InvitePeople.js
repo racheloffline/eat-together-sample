@@ -139,8 +139,9 @@ export default function ({ route, navigation }) {
   const attendees = route.params.attendees;
 
   // Other users
-  const [users, setUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [users, setUsers] = useState([]); // All users
+  const [filteredUsers, setFilteredUsers] = useState([]); // Filtered users
+  const [filteredSearchedUsers, setFilteredSearchedUsers] = useState([]); // Users that are filtered and search-queried
 
   // Disable button or not
   const [disabled, setDisabled] = useState(true);
@@ -157,6 +158,7 @@ export default function ({ route, navigation }) {
   const [mutuals, setMutuals] = useState([]); // Mutual friends
   const [loadingScreen, setLoadingScreen] = useState(true); // Loading screen for filter calculations
 
+  // Fetch users
   useEffect(async () => {
     async function fetchData() {
       //      picks icebreaker set from set of icebreakers randomly
@@ -211,92 +213,94 @@ export default function ({ route, navigation }) {
           }
         });
 
-        setFilteredUsers(list);
         setUsers(list);
+        setFilteredUsers(list);
+        setFilteredSearchedUsers(list);
       });
     }
 
     fetchData().then(() => setLoadingScreen(false));
   }, []);
 
+  // Filters
+  useEffect(() => {
+    async function filter() {
+      let newUsers = [...users];
+  
+      if (similarInterests) {
+        newUsers = await sortBySimilarInterests(newUsers);
+      }
+
+      if (friendsOnly) {
+        newUsers = filterByFriendsOnly(newUsers);
+      }
+  
+      if (mutualFriends) {
+        newUsers = filterByMutualFriends(newUsers);
+      }
+
+      setFilteredUsers(newUsers);
+
+      const newSearchedUsers = search(newUsers, curSearch);
+      setFilteredSearchedUsers(newSearchedUsers);
+    }
+
+    setLoadingScreen(true);
+    filter().then(() => {
+      setLoadingScreen(false);
+    });
+  }, [similarInterests, friendsOnly, mutualFriends]);
+
   // For searching
   const onChangeText = (text) => {
     setCurSearch(text);
-    search(text);
+    const newUsers = search(filteredUsers, text);
+    setFilteredSearchedUsers(newUsers);
   };
 
-  const search = (text) => {
-    let newEvents = users.filter((e) => isMatch(e, text));
-    setFilteredUsers(newEvents);
-    setFriendsOnly(false);
-    setSimilarInterests(false);
-    setMutualFriends(false);
+  const search = (newUsers, text) => {
+    return newUsers.filter((e) => isMatch(e, text));
   };
 
   // Display friends only
-  const filterByFriendsOnly = () => {
-    setLoading(true);
-
-    if (!friendsOnly) {
-      const newUsers = users.filter(u => userInfo.friendIDs.includes(u.id));
-      setFilteredUsers(newUsers);
-    } else {
-      setFilteredUsers(users);
-    }
-
-    setLoading(false);
-    setFriendsOnly(!friendsOnly);
-    setSimilarInterests(false);
-    setMutualFriends(false);
-    setCurSearch("");
+  const filterByFriendsOnly = (newUsers) => {
+    return newUsers.filter(u => userInfo.friendIDs.includes(u.id));
   }
 
   // Display people in descending order of similar tags
-  const sortBySimilarInterests = () => {
-    setLoadingScreen(true);
+  const sortBySimilarInterests = async (newUsers) => {
+    let result;
 
-    if (!similarInterests) {
-      let copy = [...users];
-
-      fetch("https://eat-together-match.uw.r.appspot.com/find_similarity", {
-        method: "POST",
-        body: JSON.stringify({
-          currTags: userInfo.tags.map((t) => t.tag),
-          otherTags: getPeopleTags(),
-        }),
-      })
-        .then((res) => res.json())
-        .then((res) => {
-          let i = 0;
-          copy.forEach((p) => {
-            p.similarity = res[i];
-            i++;
-          });
-
-          copy = copy.sort((a, b) => b.similarity - a.similarity);
-          setFilteredUsers(copy);
-          setLoadingScreen(false);
-        })
-        .catch((e) => {
-          // If error, alert the user
-          alert("An error occured, try again later :(");
-          setLoadingScreen(false);
+    await fetch("https://eat-together-match.uw.r.appspot.com/find_similarity", {
+      method: "POST",
+      body: JSON.stringify({
+        currTags: userInfo.tags.map((t) => t.tag),
+        otherTags: getPeopleTags(newUsers),
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        let i = 0;
+        newUsers.forEach((p) => {
+          p.similarity = res[i];
+          i++;
         });
-    } else {
-      setLoadingScreen(false);
-      setFilteredUsers(users);
-    }
 
-    setSimilarInterests(!similarInterests);
-    setFriendsOnly(false);
-    setMutualFriends(false);
-    setCurSearch("");
+        result = newUsers.sort((a, b) => b.similarity - a.similarity);
+      })
+      .catch((e) => {
+        // If error, alert the user
+        alert("An error occured, try again later :(");
+        result = newUsers;
+      });
+
+    return result;
   };
 
   // Get a list of everyone's tags
-  const getPeopleTags = () => {
+  const getPeopleTags = (newUsers) => {
     let tags = [];
-    users.forEach((p) => {
+    newUsers.forEach((p) => {
       tags.push(p.tags.map((t) => t.tag));
     });
 
@@ -304,21 +308,8 @@ export default function ({ route, navigation }) {
   };
 
   // Display people who are mutual friends
-  const filterByMutualFriends = () => {
-    setLoadingScreen(true);
-
-    if (!mutualFriends) {
-      const newUsers = users.filter((p) => mutuals.includes(p.id));
-      setFilteredUsers(newUsers);
-    } else {
-      setFilteredUsers(users);
-    }
-
-    setLoadingScreen(false);
-    setMutualFriends(!mutualFriends);
-    setFriendsOnly(false);
-    setSimilarInterests(false);
-    setCurSearch("");
+  const filterByMutualFriends = (newUsers) => {
+    return newUsers.filter((p) => mutuals.includes(p.id));
   };
 
   return (
@@ -339,17 +330,17 @@ export default function ({ route, navigation }) {
         <HorizontalRow>
           <Filter
             checked={friendsOnly}
-            onPress={filterByFriendsOnly}
+            onPress={() => setFriendsOnly(!friendsOnly)}
             text="Friends only"
           />
           <Filter
             checked={similarInterests}
-            onPress={sortBySimilarInterests}
+            onPress={() => setSimilarInterests(!similarInterests)}
             text="Sort by similar interests"
           />
           <Filter
             checked={mutualFriends}
-            onPress={filterByMutualFriends}
+            onPress={() => setMutualFriends(!mutualFriends)}
             text="Mutual friends"
           />
         </HorizontalRow>
@@ -358,7 +349,7 @@ export default function ({ route, navigation }) {
       {!loadingScreen ? <FlatList
         contentContainerStyle={styles.invites}
         keyExtractor={(item) => item.id}
-        data={filteredUsers}
+        data={filteredSearchedUsers}
         renderItem={({ item }) => (
           <InvitePerson
             navigation={navigation}
