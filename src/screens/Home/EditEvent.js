@@ -139,8 +139,8 @@ export default function ({ route, navigation }) {
 
         db.collection(table).doc(route.params.event.id).set(newEvent).then(() => {
             newEvent.date = moment(date);
-            route.params.editEvent(newEvent);
-            route.params.editEvent2(newEvent);
+            route.params.editEvent({...newEvent, type: route.params.event.type});
+            route.params.editEvent2({...newEvent, type: route.params.event.type});
             navigation.goBack();
             alert("Meal updated!");
         });

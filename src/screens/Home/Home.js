@@ -1,8 +1,9 @@
 // Display your events
 
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useRef } from "react";
 import { View, ActivityIndicator, StyleSheet, FlatList } from "react-native";
 import { Layout } from "react-native-rapi-ui";
+import RBSheet from "react-native-raw-bottom-sheet";
 
 import EventCard from "../../components/EventCard";
 import Header from "../../components/Header";
@@ -11,6 +12,7 @@ import HorizontalRow from "../../components/HorizontalRow";
 import Filter from "../../components/Filter";
 
 import MediumText from "../../components/MediumText";
+import Link from "../../components/Link";
 
 import { db, auth } from "../../provider/Firebase";
 import { AuthContext } from "../../provider/AuthProvider";
@@ -20,20 +22,27 @@ export default function ({ navigation }) {
   const user = auth.currentUser;
   const [userInfo, setUserInfo] = useState(null);
 
-  const [events, setEvents] = useState([]); // initial state, function used for updating initial state
-  const [filteredEvents, setFilteredEvents] = useState([]);
+  const [events, setEvents] = useState([]); // All personal events
+  const [filteredEvents, setFilteredEvents] = useState([]); // Filtered events
+  const [filteredSearchedEvents, setFilteredSearchedEvents] = useState([]); // Events that are filtered and search-queried
+
   const [searchQuery, setSearchQuery] = useState("");
 
   // Filters
   const [publicEvents, setPublicEvents] = useState(false);
   const [privateEvents, setPrivateEvents] = useState(false);
+  const [fromYourself, setFromYourself] = useState(false);
   const [fromFriends, setFromFriends] = useState(false);
   const [friendsAttending, setFriendsAttending] = useState(false);
 
   const [unread, setUnread] = useState(false); // See if we need to display unread notif icon
   const [loading, setLoading] = useState(true); // State variable to show loading screen when fetching data
 
-  const updateProfileImg = useContext(AuthContext).updateProfileImg;
+  const updateProfileImg = useContext(AuthContext).updateProfileImg; // Used to update profile image in navbar on load
+
+  // Display a bottom drawer showing more filters
+  const showTypeRef = useRef();
+  const showFromRef = useRef();
 
   useEffect(() => {
     // updates stuff right after React makes changes to the DOM
@@ -72,7 +81,7 @@ export default function ({ navigation }) {
 
                     setEvents(newEvents);
                     setFilteredEvents(newEvents);
-                    setLoading(false);
+                    setFilteredSearchedEvents(newEvents);
                   }
                 }).catch(e => {
                   alert("There was an error fetching some of your meals :( try again later");
@@ -84,6 +93,7 @@ export default function ({ navigation }) {
 
                   setEvents(newEvents);
                   setFilteredEvents(newEvents);
+                  setFilteredSearchedEvents(newEvents);
                   setLoading(false);
                 });
             });
@@ -98,6 +108,7 @@ export default function ({ navigation }) {
 
   // For filters
   useEffect(() => {
+    setLoading(true);
     let newEvents = [...events];
 
     if (publicEvents) {
@@ -106,6 +117,10 @@ export default function ({ navigation }) {
 
     if (privateEvents) {
       newEvents = newEvents.filter((e) => e.type === "private");
+    }
+
+    if (fromYourself) {
+      newEvents = newEvents.filter((e) => e.hostID === user.uid);
     }
 
     if (fromFriends) {
@@ -117,27 +132,15 @@ export default function ({ navigation }) {
     }
 
     setFilteredEvents(newEvents);
+
+    const newSearchedEvents = search(newEvents, searchQuery);
+    setFilteredSearchedEvents(newSearchedEvents);
+    setLoading(false);
   }, [publicEvents, privateEvents, fromFriends, friendsAttending]);
 
-  //Check to see if we should display the "No Events" placeholder text
-  function shouldDisplayPlaceholder(list) {
-    if (list == null || list.length === 0) {
-      return "You are not signed up for any upcoming events.";
-    } else {
-      return "";
-    }
-  }
-
   // Method to filter out events
-  const search = (text) => {
-    setLoading(true);
-    let newEvents = events.filter((e) => isMatch(e, text));
-    setFilteredEvents(newEvents);
-    setLoading(false);
-
-    // Reset all filters
-    setPublicEvents(false);
-    setPrivateEvents(false);
+  const search = (newEvents, text) => {
+    return newEvents.filter((e) => isMatch(e, text));
   };
 
   // Determines if an event matches search query or not
@@ -166,7 +169,8 @@ export default function ({ navigation }) {
   // Method called when a new query is typed in/deleted
   const onChangeText = (text) => {
     setSearchQuery(text);
-    search(text);
+    const newEvents = search(filteredEvents, text);
+    setFilteredSearchedEvents(newEvents);
   };
 
   // Deletes event from DOM and updates Firestore
@@ -184,24 +188,40 @@ export default function ({ navigation }) {
         });
          */
     const newEvents = events.filter((e) => e.id !== id);
-    const newFilteredEvents = events.filter((e) => e.id !== id);
+    const newFilteredEvents = filteredEvents.filter((e) => e.id !== id);
+    const newFilteredSearchedEvents = filteredSearchedEvents.filter((e) => e.id !== id);
     setEvents(newEvents);
     setFilteredEvents(newFilteredEvents);
+    setFilteredSearchedEvents(newFilteredSearchedEvents);
   };
 
   // Display public events only
   const publicOnly = () => {
     setPublicEvents(!publicEvents);
     setPrivateEvents(false);
-    setSearchQuery("");
+    showTypeRef.current.close();
   };
 
   // Display private events only
   const privateOnly = () => {
     setPrivateEvents(!privateEvents);
     setPublicEvents(false);
-    setSearchQuery("");
+    showTypeRef.current.close();
   };
+
+  // Display events from yourself only
+  const fromYourselfOnly = () => {
+    setFromYourself(!fromYourself);
+    setFromFriends(false);
+    showFromRef.current.close();
+  }
+
+  // Display events from friends only
+  const fromFriendsOnly = () => {
+    setFromFriends(!fromFriends);
+    setFromYourself(false);
+    showFromRef.current.close();
+  }
 
   // Display events that friends are hosting
   const filterByFriendsHosting = (newEvents) => {
@@ -234,12 +254,25 @@ export default function ({ navigation }) {
         return newEvent;
       }
       return e;
-    }).sort((a, b) => {
-      return a.date.seconds - b.date.seconds;
-    }).reverse();
+    });
+
+    const newFilteredEvents = filteredEvents.map(e => {
+      if (e.id === newEvent.id) {
+        return newEvent;
+      }
+      return e;
+    });
+
+    const newFilteredSearchedEvents = filteredSearchedEvents.map(e => {
+      if (e.id === newEvent.id) {
+        return newEvent;
+      }
+      return e;
+    });
 
     setEvents(newEvents);
-    setFilteredEvents(newEvents);
+    setFilteredEvents(newFilteredEvents);
+    setFilteredSearchedEvents(newFilteredSearchedEvents);
   }
 
   return (
@@ -254,21 +287,14 @@ export default function ({ navigation }) {
         />
 
         <HorizontalRow>
-          <Filter
-            checked={publicEvents}
-            onPress={publicOnly}
-            text="Public"
-          />
-          <Filter
-            checked={privateEvents}
-            onPress={privateOnly}
-            text="Private"
-          />
-          <Filter
-            checked={fromFriends}
-            onPress={() => setFromFriends(!fromFriends)}
-            text="From friends"
-          />
+          <Filter checked={publicEvents || privateEvents}
+            onPress={() => showTypeRef.current.open()}
+            text={publicEvents ? "Public" : 
+              privateEvents ? "Private" : "Type of meal"}/>
+          <Filter checked={fromYourself || fromFriends}
+            onPress={() => showFromRef.current.open()}
+            text={fromYourself ? "Yourself ;)" : 
+              fromFriends ? "Friends" : "Hosted by"}/>
           <Filter
             checked={friendsAttending}
             onPress={() => setFriendsAttending(!friendsAttending)}
@@ -282,7 +308,7 @@ export default function ({ navigation }) {
         <FlatList
           contentContainerStyle={styles.cards}
           keyExtractor={(item) => item.id}
-          data={filteredEvents}
+          data={filteredSearchedEvents}
           renderItem={({ item }) => (
             <EventCard
               event={item}
@@ -305,6 +331,70 @@ export default function ({ navigation }) {
           <ActivityIndicator size={100} color="#5DB075" />
         </View>
       )}
+
+      <RBSheet
+          height={300}
+          ref={showTypeRef}
+          closeOnDragDown={true}
+          closeOnPressMask={false}
+          customStyles={{
+              wrapper: {
+                  backgroundColor: "rgba(0,0,0,0.5)",
+              },
+              draggableIcon: {
+                  backgroundColor: "black"
+              },
+              container: {
+                  borderTopLeftRadius: 20,
+                  borderTopRightRadius: 20,
+                  padding: 10
+              }
+          }}>
+          <Filter checked={publicEvents} text="Public" marginBottom={5}
+            onPress={publicOnly}/>
+          <Filter checked={privateEvents} text="Private" marginBottom={20}
+            onPress={privateOnly}/>
+          <Link onPress={() => {
+            setPublicEvents(false);
+            setPrivateEvents(false);
+            showTypeRef.current.close();
+          }}
+        >
+          Clear
+        </Link>
+      </RBSheet>
+
+      <RBSheet
+          height={300}
+          ref={showFromRef}
+          closeOnDragDown={true}
+          closeOnPressMask={false}
+          customStyles={{
+              wrapper: {
+                  backgroundColor: "rgba(0,0,0,0.5)",
+              },
+              draggableIcon: {
+                  backgroundColor: "black"
+              },
+              container: {
+                  borderTopLeftRadius: 20,
+                  borderTopRightRadius: 20,
+                  padding: 10
+              }
+          }}>
+          <Filter checked={fromYourself} text="Yourself ;)" marginBottom={5}
+            onPress={fromYourselfOnly}/>
+          <Filter checked={fromFriends} text="Friends" marginBottom={20}
+            onPress={fromFriendsOnly}/>
+          <Link onPress={() => {
+            setFromYourself(false);
+            setFromFriends(false);
+            showFromRef.current.close();
+          }}
+        >
+          Clear
+        </Link>
+      </RBSheet>
     </Layout>
   );
 }

@@ -19,17 +19,18 @@ import DeviceToken from "../utils/DeviceToken";
 
 export default function ({ navigation }) {
     const user = auth.currentUser;
-    const uid = user.uid;
     const [userInfo, setUserInfo] = useState({});
     let [notifs, setNotifs] = useState(false);
     let [logoutDisabled, setLogoutDisabled] = useState(false); // Prevent the user from logging out "more than once"
 
     // Fetch current user info
     useEffect(() => {
-        db.collection("Users").doc(user.uid).get().then(doc => {
-            setUserInfo(doc.data());
-            setNotifs(doc.data().settings.notifications);
-        });
+        if (user) {
+            db.collection("Users").doc(user.uid).get().then(doc => {
+                setUserInfo(doc.data());
+                setNotifs(doc.data().settings.notifications);
+            });
+        }
     });
 
     function changeNotifSettings() {
@@ -87,6 +88,8 @@ export default function ({ navigation }) {
                 {
                     text: "Yes",
                     onPress: async () => {
+                        const uid = user.uid;
+
                         await user.delete().then(() => {
                             alert("Account deleted successfully. Sorry to see you go :(");
                             db.collection("Users").doc(uid).delete();
