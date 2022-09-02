@@ -1,17 +1,21 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import SmallText from "./SmallText";
+import MediumText from './MediumText';
 
 const Tag = props => {
     return (
-        <View style={styles.tag}>
-        {/*tag text isn't as bold as in figma, not sure how to update w/o fontWeight */}
-            <SmallText size={14} color="black">{props.text}</SmallText>
+        <View style={props.type ? [styles.tag, {
+            backgroundColor: props.type === "school" ? "#856B2A"
+                : props.type === "hobby" ? "#4C6FB1"
+                : "#6C2087"
+        }] : styles.tag}>
+            <MediumText size={12} color="white">{props.text}</MediumText>
             {props.remove && 
-            <TouchableOpacity onPress={props.remove} style={styles.close}>
-                <Ionicons name="close" size={16} color="black" />
-            </TouchableOpacity>}
+                <TouchableOpacity onPress={props.remove} style={styles.close}>
+                    <Ionicons name="close" size={16} color="white" />
+                </TouchableOpacity>
+            }
         </View>
     );
 }
@@ -20,7 +24,7 @@ const styles = StyleSheet.create({
     tag: {
         justifyContent: 'center',
         flex: 0,
-        backgroundColor: '#D9D9D9',
+        backgroundColor: '#666666',
         flexDirection: 'row',
         alignItems: 'center',
         margin: 2,

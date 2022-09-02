@@ -1,40 +1,43 @@
-import React, {useEffect, useState} from 'react';
-import {View, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView} from "react-native";
-import {Layout, Text, TopNav} from "react-native-rapi-ui";
+import React from 'react';
+import {
+    View,
+    StyleSheet,
+    Dimensions,
+    TouchableOpacity,
+    ScrollView,
+    ImageBackground,
+    Image
+} from "react-native";
+import {Layout, TopNav} from "react-native-rapi-ui";
 import {Ionicons} from "@expo/vector-icons";
+
+import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
+import Button from '../../components/Button';
+
 import firebase from "firebase";
 import {db, storage} from "../../provider/Firebase";
+import {Menu, MenuOption, MenuOptions, MenuTrigger} from "react-native-popup-menu";
+import getDate from '../../getDate';
+import getTime from '../../getTime';
 
 export default function ({ route, navigation}) {
     //Save the invite as a shorter name
-    const [image, setImage] = useState("");
     let invite = route.params.invite;
 
     //Get the current user and firebase ref path
     const user = firebase.auth().currentUser;
     const ref = db.collection("User Invites").doc(user.uid).collection("Invites").doc(invite.id);
 
-    useEffect(() => {
-        if (invite.hasImage) {
-            storage.ref("eventPictures/" + invite.inviteID).getDownloadURL().then(uri => {
-                setImage(uri);
-            });
-        }
-    }, [])
-
-    //Check to see if there's any details to display
-    function displayDetails() {
-        if(invite.details == null || invite.details === "") {
-            return "None provided."
-        } else {
-            return invite.details
-        }
-    }
-
     function chooseColor() {
         return route.params.hasPassed ? "red" : "black";
+    }
+
+    function reportInvite() {
+        navigation.navigate("ReportInvite", {
+            inviteID: invite.id,
+        });
     }
 
     return (
@@ -49,33 +52,73 @@ export default function ({ route, navigation}) {
                         size={20}
                     />
                 }
+                rightContent={
+                    <View>
+                        <Menu>
+                            <MenuTrigger>
+                                <Ionicons
+                                    name="ellipsis-horizontal"
+                                    size={25}
+                                />
+                            </MenuTrigger>
+                            <MenuOptions>
+                                <MenuOption onSelect={() => reportInvite()} style={styles.option}>
+                                    <NormalText size={18} color="red">Report Event</NormalText>
+                                </MenuOption>
+                            </MenuOptions>
+                        </Menu>
+                    </View>
+                }
                 leftAction={() => navigation.goBack()}
             />
             <ScrollView contentContainerStyle={styles.page}>
-                <View style={styles.background}/>
-                <Image style={styles.image} source={(image != "") ? {uri: image} : require("../../../assets/stockEvent.png")}/>
-                <MediumText style={styles.text}>{invite.hostName} is inviting you to {invite.name}!</MediumText>
-                <View style = {styles.icons}>
-                    <Ionicons name="location-outline" size={24}/>
-                    <Text>  </Text>
-                    <NormalText size = {20}>{invite.location}</NormalText>
-                </View>
-                <View style = {styles.icons}>
-                    <Ionicons name="calendar-outline" size={24} color={chooseColor()}/>
-                    <Text>  </Text>
-                    <NormalText size = {20} color={chooseColor()}>{invite.date}</NormalText>
-                </View>
-                <View style = {styles.icons}>
-                    <Ionicons name="time-outline" size={24} color={chooseColor()}/>
-                    <Text>  </Text>
-                    <NormalText size = {20} color={chooseColor()}>{invite.time}</NormalText>
-                </View>
-                <View style = {styles.text}>
-                    <NormalText size = {20}>Details: {displayDetails()}</NormalText>
+                <ImageBackground
+                    style={styles.imageBackground}
+                    resizeMode="cover"
+                    source={invite.hasImage ? {uri: invite.image} : require("../../../assets/stockEvent.png")}
+                />
+
+                <View style={styles.infoContainer}>
+                    <LargeText size={24} marginBottom={10}>You've been invited to: {invite.name}!</LargeText>
+
+                    <View style={{ flexDirection: "row", alignItems: "center" }}>
+                        <Image source={invite.hasHostImage ? {uri: invite.hostImage}
+                            : require("../../../assets/logo.png")} style={styles.profileImg}/>
+                        <MediumText size={18}>{invite.hostName ? invite.hostName
+                            : invite.hostFirstName + " " + invite.hostLastName}
+                        </MediumText>
+                    </View>
+                    
+                    <View style={styles.logistics}>
+                        <View style={styles.row}>
+                            <Ionicons name="location-sharp" size={20} />
+                            <NormalText paddingHorizontal={10} color="black">
+                                {invite.location}
+                            </NormalText>
+                        </View>
+
+                        <View style={styles.row}>
+                            <Ionicons name="calendar-outline" size={20} />
+                            <NormalText paddingHorizontal={10} color="black">
+                                {getDate(invite.date.toDate())}
+                            </NormalText>
+                        </View>
+
+                        <View style={styles.row}>
+                            <Ionicons name="time-outline" size={20} />
+                            <NormalText paddingHorizontal={10} color="black">
+                                {getTime(invite.date.toDate())}
+                            </NormalText>
+                        </View>
+                    </View>
+
+                    <View style = {styles.text}>
+                        <NormalText>{invite.description}</NormalText>
+                    </View>
                 </View>
 
                 <View style = {styles.buttonView}>
-                    <TouchableOpacity onPress = {() => {
+                    <Button onPress = {() => {
                         const inviteRef = db.collection("Private Events").doc(invite.inviteID)
                         inviteRef.get().then((doc) => {
                         let data = doc.data()
@@ -101,10 +144,10 @@ export default function ({ route, navigation}) {
 
 
                         })
-                    }}>
-                        <NormalText size = {18} color = {"green"} center = "center">Accept Invite</NormalText>
-                    </TouchableOpacity>
-                    <TouchableOpacity style = {{paddingVertical: 10}} onPress = {() => {
+                    }} marginHorizontal={10}>
+                        Accept
+                    </Button>
+                    <Button onPress = {() => {
                         ref.set({
                             accepted: "declined"
                         }, {merge: true}).then(() => {
@@ -126,9 +169,9 @@ export default function ({ route, navigation}) {
                                 })
                             });
                         })
-                    }}>
-                        <NormalText size = {18} color = {"red"} center = "center">Decline Invite</NormalText>
-                    </TouchableOpacity>
+                    }} backgroundColor="red" marginHorizontal={10}>
+                        Decline
+                    </Button>
 
                     {/*Old code*/}
 
@@ -198,32 +241,24 @@ export default function ({ route, navigation}) {
                     {/*    <NormalText size = {18} color = {"blue"} center = "center">Clear Invite</NormalText>*/}
                     {/*</TouchableOpacity>*/}
                 </View>
-
-
-
             </ScrollView>
         </Layout>
     );
 }
 
 const styles = StyleSheet.create({
-    page: {
-        paddingTop: 30,
-        alignItems: "center",
-        paddingHorizontal: 10
+    imageBackground: {
+        width: Dimensions.get("screen").width,
+        height: 150,
+        marginBottom: 30,
     },
 
-    background: {
-        position: "absolute",
-        width: Dimensions.get('screen').width,
-        height: 100,
-        backgroundColor: "#5DB075"
+    option: {
+        padding: 10
     },
 
-    image: {
-        width: Dimensions.get('screen').width - 20,
-        height: 200,
-        borderRadius: 10
+    infoContainer: {
+        paddingHorizontal: 30
     },
 
     text: {
@@ -233,17 +268,28 @@ const styles = StyleSheet.create({
         paddingVertical: 25
     },
 
-    icons: {
-        alignItems: "flex-start",
+    profileImg: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        borderColor: "#5DB075",
+        borderWidth: 1,
+        backgroundColor: "white",
+        marginRight: 3
+    },
+
+    logistics: {
+        marginVertical: 15,
+    },
+
+    row: {
         flexDirection: "row",
-        width: Dimensions.get('screen').width - 40,
-        paddingVertical: 5
+        marginVertical: 4,
     },
 
     buttonView: {
-        display: "flex",
+        flexDirection: "row",
         alignSelf: "center",
-        paddingVertical: 15
+        marginVertical: 15
     }
-
 });

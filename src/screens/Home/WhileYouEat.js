@@ -8,7 +8,8 @@ import {
   ImageBackground,
   Dimensions,
   TouchableOpacity,
-  Alert
+  Alert,
+  Image
 } from "react-native";
 import { Layout, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
@@ -32,14 +33,12 @@ import {
   MenuTrigger,
 } from "react-native-popup-menu";
 
-const FullCard = ({ route, navigation }) => {
+const WhileYouEat = ({ route, navigation }) => {
   // Event details
   const [event, setEvent] = useState(route.params.event);
 
   // Data for the attendees
-  const [attendees, setAttendees] = useState(
-    new Array(route.params.event.attendees.length).fill(false)
-  );
+  const [attendees, setAttendees] = useState([]);
   const [people, setPeople] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -78,32 +77,22 @@ const FullCard = ({ route, navigation }) => {
 
   // Fetch all attendees of this event
   const getAttendees = () => {
-    route.params.event.attendees.forEach((attendee, index) => {
+    route.params.event.attendees.forEach((attendee) => {
       if (attendee !== user.uid) {
         db.collection("Users")
           .doc(attendee)
           .get()
           .then((doc) => {
             const data = doc.data();
-
+            let attended = false;
             const ids = data.attendedEventIDs.map((e) => e.id);
+
             if (ids.includes(route.params.event.id)) {
-              let newAttendees = attendees;
-              newAttendees[index] = true;
-              setAttendees(newAttendees);
+              attended = true;
             }
 
-            if (data.hasImage) {
-              storage
-                .ref("profilePictures/" + data.id)
-                .getDownloadURL()
-                .then((uri) => {
-                  data.image = uri;
-                })
-                .then(() => setPeople((people) => [...people, data]));
-            } else {
-              setPeople((people) => [...people, data]);
-            }
+            setPeople(people => [...people, data]);
+            setAttendees(attendees => [...attendees, attended]);
           });
       }
     });
@@ -124,6 +113,7 @@ const FullCard = ({ route, navigation }) => {
         .doc(user.uid)
         .update({
           attendingEventIDs: firebase.firestore.FieldValue.arrayRemove(storeID),
+          attendedEventIDs: firebase.firestore.FieldValue.arrayRemove(storeID),
         })
         .then(() => {
           if (route.params.event.type === "private") {
@@ -201,21 +191,21 @@ const FullCard = ({ route, navigation }) => {
                 <Ionicons
                   name="ellipsis-horizontal"
                   color={loading ? "grey" : "black"}
-                  size={20}
+                  size={25}
                 />
               </MenuTrigger>
               <MenuOptions>
-                {event.hostID !== user.uid && <MenuOption onSelect={() => reportEvent()}>
+                {event.hostID !== user.uid && <MenuOption onSelect={() => reportEvent()} style={styles.option}>
                   <NormalText size={18}>Report Event</NormalText>
                 </MenuOption>}
                 {event.hostID === user.uid && <MenuOption onSelect={() => navigation.navigate("EditEvent", {
                   event,
                   editEvent,
                   editEvent2: route.params.editEvent
-                })}>
+                })}  style={styles.option}>
                   <NormalText size={18}>Edit Event</NormalText>
                 </MenuOption>}
-                <MenuOption onSelect={() => withdrawAlert()}>
+                <MenuOption onSelect={() => withdrawAlert()}  style={styles.option}>
                   <NormalText size={18} color="red">
                     Withdraw
                   </NormalText>
@@ -241,13 +231,17 @@ const FullCard = ({ route, navigation }) => {
             {event.name}
           </LargeText>
 
-          <NormalText color="black">Hosted by: {event.hostID === user.uid ? "You ;)"
-            : (event.hostFirstName ?
-            event.hostFirstName + " " + event.hostLastName.substring(0, 1) + "."
-            : event.hostName)}
-          </NormalText>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Image source={route.params.event.hasHostImage ? { uri: route.params.event.hostImage}
+              : require("../../../assets/logo.png")} style={styles.profileImg}/>
+            <MediumText size={18}>{route.params.event.hostID === user.uid ? "You ;)"
+              : (route.params.event.hostFirstName ?
+                route.params.event.hostFirstName + " " + route.params.event.hostLastName
+              : route.params.event.hostName)}
+            </MediumText>
+          </View>
 
-          {event.tags && <TagsList marginVertical={20} tags={event.tags}/>}
+          {event.tags && <TagsList marginVertical={20} tags={event.tags} left/>}
 
           {/* 3 event details (location, date, time} are below */}
 
@@ -330,15 +324,19 @@ const FullCard = ({ route, navigation }) => {
                     {"Just yourself ;)"}
                   </NormalText>
                 ) : (
-                  people.map((person, index) => (
-                    <Attendance
-                      size={17}
-                      person={person}
-                      key={person.id}
-                      attending={attendees[index]}
-                      onPress={() => markAttendee(index)}
-                    />
-                  ))
+                  people.map((person, index) => {
+                    if (person.id !== user.uid) {
+                      return (
+                        <Attendance
+                          size={17}
+                          person={person}
+                          key={person.id}
+                          attending={attendees[index]}
+                          onPress={() => markAttendee(index)}
+                        />
+                      );
+                    }
+                  })
                 )}
               </View>
             )}
@@ -355,9 +353,23 @@ const styles = StyleSheet.create({
     marginBottom: 50
   },
 
+  option: {
+    padding: 10
+  },
+
   row: {
     flexDirection: "row",
     marginVertical: 4,
+  },
+
+  profileImg: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    borderColor: "#5DB075",
+    borderWidth: 1,
+    backgroundColor: "white",
+    marginRight: 3
   },
 
   buttonRow: {
@@ -382,4 +394,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FullCard;
+export default WhileYouEat;

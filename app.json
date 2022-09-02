@@ -4,13 +4,13 @@
     "owner": "eat-together-team",
     "slug": "eat-together-softlaunch",
     "description": "Connecting students through shared meals.",
-    "version": "0.1.0",
+    "version": "0.3.0",
     "orientation": "portrait",
     "icon": "./assets/big_logo.png",
     "splash": {
-      "image": "./assets/big_logo.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#73AE7B"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -23,7 +23,7 @@
       "bundleIdentifier": "com.eattogether.eattogethersoftlaunch"
     },
     "web": {
-      "favicon": "./assets/logo.png"
+      "favicon": "./assets/big_logo.png"
     },
     "userInterfaceStyle": "automatic",
     "plugins": [

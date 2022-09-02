@@ -18,7 +18,7 @@ export default function ({ navigation }) {
     //Check to see if we should display the "No Connections" placeholder text
     function shouldDisplayPlaceholder(list) {
         if(list == null ||list.length === 0) {
-            return "No connections. Meet friends on the People page!"
+            return "No connections. Meet friends on the Explore page!"
         } else {
             return ""
         }
@@ -32,13 +32,7 @@ export default function ({ navigation }) {
             let list = [];
             friends.forEach((uid) => {
                 db.collection("Users").doc(uid).get().then((doc) => {
-                    let data = doc.data()
-                    list.push({
-                        id: data.id,
-                        username: data.username,
-                        name: data.name,
-                        hasImage: data.hasImage
-                    })
+                    list.push(doc.data());
                 }).then(() => {
                     setUsers(list);
                 });
@@ -58,7 +52,7 @@ export default function ({ navigation }) {
                         size={20}
                     />
                 }
-                leftAction={() => navigation.navigate("Invite")}
+                leftAction={() => navigation.goBack()}
             />
             <View style = {styles.switchView}>
                 <HorizontalSwitch left="Connections" right="Requests" current="left" press={(val) => navigation.navigate("Requests")}/>
@@ -70,10 +64,8 @@ export default function ({ navigation }) {
                 <FlatList contentContainerStyle={styles.invites} keyExtractor={item => item.id}
                           data={users} renderItem={({item}) =>
                     <PeopleList person={item} color={generateColor()} click={() => {
-                        db.collection("Users").doc(item.id).get().then((doc) => {
-                            navigation.navigate("FullProfile", {
-                                person: doc.data()
-                            });
+                        navigation.navigate("FullProfile", {
+                            person: item
                         });
                     }}/>
                 }/>

@@ -54,7 +54,7 @@ const Email = props => {
           <Button disabled={!verified}
             onPress={() => {
               props.setEmail(email);
-              props.navigation.navigate("Availabilities");
+              props.navigation.navigate("Password");
             }}
             marginHorizontal={10}>Next</Button>
         </View>

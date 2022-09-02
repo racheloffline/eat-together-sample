@@ -86,7 +86,11 @@ export default function ({ route, navigation }) {
 
     // For selecting a photo
     const handleChoosePhoto = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({});
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            quality: 1,
+        });
         if (!result.cancelled) {
             setPhoto(result.uri);
         }
@@ -135,9 +139,9 @@ export default function ({ route, navigation }) {
 
         db.collection(table).doc(route.params.event.id).set(newEvent).then(() => {
             newEvent.date = moment(date);
-            route.params.editEvent(newEvent);
-            route.params.editEvent2(newEvent);
-            navigation.navigate("FullCardPrivate");
+            route.params.editEvent({...newEvent, type: route.params.event.type});
+            route.params.editEvent2({...newEvent, type: route.params.event.type});
+            navigation.goBack();
             alert("Meal updated!");
         });
     }

@@ -1,28 +1,37 @@
 import React, {useEffect} from 'react';
-import { View, StyleSheet, Image} from 'react-native';
+import { View, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
 import {CheckBox} from 'react-native-rapi-ui';
-import LargeText from "./LargeText";
+
+import TagsList from './TagsList';
 import MediumText from "./MediumText";
-import {storage} from "../provider/Firebase";
-import {TouchableOpacity} from "react-native";
 
 const InvitePerson = props => {
     const [attendees, setAttendees] = React.useState(props.attendees);
     const [checkBox, setCheckbox] = React.useState(false);
     const [image, setImage] = React.useState("");
-    const [quote, setQuote] = React.useState("");
+    const [bio, setBio] = React.useState("");
+
     useEffect(() => {
         if (props.person.hasImage) {
-            storage.ref("profilePictures/" + props.person.personID).getDownloadURL().then(uri => {
-                setImage(uri);
-            });
+            setImage(props.person.image)
         }
-        if (props.person.quote.length > 31) {
-            setQuote(props.person.quote.substr(0, 28) + "...");
+        if (props.person.bio.length >= 30) {
+            setBio(props.person.bio.substr(0, 27) + "...");
         } else {
-            setQuote(props.person.quote);
+            setBio(props.person.bio);
         }
-    })
+    });
+
+    // Generate random tags
+    const shuffledArr = arr => {
+        const shuffled = [...arr]
+            .map(value => ({ value, sort: Math.random() }))
+            .sort((a, b) => a.sort - b.sort)
+            .map(({ value }) => value);
+     
+        return shuffled;
+    }
+
     return (
         <View style={styles.outline}>
             <View style={styles.head}>
@@ -32,15 +41,15 @@ const InvitePerson = props => {
                     });
                 }}>
                     <View style={styles.headleft}>
-                    <Image style={styles.image} source={{uri: image === "" ? "https://static.wixstatic.com/media/d58e38_29c96d2ee659418489aec2315803f5f8~mv2.png" : image}}/>
-                    <MediumText>{props.person.name}</MediumText>
+                        <Image style={styles.image} source={require("../../assets/logo.png")}/>
+                        <MediumText>{props.person.firstName + " " + props.person.lastName.substring(0, 1) + "."}</MediumText>
                     </View>
                 </TouchableOpacity>
                 <View style={styles.checkbox}>
                     <CheckBox value={checkBox} onValueChange={(val) => {
                         setCheckbox(val);
                         const curr = attendees;
-                        const isName = (elem) => elem == props.person.personID;
+                        const isName = (elem) => elem == props.person.id;
                         if (val) { // Add attendee
                             if (curr.length == 0) { // Undisable the "send invites" button
                                 props.undisable();
@@ -48,7 +57,7 @@ const InvitePerson = props => {
 
                             let index = curr.findIndex(isName);
                             if (index == -1) {
-                                curr.push(props.person.personID.toString());
+                                curr.push(props.person.id.toString());
                             }
                         } else { // Remove attendee
                             if (curr.length == 1) { // Disable the "send invites" button
@@ -65,7 +74,8 @@ const InvitePerson = props => {
                 </View>
             </View>
             <View style={[styles.body, {backgroundColor: props.color}]}>
-                <MediumText>"{quote}"</MediumText>
+                <MediumText>{bio}</MediumText>
+                <TagsList tags={shuffledArr(props.person.tags).slice(0, 3)} left/>
             </View>
         </View>
     );
@@ -73,10 +83,10 @@ const InvitePerson = props => {
 
 const styles = StyleSheet.create({
     outline: {
+        width: Dimensions.get("window").width - 20,
         padding: 10
     },
     head: {
-        width: 370,
         height: 80,
         backgroundColor: "grey",
         borderTopLeftRadius: 15,
@@ -86,12 +96,10 @@ const styles = StyleSheet.create({
         justifyContent: "space-between"
     },
     body: {
-        width: 370,
-        height: 100,
         backgroundColor: "red",
         borderBottomLeftRadius: 15,
         borderBottomRightRadius: 15,
-        padding: 30,
+        padding: 20,
     },
     headleft: {
         flexDirection: "row",

@@ -5,7 +5,7 @@ import { StyleSheet, FlatList, View, ActivityIndicator } from "react-native";
 import { Layout } from "react-native-rapi-ui";
 import RBSheet from "react-native-raw-bottom-sheet";
 
-import EventCard from '../../components/EventCard';
+import EventCard from "../../components/EventCard";
 import Header from "../../components/Header";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
 import Searchbar from "../../components/Searchbar";
@@ -15,7 +15,6 @@ import Link from "../../components/Link";
 
 import MediumText from "../../components/MediumText";
 
-import getDate from "../../getDate";
 import { getTimeOfDay } from "../../methods";
 import { auth, db } from "../../provider/Firebase";
 
@@ -24,13 +23,14 @@ export default function({ navigation }) {
     const user = auth.currentUser;
     const [userInfo, setUserInfo] = useState({});
 
-    const [events, setEvents] = useState([]);
-    const [filteredEvents, setFilteredEvents] = useState([]);
+    const [events, setEvents] = useState([]); // All public events
+    const [filteredEvents, setFilteredEvents] = useState([]); // Filtered events
+    const [filteredSearchedEvents, setFilteredSearchedEvents] = useState([]); // Events that are filtered and search-queried
+
     const [searchQuery, setSearchQuery] = useState("");
 
     // Filters
     const [popularity, setPopularity] = useState(false);
-    //const [closeness, setCloseness] = useState(false);
     const [fromFriends, setFromFriends] = useState(false);
     const [friendsAttending, setFriendsAttending] = useState(false);
     const [similarInterests, setSimilarInterests] = useState(false);
@@ -42,20 +42,24 @@ export default function({ navigation }) {
     const showSortFilterRef = useRef();
     const showTimeFilterRef = useRef();
 
-    const [unread, setUnread] = useState(false); // See if we need to display unread notif icon
     const [loading, setLoading] = useState(true); // State variable to show loading screen when fetching data
 
     useEffect(() => { // updates stuff right after React makes changes to the DOM
         async function fetchData() {
-            await db.collection("Users").doc(user.uid).get().then(doc => {
-              setUserInfo(doc.data());
+            let userData;
+            await db.collection("Users").doc(user.uid).onSnapshot(doc => {
+                userData = doc.data();
+                setUserInfo(doc.data());
             });
 
             const ref = db.collection("Public Events");
             await ref.onSnapshot((query) => {
                 let newEvents = [];
                 query.forEach((doc) => {
-                    newEvents.push(doc.data());
+                    if (doc.data().date.toDate() > new Date() && 
+                      !userData.blockedIDs.includes(doc.data().hostID)) {
+                        newEvents.push(doc.data());
+                    }
                 });
                 
                 // Sort events by date
@@ -64,12 +68,7 @@ export default function({ navigation }) {
                 });
                 setEvents(newEvents);
                 setFilteredEvents(newEvents);
-            });
-
-            //See if there's a new notif
-            await db.collection("Users").doc(user.uid).onSnapshot((doc) => {
-                let data = doc.data();
-                setUnread(data.hasNotif);
+                setFilteredSearchedEvents(newEvents);
             });
         }
 
@@ -85,7 +84,6 @@ export default function({ navigation }) {
 
         if (similarInterests) {
           newEvents = await sortBySimilarInterests(newEvents);
-          console.log(newEvents);
         }
 
         if (popularity) {
@@ -111,74 +109,87 @@ export default function({ navigation }) {
         if (evening) {
           newEvents = filterByTime("evening", newEvents);
         }
-        
+
         setFilteredEvents(newEvents);
+
+        const newSearchedEvents = search(newEvents, searchQuery);
+        setFilteredSearchedEvents(newSearchedEvents);
       }
 
       setLoading(true);
       filter().then(() => setLoading(false));
-    }, [similarInterests, popularity, fromFriends, friendsAttending, morning, afternoon, evening]);
-    
+    }, [
+      similarInterests,
+      popularity,
+      fromFriends,
+      friendsAttending,
+      morning,
+      afternoon,
+      evening,
+    ]);
+
     //Check to see if we should display the "No Events" placeholder text
     function shouldDisplayPlaceholder(list) {
-        if(list == null || list.length === 0) {
-            return "No events available at this time."
-        } else {
-            return ""
-        }
+      if (list == null || list.length === 0) {
+        return "No events available at this time.";
+      } else {
+        return "";
+      }
     }
 
     // Method to filter out events
-    const search = text => {
-      setLoading(true);
-      let newEvents = filteredEvents.filter(e => isMatch(e, text));
-      setFilteredEvents(newEvents);
-      setLoading(false);
-    }
+    const search = (newEvents, text) => {
+      return events.filter((e) => isMatch(e, text));
+    };
 
     // Determines if an event matches search query or not
     const isMatch = (event, text) => {
-      if (event.name.toLowerCase().includes(text.toLowerCase())) { // Name
+      // Name
+      if (event.name.toLowerCase().includes(text.toLowerCase())) {
         return true;
       }
 
-      if (event.location.toLowerCase().includes(text.toLowerCase())) { // Location
+      // Tags
+      if (event.tags.some(tag => tag.toLowerCase().includes(text.toLowerCase()))) {
         return true;
       }
 
-      if (getDate(event.date.toDate()).toLowerCase().includes(text.toLowerCase())) { // Date
-        return true;
+      // Host
+      if (event.hostName) {
+        return event.hostName.toLowerCase().includes(text.toLowerCase());
       }
 
-      return event.hostName.toLowerCase().includes(text.toLowerCase()); // Host
-    }
+      const fullName = event.hostFirstName + " " + event.hostLastName;
+      return fullName.toLowerCase().includes(text.toLowerCase());
+    };
 
     // Method called when a new query is typed in/deleted
-    const onChangeText = text => {
-      setLoading(true);
+    const onChangeText = (text) => {
       setSearchQuery(text);
-      search(text);
-      setLoading(false);
-    }
+      const newEvents = search(filteredEvents, text);
+      setFilteredSearchedEvents(newEvents);
+    };
 
     // Sort events by popularity
     const sortByPopularity = (newEvents) => {
-      newEvents = newEvents.sort((a, b) => b.attendees.length - a.attendees.length);
+      newEvents = newEvents.sort(
+        (a, b) => b.attendees.length - a.attendees.length
+      );
       return newEvents;
-    }
+    };
 
     // Display events that friends are hosting
     const filterByFriendsHosting = (newEvents) => {
-      newEvents = newEvents.filter(e => userInfo.friendIDs.includes(e.hostID));
+      newEvents = newEvents.filter((e) => userInfo.friendIDs.includes(e.hostID));
       return newEvents;
-    }
+    };
 
     // Display events that friends are attending
     const filterByFriendsAttending = (newEvents) => {
-      newEvents = newEvents.filter(e => {
+      newEvents = newEvents.filter((e) => {
         let included = false;
 
-        e.attendees.forEach(a => {
+        e.attendees.forEach((a) => {
           if (userInfo.friendIDs.includes(a)) {
             included = true;
             return;
@@ -187,9 +198,9 @@ export default function({ navigation }) {
 
         return included;
       });
-      
+
       return newEvents;
-    }
+    };
 
     // Display events in descending order of similar tags
     const sortBySimilarInterests = async (newEvents) => {
@@ -198,19 +209,23 @@ export default function({ navigation }) {
       await fetch("https://eat-together-match.uw.r.appspot.com/find_similarity", {
         method: "POST",
         body: JSON.stringify({
-          "currTags": userInfo.tags,
-          "otherTags": getEventTags()
+          currTags: userInfo.tags.map(t => t.tag),
+          otherTags: getEventTags(),
         }),
-      }).then(res => res.json()).then(res => {
+      })
+      .then((res) => res.json())
+      .then((res) => {
         let i = 0;
-        newEvents.forEach(e => {
+        newEvents.forEach((e) => {
           e.similarity = res[i];
           i++;
         });
 
         newEvents = newEvents.sort((a, b) => b.similarity - a.similarity);
         result = newEvents;
-      }).catch(e => { // If error, alert the user
+      })
+      .catch((e) => {
+        // If error, alert the user
         alert("An error occured, try again later :(");
         result = events;
       });
@@ -236,30 +251,37 @@ export default function({ navigation }) {
 
     return (
       <Layout>
-        <Header name="Explore" navigation = {navigation} hasNotif = {unread}/>
-        <HorizontalSwitch left="Your Meals" right="Public" current="right"
-          press={() => navigation.navigate("ExploreYourEvents")}/>
-        <Searchbar placeholder="Search by name, location, date, or host name"
-				  value={searchQuery} onChangeText={onChangeText}/>
+        <Header name="Explore"/>
+        <HorizontalSwitch
+          left="Meals"
+          right="People"
+          current="left"
+          press={() => navigation.navigate("People")}
+        />
 
-        <HorizontalRow>
-          <Filter checked={morning || afternoon || evening}
-            onPress={() => showTimeFilterRef.current.open()}
-            text={morning ? "Morning" : 
-              afternoon ? "Afternoon" : 
-              evening ? "Evening" :"Time of day"}/>
-          <Filter checked={similarInterests || popularity}
-            onPress={() => showSortFilterRef.current.open()}
-            text={similarInterests ? "Similar interests"
-              : popularity ? "Popularity" : "Sort by"}/>
-          <Filter checked={fromFriends}
-            onPress={() => setFromFriends(!fromFriends)} text="From friends"/>
-          <Filter checked={friendsAttending}
-            onPress={() => setFriendsAttending(!friendsAttending)} text="Friends attending"/>
-        </HorizontalRow>
+        <View style={{ paddingHorizontal: 20 }}>
+          <Searchbar placeholder="Search by name, tags, or host name"
+            value={searchQuery} onChangeText={onChangeText}/>
+          
+          <HorizontalRow>
+            <Filter checked={morning || afternoon || evening}
+              onPress={() => showTimeFilterRef.current.open()}
+              text={morning ? "Morning" : 
+                afternoon ? "Afternoon" : 
+                evening ? "Evening" :"Time of day"}/>
+            <Filter checked={similarInterests || popularity}
+              onPress={() => showSortFilterRef.current.open()}
+              text={similarInterests ? "Similar interests"
+                : popularity ? "Popularity" : "Sort by"}/>
+            <Filter checked={fromFriends}
+              onPress={() => setFromFriends(!fromFriends)} text="From friends"/>
+            <Filter checked={friendsAttending}
+              onPress={() => setFriendsAttending(!friendsAttending)} text="Friends attending"/>
+          </HorizontalRow>
+        </View>
 
         <RBSheet
-          height={400}
+          height={300}
           ref={showTimeFilterRef}
           closeOnDragDown={true}
           closeOnPressMask={false}
@@ -302,43 +324,56 @@ export default function({ navigation }) {
             setAfternoon(false);
             setEvening(false);
             showTimeFilterRef.current.close();
-          }}>Clear</Link>
-        </RBSheet>
-        
-        <RBSheet
-          height={400}
-          ref={showSortFilterRef}
-          closeOnDragDown={true}
-          closeOnPressMask={false}
-          customStyles={{
-              wrapper: {
-                  backgroundColor: "rgba(0,0,0,0.5)",
-              },
-              draggableIcon: {
-                  backgroundColor: "black"
-              },
-              container: {
-                  borderTopLeftRadius: 20,
-                  borderTopRightRadius: 20,
-                  padding: 10
-              }
-          }}>
-          <Filter checked={similarInterests} text="Similar interests" marginBottom={5}
-            onPress={() => {
-              setSimilarInterests(!similarInterests);
-              setPopularity(false);
-              showTimeFilterRef.current.close();
-            }}/>
-          <Filter checked={popularity} text="Popularity" marginBottom={20}
-            onPress={() => {
-              setPopularity(!popularity);
-              setSimilarInterests(false);
-              showTimeFilterRef.current.close();
-            }}/>
-          <Link onPress={() => {
+          }}
+        >
+          Clear
+        </Link>
+      </RBSheet>
+
+      <RBSheet
+        height={300}
+        ref={showSortFilterRef}
+        closeOnDragDown={true}
+        closeOnPressMask={false}
+        customStyles={{
+          wrapper: {
+            backgroundColor: "rgba(0,0,0,0.5)",
+          },
+          draggableIcon: {
+            backgroundColor: "black",
+          },
+          container: {
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+            padding: 10,
+          },
+        }}
+      >
+        <Filter
+          checked={similarInterests}
+          text="Similar interests"
+          marginBottom={5}
+          onPress={() => {
+            setSimilarInterests(!similarInterests);
+            setPopularity(false);
+            showSortFilterRef.current.close();
+          }}
+        />
+        <Filter
+          checked={popularity}
+          text="Popularity"
+          marginBottom={20}
+          onPress={() => {
+            setPopularity(!popularity);
+            setSimilarInterests(false);
+            showSortFilterRef.current.close();
+          }}
+        />
+        <Link
+          onPress={() => {
             setSimilarInterests(false);
             setPopularity(false);
-            showTimeFilterRef.current.close();
+            showSortFilterRef.current.close();
           }}>Clear</Link>
         </RBSheet>
 
@@ -346,18 +381,17 @@ export default function({ navigation }) {
           {!loading ? 
             filteredEvents.length > 0 ? (
             <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
-              data={filteredEvents} renderItem={({item}) =>
+              data={filteredSearchedEvents} renderItem={({item}) =>
                 <EventCard event={item} click={() => {
                     //ampInstance.logEvent('BUTTON_CLICKED'); // EXPERIMENT
                   navigation.navigate("FullCard", {
-                    event: item,
-                    public: true
+                    event: item
                   });
                 }}/>
             }/>
             ) : (
               <View style={{ flex: 1, justifyContent: "center" }}>
-                <MediumText center>No meals yet!</MediumText>
+                <MediumText center>Empty 🍽️</MediumText>
               </View>) : (
               <View style={{ flex: 1, justifyContent: "center" }}>
                 <ActivityIndicator size={100} color="#5DB075"/>
