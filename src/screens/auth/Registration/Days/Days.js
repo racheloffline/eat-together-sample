@@ -1,32 +1,42 @@
 import React, { useState } from "react";
 import { View, StyleSheet, Dimensions } from "react-native";
 import { Layout } from "react-native-rapi-ui";
+import { cloneDeep } from "lodash";
 
 import Button from "../../../../components/Button";
 import Times from "../../../../components/Times";
 import LargeText from "../../../../components/LargeText";
 
-const Monday = props => {
-    const [times, setTimes] = useState(props.times);
+const Day = props => {
+    const oldTimes = cloneDeep(props.route.params.times);
+    const [times, setTimes] = useState(props.route.params.times);
 
     const clickTime = index => {
-      const newTimes = [...times];
-      newTimes[index].clicked = !newTimes[index].clicked;
+      const newTimes = cloneDeep(times);
+      newTimes[index].available = !newTimes[index].available;
       setTimes(newTimes);
     }
 
     return (
         <Layout style={styles.page}>
-            <LargeText center>What times are you available on Monday?</LargeText>
+            <LargeText center>What times are you available on {props.route.params.day}?</LargeText>
 
             <Times times={times} change={clickTime}/>
 
             <View style={styles.buttons}>
                 <Button onPress={() => {
-                  props.setTimes(times);
+                  props.route.params.setTimes(oldTimes);
                   props.navigation.goBack();
                 }}
-                  marginHorizontal={10}>Save!</Button>
+                  marginHorizontal={10}>
+                  Cancel
+                </Button>
+                <Button onPress={() => {
+                  props.route.params.setTimes(times);
+                  props.navigation.goBack();
+                }} marginHorizontal={10}>
+                  Save!
+                </Button>
             </View>
         </Layout>
     );
@@ -49,4 +59,4 @@ const styles = StyleSheet.create({
   });
   
 
-export default Monday;
+export default Day;

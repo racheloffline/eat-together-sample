@@ -1,50 +1,76 @@
 // Specify availabilities for days of the week
 
 import React from "react";
-import { View, ScrollView, StyleSheet, Dimensions } from "react-native";
-import { Layout } from "react-native-rapi-ui";
+import { View, ScrollView, StyleSheet } from "react-native";
 
 import LargeText from "../../../components/LargeText";
-import SmallText from "../../../components/SmallText";
+import NormalText from "../../../components/NormalText";
 import Button from "../../../components/Button";
 
-export default function ({ navigation }) {
+const Availabilities = props => {
   return (
-    <Layout style={styles.page}>
-        <LargeText center>Specify your availabilites</LargeText>
-        <SmallText center>Or feel free to do this later :)</SmallText>
+    <ScrollView style={styles.page}>
+        <LargeText center size={28}>Mark your availabilites</LargeText>
+        <NormalText center>Or feel free to do this later :)</NormalText>
 
-        <ScrollView style={styles.dates}>
-            <Button onPress={() => navigation.navigate("Monday")} marginVertical={5}>Monday</Button>
-            <Button onPress={() => navigation.navigate("Tuesday")} marginVertical={5}>Tuesday</Button>
-            <Button onPress={() => navigation.navigate("Wednesday")} marginVertical={5}>Wednesday</Button>
-            <Button onPress={() => navigation.navigate("Thursday")} marginVertical={5}>Thursday</Button>
-            <Button onPress={() => navigation.navigate("Friday")} marginVertical={5}>Friday</Button>
-            <Button onPress={() => navigation.navigate("Saturday")} marginVertical={5}>Saturday</Button>
-            <Button onPress={() => navigation.navigate("Sunday")} marginVertical={5}>Sunday</Button>
-        </ScrollView>
+        <View style={styles.dates}>
+            <Button onPress={() => props.navigation.navigate("Day", {
+              times: props.monday,
+              setTimes: props.setMonday,
+              day: "Monday"
+            })} marginVertical={5}>Monday</Button>
+            <Button onPress={() => props.navigation.navigate("Day", {
+              times: props.tuesday,
+              setTimes: props.setTuesday,
+              day: "Tuesday"
+            })} marginVertical={5}>Tuesday</Button>
+            <Button onPress={() => props.navigation.navigate("Day", {
+              times: props.wednesday,
+              setTimes: props.setWednesday,
+              day: "Wednesday"
+            })} marginVertical={5}>Wednesday</Button>
+            <Button onPress={() => props.navigation.navigate("Day", {
+              times: props.thursday,
+              setTimes: props.setThursday,
+              day: "Thursday"
+            })} marginVertical={5}>Thursday</Button>
+            <Button onPress={() => props.navigation.navigate("Day", {
+              times: props.friday,
+              setTimes: props.setFriday,
+              day: "Friday"
+            })} marginVertical={5}>Friday</Button>
+            <Button onPress={() => props.navigation.navigate("Day", {
+              times: props.saturday,
+              setTimes: props.setSaturday,
+              day: "Saturday"
+            })} marginVertical={5}>Saturday</Button>
+            <Button onPress={() => props.navigation.navigate("Day", {
+              times: props.sunday,
+              setTimes: props.setSunday,
+              day: "Sunday"
+            })} marginVertical={5}>Sunday</Button>
+        </View>
 
         <View style={styles.buttons}>
-          <Button onPress={() => navigation.goBack()}
+          <Button onPress={() => props.navigation.goBack()}
             marginHorizontal={10}>Back</Button>
-          <Button onPress={() => navigation.navigate("Password")}
+          <Button onPress={() => props.navigation.navigate("Password")}
             marginHorizontal={10}>Next</Button>
         </View>
-    </Layout>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   page: {
-    alignItems: "center",
-    width: Dimensions.get('screen').width,
     paddingHorizontal: 20,
     paddingVertical: 30
   },
 
   dates: {
+    paddingHorizontal: 40,
     marginTop: 20,
-    maxHeight: Dimensions.get('screen').height/1.5
+    marginBottom: 50
   },
 
   buttons: {
@@ -53,3 +79,5 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   }
 });
+
+export default Availabilities;

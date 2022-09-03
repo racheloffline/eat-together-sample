@@ -12,13 +12,7 @@ import Tags from "../screens/auth/Registration/Tags";
 import Availabilities from "../screens/auth/Registration/Availabilities";
 import Password from "../screens/auth/Registration/Password";
 
-import Monday from "../screens/auth/Registration/Days/Monday";
-import Tuesday from "../screens/auth/Registration/Days/Tuesday";
-import Wednesday from "../screens/auth/Registration/Days/Wednesday";
-import Thursday from "../screens/auth/Registration/Days/Thursday";
-import Friday from "../screens/auth/Registration/Days/Friday";
-import Saturday from "../screens/auth/Registration/Days/Saturday";
-import Sunday from "../screens/auth/Registration/Days/Sunday";
+import Day from "../screens/auth/Registration/Days/Days";
 import timeSlots from "../screens/auth/Registration/Days/timeSlots";
 
 import { cloneDeep } from "lodash";
@@ -132,6 +126,8 @@ const Auth = () => {
       });
     });
 
+    const newTimes = convertToDate([monday, tuesday, wednesday, thursday, friday, saturday, sunday]);
+
     // Initialize user data
     const userData = {
       id: uid,
@@ -152,13 +148,13 @@ const Auth = () => {
       friendIDs: [],
       groupIDs: [],
       availabilites: {
-        monday,
-        tuesday,
-        wednesday,
-        thursday,
-        friday,
-        saturday,
-        sunday,
+        monday: newTimes[0],
+        tuesday: newTimes[1],
+        wednesday: newTimes[2],
+        thursday: newTimes[3],
+        friday: newTimes[4],
+        saturday: newTimes[5],
+        sunday: newTimes[6],
       },
       settings: {
         notifications: true,
@@ -168,13 +164,30 @@ const Auth = () => {
       verified: false,
     };
 
-    console.log(userData);
-
     await db.collection("Users").doc(`${uid}`).set(userData);
     await db.collection("Usernames").doc(userData.username).set({
       id: uid,
     });
   };
+  
+  // Convert from moment to firebase timestamp
+  const convertToDate = (days) => {
+    let newList = [];
+    days.forEach(list => {
+      let newDay = [];
+      list.forEach(time => {
+        newDay.push({
+          startTime: time.startTime.toDate(),
+          endTime: time.endTime.toDate(),
+          available: time.available
+        });
+      });
+
+      newList.push(newDay);
+    });
+
+    return newList;
+  }
 
   // Stores image in Firebase Storage
   const storeImage = async (uri, id) => {
@@ -238,38 +251,13 @@ const Auth = () => {
       <Stack.Screen
         name="Availabilities"
         options={{ headerShown: false }}
-        component={Availabilities}
-      />
-      <Stack.Screen name="Monday" options={{ headerShown: false }}>
-        {(props) => <Monday {...props} times={monday} setTimes={setMonday} />}
+      >
+        {(props) => <Availabilities {...props} monday={monday} setMonday={setMonday} tuesday={tuesday} setTuesday={setTuesday}
+          wednesday={wednesday} setWednesday={setWednesday} thursday={thursday} setThursday={setThursday}
+          friday={friday} setFriday={setFriday} saturday={saturday} setSaturday={setSaturday} sunday={sunday} setSunday={setSunday} />}
       </Stack.Screen>
-      <Stack.Screen name="Tuesday" options={{ headerShown: false }}>
-        {(props) => (
-          <Tuesday {...props} times={tuesday} setTimes={setTuesday} />
-        )}
-      </Stack.Screen>
-      <Stack.Screen name="Wednesday" options={{ headerShown: false }}>
-        {(props) => (
-          <Wednesday {...props} times={wednesday} setTimes={setWednesday} />
-        )}
-      </Stack.Screen>
-      <Stack.Screen name="Thursday" options={{ headerShown: false }}>
-        {(props) => (
-          <Thursday {...props} times={thursday} setTimes={setThursday} />
-        )}
-      </Stack.Screen>
-      <Stack.Screen name="Friday" options={{ headerShown: false }}>
-        {(props) => <Friday {...props} times={friday} setTimes={setFriday} />}
-      </Stack.Screen>
-      <Stack.Screen name="Saturday" options={{ headerShown: false }}>
-        {(props) => (
-          <Saturday {...props} times={saturday} setTimes={setSaturday} />
-        )}
-      </Stack.Screen>
-      <Stack.Screen name="Sunday" options={{ headerShown: false }}>
-        {(props) => <Sunday {...props} times={sunday} setTimes={setSunday} />}
-      </Stack.Screen>
-
+      <Stack.Screen name="Day" options={{ headerShown: false }} component={Day}/>
+        
       <Stack.Screen name="Password" options={{ headerShown: false }}>
         {(props) => (
           <Password
