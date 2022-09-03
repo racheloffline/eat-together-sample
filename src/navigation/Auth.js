@@ -12,7 +12,7 @@ import Tags from "../screens/auth/Registration/Tags";
 import Availabilities from "../screens/auth/Registration/Availabilities";
 import Password from "../screens/auth/Registration/Password";
 
-import Day from "../screens/auth/Registration/Days";
+import Day from "../screens/auth/Registration/Day";
 import timeSlots from "../timeSlots";
 
 import { cloneDeep } from "lodash";
