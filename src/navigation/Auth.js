@@ -12,8 +12,8 @@ import Tags from "../screens/auth/Registration/Tags";
 import Availabilities from "../screens/auth/Registration/Availabilities";
 import Password from "../screens/auth/Registration/Password";
 
-import Day from "../screens/auth/Registration/Days/Days";
-import timeSlots from "../screens/auth/Registration/Days/timeSlots";
+import Day from "../screens/auth/Registration/Days";
+import timeSlots from "../timeSlots";
 
 import { cloneDeep } from "lodash";
 import { db, auth, storage } from "../provider/Firebase";
