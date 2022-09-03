@@ -1,4 +1,4 @@
-// Specify availabilities for days of the week
+// FOR JOSH: homepage for availabilities, figure out how to fetch the user's availabilities
 
 import React from "react";
 import { View, ScrollView, StyleSheet } from "react-native";
