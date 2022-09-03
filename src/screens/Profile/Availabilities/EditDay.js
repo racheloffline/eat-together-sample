@@ -9,7 +9,7 @@ import Button from "../../../components/Button";
 import Times from "../../../components/Times";
 import LargeText from "../../../components/LargeText";
 
-const Day = props => {
+const EditDay = props => {
     const oldTimes = cloneDeep(props.route.params.times);
     const [times, setTimes] = useState(props.route.params.times);
 
@@ -61,4 +61,4 @@ const styles = StyleSheet.create({
   });
   
 
-export default Day;
+export default EditDay;
