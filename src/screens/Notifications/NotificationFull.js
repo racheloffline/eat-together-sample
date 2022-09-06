@@ -92,7 +92,7 @@ export default function ({ route, navigation}) {
                     
                     <View style={styles.logistics}>
                         <TouchableOpacity style={styles.row} onPress={() => {
-                            openMap({ query: event.location, provider: "google" });
+                            openMap({ query: invite.location, provider: "google" });
                         }}>
                             <Ionicons name="location-sharp" size={20} />
                             <NormalText paddingHorizontal={10} color="black">
