@@ -17,6 +17,18 @@ import NormalText from "../../components/NormalText";
 import TagsList from "../../components/TagsList";
 import EventCard from "../../components/EventCard";
 
+const { width, height } = Dimensions.get('window');
+
+//Guideline sizes are based on standard ~5" screen mobile device
+const guidelineBaseWidth = 350;
+const guidelineBaseHeight = 680;
+
+const scale = size => width / guidelineBaseWidth * size;
+const verticalScale = size => height / guidelineBaseHeight * size;
+const moderateScale = (size, factor = 0.5) => size + ( scale(size) - size ) * factor;
+
+export {scale, verticalScale, moderateScale};
+
 export default function ({ navigation }) {
   const user = auth.currentUser;
 
@@ -55,13 +67,13 @@ export default function ({ navigation }) {
                   let data = event.data();
                   newEvents.push(data);
                   eventsLength--;
-                  
+
                   if (eventsLength === 0) {
                     // Sort events by date
                     newEvents = newEvents.sort((a, b) => {
                       return a.date.seconds - b.date.seconds;
                     });
-                    
+
                     setEvents(newEvents);
                   }
                 }).catch(e => {
@@ -111,7 +123,7 @@ export default function ({ navigation }) {
             }}
           ></Ionicons>
         </View>
-        
+
         <Image
           style={styles.image}
           source={
@@ -189,13 +201,13 @@ const styles = StyleSheet.create({
   background: {
     position: "absolute",
     width: Dimensions.get("screen").width,
-    height: 150,
+    height: verticalScale(150),
     backgroundColor: "#5DB075",
   },
 
   image: {
-    width: 175,
-    height: 175,
+    width: moderateScale(175),
+    height: verticalScale(175),
     borderColor: "white",
     borderWidth: 3,
     borderRadius: 100,

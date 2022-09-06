@@ -32,6 +32,7 @@ import {
   MenuOptions,
   MenuTrigger,
 } from "react-native-popup-menu";
+import openMap from "react-native-open-maps";
 
 const WhileYouEat = ({ route, navigation }) => {
   // Event details
@@ -246,12 +247,14 @@ const WhileYouEat = ({ route, navigation }) => {
           {/* 3 event details (location, date, time} are below */}
 
           <View style={styles.logistics}>
-            <View style={styles.row}>
+            <TouchableOpacity style={styles.row} onPress={() => {
+              openMap({ query: event.location, provider: "google" });
+            }}>
               <Ionicons name="location-sharp" size={20} />
               <NormalText paddingHorizontal={10} color="black">
                 {event.location}
               </NormalText>
-            </View>
+            </TouchableOpacity>
 
             <View style={styles.row}>
               <Ionicons name="calendar-outline" size={20} />

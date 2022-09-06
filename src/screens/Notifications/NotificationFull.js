@@ -21,6 +21,7 @@ import {db, storage} from "../../provider/Firebase";
 import {Menu, MenuOption, MenuOptions, MenuTrigger} from "react-native-popup-menu";
 import getDate from '../../getDate';
 import getTime from '../../getTime';
+import openMap from "react-native-open-maps";
 
 export default function ({ route, navigation}) {
     //Save the invite as a shorter name
@@ -90,12 +91,14 @@ export default function ({ route, navigation}) {
                     </View>
                     
                     <View style={styles.logistics}>
-                        <View style={styles.row}>
+                        <TouchableOpacity style={styles.row} onPress={() => {
+                            openMap({ query: invite.location, provider: "google" });
+                        }}>
                             <Ionicons name="location-sharp" size={20} />
                             <NormalText paddingHorizontal={10} color="black">
                                 {invite.location}
                             </NormalText>
-                        </View>
+                        </TouchableOpacity>
 
                         <View style={styles.row}>
                             <Ionicons name="calendar-outline" size={20} />
