@@ -1,7 +1,7 @@
 // Full event page
 
 import React, { useState, useEffect } from "react";
-import {View, ScrollView, StyleSheet, ImageBackground, Dimensions, Image, TouchableOpacity} from "react-native";
+import {View, ScrollView, StyleSheet, ImageBackground, Dimensions, Image} from "react-native";
 import { Layout, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -10,13 +10,13 @@ import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
 import Button from "../../components/Button";
 import TagsList from "../../components/TagsList";
+import Link from "../../components/Link";
 
 import getDate from "../../getDate";
 import getTime from "../../getTime";
 
 import {db, auth} from "../../provider/Firebase";
 import * as firebase from "firebase";
-
 import openMap from "react-native-open-maps";
 
 const FullCard = ({ route, navigation }) => {
@@ -120,14 +120,15 @@ const FullCard = ({ route, navigation }) => {
           {/* 3 event details (location, date, time} are below */}
 
           <View style={styles.logistics}>
-            <TouchableOpacity style={styles.row} onPress={() => {
-              openMap({ query: route.params.event.location, provider: "google" });
-            }}>
+            <View style={styles.row}>
               <Ionicons name="location-sharp" size={20} />
               <NormalText paddingHorizontal={10} color="black">
                 {route.params.event.location}
               </NormalText>
-            </TouchableOpacity>
+              <Link onPress={() => openMap({ query: route.params.event.location, provider: "google" })}>
+                (view on map)
+              </Link>
+            </View>
 
             <View style={styles.row}>
               <Ionicons name="calendar-outline" size={20} />

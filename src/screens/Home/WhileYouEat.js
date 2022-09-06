@@ -21,10 +21,11 @@ import TagsList from "../../components/TagsList";
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
+import Link from "../../components/Link";
 
 import getDate from "../../getDate";
 import getTime from "../../getTime";
-import { db, storage, auth } from "../../provider/Firebase";
+import { db, auth } from "../../provider/Firebase";
 import * as firebase from "firebase";
 import {
   Menu,
@@ -247,14 +248,15 @@ const WhileYouEat = ({ route, navigation }) => {
           {/* 3 event details (location, date, time} are below */}
 
           <View style={styles.logistics}>
-            <TouchableOpacity style={styles.row} onPress={() => {
-              openMap({ query: event.location, provider: "google" });
-            }}>
+            <View style={styles.row}>
               <Ionicons name="location-sharp" size={20} />
               <NormalText paddingHorizontal={10} color="black">
-                {event.location}
+                {route.params.event.location}
               </NormalText>
-            </TouchableOpacity>
+              <Link onPress={() => openMap({ query: route.params.event.location, provider: "google" })}>
+                (view on map)
+              </Link>
+            </View>
 
             <View style={styles.row}>
               <Ionicons name="calendar-outline" size={20} />

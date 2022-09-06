@@ -102,7 +102,12 @@ export default function ({ navigation }) {
     }
 
     fetchEvents().then(() => {
-      setLoading(false);
+      // Verify user when they log in for the first time
+      db.collection("Users").doc(user.uid).update({
+        verified: true
+      });
+
+      setLoading(false); // Stop showing loading screen
     });
   }, []);
 
