@@ -1,6 +1,6 @@
 // Full event page
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { View, ScrollView, StyleSheet, ImageBackground, Dimensions, Image } from "react-native";
 import { Layout, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
@@ -8,76 +8,21 @@ import { Ionicons } from "@expo/vector-icons";
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
-import Button from "../../components/Button";
 import TagsList from "../../components/TagsList";
 
 import getDate from "../../getDate";
 import getTime from "../../getTime";
 
-import {db, auth} from "../../provider/Firebase";
-import * as firebase from "firebase";
+import { auth } from "../../provider/Firebase";
 
 const FullCard = ({ route, navigation }) => {
   const user = auth.currentUser;
-
-  const [attending, setAttending] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    db.collection("Users").doc(user.uid).get().then(doc => {
-      const events = doc.data().attendingEventIDs.map(e => e.id);
-
-      if (events.includes(route.params.event.id)) {
-        setAttending(true);
-      }
-    }).then(() => {
-      setLoading(false);
-    })
-  }, []);
-
-  // Attend an event
-  const attend = () => {
-    const storeID = {
-      type: "public",
-      id: route.params.event.id
-    };
-
-    db.collection("Users").doc(user.uid).update({
-      attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)
-    }).then(() => {
-      db.collection("Public Events").doc(route.params.event.id).update({
-        attendees: firebase.firestore.FieldValue.arrayUnion(user.uid)
-      }).then(() => {
-        navigation.goBack();
-        alert("You are signed up :)");
-      });
-    });
-  }
-
-  // Withdraw from an event you initially attended
-  const withdraw = () => {
-    const storeID = {
-      type: "public",
-      id: route.params.event.id
-    };
-
-    db.collection("Users").doc(user.uid).update({
-      attendingEventIDs: firebase.firestore.FieldValue.arrayRemove(storeID)
-    }).then(() => {
-      db.collection("Public Events").doc(route.params.event.id).update({
-        attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)
-      }).then(() => {
-        navigation.goBack();
-        alert("You withdrew :(");
-      });
-    });
-  }
 
   return (
     <Layout>
       <TopNav
         middleContent={
-          <MediumText center>View Event</MediumText>
+          <MediumText center>View Meal</MediumText>
         }
         leftContent={
           <Ionicons
@@ -113,7 +58,7 @@ const FullCard = ({ route, navigation }) => {
             </MediumText>
           </View>
 
-          {route.params.event.tags && <TagsList marginVertical={20} tags={route.params.event.tags} left/>}
+          {route.params.event.tags && <TagsList marginVertical={20} tags={route.params.event.tags}/>}
 
           {/* 3 event details (location, date, time} are below */}
 
@@ -143,13 +88,6 @@ const FullCard = ({ route, navigation }) => {
           <NormalText marginBottom={20} color="black">
             {route.params.event.additionalInfo}
           </NormalText>
-
-          <Button onPress={attending ? withdraw : attend} disabled={route.params.event.hostID === user.uid}
-            marginVertical={20} backgroundColor={loading ? "grey" : attending && 
-              route.params.event.hostID !== user.uid ? "red" : false}>
-              {loading ? "Loading ..." : route.params.event.hostID === user.uid ? "Your event :)" :
-                attending ? "Withdraw :(" : "Attend!"}
-          </Button>
         </View>        
       </ScrollView>
     </Layout>

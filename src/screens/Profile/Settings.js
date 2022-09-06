@@ -18,7 +18,21 @@ import MediumText from "../../components/MediumText";
 import DeviceToken from "../utils/DeviceToken";
 
 export default function ({ navigation }) {
-    let user = auth.currentUser;
+    const user = auth.currentUser;
+    const [userInfo, setUserInfo] = useState({});
+    let [notifs, setNotifs] = useState(false);
+    let [logoutDisabled, setLogoutDisabled] = useState(false); // Prevent the user from logging out "more than once"
+
+    // Fetch current user info
+    useEffect(() => {
+        if (user) {
+            db.collection("Users").doc(user.uid).get().then(doc => {
+                setUserInfo(doc.data());
+                setNotifs(doc.data().settings.notifications);
+            });
+        }
+    });
+
     function changeNotifSettings() {
         Alert.alert(
             "Update Notification Settings",
@@ -29,7 +43,10 @@ export default function ({ navigation }) {
                     onPress: async () => {
                         await db.collection("Users").doc(user.uid).update({
                             "settings.notifications": true
-                        })
+                        });
+                        
+                        setNotifs(true);
+                        alert("Notification preference updated :)");
                     }
                 },
                 {
@@ -37,7 +54,10 @@ export default function ({ navigation }) {
                     onPress: async () => {
                         await db.collection("Users").doc(user.uid).update({
                             "settings.notifications": false
-                        })
+                        });
+
+                        setNotifs(false);
+                        alert("Notification preference updated :)");
                     }
                 }
             ]
@@ -45,10 +65,14 @@ export default function ({ navigation }) {
     }
 
     async function signOut () {
-        await db.collection("Users").doc(user.uid).update({
-            pushTokens: firebase.firestore.FieldValue.arrayRemove(DeviceToken.getToken())
-        })
-        await firebase.auth().signOut()
+        if (!logoutDisabled) {
+            setLogoutDisabled(true);
+            await db.collection("Users").doc(user.uid).update({
+                pushTokens: firebase.firestore.FieldValue.arrayRemove(DeviceToken.getToken())
+            });
+
+            await firebase.auth().signOut();
+        }
     }
 
     function deleteAccount () {
@@ -63,12 +87,18 @@ export default function ({ navigation }) {
                 },
                 {
                     text: "Yes",
-                    onPress: () => {
-                        user.delete().catch((error) => {
+                    onPress: async () => {
+                        const uid = user.uid;
+
+                        await user.delete().then(() => {
+                            alert("Account deleted successfully. Sorry to see you go :(");
+                            db.collection("Users").doc(uid).delete();
+                            db.collection("Usernames").doc(userInfo.username).delete();
+                        }).catch((error) => {
                             signOut().then(() => {
                                 alert("You need to sign in again to proceed.");
-                            })
-                        })
+                            });
+                        });
                     },
                     style: "destructive"
                 }
@@ -78,42 +108,45 @@ export default function ({ navigation }) {
 
     const buttons = [
         {
-            name: "Notification Preferences",
+            name: " Notification Preferences" + (notifs ? " (ON)" : " (OFF)"),
             icon: "notifications",
             func: () => changeNotifSettings()
         },
         {
-            name: "Privacy Policy",
+            name: " Privacy Policy",
             icon: "hand-left",
             func: () => {Linking.openURL("https://www.eat-together.tech/privacy-policy")}
         },
         {
-            name: "Report a Bug",
+            name: " Report a Bug",
             icon: "bug",
             func: () => {navigation.navigate("Report Bug")}
         },
         {
-            name: "Suggest an Idea",
+            name: " Suggest an Idea",
             icon: "bulb",
             func: () => {navigation.navigate("Suggest Idea")}
         },
         {
-            name: "Log Out",
+            name: " Log Out",
             icon: "log-out",
             func: () => signOut()
         },
         {
-            name: "Delete Account",
+            name: " Delete Account",
             icon: "trash",
             func: () => deleteAccount()
         }
     ]
 
     const renderButton = ({ item }) => (
-        <TouchableOpacity onPress={item.func} style={styles.listItem}>
+        <TouchableOpacity onPress={item.func}>
             <View style={styles.listView}>
-                <Ionicons name = {item.icon} size = {25}/>
-                <MediumText style={styles.text}>{item.name}</MediumText>
+                <Ionicons name = {item.icon} size = {25}
+                    color={item.name.toLowerCase().includes("delete") ? "red" : "black"}/>
+                <MediumText color={item.name.toLowerCase().includes("delete") ? "red" : "black"}>
+                        {item.name}
+                </MediumText>
             </View>
         </TouchableOpacity>
     )
@@ -140,14 +173,8 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         marginHorizontal: 10
     },
-    listItem: {
-        marginVertical: 5
-    },
     listView: {
         flexDirection: "row",
-        width: Dimensions.get("screen").width - 20
-    },
-    text: {
-        marginHorizontal: 8
+        paddingVertical: 15
     }
 });

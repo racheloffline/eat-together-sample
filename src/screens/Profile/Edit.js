@@ -1,41 +1,60 @@
-import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Image, Dimensions, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
+import React, { useState, useEffect, useContext } from "react";
+import { View, StyleSheet, Image, Dimensions, TouchableOpacity } from 'react-native';
 import { Layout, TopNav, TextInput } from "react-native-rapi-ui";
-import { Ionicons, Feather } from '@expo/vector-icons';
+import { Ionicons, Feather, FontAwesome } from '@expo/vector-icons';
 
 import * as ImagePicker from 'expo-image-picker';
 import { db, storage } from "../../provider/Firebase";
-import firebase from "firebase";
-import "firebase/firestore"
 
-import { cloneDeep } from "lodash";
-import allTags from "../../allTags";
-
-import TagsSection from "../../components/TagsSection";
 import Button from "../../components/Button";
 import MediumText from "../../components/MediumText";
-import SmallText from "../../components/SmallText";
 import DeviceToken from "../utils/DeviceToken";
 import KeyboardAvoidingWrapper from "../../components/KeyboardAvoidingWrapper";
+
+import { AuthContext } from "../../provider/AuthProvider";
+import { checkProfanity } from "../../methods";
 
 export default function ({ route, navigation }) {
     // Input fields
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
+    const [pronouns, setPronouns] = useState('');
     const [bio, setBio] = useState('');
-    const [image, setImage] = useState('');
     const [tags, setTags] = useState([]);
+    const [tagText, setTagText] = useState('');
+
+    // Used to check if image has been updated or not; if not, don't update the DB
+    const [oldImage, setOldImage] = useState('');
+    const [image, setImage] = useState('');
 
     const [loading, setLoading] = useState(false); // Disabling button if user profile is being updated
 
-    useEffect(() => {
+    const updateProfileImg = useContext(AuthContext).updateProfileImg;
 
+    useEffect(() => {
         setFirstName(route.params.user.firstName);
         setLastName(route.params.user.lastName);
+        setPronouns(route.params.user.pronouns);
         setBio(route.params.user.bio);
-        setImage(route.params.image);
+        setOldImage(route.params.user.image);
+        setImage(route.params.user.image);
         setTags(route.params.user.tags);
+        setTagText(displayTags(route.params.user.tags));
     }, []);
+
+    // Display text for tags
+    const displayTags = tags => {
+        if (tags.length > 0) {
+            let string = tags[0].tag;
+            for (let i = 1; i < tags.length; i++) {
+                string += ", " + tags[i].tag;
+            }
+
+            return string;
+        }
+
+        return "";
+    }
 
     // Select image from library
     const pickImage = async () => {
@@ -68,50 +87,87 @@ export default function ({ route, navigation }) {
 
     // Update user profile in Firebase
     const updateUser = async () => {
-
-        route.params.updateInfo(firstName, lastName, bio, tags, image);
-
-        if (image) {
-            await updateImage().then(() => {
-                fetchImage().then((uri) => {
-                    db.collection("Users").doc(route.params.user.id).update({
-                        firstName,
-                        lastName,
-                        bio,
-                        tags,
-                        hasImage: !(!image),
-                        image: uri
-                    }).then(() => {
-                        console.log("image: " + image)
-                        console.log("uri: " + uri)
-                    })
-                })
-            })
-            alert("Profile updated!");
-            setLoading(false);
+        if (checkProfanity(firstName) || checkProfanity(lastName)) {
+            alert("Name has inappropriate words >:(");
+        } else if (checkProfanity(pronouns)) {
+            alert("Pronouns have inappropriate words >:(");
+        } else if (checkProfanity(bio)) {
+            alert("Fun fact has inappropriate words >:(");
         } else {
-            await db.collection("Users").doc(route.params.user.id).update({
-                firstName,
-                lastName,
-                bio,
-                tags
-            })
-            alert("Profile updated!");
-            setLoading(false);
+            route.params.updateInfo(firstName, lastName, pronouns, bio, tags, image);
+
+            if (image !== oldImage) {
+                await updateImage().then(() => {
+                    fetchImage().then((uri) => {
+                        updateProfileImg(uri);
+                        db.collection("Users").doc(route.params.user.id).update({
+                            firstName,
+                            lastName,
+                            pronouns,
+                            bio,
+                            tags,
+                            hasImage: !(!image),
+                            image: uri
+                        }).then(() => {
+                            alert("Profile updated!");
+                            navigation.goBack();
+                            updateEventsPfp(uri);
+                        });
+                    });
+                });
+            } else {
+                await db.collection("Users").doc(route.params.user.id).update({
+                    firstName,
+                    lastName,
+                    pronouns,
+                    bio,
+                    tags
+                }).then(() => {
+                    alert("Profile updated!");
+                    navigation.goBack();
+                });
+            }
         }
     }
 
-    //Sign out, and remove this push token from the list of acceptable push tokens
-    const signOut = async () => {
-        // let currentToken;
-        // await db.collection("Users").doc(route.params.user.id).get().then((ss) => {
-        //     currentToken = ss.data().currentToken;
-        // })
+    // Update profile pic in each event user is hosting
+    const updateEventsPfp = image => {
+        route.params.user.hostedEventIDs.forEach(id => {
+            let table = "Public Events";
+            if (id.type == "private") {
+                table = "Private Events";
+            }
 
-        await db.collection("Users").doc(route.params.user.id).update({
-            pushTokens: firebase.firestore.FieldValue.arrayRemove(DeviceToken.getToken())
-        })
-        await firebase.auth().signOut()
+            db.collection(table).doc(id.id).update({
+                hasHostImage: true,
+                hostImage: image
+            });
+        });
+    } 
+
+    // Update tags after editing them
+    const updateTags = (schoolTags, hobbyTags, foodTags) => {
+        schoolTags = schoolTags.map(tag => {
+            return {
+                tag: tag,
+                type: "school"
+            }
+        });
+        hobbyTags = hobbyTags.map(tag => {
+            return {
+                tag: tag,
+                type: "hobby"
+            }
+        });
+        foodTags = foodTags.map(tag => {
+            return {
+                tag: tag,
+                type: "food"
+            }
+        });
+        
+        setTags([...schoolTags, ...hobbyTags, ...foodTags]);
+        setTagText(displayTags([...schoolTags, ...hobbyTags, ...foodTags]));
     }
 
     return (
@@ -159,48 +215,52 @@ export default function ({ route, navigation }) {
                         />
                     </View>
                     
+                    <TextInput
+                        placeholder="Pronouns (he/him, she/her, etc.)"
+                        onChangeText={(val) => setPronouns(val)}
+                        leftContent={
+                            <FontAwesome name="quote-left" size={20}/>
+                        }
+                        value={pronouns}
+                        containerStyle={{ marginBottom: 10 }}
+                    />
 
                     <TextInput
-                        placeholder="Bio"
+                        placeholder="Fun fact (10 to 100 characters)"
                         onChangeText={(val) => setBio(val)}
                         leftContent={
-                            <Ionicons name="chatbox-ellipses-outline" size={20}/>
+                            <FontAwesome name="exclamation" size={20}/>
                         }
                         value={bio}
                         containerStyle={{ marginBottom: 10 }}
                     />
 
-                    <TagsSection
-                        multi={true}
-                        selectedItems={tags}
-                        onItemSelect={(tag) => {
-                            setTags([...tags, tag]);
-                        }}
-                        onRemoveItem={(item, index) => {
-                            const newTags = tags.filter((tag, i) => i !== index);
-                            setTags(newTags);
-                        }}
-                        inline={true}
-                        items={cloneDeep(allTags)}
-                        chip={true}
-                        resetValue={false}
-                    />
+                    <TouchableOpacity onPress={() => navigation.navigate("EditTags", {
+                        schoolTags: tags.filter(tag => tag.type === "school").map(tag => tag.tag),
+                        hobbyTags: tags.filter(tag => tag.type === "hobby").map(tag => tag.tag),
+                        foodTags: tags.filter(tag => tag.type === "food").map(tag => tag.tag),
+                        updateTags
+                    })}>
+                        <TextInput
+                            placeholder="Tags"
+                            onChangeText={(val) => setBio(val)}
+                            leftContent={
+                                <Ionicons name="pricetag" size={20}/>
+                            }
+                            value={tagText}
+                            editable={false}
+                        />
+                    </TouchableOpacity>
 
-                    <SmallText center>Note: must have between 3 and 6 tags (inclusive).</SmallText>
-
-                    <TouchableOpacity disabled={firstName === "" || lastName === "" || bio === ""
-                            || tags.length < 3 || tags.length > 6 || loading}
-                        style={firstName === "" || lastName === "" || bio === "" || tags.length < 3
-                            || tags.length > 6 ? styles.saveDisabled : styles.save} 
+                    <Button disabled={firstName === "" || lastName === "" || bio === "" || loading}
+                        marginVertical={40}
                         onPress={async () => {
                             setLoading(true);
                             await updateUser();
+                            setLoading(false);
                         }}>
-                        <MediumText color="#5DB075">{loading ? "Updating ..." : "Update Profile"}</MediumText>
-                    </TouchableOpacity>
-
-                    <Button onPress={() => signOut()}
-                        marginVertical={20}>Log Out</Button>
+                        {loading ? "Updating ..." : "Update Profile"}
+                    </Button>
                 </View>
             </KeyboardAvoidingWrapper>
         </Layout>
@@ -210,7 +270,7 @@ const styles = StyleSheet.create({
     image: {
         width: 150,
         height: 150,
-        borderColor: "white",
+        borderColor: "#5DB075",
         borderWidth: 3,
         borderRadius: 100,
         alignItems: 'center'
@@ -235,8 +295,8 @@ const styles = StyleSheet.create({
     },
     
     editImage: {
-        left: 40,
-        bottom: 40,
+        left: 45,
+        bottom: 45,
         padding: 12,
         backgroundColor: "#5DB075",
         borderRadius: 100
@@ -247,16 +307,5 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         marginBottom: 10
-    },
-
-    save: {
-        alignItems: 'center',
-        marginVertical: 10
-    },
-
-    saveDisabled: {
-        alignItems: 'center',
-        marginVertical: 10,
-        opacity: 0.7
     }
 });

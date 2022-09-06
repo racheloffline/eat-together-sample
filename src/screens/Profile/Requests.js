@@ -56,7 +56,7 @@ export default function ({ navigation }) {
                         size={20}
                     />
                 }
-                leftAction={() => navigation.navigate("Invite")}
+                leftAction={() => navigation.navigate("Me")}
             />
             <View style={styles.switchView}>
                 <HorizontalSwitch left="Connections" right="Requests" current="right" press={(val) => navigation.navigate("Connections")}/>

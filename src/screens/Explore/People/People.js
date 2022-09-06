@@ -20,10 +20,11 @@ export default function ({ navigation }) {
 
   const [mutuals, setMutuals] = useState([]); // Mutual friends
 
-  const [people, setPeople] = useState([]); // initial state, function used for updating initial state
-  const [filteredPeople, setFilteredPeople] = useState([]);
+  const [people, setPeople] = useState([]); // List of all users
+  const [filteredPeople, setFilteredPeople] = useState([]); // List of filtered users
+  const [filteredSearchedPeople, setFilteredSearchPeople] = useState([]); // List of users with filters and search query on
+
   const [searchQuery, setSearchQuery] = useState("");
-  const [unread, setUnread] = useState(false); //show the unread notification icon
 
   // Filters
   const [similarInterests, setSimilarInterests] = useState(false);
@@ -31,11 +32,13 @@ export default function ({ navigation }) {
 
   const [loading, setLoading] = useState(true); // State variable to show loading screen when fetching data
 
+  // Fetch all users
   useEffect(() => {
     // updates stuff right after React makes changes to the DOM
     async function fetchData() {
       const ref = db.collection("Users");
       let userData;
+
       // This is causing the page to crash, needs fix ASAP
       await ref
         .doc(user.uid)
@@ -49,13 +52,11 @@ export default function ({ navigation }) {
               .doc(id)
               .get()
               .then((doc) => {
-                if (doc) {
-                  if (doc.data().friendIDs) {
-                    // TODO FIX: Not all docs have friendIDs in db
-                    setMutuals((mutuals) =>
-                      mutuals.concat(doc.data().friendIDs)
-                    );
-                  }
+                if (doc && doc.data().friendIDs) {
+                  // TODO FIX: Not all docs have friendIDs in db
+                  setMutuals((mutuals) =>
+                    mutuals.concat(doc.data().friendIDs)
+                  );
                 }
               });
           });
@@ -64,8 +65,9 @@ export default function ({ navigation }) {
       await ref.onSnapshot((query) => {
         let users = [];
         query.forEach((doc) => {
-          if (doc.data().id !== user.uid && doc.data().verified) {
-            let data = doc.data();
+          let data = doc.data();
+          if (data.id !== user.uid && data.verified && !userData.blockedIDs.includes(doc.data().id)
+            && !doc.data().blockedIDs.includes(user.uid)) { // Only show verified + unblocked users
             data.inCommon = getCommonTags(userData, data);
             users.push(data);
           }
@@ -73,10 +75,7 @@ export default function ({ navigation }) {
 
         setPeople(users);
         setFilteredPeople(users);
-      });
-
-      await ref.doc(user.uid).onSnapshot((doc) => {
-        setUnread(doc.data().hasNotif);
+        setFilteredSearchPeople(users);
       });
     }
 
@@ -84,6 +83,31 @@ export default function ({ navigation }) {
       setLoading(false);
     });
   }, []);
+
+
+  // Filters
+  useEffect(() => {
+    async function filter() {
+      let newPeople = [...people];
+  
+      if (similarInterests) {
+        newPeople = await sortBySimilarInterests(newPeople);
+      }
+  
+      if (mutualFriends) {
+        newPeople = filterByMutualFriends(newPeople);
+      }
+
+      setFilteredPeople(newPeople);
+      const newSearchedPeople = search(newPeople, searchQuery);
+      setFilteredSearchPeople(newSearchedPeople);
+    }
+
+    setLoading(true);
+    filter().then(() => {
+      setLoading(false);
+    });
+  }, [similarInterests, mutualFriends]);
 
   // Get tags in common with current user and user being compared to
   const getCommonTags = (currUser, otherUser) => {
@@ -100,13 +124,8 @@ export default function ({ navigation }) {
   };
 
   // Method to filter out people based on name, username, or tags
-  const search = (text) => {
-    let newPeople = people.filter((p) => isMatch(p, text));
-    setFilteredPeople(newPeople);
-
-    // Reset all filters
-    setSimilarInterests(false);
-    setMutualFriends(false);
+  const search = (newPeople, text) => {
+    return newPeople.filter((p) => isMatch(p, text));
   };
 
   // Determines if a person matches the search query or not
@@ -131,55 +150,44 @@ export default function ({ navigation }) {
   // Method called when a new query is typed in/deleted
   const onChangeText = (text) => {
     setSearchQuery(text);
-    search(text);
+    const newPeople = search(filteredPeople, text);
+    setFilteredSearchPeople(newPeople);
   };
 
   // Display people in descending order of similar tags
-  const sortBySimilarInterests = () => {
-    setLoading(true);
+  const sortBySimilarInterests = async (newPeople) => {
+    let result;
 
-    if (!similarInterests) {
-      let copy = [...people];
-
-      fetch("https://eat-together-match.uw.r.appspot.com/find_similarity", {
-        method: "POST",
-        body: JSON.stringify({
-          currTags: userInfo.tags.map((t) => t.tag),
-          otherTags: getPeopleTags(),
-        }),
-      })
-        .then((res) => res.json())
-        .then((res) => {
-          let i = 0;
-          copy.forEach((p) => {
-            p.similarity = res[i];
-            i++;
-          });
-
-          copy = copy.sort((a, b) => b.similarity - a.similarity);
-          setFilteredPeople(copy);
-          setSimilarInterests(true);
-          setLoading(false);
-        })
-        .catch((e) => {
-          // If error, alert the user
-          alert("An error occured, try again later :(");
-          setLoading(false);
+    await fetch("https://eat-together-match.uw.r.appspot.com/find_similarity", {
+      method: "POST",
+      body: JSON.stringify({
+        currTags: userInfo.tags.map((t) => t.tag),
+        otherTags: getPeopleTags(newPeople),
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        let i = 0;
+        newPeople.forEach((p) => {
+          p.similarity = res[i];
+          i++;
         });
-    } else {
-      setLoading(false);
-      setFilteredPeople(people);
-    }
 
-    setSimilarInterests(!similarInterests);
-    setMutualFriends(false);
-    setSearchQuery("");
+        result = newPeople.sort((a, b) => b.similarity - a.similarity);
+      })
+      .catch((e) => {
+        // If error, alert the user
+        alert("An error occured, try again later :(");
+        result = newPeople;
+      });
+
+    return result;
   };
 
   // Get a list of everyone's tags
-  const getPeopleTags = () => {
+  const getPeopleTags = (newPeople) => {
     let tags = [];
-    people.forEach((p) => {
+    newPeople.forEach((p) => {
       tags.push(p.tags.map((t) => t.tag));
     });
 
@@ -187,20 +195,8 @@ export default function ({ navigation }) {
   };
 
   // Display people who are mutual friends
-  const filterByMutualFriends = () => {
-    setLoading(true);
-
-    if (!mutualFriends) {
-      const newPeople = people.filter((p) => mutuals.includes(p.id));
-      setFilteredPeople(newPeople);
-    } else {
-      setFilteredPeople(people);
-    }
-
-    setLoading(false);
-    setMutualFriends(!mutualFriends);
-    setSimilarInterests(false);
-    setSearchQuery("");
+  const filterByMutualFriends = (newPeople) => {
+    return newPeople.filter((p) => mutuals.includes(p.id));
   };
 
   return (
@@ -223,12 +219,12 @@ export default function ({ navigation }) {
         <HorizontalRow>
           <Filter
             checked={similarInterests}
-            onPress={sortBySimilarInterests}
+            onPress={() => setSimilarInterests(!similarInterests)}
             text="Sort by similar interests"
           />
           <Filter
             checked={mutualFriends}
-            onPress={filterByMutualFriends}
+            onPress={() => setMutualFriends(!mutualFriends)}
             text="Mutual friends"
           />
         </HorizontalRow>
@@ -238,7 +234,7 @@ export default function ({ navigation }) {
         {!loading ? (
           <FlatList
             keyExtractor={(item) => item.id}
-            data={filteredPeople}
+            data={filteredSearchedPeople}
             renderItem={({ item }) => (
               <ProfileBubble
                 person={item}

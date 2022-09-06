@@ -27,6 +27,7 @@ import * as ImagePicker from "expo-image-picker";
 import { db, auth, storage } from "../../provider/Firebase";
 import { cloneDeep } from "lodash";
 import moment from "moment";
+import { checkProfanity } from "../../methods";
 
 export default function ({ navigation }) {
     // Current user
@@ -47,7 +48,6 @@ export default function ({ navigation }) {
     const [showDate, setShowDate] = useState(false);
     const [mode, setMode] = useState("date");
     const [disabled, setDisabled] = useState(true);
-    const [unread, setUnread] = useState(false);
 
     const [loading, setLoading] = useState(false); // Disable button if event is being created in Firebase
 
@@ -61,19 +61,15 @@ export default function ({ navigation }) {
         db.collection("Icebreakers").onSnapshot((querySnapshot) => {
             querySnapshot.forEach((doc) => {
                 breakOptions.push(doc.id);
-                console.log(doc.id);
-                console.log("IS THIS WORKING?????")
-            })
-            console.log(breakOptions);
+            });
+
             var num = Math.floor(Math.random()*breakOptions.length);
             db.collection("Icebreakers").doc(breakOptions[num]).get().then(doc => {
-                    console.log("please be working!!!!");
-                    setIcebreakers(doc.data().icebreakers);
-                })
+                setIcebreakers(doc.data().icebreakers);
+            });
         });
         async function fetchData() {
             await db.collection("Users").doc(user.uid).onSnapshot((doc) => {
-                setUnread(doc.data().hasNotif);
                 setUserInfo(doc.data());
             });
         }
@@ -192,7 +188,7 @@ export default function ({ navigation }) {
             <View style={{ flex: 1 }}>
                 <ScrollView style={styles.content}>
                     <TextInput
-                        placeholder="Event Name"
+                        placeholder="Meal Name"
                         value={name}
                         onChangeText={(val) => {
                             setName(val);
@@ -270,19 +266,27 @@ export default function ({ navigation }) {
                         />
                     </TouchableOpacity>
 
-                    <Button disabled={disabled || loading} onPress={function () {
-                        setLoading(true);
-                        const id = Date.now() + user.uid;
-                        let hasImage = false;
-                        if (photo !== "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400") {
-                            hasImage = true;
-                            storeImage(photo, id).then(() => {
-                                fetchImage(id).then(uri => {
-                                    storeEvent(id, hasImage, uri);
-                                });
-                            });
+                    <Button disabled={disabled || loading} onPress={() => {
+                        if (checkProfanity(name)) {
+                            alert("Name has inappropriate words >:(");
+                        } else if (checkProfanity(location)) {
+                            alert("Location has inappropriate words >:(");
+                        } else if (checkProfanity(additionalInfo)) {
+                            alert("Additional info has inappropriate words >:(");
                         } else {
-                            storeEvent(id, hasImage, "");
+                            setLoading(true);
+                            const id = Date.now() + user.uid;
+                            let hasImage = false;
+                            if (photo !== "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400") {
+                                hasImage = true;
+                                storeImage(photo, id).then(() => {
+                                    fetchImage(id).then(uri => {
+                                        storeEvent(id, hasImage, uri);
+                                    });
+                                });
+                            } else {
+                                storeEvent(id, hasImage, "");
+                            }
                         }
                     }} marginVertical={20}>{loading ? "Posting ..." : "Post"}</Button>
                 </ScrollView>

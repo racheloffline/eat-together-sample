@@ -6,17 +6,12 @@ import { TextInput } from "react-native-rapi-ui";
 import { Feather, FontAwesome } from '@expo/vector-icons';
 
 import * as ImagePicker from 'expo-image-picker';
-import allTags from "../../../allTags";
 
 import LargeText from "../../../components/LargeText";
-import MediumText from "../../../components/MediumText";
-import SmallText from "../../../components/SmallText";
 import Button from "../../../components/Button";
-import TagsSection from "../../../components/TagsSection";
 import KeyboardAvoidingWrapper from "../../../components/KeyboardAvoidingWrapper";
 
-import profaneWords from "./profaneWords";
-import { cloneDeep } from "lodash";
+import { checkProfanity } from "../../../methods";
 
 const Name = props => {
   // Input fields
@@ -26,20 +21,17 @@ const Name = props => {
   const [bio, setBio] = useState(props.bio);
   const [image, setImage] = useState(props.image);
 
-  const badWords = cloneDeep(profaneWords); // List of profane words
-
-  const checkProfanity = word => {
-    const profane = badWords.some(w => word.toLowerCase().includes(w));
-    return profane;
-  }
-
   const goNext = () => {
-    if (checkProfanity(firstName) || checkProfanity(lastName)
-        || checkProfanity(pronouns) || checkProfanity(bio)) {
-      alert("Inappropriate words used >:(");
+    if (checkProfanity(firstName) || checkProfanity(lastName)) {
+      alert("Name has inappropriate words >:(");
+    } else if (checkProfanity(pronouns)) {
+      alert("Pronouns have inappropriate words >:(");
+    } else if (checkProfanity(bio)) {
+      alert("Fun fact has inappropriate words >:(");
     } else {
       props.setFirstName(firstName);
       props.setLastName(lastName);
+      props.setPronouns(pronouns);
       props.setBio(bio);
       props.setImage(image);
       props.navigation.navigate("Tags");

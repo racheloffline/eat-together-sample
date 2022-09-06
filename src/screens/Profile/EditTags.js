@@ -6,23 +6,23 @@ import { Layout, TextInput } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 import RBSheet from "react-native-raw-bottom-sheet";
 
-import LargeText from "../../../components/LargeText";
-import MediumText from "../../../components/MediumText";
-import NormalText from "../../../components/NormalText";
+import LargeText from "../../components/LargeText";
+import MediumText from "../../components/MediumText";
+import NormalText from "../../components/NormalText";
 
-import TagsSection from "../../../components/TagsSection";
-import Button from "../../../components/Button";
+import TagsSection from "../../components/TagsSection";
+import Button from "../../components/Button";
 
-import schoolTags from "../../../schoolTags";
-import hobbyTags from "../../../hobbyTags";
-import foodTags from "../../../foodTags";
+import schoolTags from "../../schoolTags";
+import hobbyTags from "../../hobbyTags";
+import foodTags from "../../foodTags";
 import { cloneDeep } from "lodash";
 
-const Tags = props => {
+const EditTags = props => {
   // Tags
-  const [schoolTagsSelected, setSchoolTagsSelected] = useState(props.schoolTags);
-  const [hobbyTagsSelected, setHobbyTagsSelected] = useState(props.hobbyTags);
-  const [foodTagsSelected, setFoodTagsSelected] = useState(props.foodTags);
+  const [schoolTagsSelected, setSchoolTagsSelected] = useState(props.route.params.schoolTags);
+  const [hobbyTagsSelected, setHobbyTagsSelected] = useState(props.route.params.hobbyTags);
+  const [foodTagsSelected, setFoodTagsSelected] = useState(props.route.params.foodTags);
   const [schoolTagsValue, setSchoolTagsValue] = useState("");
   const [hobbyTagsValue, setHobbyTagsValue] = useState("");
   const [foodTagsValue, setFoodTagsValue] = useState("");
@@ -76,7 +76,7 @@ const Tags = props => {
 
   return (
     <Layout style={styles.page}>
-        <LargeText center>Next, add some tags!</LargeText>
+        <LargeText center>Edit your tags!</LargeText>
         <NormalText center size={12} marginBottom={30}>Note: each category must contain between 1 to 4 tags.</NormalText>
 
         <View style={styles.tagSection}>
@@ -141,16 +141,15 @@ const Tags = props => {
 
         <View style={styles.buttons}>
             <Button onPress={() => props.navigation.goBack()}
-                marginHorizontal={10}>Back</Button>
+                marginHorizontal={10}>Cancel</Button>
             <Button onPress={() => {
-                props.setSchoolTags(schoolTagsSelected);
-                props.setHobbyTags(hobbyTagsSelected);
-                props.setFoodTags(foodTagsSelected);
-                props.navigation.navigate("Availabilities");
+                props.route.params.updateTags(schoolTagsSelected, hobbyTagsSelected, foodTagsSelected);
+                props.navigation.goBack();
+                alert("Tags saved! Click on 'Update Profile' to update your profile.");
             }}
               disabled={schoolTagsSelected.length < 1 || schoolTagsSelected.length > 4 || hobbyTagsSelected.length < 1
                 || hobbyTagsSelected.length > 4 || foodTagsSelected.length < 1 || foodTagsSelected.length > 4}
-              marginHorizontal={10}>Next</Button>
+              marginHorizontal={10}>Save</Button>
         </View>
 
         <RBSheet
@@ -256,4 +255,4 @@ const styles = StyleSheet.create({
   }  
 });
 
-export default Tags;
+export default EditTags;

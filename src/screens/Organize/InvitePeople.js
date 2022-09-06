@@ -1,16 +1,20 @@
 //Display upcoming events to join
 
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, FlatList, Dimensions } from "react-native";
+import { View, StyleSheet, FlatList, Dimensions, ActivityIndicator } from "react-native";
 
 import { db, auth, storage } from "../../provider/Firebase";
-import { TopNav, Button, Layout } from "react-native-rapi-ui";
+import { TopNav, Layout } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 import firebase from "firebase";
 
+import Button from "../../components/Button";
 import MediumText from "../../components/MediumText";
 import InvitePerson from "../../components/InvitePerson";
 import Searchbar from "../../components/Searchbar";
+import HorizontalRow from "../../components/HorizontalRow";
+import Filter from "../../components/Filter";
+
 import { generateColor } from "../../methods";
 
 // Stores image in Firebase Storage
@@ -45,9 +49,12 @@ async function sendInvites(
         date: invite.date,
         description: invite.additionalInfo,
         hostID: user.id,
-        hostName: user.firstName + " " + user.lastName,
+        hostFirstName: user.firstName,
+        hostLastName: user.lastName,
         hasImage: invite.hasImage,
         image: invite.image,
+        hasHostImage: user.hasImage,
+        hostImage: user.image,
         location: invite.location,
         name: invite.name,
         inviteID: id,
@@ -105,23 +112,23 @@ async function sendInvites(
     });
 }
 
-const isMatch = (user, text) => {
-  if (user.name.toLowerCase().includes(text.toLowerCase())) {
-    // Name
+// Determines if a person matches the search query or not
+const isMatch = (person, text) => {
+  // Name
+  const fullName = person.firstName + " " + person.lastName;
+  if (fullName.toLowerCase().includes(text.toLowerCase())) {
     return true;
   }
 
-  if (user.username.toLowerCase().includes(text.toLowerCase())) {
-    // Username
+  // Username
+  if (person.username.toLowerCase().includes(text.toLowerCase())) {
     return true;
   }
 
-  if (user.bio.toLowerCase().includes(text.toLowerCase())) {
-    // Bio
-    return true;
-  }
-
-  return false;
+  // Tags
+  return person.tags.some((tag) =>
+    tag.tag.toLowerCase().includes(text.toLowerCase())
+  );
 };
 
 export default function ({ route, navigation }) {
@@ -131,68 +138,178 @@ export default function ({ route, navigation }) {
 
   const attendees = route.params.attendees;
 
-  const [users, setUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
-  const [curSearch, setCurSearch] = useState("");
+  // Other users
+  const [users, setUsers] = useState([]); // All users
+  const [filteredUsers, setFilteredUsers] = useState([]); // Filtered users
+  const [filteredSearchedUsers, setFilteredSearchedUsers] = useState([]); // Users that are filtered and search-queried
 
+  // Disable button or not
   const [disabled, setDisabled] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  const [icebreakers, setIcebreakers] = useState([]);
+  const [icebreakers, setIcebreakers] = useState([]); // Icebreakers
 
-  useEffect(() => {
-    //      picks icebreaker set from set of icebreakers randomly
-    const breakOptions = [];
-    db.collection("Icebreakers").onSnapshot((querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-        breakOptions.push(doc.id);
-      });
-      var num = Math.floor(Math.random() * breakOptions.length);
-      db.collection("Icebreakers")
-        .doc(breakOptions[num])
-        .get()
-        .then((doc) => {
-          setIcebreakers(doc.data().icebreakers);
+  // Filters
+  const [curSearch, setCurSearch] = useState("");
+  const [friendsOnly, setFriendsOnly] = useState(false);
+  const [similarInterests, setSimilarInterests] = useState(false);
+  const [mutualFriends, setMutualFriends] = useState(false);
+
+  const [mutuals, setMutuals] = useState([]); // Mutual friends
+  const [loadingScreen, setLoadingScreen] = useState(true); // Loading screen for filter calculations
+
+  // Fetch users
+  useEffect(async () => {
+    async function fetchData() {
+      //      picks icebreaker set from set of icebreakers randomly
+      const breakOptions = [];
+      await db.collection("Icebreakers").onSnapshot((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          breakOptions.push(doc.id);
         });
-    });
-
-    // Fetch all users
-    const ref = db.collection("Users");
-    ref.onSnapshot((query) => {
-      const list = [];
-      query.forEach((doc) => {
-        let data = doc.data();
-        if (data.verified && data.id !== user.uid) {
-          list.push({
-            id: doc.id,
-            username: data.username,
-            personID: data.id,
-            name: data.firstName + " " + data.lastName,
-            bio: data.bio,
-            hasImage: data.hasImage,
-            attendees: data.attendees,
-            tags: data.tags,
-            attendedEventIDs: data.attendedEventIDs,
-            attendingEventIDs: data.attendingEventIDs,
+        var num = Math.floor(Math.random() * breakOptions.length);
+        db.collection("Icebreakers")
+          .doc(breakOptions[num])
+          .get()
+          .then((doc) => {
+            setIcebreakers(doc.data().icebreakers);
           });
-        } else if (data.id === user.uid) {
-          setUserInfo(data);
-        }
       });
-      setFilteredUsers(list);
-      setUsers(list);
-    });
-    // COMMENT THIS AREA OUT WHEN READY (END)
+
+      // Fetch users
+      const ref = db.collection("Users");
+
+      // Current user
+      let currUser;
+      await ref.doc(user.uid).get().then((doc) => {
+        currUser = doc.data();
+        setUserInfo(currUser);
+
+        currUser.friendIDs.forEach((id) => { // Fetching mutual friends
+          db.collection("Users")
+            .doc(id)
+            .get()
+            .then((doc) => {
+              if (doc) {
+                if (doc.data().friendIDs) {
+                  // TODO FIX: Not all docs have friendIDs in db
+                  setMutuals((mutuals) =>
+                    mutuals.concat(doc.data().friendIDs)
+                  );
+                }
+              }
+            });
+        });
+      });
+
+      // Fetch other users
+      await ref.onSnapshot((query) => {
+        const list = [];
+        query.forEach((doc) => {
+          let data = doc.data();
+          if (data.verified && data.id !== user.uid && !currUser.blockedIDs.includes(data.id)
+            && !data.blockedIDs.includes(user.uid)) { // Only show verified + unblocked users
+            list.push(data);
+          }
+        });
+
+        setUsers(list);
+        setFilteredUsers(list);
+        setFilteredSearchedUsers(list);
+      });
+    }
+
+    fetchData().then(() => setLoadingScreen(false));
   }, []);
 
+  // Filters
+  useEffect(() => {
+    async function filter() {
+      let newUsers = [...users];
+  
+      if (similarInterests) {
+        newUsers = await sortBySimilarInterests(newUsers);
+      }
+
+      if (friendsOnly) {
+        newUsers = filterByFriendsOnly(newUsers);
+      }
+  
+      if (mutualFriends) {
+        newUsers = filterByMutualFriends(newUsers);
+      }
+
+      setFilteredUsers(newUsers);
+
+      const newSearchedUsers = search(newUsers, curSearch);
+      setFilteredSearchedUsers(newSearchedUsers);
+    }
+
+    setLoadingScreen(true);
+    filter().then(() => {
+      setLoadingScreen(false);
+    });
+  }, [similarInterests, friendsOnly, mutualFriends]);
+
+  // For searching
   const onChangeText = (text) => {
     setCurSearch(text);
-    search(curSearch);
+    const newUsers = search(filteredUsers, text);
+    setFilteredSearchedUsers(newUsers);
   };
 
-  const search = (text) => {
-    let newEvents = users.filter((e) => isMatch(e, text));
-    setFilteredUsers(newEvents);
+  const search = (newUsers, text) => {
+    return newUsers.filter((e) => isMatch(e, text));
+  };
+
+  // Display friends only
+  const filterByFriendsOnly = (newUsers) => {
+    return newUsers.filter(u => userInfo.friendIDs.includes(u.id));
+  }
+
+  // Display people in descending order of similar tags
+  const sortBySimilarInterests = async (newUsers) => {
+    let result;
+
+    await fetch("https://eat-together-match.uw.r.appspot.com/find_similarity", {
+      method: "POST",
+      body: JSON.stringify({
+        currTags: userInfo.tags.map((t) => t.tag),
+        otherTags: getPeopleTags(newUsers),
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        let i = 0;
+        newUsers.forEach((p) => {
+          p.similarity = res[i];
+          i++;
+        });
+
+        result = newUsers.sort((a, b) => b.similarity - a.similarity);
+      })
+      .catch((e) => {
+        // If error, alert the user
+        alert("An error occured, try again later :(");
+        result = newUsers;
+      });
+
+    return result;
+  };
+
+  // Get a list of everyone's tags
+  const getPeopleTags = (newUsers) => {
+    let tags = [];
+    newUsers.forEach((p) => {
+      tags.push(p.tags.map((t) => t.tag));
+    });
+
+    return tags;
+  };
+
+  // Display people who are mutual friends
+  const filterByMutualFriends = (newUsers) => {
+    return newUsers.filter((p) => mutuals.includes(p.id));
   };
 
   return (
@@ -203,15 +320,36 @@ export default function ({ route, navigation }) {
         leftAction={() => navigation.goBack()}
       />
 
-      <Searchbar
-        placeholder="Search by name, username, or fun fact"
-        value={curSearch}
-        onChangeText={onChangeText}
-      />
-      <FlatList
+      <View style={{ padding: 20 }}>
+        <Searchbar
+          placeholder="Search by name, username, or tags"
+          value={curSearch}
+          onChangeText={onChangeText}
+        />
+
+        <HorizontalRow>
+          <Filter
+            checked={friendsOnly}
+            onPress={() => setFriendsOnly(!friendsOnly)}
+            text="Friends only"
+          />
+          <Filter
+            checked={similarInterests}
+            onPress={() => setSimilarInterests(!similarInterests)}
+            text="Sort by similar interests"
+          />
+          <Filter
+            checked={mutualFriends}
+            onPress={() => setMutualFriends(!mutualFriends)}
+            text="Mutual friends"
+          />
+        </HorizontalRow>
+      </View>
+
+      {!loadingScreen ? <FlatList
         contentContainerStyle={styles.invites}
         keyExtractor={(item) => item.id}
-        data={filteredUsers}
+        data={filteredSearchedUsers}
         renderItem={({ item }) => (
           <InvitePerson
             navigation={navigation}
@@ -222,51 +360,47 @@ export default function ({ route, navigation }) {
             undisable={() => setDisabled(false)}
           />
         )}
-      />
+      /> : <View style={{ flex: 1, justifyContent: "center" }}>
+        <ActivityIndicator size={100} color="#5DB075" />
+      </View>}
 
-      <View style={styles.buttons}>
-        <Button
-          text={loading ? "Sending ..." : "Send Invites"}
-          width={Dimensions.get("screen").width}
-          disabled={disabled || loading}
-          color="#5DB075"
-          size="lg"
-          onPress={() => {
-            setLoading(true);
-            const id = Date.now() + user.uid; // Generate a unique ID for the event
+      <Button
+        disabled={disabled || loading}
+        onPress={() => {
+          setLoading(true);
+          const id = Date.now() + user.uid; // Generate a unique ID for the event
 
-            if (route.params.hasImage) {
-              storeImage(route.params.image, id).then(() => {
-                fetchImage(id).then((uri) => {
-                  sendInvites(
-                    attendees,
-                    route.params,
-                    navigation,
-                    userInfo,
-                    id,
-                    uri,
-                    icebreakers
-                  ).then(() => {
-                    setLoading(false);
-                  });
+          if (route.params.hasImage) {
+            storeImage(route.params.image, id).then(() => {
+              fetchImage(id).then((uri) => {
+                sendInvites(
+                  attendees,
+                  route.params,
+                  navigation,
+                  userInfo,
+                  id,
+                  uri,
+                  icebreakers
+                ).then(() => {
+                  setLoading(false);
                 });
               });
-            } else {
-              sendInvites(
-                attendees,
-                route.params,
-                navigation,
-                userInfo,
-                id,
-                "",
-                icebreakers
-              ).then(() => {
-                setLoading(false);
-              });
-            }
-          }}
-        />
-      </View>
+            });
+          } else {
+            sendInvites(
+              attendees,
+              route.params,
+              navigation,
+              userInfo,
+              id,
+              "",
+              icebreakers
+            ).then(() => {
+              setLoading(false);
+            });
+          }
+        }}
+      >{loading ? "Sending ..." : "Send Invites"}</Button>
     </Layout>
   );
 }
@@ -274,7 +408,6 @@ export default function ({ route, navigation }) {
 const styles = StyleSheet.create({
   invites: {
     alignItems: "center",
-    padding: 30,
   },
   submit: {
     position: "absolute",
@@ -291,9 +424,5 @@ const styles = StyleSheet.create({
   input: {
     width: Dimensions.get("screen").width / 1.5,
     marginRight: 10,
-  },
-  buttons: {
-    justifyContent: "center",
-    flexDirection: "row",
   },
 });
