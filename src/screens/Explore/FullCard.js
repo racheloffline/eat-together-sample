@@ -1,7 +1,7 @@
 // Full event page
 
 import React, { useState, useEffect } from "react";
-import { View, ScrollView, StyleSheet, ImageBackground, Dimensions, Image } from "react-native";
+import {View, ScrollView, StyleSheet, ImageBackground, Dimensions, Image, TouchableOpacity} from "react-native";
 import { Layout, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -16,6 +16,8 @@ import getTime from "../../getTime";
 
 import {db, auth} from "../../provider/Firebase";
 import * as firebase from "firebase";
+
+import openMap from "react-native-open-maps";
 
 const FullCard = ({ route, navigation }) => {
   const user = auth.currentUser;
@@ -118,12 +120,14 @@ const FullCard = ({ route, navigation }) => {
           {/* 3 event details (location, date, time} are below */}
 
           <View style={styles.logistics}>
-            <View style={styles.row}>
+            <TouchableOpacity style={styles.row} onPress={() => {
+              openMap({ query: route.params.event.location, provider: "google" });
+            }}>
               <Ionicons name="location-sharp" size={20} />
               <NormalText paddingHorizontal={10} color="black">
                 {route.params.event.location}
               </NormalText>
-            </View>
+            </TouchableOpacity>
 
             <View style={styles.row}>
               <Ionicons name="calendar-outline" size={20} />
