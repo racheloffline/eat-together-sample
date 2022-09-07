@@ -117,7 +117,7 @@ export const checkProfanity = word => {
 Determines if a user is available for a particular event/meal.
  */
 export const isAvailable = (user, event) => {
-    const date = event.date.toDate();
+    const date = (event.date instanceof Date) ? event.date : event.date.toDate();
     const hour = date.getHours();
 
     switch (new Date(date).getDay()) { // Days of the week

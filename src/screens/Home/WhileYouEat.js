@@ -57,10 +57,6 @@ const WhileYouEat = ({ route, navigation }) => {
     if (route.params.event.hostID === user.uid) {
       getAttendees();
     }
-
-    db.collection("Users").doc(user.uid).get().then(doc => {
-      console.log(isAvailable(doc.data(), route.params.event));
-    });
   }, []);
 
   // Mark an attendee absent or present
