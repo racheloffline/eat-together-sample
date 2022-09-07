@@ -309,7 +309,7 @@ export default function ({ navigation }) {
       </View>
 
       {!loading ? 
-        filteredEvents.length > 0 ? (
+        filteredSearchedEvents.length > 0 ? (
         <FlatList
           contentContainerStyle={styles.cards}
           keyExtractor={(item) => item.id}

@@ -268,7 +268,7 @@ export default function({ navigation }) {
           
           <HorizontalRow>
             <Filter checked={available}
-              onPress={() => setAvailable(!available)} text="Available"/>
+              onPress={() => setAvailable(!available)} text="Fits schedule"/>
             <Filter checked={morning || afternoon || evening}
               onPress={() => showTimeFilterRef.current.open()}
               text={morning ? "Morning" : 
@@ -384,7 +384,7 @@ export default function({ navigation }) {
 
         <View style={{ flex: 1 }}>
           {!loading ? 
-            filteredEvents.length > 0 ? (
+            filteredSearchedEvents.length > 0 ? (
             <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
               data={filteredSearchedEvents} renderItem={({item}) =>
                 <EventCard event={item} click={() => {
