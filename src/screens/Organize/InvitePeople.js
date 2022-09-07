@@ -15,7 +15,7 @@ import Searchbar from "../../components/Searchbar";
 import HorizontalRow from "../../components/HorizontalRow";
 import Filter from "../../components/Filter";
 
-import { generateColor } from "../../methods";
+import { generateColor, isAvailable } from "../../methods";
 
 // Stores image in Firebase Storage
 const storeImage = async (uri, event_id) => {
@@ -208,7 +208,7 @@ export default function ({ route, navigation }) {
         query.forEach((doc) => {
           let data = doc.data();
           if (data.verified && data.id !== user.uid && !currUser.blockedIDs.includes(data.id)
-            && !data.blockedIDs.includes(user.uid)) { // Only show verified + unblocked users
+            && !data.blockedIDs.includes(user.uid) && isAvailable(data, route.params)) { // Only show verified + unblocked + available users
             list.push(data);
           }
         });

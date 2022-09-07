@@ -17,6 +17,7 @@ import MediumText from "../../components/MediumText";
 
 import { getTimeOfDay } from "../../methods";
 import { auth, db } from "../../provider/Firebase";
+import { isAvailable } from "../../methods";
 
 export default function({ navigation }) {
     // Fetch current user
@@ -30,10 +31,11 @@ export default function({ navigation }) {
     const [searchQuery, setSearchQuery] = useState("");
 
     // Filters
+    const [similarInterests, setSimilarInterests] = useState(false);
     const [popularity, setPopularity] = useState(false);
+    const [available, setAvailable] = useState(false);
     const [fromFriends, setFromFriends] = useState(false);
     const [friendsAttending, setFriendsAttending] = useState(false);
-    const [similarInterests, setSimilarInterests] = useState(false);
     const [morning, setMorning] = useState(false);
     const [afternoon, setAfternoon] = useState(false);
     const [evening, setEvening] = useState(false);
@@ -90,6 +92,10 @@ export default function({ navigation }) {
           newEvents = sortByPopularity(newEvents);
         }
 
+        if (available) {
+          newEvents = filterByAvailability(newEvents);
+        }
+
         if (fromFriends) {
           newEvents = filterByFriendsHosting(newEvents);
         }
@@ -121,6 +127,7 @@ export default function({ navigation }) {
     }, [
       similarInterests,
       popularity,
+      available,
       fromFriends,
       friendsAttending,
       morning,
@@ -128,18 +135,9 @@ export default function({ navigation }) {
       evening,
     ]);
 
-    //Check to see if we should display the "No Events" placeholder text
-    function shouldDisplayPlaceholder(list) {
-      if (list == null || list.length === 0) {
-        return "No events available at this time.";
-      } else {
-        return "";
-      }
-    }
-
     // Method to filter out events
     const search = (newEvents, text) => {
-      return events.filter((e) => isMatch(e, text));
+      return newEvents.filter((e) => isMatch(e, text));
     };
 
     // Determines if an event matches search query or not
@@ -177,6 +175,11 @@ export default function({ navigation }) {
       );
       return newEvents;
     };
+
+    // Display events that match the user's availabilities
+    const filterByAvailability = (newEvents) => {
+      return newEvents.filter(e => isAvailable(userInfo, e));
+    }
 
     // Display events that friends are hosting
     const filterByFriendsHosting = (newEvents) => {
@@ -264,6 +267,8 @@ export default function({ navigation }) {
             value={searchQuery} onChangeText={onChangeText}/>
           
           <HorizontalRow>
+            <Filter checked={available}
+              onPress={() => setAvailable(!available)} text="Available"/>
             <Filter checked={morning || afternoon || evening}
               onPress={() => showTimeFilterRef.current.open()}
               text={morning ? "Morning" : 
