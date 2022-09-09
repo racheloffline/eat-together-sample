@@ -15,7 +15,7 @@ import Searchbar from "../../components/Searchbar";
 import HorizontalRow from "../../components/HorizontalRow";
 import Filter from "../../components/Filter";
 
-import { generateColor, isAvailable } from "../../methods";
+import { generateColor } from "../../methods";
 
 // Stores image in Firebase Storage
 const storeImage = async (uri, event_id) => {
@@ -86,7 +86,7 @@ async function sendInvites(
     })
     .then(async (docRef) => {
       await attendees.forEach((attendee) => {
-        const ref = db.collection("User Invites").doc(attendee.id);
+        const ref = db.collection("User Invites").doc(attendee);
         ref.get().then(async (docRef) => {
           if (attendee !== user.id) {
             await sendInvitations(ref);
@@ -136,6 +136,8 @@ export default function ({ route, navigation }) {
   const user = auth.currentUser;
   const [userInfo, setUserInfo] = useState([]);
 
+  const attendees = route.params.attendees;
+
   // Other users
   const [users, setUsers] = useState([]); // All users
   const [filteredUsers, setFilteredUsers] = useState([]); // Filtered users
@@ -149,7 +151,6 @@ export default function ({ route, navigation }) {
 
   // Filters
   const [curSearch, setCurSearch] = useState("");
-  const [available, setAvailable] = useState(true);
   const [friendsOnly, setFriendsOnly] = useState(false);
   const [similarInterests, setSimilarInterests] = useState(false);
   const [mutualFriends, setMutualFriends] = useState(false);
@@ -208,14 +209,13 @@ export default function ({ route, navigation }) {
           let data = doc.data();
           if (data.verified && data.id !== user.uid && !currUser.blockedIDs.includes(data.id)
             && !data.blockedIDs.includes(user.uid)) { // Only show verified + unblocked users
-            data.invited = false;
             list.push(data);
           }
         });
 
         setUsers(list);
-        setFilteredUsers(filterByAvailability(list));
-        setFilteredSearchedUsers(filterByAvailability(list));
+        setFilteredUsers(list);
+        setFilteredSearchedUsers(list);
       });
     }
 
@@ -229,10 +229,6 @@ export default function ({ route, navigation }) {
   
       if (similarInterests) {
         newUsers = await sortBySimilarInterests(newUsers);
-      }
-
-      if (available) {
-        newUsers = filterByAvailability(newUsers);
       }
 
       if (friendsOnly) {
@@ -253,33 +249,7 @@ export default function ({ route, navigation }) {
     filter().then(() => {
       setLoadingScreen(false);
     });
-  }, [similarInterests, available, friendsOnly, mutualFriends]);
-
-  // Disabling/undisabling the invite button
-  useEffect(() => {
-    const invitedUsers = users.filter((user) => user.invited);
-    setDisabled(invitedUsers.length === 0);
-  }, [users]);
-
-  // Toggle a user's invite status
-  const toggleInvite = (id) => {
-    const newUsers = [...users];
-    const newFilteredUsers = [...filteredUsers];
-    const newFilteredSearchedUsers = [...filteredSearchedUsers];
-
-    const index = newUsers.findIndex((user) => user.id === id);
-    newUsers[index].invited = !newUsers[index].invited;
-
-    const index2 = newFilteredUsers.findIndex((user) => user.id === id);
-    newFilteredUsers[index2].invited = !newFilteredUsers[index2].invited;
-
-    const index3 = newFilteredSearchedUsers.findIndex((user) => user.id === id);
-    newFilteredSearchedUsers[index3].invited = !newFilteredSearchedUsers[index3].invited;
-
-    setUsers(newUsers);
-    setFilteredUsers(newFilteredUsers);
-    setFilteredSearchedUsers(newFilteredSearchedUsers);
-  }
+  }, [similarInterests, friendsOnly, mutualFriends]);
 
   // For searching
   const onChangeText = (text) => {
@@ -291,11 +261,6 @@ export default function ({ route, navigation }) {
   const search = (newUsers, text) => {
     return newUsers.filter((e) => isMatch(e, text));
   };
-
-  // Filtering by people who are available to the event or not
-  const filterByAvailability = (newUsers) => {
-    return newUsers.filter(u => isAvailable(u, route.params));
-  }
 
   // Display friends only
   const filterByFriendsOnly = (newUsers) => {
@@ -364,11 +329,6 @@ export default function ({ route, navigation }) {
 
         <HorizontalRow>
           <Filter
-            checked={available}
-            onPress={() => setAvailable(!available)}
-            text="Is available"
-          />
-          <Filter
             checked={friendsOnly}
             onPress={() => setFriendsOnly(!friendsOnly)}
             text="Friends only"
@@ -386,25 +346,23 @@ export default function ({ route, navigation }) {
         </HorizontalRow>
       </View>
 
-      {!loadingScreen ?
-        filteredSearchedUsers.length > 0 ? (<FlatList
-          contentContainerStyle={styles.invites}
-          keyExtractor={(item) => item.id}
-          data={filteredSearchedUsers}
-          renderItem={({ item }) => (
-            <InvitePerson
-              navigation={navigation}
-              person={item}
-              toggleInvite={toggleInvite}
-              color={generateColor()}
-            />
-          )}
-        />)
-        : (<View style={{ flex: 1, justifyContent: "center" }}>
-          <MediumText center>Empty 🍽️</MediumText>
-        </View>) : (<View style={{ flex: 1, justifyContent: "center" }}>
+      {!loadingScreen ? <FlatList
+        contentContainerStyle={styles.invites}
+        keyExtractor={(item) => item.id}
+        data={filteredSearchedUsers}
+        renderItem={({ item }) => (
+          <InvitePerson
+            navigation={navigation}
+            person={item}
+            attendees={attendees}
+            color={generateColor()}
+            disable={() => setDisabled(true)}
+            undisable={() => setDisabled(false)}
+          />
+        )}
+      /> : <View style={{ flex: 1, justifyContent: "center" }}>
         <ActivityIndicator size={100} color="#5DB075" />
-      </View>)}
+      </View>}
 
       <Button
         disabled={disabled || loading}
@@ -416,7 +374,7 @@ export default function ({ route, navigation }) {
             storeImage(route.params.image, id).then(() => {
               fetchImage(id).then((uri) => {
                 sendInvites(
-                  users.filter((user) => user.invited),
+                  attendees,
                   route.params,
                   navigation,
                   userInfo,
@@ -430,7 +388,7 @@ export default function ({ route, navigation }) {
             });
           } else {
             sendInvites(
-              users.filter((user) => user.invited),
+              attendees,
               route.params,
               navigation,
               userInfo,

@@ -102,12 +102,7 @@ export default function ({ navigation }) {
     }
 
     fetchEvents().then(() => {
-      // Verify user when they log in for the first time
-      db.collection("Users").doc(user.uid).update({
-        verified: true
-      });
-
-      setLoading(false); // Stop showing loading screen
+      setLoading(false);
     });
   }, []);
 
@@ -309,7 +304,7 @@ export default function ({ navigation }) {
       </View>
 
       {!loading ? 
-        filteredSearchedEvents.length > 0 ? (
+        filteredEvents.length > 0 ? (
         <FlatList
           contentContainerStyle={styles.cards}
           keyExtractor={(item) => item.id}

@@ -147,7 +147,7 @@ const Auth = () => {
       blockedIDs: [],
       friendIDs: [],
       groupIDs: [],
-      availabilities: {
+      availabilites: {
         monday: newTimes[0],
         tuesday: newTimes[1],
         wednesday: newTimes[2],

@@ -46,7 +46,31 @@ const InvitePerson = props => {
                     </View>
                 </TouchableOpacity>
                 <View style={styles.checkbox}>
-                    <CheckBox value={props.person.invited} onValueChange={() => props.toggleInvite(props.person.id)} />
+                    <CheckBox value={checkBox} onValueChange={(val) => {
+                        setCheckbox(val);
+                        const curr = attendees;
+                        const isName = (elem) => elem == props.person.id;
+                        if (val) { // Add attendee
+                            if (curr.length == 0) { // Undisable the "send invites" button
+                                props.undisable();
+                            }
+
+                            let index = curr.findIndex(isName);
+                            if (index == -1) {
+                                curr.push(props.person.id.toString());
+                            }
+                        } else { // Remove attendee
+                            if (curr.length == 1) { // Disable the "send invites" button
+                                props.disable();
+                            }
+
+                            let index = curr.findIndex(isName);
+                            if (index != -1) {
+                                curr.splice(index, 1);
+                            }
+                        }
+                        setAttendees(curr);
+                    }} />
                 </View>
             </View>
             <View style={[styles.body, {backgroundColor: props.color}]}>
