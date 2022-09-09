@@ -241,15 +241,17 @@ export default function ({ route, navigation }) {
                         foodTags: tags.filter(tag => tag.type === "food").map(tag => tag.tag),
                         updateTags
                     })}>
-                        <TextInput
-                            placeholder="Tags"
-                            onChangeText={(val) => setBio(val)}
-                            leftContent={
-                                <Ionicons name="pricetag" size={20}/>
-                            }
-                            value={tagText}
-                            editable={false}
-                        />
+                        <View pointerEvents="none">
+                            <TextInput
+                                placeholder="Tags"
+                                onChangeText={(val) => setBio(val)}
+                                leftContent={
+                                    <Ionicons name="pricetag" size={20}/>
+                                }
+                                value={tagText}
+                                editable={false}
+                            />
+                        </View>
                     </TouchableOpacity>
 
                     <Button disabled={firstName === "" || lastName === "" || bio === "" || loading}

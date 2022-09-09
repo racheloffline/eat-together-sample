@@ -1,5 +1,5 @@
 import React from "react";
-import { Text } from "react-native";
+import { Platform, Text } from "react-native";
 import { useFonts, Inter_200ExtraLight } from '@expo-google-fonts/inter';
 
 const SmallText = props => {
@@ -9,7 +9,7 @@ const SmallText = props => {
         return (
             <Text style={{
                 fontSize: props.size ? props.size : 10,
-                fontFamily: 'sans-serif',
+                fontFamily: Platform.os === 'ios' ? 'AppleSDGothicNeo-Light' : 'sans-serif-light',
                 color: props.color ? props.color : "black",
                 textAlign: props.center ? "center" : "auto",
                 paddingHorizontal: props.paddingHorizontal ? props.paddingHorizontal : 0,

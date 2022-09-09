@@ -88,14 +88,16 @@ const EditTags = props => {
                 setSchool(true);
                 refRBSheet.current.open();
             }}>
-                <TextInput
-                    placeholder="Tags"
-                    value={schoolTagsValue}
-                    leftContent={
-                        <Ionicons name="pricetags-outline" size={20}/>
-                    }
-                    editable={false}
-                />
+                <View pointerEvents="none">
+                    <TextInput
+                        placeholder="Tags"
+                        value={schoolTagsValue}
+                        leftContent={
+                            <Ionicons name="pricetags-outline" size={20}/>
+                        }
+                        editable={false}
+                    />
+                </View>
             </TouchableOpacity>
         </View>
 
@@ -108,14 +110,16 @@ const EditTags = props => {
                 setHobby(true);
                 refRBSheet.current.open();
             }}>
-                <TextInput
-                    placeholder="Tags"
-                    value={hobbyTagsValue}
-                    leftContent={
-                        <Ionicons name="pricetags-outline" size={20}/>
-                    }
-                    editable={false}
-                />
+                <View pointerEvents="none">
+                    <TextInput
+                        placeholder="Tags"
+                        value={hobbyTagsValue}
+                        leftContent={
+                            <Ionicons name="pricetags-outline" size={20}/>
+                        }
+                        editable={false}
+                    />
+                </View>
             </TouchableOpacity>
         </View>
 
@@ -128,14 +132,16 @@ const EditTags = props => {
                 setFood(true);
                 refRBSheet.current.open();
             }}>
-                <TextInput
-                    placeholder="Tags"
-                    value={foodTagsValue}
-                    leftContent={
-                        <Ionicons name="pricetags-outline" size={20}/>
-                    }
-                    editable={false}
-                />
+                <View pointerEvents="none">
+                    <TextInput
+                        placeholder="Tags"
+                        value={foodTagsValue}
+                        leftContent={
+                            <Ionicons name="pricetags-outline" size={20}/>
+                        }
+                        editable={false}
+                    />
+                </View>
             </TouchableOpacity>
         </View>
 
