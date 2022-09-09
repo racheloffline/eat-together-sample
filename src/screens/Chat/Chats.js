@@ -6,15 +6,16 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  Dimensions,
 } from "react-native";
-import { Button, Layout, TopNav } from "react-native-rapi-ui";
+import { Button, Layout } from "react-native-rapi-ui";
+
 import Header from "../../components/Header";
+
 import { db } from "../../provider/Firebase";
 import firebase from "firebase";
+
 import ChatPreview from "../../components/ChatPreview";
 import SearchableDropdown from "react-native-searchable-dropdown";
-import LargeText from "../../components/LargeText";
 
 export default function ({ navigation }) {
   const [selectedUsers, setSelectedUsers] = useState([]);
@@ -32,8 +33,9 @@ export default function ({ navigation }) {
         allUsernames.push(user.username);
         allNames.push(user.name);
       });
+
       allUsernames.push(currUser.data().username);
-      allNames.push(currUser.data().name);
+      allNames.push(currUser.data().firstName + " " + currUser.data().lastName);
       const chatID = allUsernames.sort().join();
       // Get all the uid in this chat
       let allUIDs = [];
@@ -71,7 +73,7 @@ export default function ({ navigation }) {
   // Get your taste buds as search suggestions
   useEffect(() => {
     userInfo.onSnapshot((doc) => {
-      const nameCurrent = doc.data().name;
+      const nameCurrent = doc.data().firstName + " " + doc.data().lastName;
       const friends = doc.data().friendIDs;
       const groups = doc.data().groupIDs;
       // update the groups displayed
@@ -126,7 +128,7 @@ export default function ({ navigation }) {
             list.push({
               id: data.id,
               username: data.username,
-              name: data.name,
+              name: data.firstName + " " + data.lastName,
               hasImage: data.hasImage,
               pictureID: data.id,
             });

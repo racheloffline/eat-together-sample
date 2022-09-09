@@ -169,7 +169,6 @@ export default function ({ navigation }) {
                                 location,
                                 date,
                                 additionalInfo: additionalInfo,
-                                attendees: [],
                                 hasImage: hasImage,
                                 image: hasImage ? photo : "",
                                 clearAll

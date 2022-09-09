@@ -21,10 +21,11 @@ import TagsList from "../../components/TagsList";
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
+import Link from "../../components/Link";
 
 import getDate from "../../getDate";
 import getTime from "../../getTime";
-import { db, storage, auth } from "../../provider/Firebase";
+import { db, auth } from "../../provider/Firebase";
 import * as firebase from "firebase";
 import {
   Menu,
@@ -32,6 +33,9 @@ import {
   MenuOptions,
   MenuTrigger,
 } from "react-native-popup-menu";
+import openMap from "react-native-open-maps";
+
+import { isAvailable } from "../../methods";
 
 const WhileYouEat = ({ route, navigation }) => {
   // Event details
@@ -249,8 +253,11 @@ const WhileYouEat = ({ route, navigation }) => {
             <View style={styles.row}>
               <Ionicons name="location-sharp" size={20} />
               <NormalText paddingHorizontal={10} color="black">
-                {event.location}
+                {route.params.event.location}
               </NormalText>
+              <Link onPress={() => openMap({ query: route.params.event.location, provider: "google" })}>
+                (view on map)
+              </Link>
             </View>
 
             <View style={styles.row}>
