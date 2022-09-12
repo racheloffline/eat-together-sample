@@ -10,7 +10,7 @@ import Button from "../../../components/Button";
 const Availabilities = props => {
   return (
     <ScrollView style={styles.page}>
-        <LargeText center size={28}>Mark your availabilites</LargeText>
+        <LargeText center size={28}>Mark your availabilities</LargeText>
         <NormalText center>Or feel free to do this later :)</NormalText>
 
         <View style={styles.dates}>
