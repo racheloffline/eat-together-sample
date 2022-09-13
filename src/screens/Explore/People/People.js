@@ -11,8 +11,6 @@ import HorizontalRow from "../../../components/HorizontalRow";
 import HorizontalSwitch from "../../../components/HorizontalSwitch";
 import Filter from "../../../components/Filter";
 
-import MediumText from "../../../components/MediumText";
-
 import { db, auth } from "../../../provider/Firebase";
 
 export default function ({ navigation }) {
@@ -233,8 +231,7 @@ export default function ({ navigation }) {
       </View>
 
       <View style={{ flex: 1, alignItems: "center" }}>
-        {!loading ?
-          filteredSearchedPeople.length > 0 ? (
+        {!loading ? (
           <FlatList
             keyExtractor={(item) => item.id}
             data={filteredSearchedPeople}
@@ -249,9 +246,7 @@ export default function ({ navigation }) {
               />
             )}
           />
-        ) : (<View style={{ flex: 1, justifyContent: "center" }}>
-          <MediumText center>Empty 🍽️</MediumText>
-        </View>) : (
+        ) : (
           <View style={{ flex: 1, justifyContent: "center" }}>
             <ActivityIndicator size={100} color="#5DB075" />
           </View>

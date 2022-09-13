@@ -27,10 +27,10 @@ const ChatPreview = (props) => {
           <Image style={styles.image} source={{ uri: image }} />
           <View style={styles.textContainer}>
             <MediumText>{props.group.name}</MediumText>
-            {props.group.message !== "" && <SmallText>{props.group.message}</SmallText>}
+            <SmallText>{props.group.message}</SmallText>
           </View>
         </View>
-        {props.group.time !== "" && <SmallText>{time}</SmallText>}
+        <SmallText>{time}</SmallText>
       </View>
     </View>
   );
