@@ -1,3 +1,5 @@
+editday
+
 // FOR JOSH: page for editing availabilities, figure out how to pass data as props btw AvailabilitiesHome and this component
 
 import React, { useState } from "react";
@@ -62,3 +64,4 @@ const styles = StyleSheet.create({
   
 
 export default EditDay;
+

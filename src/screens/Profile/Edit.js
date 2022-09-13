@@ -1,3 +1,5 @@
+edit
+
 import React, { useState, useEffect, useContext } from "react";
 import { View, StyleSheet, Image, Dimensions, TouchableOpacity } from 'react-native';
 import { Layout, TopNav, TextInput } from "react-native-rapi-ui";
@@ -14,6 +16,11 @@ import KeyboardAvoidingWrapper from "../../components/KeyboardAvoidingWrapper";
 import { AuthContext } from "../../provider/AuthProvider";
 import { checkProfanity } from "../../methods";
 
+import timeSlots from "../../timeSlots";
+
+import { cloneDeep } from "lodash";
+
+
 export default function ({ route, navigation }) {
     // Input fields
     const [firstName, setFirstName] = useState('');
@@ -22,6 +29,15 @@ export default function ({ route, navigation }) {
     const [bio, setBio] = useState('');
     const [tags, setTags] = useState([]);
     const [tagText, setTagText] = useState('');
+
+    // Days
+    const [monday, setMonday] = useState(cloneDeep(timeSlots));
+    const [tuesday, setTuesday] = useState(cloneDeep(timeSlots));
+    const [wednesday, setWednesday] = useState(cloneDeep(timeSlots));
+    const [thursday, setThursday] = useState(cloneDeep(timeSlots));
+    const [friday, setFriday] = useState(cloneDeep(timeSlots));
+    const [saturday, setSaturday] = useState(cloneDeep(timeSlots));
+    const [sunday, setSunday] = useState(cloneDeep(timeSlots));
 
     // Used to check if image has been updated or not; if not, don't update the DB
     const [oldImage, setOldImage] = useState('');
@@ -40,6 +56,14 @@ export default function ({ route, navigation }) {
         setImage(route.params.user.image);
         setTags(route.params.user.tags);
         setTagText(displayTags(route.params.user.tags));
+        setMonday(route.params.user.availabilities.monday);
+        setTuesday(route.params.user.availabilities.tuesday);
+        setWednesday(route.params.user.availabilities.wednesday);
+        setThursday(route.params.user.availabilities.thursday);
+        setFriday(route.params.user.availabilities.friday);
+        setSaturday(route.params.user.availabilities.saturday);
+        setSunday(route.params.user.availabilities.sunday);
+        console.log("am i available on FRIDAY? " + friday[0].available);
     }, []);
 
     // Display text for tags
@@ -143,7 +167,7 @@ export default function ({ route, navigation }) {
                 hostImage: image
             });
         });
-    } 
+    }
 
     // Update tags after editing them
     const updateTags = (schoolTags, hobbyTags, foodTags) => {
@@ -165,7 +189,7 @@ export default function ({ route, navigation }) {
                 type: "food"
             }
         });
-        
+
         setTags([...schoolTags, ...hobbyTags, ...foodTags]);
         setTagText(displayTags([...schoolTags, ...hobbyTags, ...foodTags]));
     }
@@ -193,7 +217,7 @@ export default function ({ route, navigation }) {
                             <Feather name="edit-2" size={25} color="black"/>
                         </TouchableOpacity>
                     </View>
-                    
+
                     <View style={styles.name}>
                         <TextInput
                             placeholder="First name"
@@ -214,7 +238,7 @@ export default function ({ route, navigation }) {
                             containerStyle={{ width: "47%" }}
                         />
                     </View>
-                    
+
                     <TextInput
                         placeholder="Pronouns (he/him, she/her, etc.)"
                         onChangeText={(val) => setPronouns(val)}
@@ -251,6 +275,26 @@ export default function ({ route, navigation }) {
                             editable={false}
                         />
                     </TouchableOpacity>
+
+                    <Button onPress={() => navigation.navigate("AvailabilitiesHome",
+                        {monday: {monday},
+                        setMonday: {setMonday},
+                        tuesday: {tuesday},
+                        setTuesday: {setTuesday},
+                        wednesday: {wednesday},
+                        setWednesday: {setWednesday},
+                        thursday: {thursday},
+                        setThursday: {setThursday},
+                        friday: {friday},
+                        setFriday: {setFriday},
+                        saturday: {saturday},
+                        setSaturday: {setSaturday},
+                        sunday: {sunday},
+                        setSunday: {setSunday}
+                        })}
+                        >
+                    "hi"
+                    </Button>
 
                     <Button disabled={firstName === "" || lastName === "" || bio === "" || loading}
                         marginVertical={40}
@@ -293,7 +337,7 @@ const styles = StyleSheet.create({
         marginTop: 30,
         alignItems: "center"
     },
-    
+
     editImage: {
         left: 45,
         bottom: 45,
@@ -309,3 +353,6 @@ const styles = StyleSheet.create({
         marginBottom: 10
     }
 });
+
+
+
