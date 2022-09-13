@@ -21,7 +21,7 @@ const EditDay = props => {
 
     return (
         <Layout style={styles.page}>
-            <LargeText center>What times are you available on {props.route.params.day}?</LargeText>
+            <LargeText center>What times would like to eat on {props.route.params.day}?</LargeText>
 
             <Times times={times} change={clickTime}/>
 
@@ -35,7 +35,9 @@ const EditDay = props => {
                 </Button>
                 <Button onPress={() => {
                   props.route.params.setTimes(times);
+                  props.route.params.saveAvailabilities(props.route.params.day, times);
                   props.navigation.goBack();
+                  alert("New times saved!");
                 }} marginHorizontal={10}>
                   Save!
                 </Button>

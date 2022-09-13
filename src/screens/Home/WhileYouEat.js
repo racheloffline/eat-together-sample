@@ -21,10 +21,11 @@ import TagsList from "../../components/TagsList";
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
+import Link from "../../components/Link";
 
 import getDate from "../../getDate";
 import getTime from "../../getTime";
-import { db, storage, auth } from "../../provider/Firebase";
+import { db, auth } from "../../provider/Firebase";
 import * as firebase from "firebase";
 import {
   Menu,
@@ -32,6 +33,8 @@ import {
   MenuOptions,
   MenuTrigger,
 } from "react-native-popup-menu";
+import openMap from "react-native-open-maps";
+import { isAvailable } from "../../methods";
 
 const WhileYouEat = ({ route, navigation }) => {
   // Event details
@@ -232,12 +235,12 @@ const WhileYouEat = ({ route, navigation }) => {
           </LargeText>
 
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Image source={route.params.event.hasHostImage ? { uri: route.params.event.hostImage}
+            <Image source={event.hasHostImage ? { uri: event.hostImage }
               : require("../../../assets/logo.png")} style={styles.profileImg}/>
             <MediumText size={18}>{route.params.event.hostID === user.uid ? "You ;)"
-              : (route.params.event.hostFirstName ?
-                route.params.event.hostFirstName + " " + route.params.event.hostLastName
-              : route.params.event.hostName)}
+              : (event.hostFirstName ?
+                event.hostFirstName + " " + event.hostLastName
+              : event.hostName)}
             </MediumText>
           </View>
 
@@ -251,6 +254,9 @@ const WhileYouEat = ({ route, navigation }) => {
               <NormalText paddingHorizontal={10} color="black">
                 {event.location}
               </NormalText>
+              <Link onPress={() => openMap({ query: event.location, provider: "google" })}>
+                (view on map)
+              </Link>
             </View>
 
             <View style={styles.row}>

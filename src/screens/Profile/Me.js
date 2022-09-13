@@ -17,6 +17,18 @@ import NormalText from "../../components/NormalText";
 import TagsList from "../../components/TagsList";
 import EventCard from "../../components/EventCard";
 
+const { width, height } = Dimensions.get('window');
+
+//Guideline sizes are based on standard ~5" screen mobile device
+const guidelineBaseWidth = 350;
+const guidelineBaseHeight = 680;
+
+const scale = size => width / guidelineBaseWidth * size;
+const verticalScale = size => height / guidelineBaseHeight * size;
+const moderateScale = (size, factor = 0.5) => size + ( scale(size) - size ) * factor;
+
+export {scale, verticalScale, moderateScale};
+
 export default function ({ navigation }) {
   const user = auth.currentUser;
 
@@ -81,6 +93,7 @@ export default function ({ navigation }) {
     fetchData();
   }, []);
 
+  // Update user profile after editing
   const updateInfo = (newFirstName, newLastName, newPronouns, newBio, newTags, newImage) => {
     setUserInfo((prev) => ({
       ...prev,
@@ -92,6 +105,14 @@ export default function ({ navigation }) {
       image: newImage
     }));
   };
+
+  // Update user's availabilities after editing
+  const updateAvailabilities = newAvailabilities => {
+    setUserInfo(prev => ({
+      ...prev,
+      availabilities: newAvailabilities
+    }));
+  }
 
   return (
     <Layout>
@@ -107,6 +128,19 @@ export default function ({ navigation }) {
                 user: userInfo,
                 image: userInfo.image,
                 updateInfo,
+              });
+            }}
+          ></Ionicons>
+        </View>
+        <View style={styles.calendar}>
+          <Ionicons
+            name="calendar-sharp"
+            size={40}
+            color="white"
+            onPress={() => {
+              navigation.navigate("AvailabilitiesHome", {
+                user: userInfo,
+                updateAvailabilities,
               });
             }}
           ></Ionicons>
@@ -189,13 +223,13 @@ const styles = StyleSheet.create({
   background: {
     position: "absolute",
     width: Dimensions.get("screen").width,
-    height: 150,
+    height: verticalScale(150),
     backgroundColor: "#5DB075",
   },
 
   image: {
-    width: 175,
-    height: 175,
+    width: moderateScale(175),
+    height: verticalScale(175),
     borderColor: "white",
     borderWidth: 3,
     borderRadius: 100,
@@ -212,6 +246,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 20,
     top: 20,
+  },
+
+  calendar: {
+    position: "absolute",
+    right: 20,
+    top: 70,
   },
 
   connections: {

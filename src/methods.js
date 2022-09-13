@@ -111,3 +111,46 @@ export const checkProfanity = word => {
     const profane = profaneWords.some(w => word.toLowerCase().includes(w));
     return profane;
 }
+
+/*
+Determines if a user is available for a particular event/meal.
+ */
+export const isAvailable = (user, event) => {
+    const date = (event.date instanceof Date) ? event.date : event.date.toDate();
+    const hour = date.getHours();
+
+    switch (new Date(date).getDay()) { // Days of the week
+        case 0: // Sunday
+            return isMatch(hour, user.availabilities.sunday);
+        case 1: // Monday
+            return isMatch(hour, user.availabilities.monday);
+        case 2: // Tuesday
+            return isMatch(hour, user.availabilities.tuesday);
+        case 3: // Wednesday
+            return isMatch(hour, user.availabilities.wednesday);
+        case 4: // Thursday
+            return isMatch(hour, user.availabilities.thursday);
+        case 5: // Friday
+            return isMatch(hour, user.availabilities.friday);
+        case 6: // Saturday
+            return isMatch(hour, user.availabilities.saturday);
+    }
+}
+
+/*
+Helper function to determine if a user's schedule matches with an event/meal.
+ */
+const isMatch = (hour, availabilities) => {
+    let result = false;
+    availabilities.forEach(availability => {
+        if (availability.startTime.toDate().getHours() === hour) {
+            if (availability.available) {
+                result = true;
+            }
+
+            return;
+        }
+    });
+
+    return result;
+}

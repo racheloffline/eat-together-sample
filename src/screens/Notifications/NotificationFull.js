@@ -3,7 +3,6 @@ import {
     View,
     StyleSheet,
     Dimensions,
-    TouchableOpacity,
     ScrollView,
     ImageBackground,
     Image
@@ -15,12 +14,14 @@ import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
 import Button from '../../components/Button';
+import Link from "../../components/Link";
 
 import firebase from "firebase";
-import {db, storage} from "../../provider/Firebase";
-import {Menu, MenuOption, MenuOptions, MenuTrigger} from "react-native-popup-menu";
+import { db } from "../../provider/Firebase";
+import { Menu, MenuOption, MenuOptions, MenuTrigger } from "react-native-popup-menu";
 import getDate from '../../getDate';
 import getTime from '../../getTime';
+import openMap from "react-native-open-maps";
 
 export default function ({ route, navigation}) {
     //Save the invite as a shorter name
@@ -95,6 +96,9 @@ export default function ({ route, navigation}) {
                             <NormalText paddingHorizontal={10} color="black">
                                 {invite.location}
                             </NormalText>
+                            <Link onPress={() => openMap({ query: invite.location, provider: "google" })}>
+                                (view on map)
+                            </Link>
                         </View>
 
                         <View style={styles.row}>
@@ -172,74 +176,6 @@ export default function ({ route, navigation}) {
                     }} backgroundColor="red" marginHorizontal={10}>
                         Decline
                     </Button>
-
-                    {/*Old code*/}
-
-                    {/*<TouchableOpacity onPress = {() => {*/}
-                    {/*    ref.set({*/}
-                    {/*        accepted: "accepted"*/}
-                    {/*    }, {merge: true}).then(() => {*/}
-                    {/*        const inviteRef = db.collection("Private Events").doc(invite.inviteID)*/}
-                    {/*        inviteRef.get().then((doc) => {*/}
-                    {/*            let data = doc.data()*/}
-                    {/*            let currentAttendees = data.attendees*/}
-                    {/*            if(!currentAttendees.includes(user.uid)) {*/}
-                    {/*                currentAttendees.push(user.uid)*/}
-                    {/*                inviteRef.set({*/}
-                    {/*                    attendees: currentAttendees*/}
-                    {/*                }, {merge: true}).then(() => {*/}
-                    {/*                    const storeID = {*/}
-                    {/*                        type: "private",*/}
-                    {/*                        id: invite.inviteID*/}
-                    {/*                    };*/}
-
-                    {/*                    db.collection("Users").doc(user.uid).update({*/}
-                    {/*                        attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)*/}
-                    {/*                    }).then(() => {*/}
-                    {/*                        alert("Invite Accepted!");*/}
-                    {/*                        navigation.goBack();*/}
-                    {/*                    });*/}
-                    {/*                })*/}
-                    {/*            } else {*/}
-                    {/*                alert("Invite already accepted.");*/}
-                    {/*            }*/}
-
-                    {/*        })*/}
-                    {/*    })*/}
-                    {/*}}>*/}
-                    {/*    <NormalText size = {18} color = {"green"} center = "center">Accept Invite</NormalText>*/}
-                    {/*</TouchableOpacity>*/}
-                    {/*<TouchableOpacity style = {{paddingVertical: 10}} onPress = {() => {*/}
-                    {/*    ref.set({*/}
-                    {/*        accepted: "declined"*/}
-                    {/*    }, {merge: true}).then(() => {*/}
-                    {/*        const storeID = {*/}
-                    {/*            type: "private",*/}
-                    {/*            id: invite.inviteID*/}
-                    {/*        };*/}
-
-                    {/*        db.collection("Users").doc(user.uid).update({*/}
-                    {/*            attendingEventIDs: firebase.firestore.FieldValue.arrayRemove(storeID)*/}
-                    {/*        }).then(() => {*/}
-                    {/*            db.collection("Private Events").doc(invite.inviteID).update({*/}
-                    {/*                attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)*/}
-                    {/*            }).then(() => {*/}
-                    {/*                alert("Invite Declined");*/}
-                    {/*                navigation.goBack();*/}
-                    {/*            })*/}
-                    {/*        });*/}
-                    {/*    })*/}
-                    {/*}}>*/}
-                    {/*    <NormalText size = {18} color = {"red"} center = "center">Decline Invite</NormalText>*/}
-                    {/*</TouchableOpacity>*/}
-                    {/*<TouchableOpacity onPress = {() => {*/}
-                    {/*    ref.delete().then(r => {*/}
-                    {/*        alert("Invite Cleared")*/}
-                    {/*        navigation.goBack();*/}
-                    {/*    })*/}
-                    {/*}}>*/}
-                    {/*    <NormalText size = {18} color = {"blue"} center = "center">Clear Invite</NormalText>*/}
-                    {/*</TouchableOpacity>*/}
                 </View>
             </ScrollView>
         </Layout>

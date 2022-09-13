@@ -10,12 +10,14 @@ import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
 import Button from "../../components/Button";
 import TagsList from "../../components/TagsList";
+import Link from "../../components/Link";
 
 import getDate from "../../getDate";
 import getTime from "../../getTime";
 
 import {db, auth} from "../../provider/Firebase";
 import * as firebase from "firebase";
+import openMap from "react-native-open-maps";
 
 const FullCard = ({ route, navigation }) => {
   const user = auth.currentUser;
@@ -123,6 +125,9 @@ const FullCard = ({ route, navigation }) => {
               <NormalText paddingHorizontal={10} color="black">
                 {route.params.event.location}
               </NormalText>
+              <Link onPress={() => openMap({ query: route.params.event.location, provider: "google" })}>
+                (view on map)
+              </Link>
             </View>
 
             <View style={styles.row}>
