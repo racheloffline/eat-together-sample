@@ -46,7 +46,7 @@ export default function ({ navigation }) {
                         });
                         
                         setNotifs(true);
-                        alert("Notification preference updated :)");
+                        alert("Notification preference updated!");
                     }
                 },
                 {
@@ -57,7 +57,7 @@ export default function ({ navigation }) {
                         });
 
                         setNotifs(false);
-                        alert("Notification preference updated :)");
+                        alert("Notification preference updated!");
                     }
                 }
             ]

@@ -19,7 +19,7 @@ const Day = props => {
 
     return (
         <Layout style={styles.page}>
-            <LargeText center>What times are you available on {props.route.params.day}?</LargeText>
+            <LargeText center>When would you like to eat on {props.route.params.day}?</LargeText>
 
             <Times times={times} change={clickTime}/>
 

@@ -51,7 +51,7 @@ const FullCard = ({ route, navigation }) => {
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Image source={route.params.event.hasHostImage ? { uri: route.params.event.hostImage}
               : require("../../../assets/logo.png")} style={styles.profileImg}/>
-            <MediumText size={18}>{route.params.event.hostID === user.uid ? "You ;)"
+            <MediumText size={18}>{route.params.event.hostID === user.uid ? "You!"
               : (route.params.event.hostFirstName ?
                 route.params.event.hostFirstName + " " + route.params.event.hostLastName
               : route.params.event.hostName)}

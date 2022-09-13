@@ -1,5 +1,5 @@
 import React from "react";
-import { Text } from "react-native";
+import { Platform, Text } from "react-native";
 import { useFonts, Inter_800ExtraBold } from '@expo-google-fonts/inter';
 
 const LargeText = props => {
@@ -9,7 +9,7 @@ const LargeText = props => {
         return (
             <Text style={{
                 fontSize: props.size ? props.size : 30,
-                fontFamily: 'sans-serif',
+                fontFamily: Platform.os === 'ios' ? 'AppleSDGothicNeo-Bold' : 'sans-serif-condensed',
                 color: props.color ? props.color : "black",
                 textAlign: props.center ? "center" : "auto",
                 paddingHorizontal: props.paddingHorizontal ? props.paddingHorizontal : 0,

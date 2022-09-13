@@ -10,8 +10,8 @@ import Button from "../../../components/Button";
 const Availabilities = props => {
   return (
     <ScrollView style={styles.page}>
-        <LargeText center size={28}>Mark your availabilites</LargeText>
-        <NormalText center>Or feel free to do this later :)</NormalText>
+        <LargeText center size={28}>Mark when you'd like to eat!</LargeText>
+        <NormalText center>Or feel free to do this later.</NormalText>
 
         <View style={styles.dates}>
             <Button onPress={() => props.navigation.navigate("Day", {
