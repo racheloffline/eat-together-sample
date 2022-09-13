@@ -1,5 +1,3 @@
-edit
-
 import React, { useState, useEffect, useContext } from "react";
 import { View, StyleSheet, Image, Dimensions, TouchableOpacity } from 'react-native';
 import { Layout, TopNav, TextInput } from "react-native-rapi-ui";
@@ -21,7 +19,7 @@ import timeSlots from "../../timeSlots";
 import { cloneDeep } from "lodash";
 
 
-export default function ({ route, navigation }) {
+export default function edit({ route, navigation }) {
     // Input fields
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');

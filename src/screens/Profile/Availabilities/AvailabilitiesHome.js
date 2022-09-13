@@ -1,6 +1,3 @@
-availabilitieshome
-
-
 // FOR JOSH: homepage for availabilities, figure out how to fetch the user's availabilities
 
 import React, {useState} from "react";
@@ -33,37 +30,37 @@ const AvailabilitiesHome = props => {
 
         <View style={styles.dates}>
             <Button onPress={() => props.navigation.navigate("EditDay", {
-              times: monday,
+              times: monday.monday,
               setTimes: setMonday,
               day: "Monday"
             })} marginVertical={5}>Monday</Button>
             <Button onPress={() => props.navigation.navigate("EditDay", {
-              times: tuesday,
+              times: tuesday.tuesday,
               setTimes: setTuesday,
               day: "Tuesday"
             })} marginVertical={5}>Tuesday</Button>
             <Button onPress={() => props.navigation.navigate("EditDay", {
-              times: wednesday,
+              times: wednesday.wednesday,
               setTimes: setWednesday,
               day: "Wednesday"
             })} marginVertical={5}>Wednesday</Button>
             <Button onPress={() => props.navigation.navigate("EditDay", {
-              times: thursday,
+              times: thursday.thursday,
               setTimes: setThursday,
               day: "Thursday"
             })} marginVertical={5}>Thursday</Button>
             <Button onPress={() => props.navigation.navigate("EditDay", {
-              times: friday,
+              times: friday.friday,
               setTimes: setFriday,
               day: "Friday"
             })} marginVertical={5}>Friday</Button>
             <Button onPress={() => props.navigation.navigate("EditDay", {
-              times: saturday,
+              times: saturday.saturday,
               setTimes: setSaturday,
               day: "Saturday"
             })} marginVertical={5}>Saturday</Button>
             <Button onPress={() => props.navigation.navigate("EditDay", {
-              times: sunday,
+              times: sunday.sunday,
               setTimes: setSunday,
               day: "Sunday"
             })} marginVertical={5}>Sunday</Button>
