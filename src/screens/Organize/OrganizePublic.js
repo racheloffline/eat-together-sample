@@ -316,7 +316,7 @@ export default function ({ navigation }) {
                         padding: 10
                     }
                 }}>
-                <NormalText center marginBottom={10}>Add as many tags as you want :)</NormalText>
+                <NormalText center marginBottom={10}>Add as many tags as you want!</NormalText>
                 <TagsSection
                     multi={true}
                     selectedItems={tagsSelected}

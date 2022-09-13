@@ -19,7 +19,7 @@ export default function ({ navigation }) {
   //Check to see if we should display the "No Invites" placeholder text
   function shouldDisplayPlaceholder(list) {
     if (list == null || list.length === 0) {
-      return "No invites as of yet. Explore some public events! :)";
+      return "No invites as of yet. Explore some public events!";
     } else {
       return "";
     }
