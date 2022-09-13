@@ -4,7 +4,7 @@ import Tag from "./Tag";
 
 const TagsList = props => {
     return (
-        <View style={{ flexDirection: "row" }} onStartShouldSetResponder={() => true}>
+        <View style={{ flexDirection: "row" }} onStartShouldSetResponder={() => props.remove ? true : false}>
             <ScrollView horizontal={true} style={{ marginVertical: props.marginVertical ? props.marginVertical : 10 }}
                 contentContainerStyle={{ flexGrow: 1, justifyContent: props.left ? "flex-start" : "center" }}>
             {props.tags.map((tag, i) => <Tag text={tag.tag ? tag.tag : tag} key={tag.tag ? tag.tag : tag}

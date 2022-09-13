@@ -1,7 +1,7 @@
 // Full event page
 
 import React, { useState, useEffect } from "react";
-import {View, ScrollView, StyleSheet, ImageBackground, Dimensions, Image} from "react-native";
+import { View, ScrollView, StyleSheet, ImageBackground, Dimensions, Image } from "react-native";
 import { Layout, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -108,7 +108,7 @@ const FullCard = ({ route, navigation }) => {
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Image source={route.params.event.hasHostImage ? { uri: route.params.event.hostImage}
               : require("../../../assets/logo.png")} style={styles.profileImg}/>
-            <MediumText size={18}>{route.params.event.hostID === user.uid ? "You ;)"
+            <MediumText size={18}>{route.params.event.hostID === user.uid ? "You!"
               : (route.params.event.hostFirstName ?
                 route.params.event.hostFirstName + " " + route.params.event.hostLastName
               : route.params.event.hostName)}

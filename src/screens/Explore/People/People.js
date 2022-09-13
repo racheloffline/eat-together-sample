@@ -249,9 +249,9 @@ export default function ({ navigation }) {
               />
             )}
           />
-        ) : (<View style={{ flex: 1, justifyContent: "center" }}>
-          <MediumText center>Empty 🍽️</MediumText>
-        </View>) : (
+          ) : (<View style={{ flex: 1, justifyContent: "center" }}>
+            <MediumText center>Empty 🍽️</MediumText>
+          </View>) : (
           <View style={{ flex: 1, justifyContent: "center" }}>
             <ActivityIndicator size={100} color="#5DB075" />
           </View>

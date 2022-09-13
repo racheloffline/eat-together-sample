@@ -34,7 +34,6 @@ import {
   MenuTrigger,
 } from "react-native-popup-menu";
 import openMap from "react-native-open-maps";
-
 import { isAvailable } from "../../methods";
 
 const WhileYouEat = ({ route, navigation }) => {
@@ -236,12 +235,12 @@ const WhileYouEat = ({ route, navigation }) => {
           </LargeText>
 
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Image source={route.params.event.hasHostImage ? { uri: route.params.event.hostImage}
+            <Image source={event.hasHostImage ? { uri: event.hostImage }
               : require("../../../assets/logo.png")} style={styles.profileImg}/>
             <MediumText size={18}>{route.params.event.hostID === user.uid ? "You ;)"
-              : (route.params.event.hostFirstName ?
-                route.params.event.hostFirstName + " " + route.params.event.hostLastName
-              : route.params.event.hostName)}
+              : (event.hostFirstName ?
+                event.hostFirstName + " " + event.hostLastName
+              : event.hostName)}
             </MediumText>
           </View>
 
@@ -253,9 +252,9 @@ const WhileYouEat = ({ route, navigation }) => {
             <View style={styles.row}>
               <Ionicons name="location-sharp" size={20} />
               <NormalText paddingHorizontal={10} color="black">
-                {route.params.event.location}
+                {event.location}
               </NormalText>
-              <Link onPress={() => openMap({ query: route.params.event.location, provider: "google" })}>
+              <Link onPress={() => openMap({ query: event.location, provider: "google" })}>
                 (view on map)
               </Link>
             </View>

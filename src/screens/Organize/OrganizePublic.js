@@ -216,26 +216,30 @@ export default function ({ navigation }) {
                             setShowDate(true);
                             setMode("date");
                         }} style={styles.smallInput}>
-                            <TextInput
-                                value={getDate(date)}
-                                leftContent={
-                                    <Ionicons name="calendar-outline" size={20}/>
-                                }
-                                editable={false}
-                            />
+                            <View pointerEvents="none">
+                                <TextInput
+                                    value={getDate(date)}
+                                    leftContent={
+                                        <Ionicons name="calendar-outline" size={20}/>
+                                    }
+                                    editable={false}
+                                />
+                            </View>
                         </TouchableOpacity>
 
                         <TouchableOpacity onPress={() => {
                             setShowDate(true);
                             setMode("time");
                         }} style={styles.smallInput}>
-                            <TextInput
-                                value={getTime(date)}
-                                leftContent={
-                                    <Ionicons name="time-outline" size={20}/>
-                                }
-                                editable={false}
-                            />
+                            <View pointerEvents="none">
+                                <TextInput
+                                    value={getTime(date)}
+                                    leftContent={
+                                        <Ionicons name="time-outline" size={20}/>
+                                    }
+                                    editable={false}
+                                />
+                            </View>
                         </TouchableOpacity>
                     </View>                        
 
@@ -256,14 +260,16 @@ export default function ({ navigation }) {
 
                     <TouchableOpacity onPress={() => refRBSheet.current.open()}
                         style={styles.input}>
-                        <TextInput
-                            placeholder="Tags"
-                            value={tagsValue}
-                            leftContent={
-                                <Ionicons name="pricetags-outline" size={20}/>
-                            }
-                            editable={false}
-                        />
+                        <View pointerEvents="none">
+                            <TextInput
+                                placeholder="Tags"
+                                value={tagsValue}
+                                leftContent={
+                                    <Ionicons name="pricetags-outline" size={20}/>
+                                }
+                                editable={false}
+                            />
+                        </View>
                     </TouchableOpacity>
 
                     <Button disabled={disabled || loading} onPress={() => {
@@ -310,7 +316,7 @@ export default function ({ navigation }) {
                         padding: 10
                     }
                 }}>
-                <NormalText center marginBottom={10}>Add as many tags as you want :)</NormalText>
+                <NormalText center marginBottom={10}>Add as many tags as you want!</NormalText>
                 <TagsSection
                     multi={true}
                     selectedItems={tagsSelected}

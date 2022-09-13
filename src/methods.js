@@ -103,7 +103,6 @@ export const getTimeOfDay = (time) => {
         return "evening";
     }
 }
-
 /*
 Check whether inappropriate words are used.
 Returns: true if inappropriate words are used, false otherwise.

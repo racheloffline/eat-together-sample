@@ -15,9 +15,8 @@ import Link from "../../components/Link";
 
 import MediumText from "../../components/MediumText";
 
-import { getTimeOfDay } from "../../methods";
+import { getTimeOfDay, isAvailable } from "../../methods";
 import { auth, db } from "../../provider/Firebase";
-import { isAvailable } from "../../methods";
 
 export default function({ navigation }) {
     // Fetch current user
@@ -273,7 +272,7 @@ export default function({ navigation }) {
               onPress={() => showTimeFilterRef.current.open()}
               text={morning ? "Morning" : 
                 afternoon ? "Afternoon" : 
-                evening ? "Evening" :"Time of day"}/>
+                evening ? "Evening" : "Time of day"}/>
             <Filter checked={similarInterests || popularity}
               onPress={() => showSortFilterRef.current.open()}
               text={similarInterests ? "Similar interests"

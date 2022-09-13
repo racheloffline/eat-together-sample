@@ -40,8 +40,9 @@ export default function ({ navigation }) {
                             alert("Account deleted successfully. Sorry to see you go :(");
                             db.collection("Users").doc(uid).delete();
                             db.collection("Usernames").doc(userInfo.username).delete();
+                            auth.signOut();
                         }).catch((error) => {
-                            signOut().then(() => {
+                            auth.signOut().then(() => {
                                 alert("You need to sign in again to proceed.");
                             });
                         });

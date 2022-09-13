@@ -17,8 +17,8 @@ import Button from '../../components/Button';
 import Link from "../../components/Link";
 
 import firebase from "firebase";
-import {db} from "../../provider/Firebase";
-import {Menu, MenuOption, MenuOptions, MenuTrigger} from "react-native-popup-menu";
+import { db } from "../../provider/Firebase";
+import { Menu, MenuOption, MenuOptions, MenuTrigger } from "react-native-popup-menu";
 import getDate from '../../getDate';
 import getTime from '../../getTime';
 import openMap from "react-native-open-maps";

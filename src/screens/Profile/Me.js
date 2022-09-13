@@ -67,13 +67,13 @@ export default function ({ navigation }) {
                   let data = event.data();
                   newEvents.push(data);
                   eventsLength--;
-
+                  
                   if (eventsLength === 0) {
                     // Sort events by date
                     newEvents = newEvents.sort((a, b) => {
                       return a.date.seconds - b.date.seconds;
                     });
-
+                    
                     setEvents(newEvents);
                   }
                 }).catch(e => {
@@ -93,6 +93,7 @@ export default function ({ navigation }) {
     fetchData();
   }, []);
 
+  // Update user profile after editing
   const updateInfo = (newFirstName, newLastName, newPronouns, newBio, newTags, newImage) => {
     setUserInfo((prev) => ({
       ...prev,
@@ -104,6 +105,14 @@ export default function ({ navigation }) {
       image: newImage
     }));
   };
+
+  // Update user's availabilities after editing
+  const updateAvailabilities = newAvailabilities => {
+    setUserInfo(prev => ({
+      ...prev,
+      availabilities: newAvailabilities
+    }));
+  }
 
   return (
     <Layout>
@@ -123,7 +132,20 @@ export default function ({ navigation }) {
             }}
           ></Ionicons>
         </View>
-
+        <View style={styles.calendar}>
+          <Ionicons
+            name="calendar-sharp"
+            size={40}
+            color="white"
+            onPress={() => {
+              navigation.navigate("AvailabilitiesHome", {
+                user: userInfo,
+                updateAvailabilities,
+              });
+            }}
+          ></Ionicons>
+        </View>
+        
         <Image
           style={styles.image}
           source={
@@ -224,6 +246,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 20,
     top: 20,
+  },
+
+  calendar: {
+    position: "absolute",
+    right: 20,
+    top: 70,
   },
 
   connections: {

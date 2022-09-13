@@ -1,5 +1,5 @@
 import React from "react";
-import { Text } from "react-native";
+import { Platform, Text } from "react-native";
 import { useFonts, Inter_600SemiBold } from '@expo-google-fonts/inter';
 
 const MediumText = props => {
@@ -9,7 +9,7 @@ const MediumText = props => {
         return (
             <Text style={{
                 fontSize: props.size ? props.size : 20,
-                fontFamily: 'sans-serif',
+                fontFamily: Platform.os === 'ios' ? 'AppleSDGothicNeo-Medium' : 'sans-serif-medium',
                 color: props.color ? props.color : "black",
                 textAlign: props.center ? "center" : "auto",
                 paddingHorizontal: props.paddingHorizontal ? props.paddingHorizontal : 0,

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
     View,
     StyleSheet,
-    Dimensions,
     TouchableOpacity,
     FlatList,
     Alert, Linking
@@ -46,7 +45,7 @@ export default function ({ navigation }) {
                         });
                         
                         setNotifs(true);
-                        alert("Notification preference updated :)");
+                        alert("Notification preference updated!");
                     }
                 },
                 {
@@ -57,7 +56,7 @@ export default function ({ navigation }) {
                         });
 
                         setNotifs(false);
-                        alert("Notification preference updated :)");
+                        alert("Notification preference updated!");
                     }
                 }
             ]
@@ -94,6 +93,10 @@ export default function ({ navigation }) {
                             alert("Account deleted successfully. Sorry to see you go :(");
                             db.collection("Users").doc(uid).delete();
                             db.collection("Usernames").doc(userInfo.username).delete();
+                            if (userInfo.hasImage) {
+                                storage.ref().child("profilePictures/" + uid).delete();
+                            }
+                            signOut();
                         }).catch((error) => {
                             signOut().then(() => {
                                 alert("You need to sign in again to proceed.");

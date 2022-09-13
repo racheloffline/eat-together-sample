@@ -292,8 +292,8 @@ export default function ({ route, navigation }) {
     return newUsers.filter((e) => isMatch(e, text));
   };
 
-  // Filtering by people who are available to the event or not
-  const filterByAvailability = (newUsers) => {
+   // Filtering by people who are available to the event or not
+   const filterByAvailability = (newUsers) => {
     return newUsers.filter(u => isAvailable(u, route.params));
   }
 

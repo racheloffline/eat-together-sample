@@ -5,7 +5,7 @@ import {
   View,
   StyleSheet,
   FlatList,
-  TouchableOpacity,
+  TouchableOpacity
 } from "react-native";
 import { Button, Layout } from "react-native-rapi-ui";
 
@@ -15,7 +15,7 @@ import { db } from "../../provider/Firebase";
 import firebase from "firebase";
 
 import ChatPreview from "../../components/ChatPreview";
-import SearchableDropdown from "react-native-searchable-dropdown";
+import SearchableDropdown from "../../components/SearchableDropdown";
 
 export default function ({ navigation }) {
   const [selectedUsers, setSelectedUsers] = useState([]);
@@ -33,7 +33,6 @@ export default function ({ navigation }) {
         allUsernames.push(user.username);
         allNames.push(user.name);
       });
-
       allUsernames.push(currUser.data().username);
       allNames.push(currUser.data().firstName + " " + currUser.data().lastName);
       const chatID = allUsernames.sort().join();
@@ -169,11 +168,10 @@ export default function ({ navigation }) {
             }}
             itemStyle={{
               padding: 10,
-              marginTop: 2,
-              backgroundColor: "#ddd",
-              borderColor: "#bbb",
-              borderWidth: 1,
+              borderWidth: 2,
+              borderColor: '#5DB075',
               borderRadius: 5,
+              marginTop: 2,
             }}
             itemTextStyle={{ color: "#222" }}
             itemsContainerStyle={{ maxHeight: 140 }}
@@ -183,13 +181,6 @@ export default function ({ navigation }) {
             resetValue={true}
             textInputProps={{
               placeholder: "Search for taste buds",
-              style: {
-                padding: 12,
-                borderWidth: 1,
-                borderColor: "#ccc",
-                borderRadius: 5,
-                maxWidth: 220,
-              },
             }}
           />
           <Button
