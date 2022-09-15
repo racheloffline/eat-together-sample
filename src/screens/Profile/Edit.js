@@ -89,11 +89,11 @@ export default function edit({ route, navigation }) {
     // Update user profile in Firebase
     const updateUser = async () => {
         if (checkProfanity(firstName) || checkProfanity(lastName)) {
-            alert("Name has inappropriate words >:(");
+            alert("Name has inappropriate words");
         } else if (checkProfanity(pronouns)) {
-            alert("Pronouns have inappropriate words >:(");
+            alert("Pronouns have inappropriate words");
         } else if (checkProfanity(bio)) {
-            alert("Fun fact has inappropriate words >:(");
+            alert("Fun fact has inappropriate words");
         } else {
             route.params.updateInfo(firstName, lastName, pronouns, bio, tags, image);
 
