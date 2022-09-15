@@ -141,7 +141,7 @@ export default function ({ navigation }) {
     const newSearchedEvents = search(newEvents, searchQuery);
     setFilteredSearchedEvents(newSearchedEvents);
     setLoading(false);
-  }, [publicEvents, privateEvents, fromFriends, friendsAttending]);
+  }, [publicEvents, privateEvents, fromYourself, fromFriends, friendsAttending]);
 
   // Method to filter out events
   const search = (newEvents, text) => {
@@ -256,21 +256,30 @@ export default function ({ navigation }) {
   const editEvent = newEvent => {
     const newEvents = events.map(e => {
       if (e.id === newEvent.id) {
-        return newEvent;
+        return {
+          ...e,
+          ...newEvent
+        };
       }
       return e;
     });
 
     const newFilteredEvents = filteredEvents.map(e => {
       if (e.id === newEvent.id) {
-        return newEvent;
+        return {
+          ...e,
+          ...newEvent
+        };
       }
       return e;
     });
 
     const newFilteredSearchedEvents = filteredSearchedEvents.map(e => {
       if (e.id === newEvent.id) {
-        return newEvent;
+        return {
+          ...e,
+          ...newEvent
+        };
       }
       return e;
     });
