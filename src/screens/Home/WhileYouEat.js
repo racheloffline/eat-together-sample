@@ -237,7 +237,7 @@ const WhileYouEat = ({ route, navigation }) => {
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Image source={event.hasHostImage ? { uri: event.hostImage }
               : require("../../../assets/logo.png")} style={styles.profileImg}/>
-            <MediumText size={18}>{route.params.event.hostID === user.uid ? "You ;)"
+            <MediumText size={18}>{route.params.event.hostID === user.uid ? "You"
               : (event.hostFirstName ?
                 event.hostFirstName + " " + event.hostLastName
               : event.hostName)}
@@ -327,7 +327,7 @@ const WhileYouEat = ({ route, navigation }) => {
               <View style={{ marginTop: 10 }}>
                 {people.length === 0 ? (
                   <NormalText paddingHorizontal={25} size={17} color="black">
-                    {"Just yourself ;)"}
+                    {"Just yourself"}
                   </NormalText>
                 ) : (
                   people.map((person, index) => {
