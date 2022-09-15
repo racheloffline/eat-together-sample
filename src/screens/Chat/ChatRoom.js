@@ -13,6 +13,8 @@ import firebase from "firebase";
 import { db } from "../../provider/Firebase";
 import moment from "moment";
 import TextMessage from "../../components/TextMessage";
+import NormalText from "../../components/NormalText";
+import MediumText from "../../components/MediumText";
 
 export default function ({ route, navigation }) {
   const [image, setImage] = useState(
@@ -54,7 +56,13 @@ export default function ({ route, navigation }) {
   return (
     <Layout>
       <TopNav
-        middleContent={group.name}
+        middleContent={
+          <TouchableOpacity onPress={() => navigation.navigate("ChatRoomDetails", {
+              group: group
+          })}>
+              <MediumText>{group.name}</MediumText>
+          </TouchableOpacity>
+        }
         leftContent={<Ionicons name="chevron-back" size={20} />}
         rightContent={<Image style={styles.image} source={{ uri: image }} />}
         leftAction={() => {
