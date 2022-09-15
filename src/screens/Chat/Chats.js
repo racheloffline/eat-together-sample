@@ -16,6 +16,7 @@ import firebase from "firebase";
 
 import ChatPreview from "../../components/ChatPreview";
 import SearchableDropdown from "../../components/SearchableDropdown";
+import {useIsFocused} from "@react-navigation/native";
 
 export default function ({ navigation }) {
   const [selectedUsers, setSelectedUsers] = useState([]);
@@ -23,6 +24,8 @@ export default function ({ navigation }) {
   const [groups, setGroups] = useState([]);
   const user = firebase.auth().currentUser;
   const userInfo = db.collection("Users").doc(user.uid);
+
+  const isFocused = useIsFocused(); //OMG THIS IS A LIFESAVING HACK
 
   const createNewChat = () => {
     userInfo.get().then((currUser) => {
@@ -137,7 +140,7 @@ export default function ({ navigation }) {
           });
       });
     });
-  }, []);
+  }, [isFocused]);
   /*
   return (
     <View style={{ flexGrow: 1, justifyContent: "center", margin: 40 }}>
