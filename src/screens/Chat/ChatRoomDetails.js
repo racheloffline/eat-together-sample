@@ -2,14 +2,15 @@ import React, { useEffect, useState } from "react";
 import {View, StyleSheet, FlatList, Dimensions} from "react-native";
 import {Layout, TextInput, TopNav} from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
-import { db } from "../../provider/Firebase";
+import { db, auth } from "../../provider/Firebase";
 import MediumText from "../../components/MediumText";
 import PeopleList from "../../components/PeopleList";
-import {generateColor} from "../../methods";
+import {checkProfanity, generateColor} from "../../methods";
 import NormalText from "../../components/NormalText";
 
 export default function ({route, navigation}) {
     let group = route.params.group;
+    let user = auth.currentUser;
     const [users, setUsers] = useState([]);
 
     const [chatName, setChatName] = useState(group.name);
@@ -20,6 +21,7 @@ export default function ({route, navigation}) {
             let userList = [];
             userIDs = doc.data().uids;
             userIDs.forEach((uid) => {
+                if(uid == user.uid) return;
                 db.collection("Users").doc(uid).get().then((doc) => {
                     userList.push(doc.data());
                 }).then(() => {
@@ -38,13 +40,19 @@ export default function ({route, navigation}) {
                 }}
             />
             <View style={styles.chatName}>
-                <NormalText>Group name: </NormalText>
+                <View style = {styles.groupName}>
+                    <NormalText>Group name: </NormalText>
+                </View>
                 <TextInput
                     placeholder="Group Name"
                     onChangeText={(val) => setChatName(val)}
                     value={chatName}
                     containerStyle={{ width: "75%" }}
                     onEndEditing={() => {
+                        if(checkProfanity(chatName)) {
+                            alert("Please do not use profane words in the chat name.");
+                            return;
+                        }
                         db.collection("Groups").doc(group.groupID).update({
                             name: chatName
                         }).then(() => {
@@ -71,8 +79,14 @@ export default function ({route, navigation}) {
 const styles = StyleSheet.create({
     chatName: {
         flexDirection: "row",
-        width: Dimensions.get("screen").width - 20,
-        alignContent: "center"
+        alignContent: "center",
+        paddingBottom: 20,
+        paddingHorizontal: 20,
+        paddingTop: 10
+    },
+    groupName: {
+        paddingRight: 10,
+        paddingTop: 10
     },
     invites: {
         alignItems: "center",
