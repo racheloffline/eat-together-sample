@@ -116,16 +116,9 @@ export default function ({ route, navigation }) {
         const newEvent = {
             id,
             name,
-            hostID: route.params.event.hostID,
-            hostFirstName: route.params.event.hostFirstName,
-            hostLastName: route.params.event.hostLastName,
-            hasHostImage: route.params.event.hasHostImage,
-            hostImage: route.params.event.hostImage,
             location,
             date,
             additionalInfo,
-            attendees: route.params.event.attendees,
-            ice: route.params.event.ice,
             hasImage,
             image
         };
@@ -137,7 +130,7 @@ export default function ({ route, navigation }) {
             table = "Public Events";
         }
 
-        db.collection(table).doc(route.params.event.id).set(newEvent).then(() => {
+        db.collection(table).doc(route.params.event.id).update(newEvent).then(() => {
             newEvent.date = moment(date);
             route.params.editEvent({...newEvent, type: route.params.event.type});
             route.params.editEvent2({...newEvent, type: route.params.event.type});

@@ -153,7 +153,10 @@ const WhileYouEat = ({ route, navigation }) => {
 
   // Replace event with new details (for editing)
   const editEvent = newEvent => {
-    setEvent(newEvent);
+    setEvent(event => ({
+      ...event,
+      ...newEvent
+    }));
   }
 
   // Alert the user if they want to withdraw from the event or not
