@@ -65,7 +65,7 @@ export default function({ navigation }) {
                 
                 // Sort events by date
                 newEvents = newEvents.sort((a, b) => {
-                    return b.date.seconds - a.date.seconds;
+                    return a.date.seconds - b.date.seconds;
                 });
                 setEvents(newEvents);
                 setFilteredEvents(newEvents);
