@@ -93,8 +93,10 @@ export default function ({ navigation }) {
                             alert("Account deleted successfully. Sorry to see you go :(");
                             db.collection("Users").doc(uid).delete();
                             db.collection("Usernames").doc(userInfo.username).delete();
+                            
                             if (userInfo.hasImage) {
-                                storage.ref().child("profilePictures/" + uid).delete();
+                                const ref = storage.ref().child(`profilePictures/${uid}`);
+                                ref.delete();
                             }
                             signOut();
                         }).catch((error) => {

@@ -108,6 +108,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     marginVertical: 4,
+    flexWrap: "wrap"
   },
 
   profileImg: {

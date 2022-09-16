@@ -255,11 +255,16 @@ export default function ({ route, navigation }) {
                         let hasImage = false;
                         if (photo !== "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400") {
                             hasImage = true;
-                            storeImage(photo, route.params.event.id).then(() => {
-                                fetchImage(route.params.event.id).then(uri => {
-                                    storeEvent(route.params.event.id, hasImage, uri);
+                            
+                            if (photo !== route.params.event.image) {
+                                storeImage(photo, route.params.event.id).then(() => {
+                                    fetchImage(route.params.event.id).then(uri => {
+                                        storeEvent(route.params.event.id, hasImage, uri);
+                                    });
                                 });
-                            });
+                            } else {
+                                storeEvent(route.params.event.id, hasImage, route.params.event.image);
+                            }
                         } else {
                             storeEvent(route.params.event.id, hasImage, "");
                         }
