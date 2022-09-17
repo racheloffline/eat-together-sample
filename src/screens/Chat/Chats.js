@@ -12,7 +12,7 @@ import { Button, Layout } from "react-native-rapi-ui";
 import Header from "../../components/Header";
 
 import { db } from "../../provider/Firebase";
-import firebase from "firebase";
+import firebase from "firebase/compat";
 
 import ChatPreview from "../../components/ChatPreview";
 import SearchableDropdown from "../../components/SearchableDropdown";

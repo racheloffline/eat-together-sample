@@ -4,8 +4,8 @@ import {Layout, TopNav, Button, TextInput} from "react-native-rapi-ui";
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
 import {FontAwesome, Ionicons} from "@expo/vector-icons";
-import admin from "firebase";
-import firebase from "firebase";
+import admin from "firebase/compat";
+import firebase from "firebase/compat";
 
 const ReportEvent = ({ route, navigation }) => {
     const [report, setReport] = useState('');

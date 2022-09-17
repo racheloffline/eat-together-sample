@@ -1,5 +1,5 @@
 import {db} from "./provider/Firebase";
-import firebase from "firebase";
+import firebase from "firebase/compat";
 import profaneWords from "./profaneWords";
 
 /*

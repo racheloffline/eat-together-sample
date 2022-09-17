@@ -1,4 +1,5 @@
-import firebase from "firebase";
+import firebase from "firebase/compat";
+import "firebase/compat/storage";  
 import {
     FIREBASE_API_KEY,
     FIREBASE_AUTH_DOMAIN,

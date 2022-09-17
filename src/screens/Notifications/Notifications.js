@@ -9,7 +9,7 @@ import MediumText from "../../components/MediumText";
 import EventCard from "../../components/EventCard";
 
 import { db } from "../../provider/Firebase";
-import firebase from "firebase";
+import firebase from "firebase/compat";
 
 export default function ({ navigation }) {
   //Get a list of current invites from Firebase up here

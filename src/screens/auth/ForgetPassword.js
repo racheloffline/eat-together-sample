@@ -9,7 +9,7 @@ import {
   KeyboardAvoidingView,
   Image,
 } from "react-native";
-import * as firebase from "firebase";
+import * as firebase from "firebase/compat";
 
 import {
   Layout,

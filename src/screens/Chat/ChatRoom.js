@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { Layout, TextInput, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
-import firebase from "firebase";
+import firebase from "firebase/compat";
 import { db } from "../../provider/Firebase";
 import moment from "moment";
 import TextMessage from "../../components/TextMessage";
