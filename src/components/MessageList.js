@@ -5,7 +5,7 @@ import LargeText from "./LargeText";
 import MediumText from "./MediumText";
 import {Ionicons} from "@expo/vector-icons";
 import {TouchableOpacity} from "react-native";
-import firebase from "firebase";
+import firebase from "firebase/compat";
 import {db} from "../provider/Firebase";
 
 const MessageList = props => {

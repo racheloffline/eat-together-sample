@@ -22,7 +22,7 @@ import HorizontalSwitch from "../../components/HorizontalSwitch";
 import Button from "../../components/Button";
 import NormalText from "../../components/NormalText";
 
-import * as firebase from "firebase";
+import * as firebase from "firebase/compat";
 import * as ImagePicker from "expo-image-picker";
 import { db, auth, storage } from "../../provider/Firebase";
 import { cloneDeep } from "lodash";

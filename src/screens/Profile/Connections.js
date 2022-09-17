@@ -8,7 +8,7 @@ import {db} from "../../provider/Firebase";
 import {FlatList, StyleSheet, View} from "react-native";
 import PeopleList from "../../components/PeopleList";
 import {generateColor} from "../../methods";
-import firebase from "firebase";
+import firebase from "firebase/compat";
 import NormalText from "../../components/NormalText";
 import MediumText from "../../components/MediumText";
 
