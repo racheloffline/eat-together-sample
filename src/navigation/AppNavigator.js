@@ -83,6 +83,10 @@ const MainTabs = () => {
         },
         showLabel: false,
       }}
+      screenOptions={{
+        headerShown: false,
+        animationEnabled: false,
+      }}
     >
       <Tabs.Screen
         name="Home"
