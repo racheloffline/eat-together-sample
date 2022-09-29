@@ -25,7 +25,7 @@ import { AuthContext } from "../provider/AuthProvider";
 
 //Screen for if the user hasn't verified their email
 import VerifyEmail from "../screens/VerifyEmail";
-import firebase from "firebase";
+import firebase from "firebase/compat";
 import { db } from "../provider/Firebase";
 
 //Push notifications functions and imports
@@ -82,6 +82,10 @@ const MainTabs = () => {
           backgroundColor: "#ffffff",
         },
         showLabel: false,
+      }}
+      screenOptions={{
+        headerShown: false,
+        animationEnabled: false,
       }}
     >
       <Tabs.Screen

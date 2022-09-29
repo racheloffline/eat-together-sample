@@ -1,5 +1,5 @@
 import { View, StyleSheet } from "react-native";
-import firebase from "firebase";
+import firebase from "firebase/compat";
 import MediumText from "./MediumText";
 const TextMessage = props => {
     const user = firebase.auth().currentUser;

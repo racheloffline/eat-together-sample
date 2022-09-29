@@ -6,7 +6,7 @@ import { View, StyleSheet, FlatList, Dimensions, ActivityIndicator } from "react
 import { db, auth, storage } from "../../provider/Firebase";
 import { TopNav, Layout } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
-import firebase from "firebase";
+import firebase from "firebase/compat";
 
 import Button from "../../components/Button";
 import MediumText from "../../components/MediumText";

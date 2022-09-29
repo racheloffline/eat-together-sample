@@ -24,7 +24,7 @@ export default function () {
       initialRouteName="Me"
       screenOptions={{
         headerShown: false,
-        animationEnabled: true,
+        animationEnabled: false,
       }}
     >
       <Stack.Screen name="Me" component={Me} />

@@ -1,7 +1,7 @@
 //Authenticates usernames and passwords using firebase implementation
 
 import React, { createContext, useState, useEffect } from "react";
-import * as firebase from "firebase";
+import firebase from "firebase/compat";
 import { db } from "../provider/Firebase";
 const AuthContext = createContext();
 

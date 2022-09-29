@@ -13,7 +13,7 @@ export default function () {
       initialRouteName="Explore"
       screenOptions={{
         headerShown: false,
-        animationEnabled: true,
+        animationEnabled: false,
       }}
     >
       <Stack.Screen name="Explore" component={Explore} />

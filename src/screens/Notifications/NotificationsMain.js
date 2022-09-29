@@ -12,7 +12,7 @@ export default function () {
       initialRouteName="Notifications"
       screenOptions={{
         headerShown: false,
-        animationEnabled: true,
+        animationEnabled: false,
       }}
     >
       <Stack.Screen name="Notifications" component={Notifications} />
