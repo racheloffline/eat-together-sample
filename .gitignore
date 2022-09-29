@@ -18,3 +18,4 @@ src/provider/Firebase.js
 
 package-lock.json
 .idea/*
+app.json

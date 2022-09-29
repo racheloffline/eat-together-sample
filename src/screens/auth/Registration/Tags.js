@@ -76,8 +76,7 @@ const Tags = props => {
 
   return (
     <Layout style={styles.page}>
-        <LargeText center>Next, add some tags!</LargeText>
-        <NormalText center size={12} marginBottom={30}>Note: each category must contain between 1 to 4 tags.</NormalText>
+        <LargeText center marginBottom={20}>Next, add some tags!</LargeText>
 
         <View style={styles.tagSection}>
             <MediumText center marginBottom={5}>School</MediumText>
@@ -144,6 +143,9 @@ const Tags = props => {
                 </View>
             </TouchableOpacity>
         </View>
+
+        <NormalText center size={12}>Note: each of the 3 categories above must contain:</NormalText>
+        <MediumText center size={12}>Minimum 1 tag, maximum 4 tags</MediumText>
 
         <View style={styles.buttons}>
             <Button onPress={() => props.navigation.goBack()}
