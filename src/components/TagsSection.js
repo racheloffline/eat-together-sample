@@ -52,7 +52,7 @@ export default class TagsSection extends Component {
       return (
         <FlatList
           { ...flatListProps }
-          style={{ maxHeight: 200 }}
+          style={{ maxHeight: 150 }}
         />
       );
     }
@@ -87,50 +87,48 @@ export default class TagsSection extends Component {
   };
 
   renderItems = (item, index) => {
-    if (this.state.item !== "") {
-        if (this.props.multi && this.props.selectedItems && this.props.selectedItems.length > 0) {
-            return (
-                this.props.selectedItems.find(sitem => sitem === item) ?
+    if (this.props.multi && this.props.selectedItems && this.props.selectedItems.length > 0) {
+        return (
+            this.props.selectedItems.find(sitem => sitem === item) ?
 
-                <TouchableOpacity style={{...styles.item, backgroundColor: "#5DB075", borderBottomWidth: 0}}>
-                    <NormalText color="white">{ item }</NormalText>
-                </TouchableOpacity>
+            <TouchableOpacity style={{...styles.item, backgroundColor: "#5DB075", borderBottomWidth: 0}}>
+                <NormalText color="white">{ item }</NormalText>
+            </TouchableOpacity>
 
-                : <TouchableOpacity
-                    onPress={() => {
-                        this.setState({
-                            focus: false,
-                            item: "",
-                            listItems: this.props.items
-                        });
+            : <TouchableOpacity
+                onPress={() => {
+                    this.setState({
+                        focus: false,
+                        item: "",
+                        listItems: this.props.items
+                    });
 
-                        this.props.onItemSelect(item);
-                        Keyboard.dismiss();
-                    }}
-                    style={styles.item}>
-                    <NormalText>{ item }</NormalText>
-                </TouchableOpacity>
-            )
-        } else {
-            return (
-                <TouchableOpacity
-                    style={styles.item}
-                    onPress={() => {
-                        this.setState({ item: item, focus: false, listItems: this.props.items });
-                        this.props.onItemSelect(item);
+                    this.props.onItemSelect(item);
+                    Keyboard.dismiss();
+                }}
+                style={styles.item}>
+                <NormalText>{ item }</NormalText>
+            </TouchableOpacity>
+        )
+    } else {
+        return (
+            <TouchableOpacity
+                style={styles.item}
+                onPress={() => {
+                    this.setState({ item: item, focus: false, listItems: this.props.items });
+                    this.props.onItemSelect(item);
 
-                        if (this.props.resetValue) {
-                            this.setState({ focus: true, item: "" });
-                            this.input.focus();
-                        }
+                    if (this.props.resetValue) {
+                        this.setState({ focus: true, item: "" });
+                        this.input.focus();
+                    }
 
-                        Keyboard.dismiss();
-                    }}
-                >
-                  <NormalText>{ item }</NormalText>
-                </TouchableOpacity>
-            );
-        }
+                    Keyboard.dismiss();
+                }}
+            >
+              <NormalText>{ item }</NormalText>
+            </TouchableOpacity>
+        );
     }
   };
 

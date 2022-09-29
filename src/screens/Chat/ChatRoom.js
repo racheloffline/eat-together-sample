@@ -67,8 +67,7 @@ export default function ({ route, navigation }) {
         rightContent={<Image style={styles.image} source={{ uri: image }} />}
         leftAction={() => {
           // Temporary fix with invalid chat preview, to be fixed in the future for better speed.
-          navigation.navigate("Invite");
-          navigation.navigate("Chats");
+          navigation.goBack();
         }}
       />
       <FlatList
