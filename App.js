@@ -3,9 +3,11 @@ import AppNavigator from "./src/navigation/AppNavigator";
 import { AuthProvider } from "./src/provider/AuthProvider";
 import { ThemeProvider } from "react-native-rapi-ui";
 import {MenuProvider} from "react-native-popup-menu";
+import { YellowBox } from "react-native";
 
 export default function App() {
   console.disableYellowBox = true; //DISABLE THOSE STUPID WARNINGS SLAYYYYY
+  YellowBox.ignoreWarnings([""]);
 
   const images = [
     require("./assets/icon.png"),
