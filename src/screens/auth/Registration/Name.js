@@ -1,7 +1,7 @@
 // First page of registration
 
 import React, { useState } from "react";
-import { View, StyleSheet, Dimensions, Image, TouchableOpacity } from "react-native";
+import { View, StyleSheet, Dimensions, Image, TouchableOpacity, SafeAreaView } from "react-native";
 import { TextInput } from "react-native-rapi-ui";
 import { Feather, FontAwesome } from '@expo/vector-icons';
 
@@ -52,48 +52,92 @@ const Name = props => {
   }
 
   return (
-    <KeyboardAvoidingWrapper>
-      <View>
-        <View style={styles.header}>
-          <LargeText color="white" center size={25}>Let's set up your profile!</LargeText>
-        </View>
-
-        <View style={styles.imageContainer}>
-          {image !== "" ? <Image style={styles.image} source={{uri: image}}/>
-            : <Image style={styles.image} source={require("../../../../assets/logo.png")}/>}
-          <TouchableOpacity style={styles.editImage} onPress={pickImage}>
-            <Feather name="edit-2" size={24} color="black"/>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.content}>
-          <View style={styles.name}>
-            <TextInput placeholder="First name" value={firstName} maxLength={20}
-              onChangeText={val => setFirstName(val)} containerStyle={{width: "47%"}}
-              leftContent={<FontAwesome name="user" size={18}/>} autoComplete="name"/>
-            <TextInput placeholder="Last name" value={lastName} maxLength={30}
-              onChangeText={val => setLastName(val)} containerStyle={{width: "47%"}}
-              leftContent={<FontAwesome name="user" size={18}/>} autoComplete="name"/>
+    <SafeAreaView>
+      <KeyboardAvoidingWrapper>
+        <View>
+          <View style={styles.header}>
+            <LargeText color="white" center size={25}>
+              Let's set up your profile!
+            </LargeText>
           </View>
 
-          <TextInput placeholder="Pronouns (he/him, she/her, etc.)" value={pronouns}
-            onChangeText={val => setPronouns(val)} containerStyle={{marginTop: 10}}
-            leftContent={<FontAwesome name="quote-left" size={18}/>}/>
+          <View style={styles.imageContainer}>
+            {image !== "" ? (
+              <Image style={styles.image} source={{ uri: image }} />
+            ) : (
+              <Image
+                style={styles.image}
+                source={require("../../../../assets/logo.png")}
+              />
+            )}
+            <TouchableOpacity style={styles.editImage} onPress={pickImage}>
+              <Feather name="edit-2" size={24} color="black" />
+            </TouchableOpacity>
+          </View>
 
-          <TextInput placeholder="Fun fact (10 to 100 characters)" value={bio} maxLength={100}
-            onChangeText={val => setBio(val)} containerStyle={{marginTop: 10}}
-            leftContent={<FontAwesome name="exclamation" size={18}/>}/>
+          <View style={styles.content}>
+            <View style={styles.name}>
+              <TextInput
+                placeholder="First name"
+                value={firstName}
+                maxLength={20}
+                onChangeText={(val) => setFirstName(val)}
+                containerStyle={{ width: "47%" }}
+                leftContent={<FontAwesome name="user" size={18} />}
+                autoComplete="name"
+              />
+              <TextInput
+                placeholder="Last name"
+                value={lastName}
+                maxLength={30}
+                onChangeText={(val) => setLastName(val)}
+                containerStyle={{ width: "47%" }}
+                leftContent={<FontAwesome name="user" size={18} />}
+                autoComplete="name"
+              />
+            </View>
 
-          <View style={styles.buttons}>
-            <Button onPress={() => props.navigation.goBack()}
-              marginHorizontal={10}>Back</Button>
-            <Button disabled={firstName === "" || lastName === "" || pronouns === "" || bio.length < 10}
-              onPress={goNext}
-              marginHorizontal={10}>Next</Button>
-          </View>    
+            <TextInput
+              placeholder="Pronouns (he/him, she/her, etc.)"
+              value={pronouns}
+              onChangeText={(val) => setPronouns(val)}
+              containerStyle={{ marginTop: 10 }}
+              leftContent={<FontAwesome name="quote-left" size={18} />}
+            />
+
+            <TextInput
+              placeholder="Fun fact (10 to 100 characters)"
+              value={bio}
+              maxLength={100}
+              onChangeText={(val) => setBio(val)}
+              containerStyle={{ marginTop: 10 }}
+              leftContent={<FontAwesome name="exclamation" size={18} />}
+            />
+
+            <View style={styles.buttons}>
+              <Button
+                onPress={() => props.navigation.goBack()}
+                marginHorizontal={10}
+              >
+                Back
+              </Button>
+              <Button
+                disabled={
+                  firstName === "" ||
+                  lastName === "" ||
+                  pronouns === "" ||
+                  bio.length < 10
+                }
+                onPress={goNext}
+                marginHorizontal={10}
+              >
+                Next
+              </Button>
+            </View>
+          </View>
         </View>
-      </View>
-    </KeyboardAvoidingWrapper>
+      </KeyboardAvoidingWrapper>
+    </SafeAreaView>
   );
 }
 
