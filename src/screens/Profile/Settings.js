@@ -66,7 +66,7 @@ export default function ({ navigation }) {
     async function signOut () {
         if (!logoutDisabled) {
             setLogoutDisabled(true);
-            await db.collection("Users").doc(user.uid).update({
+            if (DeviceToken.getToken()) await db.collection("Users").doc(user.uid).update({
                 pushTokens: firebase.firestore.FieldValue.arrayRemove(DeviceToken.getToken())
             });
 
