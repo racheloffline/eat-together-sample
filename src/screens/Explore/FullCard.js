@@ -1,7 +1,7 @@
 // Full event page
 
 import React, { useState, useEffect } from "react";
-import { View, ScrollView, StyleSheet, ImageBackground, Dimensions, Image } from "react-native";
+import {View, ScrollView, StyleSheet, ImageBackground, Dimensions, Image, TouchableOpacity} from "react-native";
 import { Layout, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -25,6 +25,7 @@ const FullCard = ({ route, navigation }) => {
 
   const [attending, setAttending] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [host, setHost] = useState(null);
 
   useEffect(() => {
     db.collection("Users").doc(user.uid).get().then(doc => {
@@ -33,6 +34,10 @@ const FullCard = ({ route, navigation }) => {
       if (events.includes(route.params.event.id)) {
         setAttending(true);
       }
+    }).then(() => {
+      db.collection("Users").doc(route.params.event.hostID).get().then(doc => {
+        setHost(doc.data());
+      })
     }).then(() => {
       setLoading(false);
     })
@@ -134,7 +139,11 @@ const FullCard = ({ route, navigation }) => {
             {route.params.event.name}
           </LargeText>
           
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <TouchableOpacity style={{ flexDirection: "row", alignItems: "center" }} onPress={() =>{
+            if(host) navigation.navigate("FullProfile", {
+              person: host
+            })
+          }}>
             <Image source={route.params.event.hasHostImage ? { uri: route.params.event.hostImage}
               : require("../../../assets/logo.png")} style={styles.profileImg}/>
             <MediumText size={18}>{route.params.event.hostID === user.uid ? "You!"
@@ -142,7 +151,7 @@ const FullCard = ({ route, navigation }) => {
                 route.params.event.hostFirstName + " " + route.params.event.hostLastName
               : route.params.event.hostName)}
             </MediumText>
-          </View>
+          </TouchableOpacity>
 
           {route.params.event.tags && <TagsList marginVertical={20} tags={route.params.event.tags} left/>}
 
