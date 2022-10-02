@@ -16,8 +16,9 @@ import getDate from "../../getDate";
 import getTime from "../../getTime";
 
 import {db, auth} from "../../provider/Firebase";
-import * as firebase from "firebase";
+import * as firebase from "firebase/compat";
 import openMap from "react-native-open-maps";
+import {Menu, MenuOption, MenuOptions, MenuTrigger} from "react-native-popup-menu";
 
 const FullCard = ({ route, navigation }) => {
   const user = auth.currentUser;
@@ -75,6 +76,14 @@ const FullCard = ({ route, navigation }) => {
     });
   }
 
+  // Report an event that the user feels is offensive in some way
+  //Reporting event function
+  function reportEvent() {
+    navigation.navigate("ReportEvent", {
+      eventID: route.params.event.id,
+    });
+  }
+
   return (
     <Layout>
       <TopNav
@@ -88,6 +97,26 @@ const FullCard = ({ route, navigation }) => {
           />
         }
         leftAction={() => navigation.goBack()}
+        rightContent={
+          <View>
+            <Menu>
+              <MenuTrigger>
+                <Ionicons
+                    name="ellipsis-horizontal"
+                    color={loading ? "grey" : "black"}
+                    size={25}
+                />
+              </MenuTrigger>
+              <MenuOptions>
+                <MenuOption onSelect={() => reportEvent()}  style={styles.option}>
+                  <NormalText size={18} color="red">
+                    Report
+                  </NormalText>
+                </MenuOption>
+              </MenuOptions>
+            </Menu>
+          </View>
+        }
       />
       
       <ScrollView>
@@ -170,6 +199,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     marginVertical: 4,
+    flexWrap: "wrap"
   },
 
   profileImg: {

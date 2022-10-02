@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { Layout, TextInput, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
-import firebase from "firebase";
+import firebase from "firebase/compat";
 import { db } from "../../provider/Firebase";
 import moment from "moment";
 import TextMessage from "../../components/TextMessage";
@@ -67,8 +67,7 @@ export default function ({ route, navigation }) {
         rightContent={<Image style={styles.image} source={{ uri: image }} />}
         leftAction={() => {
           // Temporary fix with invalid chat preview, to be fixed in the future for better speed.
-          navigation.navigate("Invite");
-          navigation.navigate("Chats");
+          navigation.goBack();
         }}
       />
       <FlatList

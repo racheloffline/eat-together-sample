@@ -10,7 +10,7 @@ import { Layout, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from '@expo/vector-icons';
 
 import { db, auth } from "../../provider/Firebase";
-import firebase from "firebase";
+import firebase from "firebase/compat";
 import "firebase/firestore"
 
 import MediumText from "../../components/MediumText";
@@ -66,7 +66,7 @@ export default function ({ navigation }) {
     async function signOut () {
         if (!logoutDisabled) {
             setLogoutDisabled(true);
-            await db.collection("Users").doc(user.uid).update({
+            if (DeviceToken.getToken()) await db.collection("Users").doc(user.uid).update({
                 pushTokens: firebase.firestore.FieldValue.arrayRemove(DeviceToken.getToken())
             });
 
@@ -93,8 +93,10 @@ export default function ({ navigation }) {
                             alert("Account deleted successfully. Sorry to see you go :(");
                             db.collection("Users").doc(uid).delete();
                             db.collection("Usernames").doc(userInfo.username).delete();
+                            
                             if (userInfo.hasImage) {
-                                storage.ref().child("profilePictures/" + uid).delete();
+                                const ref = storage.ref().child(`profilePictures/${uid}`);
+                                ref.delete();
                             }
                             signOut();
                         }).catch((error) => {

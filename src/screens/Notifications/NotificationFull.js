@@ -16,7 +16,7 @@ import NormalText from "../../components/NormalText";
 import Button from '../../components/Button';
 import Link from "../../components/Link";
 
-import firebase from "firebase";
+import firebase from "firebase/compat";
 import { db } from "../../provider/Firebase";
 import { Menu, MenuOption, MenuOptions, MenuTrigger } from "react-native-popup-menu";
 import getDate from '../../getDate';

@@ -13,11 +13,17 @@ export default function () {
       initialRouteName="OrganizePrivate"
       screenOptions={{
         headerShown: false,
-        animationEnabled: true,
+        animationEnabled: false,
       }}
     >
-      <Stack.Screen name="OrganizePrivate" component={OrganizePrivate} />
-      <Stack.Screen name="OrganizePublic" component={OrganizePublic} />
+      <Stack.Screen
+        name="OrganizePrivate"
+        component={OrganizePrivate}
+      />
+      <Stack.Screen
+        name="OrganizePublic"
+        component={OrganizePublic}
+      />
       <Stack.Screen name="InvitePeople" component={InvitePeople} />
       <Stack.Screen name="FullProfile" component={FullProfile} />
     </Stack.Navigator>

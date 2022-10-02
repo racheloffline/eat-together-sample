@@ -26,7 +26,7 @@ import {
 } from "react-native-popup-menu";
 
 import { db, auth } from "../../../provider/Firebase";
-import firebase from "firebase";
+import firebase from "firebase/compat";
 
 const blockPerson = (uid, navigation) => {
   Alert.alert("Block", "Are you sure you want to block this user?", [

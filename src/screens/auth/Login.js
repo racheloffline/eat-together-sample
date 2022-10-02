@@ -11,7 +11,7 @@ import {
 import {db} from "../../provider/Firebase";
 import {auth} from "../../provider/Firebase";
 import "firebase/firestore"
-import firebase from "firebase";
+import firebase from "firebase/compat";
 
 
 import {

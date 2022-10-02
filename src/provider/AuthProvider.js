@@ -1,8 +1,7 @@
 //Authenticates usernames and passwords using firebase implementation
 
 import React, { createContext, useState, useEffect } from "react";
-import * as firebase from "firebase";
-import { db } from "../provider/Firebase";
+import { auth, db } from "../provider/Firebase";
 const AuthContext = createContext();
 
 const AuthProvider = (props) => {
@@ -28,12 +27,13 @@ const AuthProvider = (props) => {
       });
   }
   function checkLogin() {
-    firebase.auth().onAuthStateChanged(function (u) {
+    auth.onAuthStateChanged(u => {
       if (u) {
         setUser(true);
         setCurrUser(u);
         getProfileUri(u);
       } else {
+        console.log("User is not logged in");
         setUser(false);
         setCurrUser(u);
         // setUserData(null);

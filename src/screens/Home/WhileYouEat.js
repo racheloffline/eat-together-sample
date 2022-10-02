@@ -26,7 +26,7 @@ import Link from "../../components/Link";
 import getDate from "../../getDate";
 import getTime from "../../getTime";
 import { db, auth } from "../../provider/Firebase";
-import * as firebase from "firebase";
+import * as firebase from "firebase/compat";
 import {
   Menu,
   MenuOption,
@@ -369,6 +369,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     marginVertical: 4,
+    flexWrap: "wrap"
   },
 
   profileImg: {
