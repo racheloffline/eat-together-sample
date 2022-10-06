@@ -13,6 +13,7 @@ import Filter from "../../../components/Filter";
 
 import MediumText from "../../../components/MediumText";
 
+import { generateColor, randomize3 } from "../../../methods";
 import { db, auth } from "../../../provider/Firebase";
 
 export default function ({ navigation }) {
@@ -71,6 +72,8 @@ export default function ({ navigation }) {
           if (data.id !== user.uid && data.verified && !userData.blockedIDs.includes(doc.data().id)
             && !doc.data().blockedIDs.includes(user.uid)) { // Only show verified + unblocked users
             data.inCommon = getCommonTags(userData, data);
+            data.color = generateColor();
+            data.selectedTags = randomize3(data.tags);
             users.push(data);
           }
         });
