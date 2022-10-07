@@ -49,6 +49,9 @@ const WhileYouEat = ({ route, navigation }) => {
   const [openAttendance, setOpenAttendance] = useState(false);
   const [openIcebreakers, setOpenIcebreakers] = useState(false);
 
+  // Get the host of the event
+  const [host, setHost] = useState(null);
+
   // Get the current user
   const user = auth.currentUser;
 
@@ -56,6 +59,9 @@ const WhileYouEat = ({ route, navigation }) => {
     if (route.params.event.hostID === user.uid) {
       getAttendees();
     }
+    db.collection("Users").doc(route.params.event.hostID).get().then(doc => {
+      setHost(doc.data());
+    })
   }, []);
 
   // Mark an attendee absent or present
@@ -237,7 +243,11 @@ const WhileYouEat = ({ route, navigation }) => {
             {event.name}
           </LargeText>
 
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <TouchableOpacity style={{ flexDirection: "row", alignItems: "center" }} onPress={() =>{
+            if(host) navigation.navigate("FullProfile", {
+              person: host
+            })
+          }}>
             <Image source={event.hasHostImage ? { uri: event.hostImage }
               : require("../../../assets/logo.png")} style={styles.profileImg}/>
             <MediumText size={18}>{route.params.event.hostID === user.uid ? "You"
@@ -245,7 +255,7 @@ const WhileYouEat = ({ route, navigation }) => {
                 event.hostFirstName + " " + event.hostLastName
               : event.hostName)}
             </MediumText>
-          </View>
+          </TouchableOpacity>
 
           {event.tags && <TagsList marginVertical={20} tags={event.tags} left/>}
 
