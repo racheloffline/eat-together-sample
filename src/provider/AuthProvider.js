@@ -33,7 +33,6 @@ const AuthProvider = (props) => {
         setCurrUser(u);
         getProfileUri(u);
       } else {
-        console.log("User is not logged in");
         setUser(false);
         setCurrUser(u);
         // setUserData(null);

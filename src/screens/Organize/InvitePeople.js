@@ -15,7 +15,7 @@ import Searchbar from "../../components/Searchbar";
 import HorizontalRow from "../../components/HorizontalRow";
 import Filter from "../../components/Filter";
 
-import { generateColor, isAvailable } from "../../methods";
+import { generateColor, isAvailable, randomize3 } from "../../methods";
 
 // Stores image in Firebase Storage
 const storeImage = async (uri, event_id) => {
@@ -191,7 +191,6 @@ export default function ({ route, navigation }) {
             .then((doc) => {
               if (doc) {
                 if (doc.data().friendIDs) {
-                  // TODO FIX: Not all docs have friendIDs in db
                   setMutuals((mutuals) =>
                     mutuals.concat(doc.data().friendIDs)
                   );
@@ -209,6 +208,8 @@ export default function ({ route, navigation }) {
           if (data.verified && data.id !== user.uid && !currUser.blockedIDs.includes(data.id)
             && !data.blockedIDs.includes(user.uid)) { // Only show verified + unblocked users
             data.invited = false;
+            data.color = generateColor();
+            data.selectedTags = randomize3(data.tags);
             list.push(data);
           }
         });
@@ -396,7 +397,6 @@ export default function ({ route, navigation }) {
               navigation={navigation}
               person={item}
               toggleInvite={toggleInvite}
-              color={generateColor()}
             />
           )}
         />)

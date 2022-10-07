@@ -6,8 +6,6 @@ import TagsList from './TagsList';
 import MediumText from "./MediumText";
 
 const InvitePerson = props => {
-    const [attendees, setAttendees] = React.useState(props.attendees);
-    const [checkBox, setCheckbox] = React.useState(false);
     const [image, setImage] = React.useState("");
     const [bio, setBio] = React.useState("");
 
@@ -21,16 +19,6 @@ const InvitePerson = props => {
             setBio(props.person.bio);
         }
     });
-
-    // Generate random tags
-    const shuffledArr = arr => {
-        const shuffled = [...arr]
-            .map(value => ({ value, sort: Math.random() }))
-            .sort((a, b) => a.sort - b.sort)
-            .map(({ value }) => value);
-     
-        return shuffled;
-    }
 
     return (
         <View style={styles.outline}>
@@ -49,9 +37,9 @@ const InvitePerson = props => {
                     <CheckBox value={props.person.invited} onValueChange={() => props.toggleInvite(props.person.id)} />
                 </View>
             </View>
-            <View style={[styles.body, {backgroundColor: props.color}]}>
+            <View style={[styles.body, {backgroundColor: props.person.color}]}>
                 <MediumText>{bio}</MediumText>
-                <TagsList tags={shuffledArr(props.person.tags).slice(0, 3)} left/>
+                <TagsList tags={props.person.selectedTags} left/>
             </View>
         </View>
     );

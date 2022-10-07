@@ -2,9 +2,9 @@ import {db} from "./provider/Firebase";
 import firebase from "firebase/compat";
 import profaneWords from "./profaneWords";
 
-/*
-Generates a random color.
-Returns: Hex value of random color.
+/**
+ * Generates a random color.
+ * Returns: Hex value of random color.
  */
 export const generateColor = () => {
     const colors = ["#5DB075", "#6DE2BF", "#62E286", "#31B87F", "#71D8AC", "#3DD671"];
@@ -12,9 +12,9 @@ export const generateColor = () => {
     return colors[random];
 };
 
-/*
-Gets a list of the top 5 profiles suggestions based on the current user and tags.
-Returns: A list of usernames of the top 5 user suggestions.
+/**
+ * Gets a list of the top 5 profiles suggestions based on the current user and tags.
+ * Returns: A list of usernames of the top 5 user suggestions.
  */
 export const getProfileRecs = () => {
     const user = firebase.auth().currentUser; // You can access properties from this variable
@@ -89,9 +89,9 @@ export const getProfileRecs = () => {
     return bestUsers; 
 }
 
-/*
-Determines if an event is in the morning, afternoon, or evening.
-Returns: "morning", "afternoon", or "evening".
+/**
+ * Determines if an event is in the morning, afternoon, or evening.
+ * Returns: "morning", "afternoon", or "evening".
  */
 export const getTimeOfDay = (time) => {
     let hour = time.getHours();
@@ -103,17 +103,18 @@ export const getTimeOfDay = (time) => {
         return "evening";
     }
 }
-/*
-Check whether inappropriate words are used.
-Returns: true if inappropriate words are used, false otherwise.
+
+/**
+ * Check whether inappropriate words are used.
+ * Returns: true if inappropriate words are used, false otherwise.
  */
 export const checkProfanity = word => {
     const profane = profaneWords.some(w => word.toLowerCase().includes(w));
     return profane;
 }
 
-/*
-Determines if a user is available for a particular event/meal.
+/**
+ * Determines if a user is available for a particular event/meal.
  */
 export const isAvailable = (user, event) => {
     const date = (event.date instanceof Date) ? event.date : event.date.toDate();
@@ -137,8 +138,9 @@ export const isAvailable = (user, event) => {
     }
 }
 
-/*
-Helper function to determine if a user's schedule matches with an event/meal.
+/**
+ * Helper function to determine if a user's schedule matches with an event/meal.
+ * Returns: true if match, false if not.
  */
 const isMatch = (hour, availabilities) => {
     let result = false;
@@ -151,6 +153,22 @@ const isMatch = (hour, availabilities) => {
             return;
         }
     });
+
+    return result;
+}
+
+/**
+ * Randomly chooses three elements from an array.
+ * Returns: An array of three random elements.
+ */
+export const randomize3 = (array) => {
+    let result = [];
+    let copy = array.slice();
+    for (let i = 0; i < 3; i++) {
+        let index = Math.floor(Math.random() * copy.length);
+        result.push(copy[index]);
+        copy.splice(index, 1);
+    }
 
     return result;
 }
