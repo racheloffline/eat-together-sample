@@ -96,14 +96,19 @@ export default function ({ navigation }) {
               data.messages.length != 0
                 ? data.messages[data.messages.length - 1].sentAt
                 : "";
-            // Get rid of your own name and all the ways it can be formatted in group title
-            // let name = data.name.replace(nameCurrent + ", ", "");
-            // if (name.endsWith(", " + nameCurrent)) {
-            //   name = name.slice(0, -1 * (nameCurrent.length + 2));
-            // }
+
+            // Get rid of your own name and all the ways it can be formatted in group title (if it is a DM)
+            let name = data.name;
+            if(data.uids.length == 2) {
+              name = name.replace(nameCurrent + ", ", "");
+              if (name.endsWith(", " + nameCurrent)) {
+                name = name.slice(0, -1 * (nameCurrent.length + 2));
+              }
+            }
+
             temp.push({
               groupID: groupID,
-              name: data.name,
+              name: name,
               uids: data.uids,
               hasImage: data.hasImage,
               message: message,
