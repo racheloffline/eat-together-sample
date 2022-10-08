@@ -32,6 +32,7 @@ import { db } from "../provider/Firebase";
 import * as NotificationFunctions from "expo-notifications";
 
 import DeviceToken from "../screens/utils/DeviceToken";
+import {Alert, Linking} from "react-native";
 
 async function registerForPushNotificationsAsync() {
   let token;
@@ -46,7 +47,23 @@ async function registerForPushNotificationsAsync() {
   }
 
   if (finalStatus !== "granted") {
-    alert("Push notifications are not enabled.");
+      Alert.alert(
+          "Push Notification Disabled",
+          "Push notifications for Eat Together have been disabled in Settings. Would you like to open settings and enable them now?",
+          [
+              {
+                  text: "Yes",
+                  onPress:() => {
+                      Linking.openSettings();
+                  },
+                  style: "cancel"
+              },
+              {
+                  text: "No",
+                  onPress: () => {}
+              }
+          ]
+      );
     return;
   }
 
