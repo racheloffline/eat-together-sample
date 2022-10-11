@@ -70,7 +70,7 @@ export default function ({ navigation }) {
         query.forEach((doc) => {
           let data = doc.data();
           if (data.id !== user.uid && data.verified && !userData.blockedIDs.includes(doc.data().id)
-            && !doc.data().blockedIDs.includes(user.uid)) { // Only show verified + unblocked users
+            && !doc.data().blockedIDs.includes(user.uid) && !userData.friendIDs.includes(doc.data().id)) { // Only show verified + unblocked + non-friend users
             data.inCommon = getCommonTags(userData, data);
             data.color = generateColor();
             data.selectedTags = randomize3(data.tags);

@@ -34,11 +34,12 @@ import {
   MenuTrigger,
 } from "react-native-popup-menu";
 import openMap from "react-native-open-maps";
-import { isAvailable } from "../../methods";
 
 const WhileYouEat = ({ route, navigation }) => {
   // Event details
   const [event, setEvent] = useState(route.params.event);
+  const [friend, setFriend] = useState(null); // Display a friend who is also attending the event
+  const [host, setHost] = useState(null);
 
   // Data for the attendees
   const [attendees, setAttendees] = useState([]);
@@ -56,6 +57,18 @@ const WhileYouEat = ({ route, navigation }) => {
     if (route.params.event.hostID === user.uid) {
       getAttendees();
     }
+
+    db.collection("Users").doc(route.params.event.hostID).get().then(doc => {
+      setHost(doc.data());
+    });
+
+    db.collection("Users").doc(user.uid).get().then(doc => {
+      if (friendAttending(doc.data())) {
+        db.collection("Users").doc(friendAttending(doc.data())).get().then(doc => {
+          setFriend(doc.data());
+        });
+      }
+    });
   }, []);
 
   // Mark an attendee absent or present
@@ -176,6 +189,19 @@ const WhileYouEat = ({ route, navigation }) => {
     );
   }
 
+  // Determine if a friend is attending the event or not, and return them
+  const friendAttending = (userInfo) => {
+    let friend = null;
+    userInfo.friendIDs.forEach(f => {
+      if (route.params.event.attendees.includes(f) && f !== route.params.event.hostID) {
+        friend = f;
+        return;
+      }
+    });
+
+    return friend;
+  }
+
   return (
     <Layout>
       <TopNav
@@ -233,21 +259,32 @@ const WhileYouEat = ({ route, navigation }) => {
           resizeMode="cover"
         ></ImageBackground>
         <View style={styles.infoContainer}>
-          <LargeText size={20} marginBottom={10}>
+          <LargeText size={24} marginBottom={10}>
             {event.name}
           </LargeText>
 
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Image source={event.hasHostImage ? { uri: event.hostImage }
+          <TouchableOpacity style={styles.row} onPress={() =>{
+            if(host) navigation.navigate("FullProfile", {
+              person: host
+            })
+          }}>
+            <Image source={route.params.event.hasHostImage ? { uri: route.params.event.hostImage}
               : require("../../../assets/logo.png")} style={styles.profileImg}/>
-            <MediumText size={18}>{route.params.event.hostID === user.uid ? "You"
-              : (event.hostFirstName ?
-                event.hostFirstName + " " + event.hostLastName
-              : event.hostName)}
+            <MediumText size={18}>{route.params.event.hostID === user.uid ? "You!"
+              : (route.params.event.hostFirstName ?
+                route.params.event.hostFirstName + " " + route.params.event.hostLastName
+              : route.params.event.hostName)}
             </MediumText>
+          </TouchableOpacity>
+          
+          <View style={styles.row}>
+            <NormalText>{route.params.event.attendees.length} attendee{route.params.event.attendees.length !== 1 && "s"}</NormalText>
+            {friend && <NormalText>, including: </NormalText>}
+            {friend && <Image source={friend.hasImage ? { uri: friend.image } : require("../../../assets/logo.png")} style={styles.profileImg}/>}
+            {friend && <NormalText>{friend.firstName + " " + friend.lastName}</NormalText>}
           </View>
-
-          {event.tags && <TagsList marginVertical={20} tags={event.tags} left/>}
+          {event.tags && event.tags.length > 0 &&
+            <TagsList marginVertical={10} tags={event.tags} left/>}
 
           {/* 3 event details (location, date, time} are below */}
 
@@ -368,6 +405,7 @@ const styles = StyleSheet.create({
 
   row: {
     flexDirection: "row",
+    alignItems: "center",
     marginVertical: 4,
     flexWrap: "wrap"
   },

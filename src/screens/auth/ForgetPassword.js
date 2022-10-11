@@ -98,13 +98,13 @@ export default function ({ navigation }) {
                 justifyContent: "center",
               }}
             >
-              <NormalText>Already have an account? </NormalText>
+              <NormalText>Remember your password? </NormalText>
               <TouchableOpacity
                 onPress={() => {
                   navigation.navigate("Login");
                 }}
               >
-                <NormalText center color="#5DB075">Login here</NormalText>
+                <NormalText center color="#5DB075">Go back</NormalText>
               </TouchableOpacity>
             </View>
           </View>

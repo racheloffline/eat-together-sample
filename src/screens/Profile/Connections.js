@@ -62,7 +62,7 @@ export default function ({ navigation }) {
             </View>
             <View style = {styles.list}>
                 <FlatList contentContainerStyle={styles.invites} keyExtractor={item => item.id}
-                          data={users} renderItem={({item}) =>
+                        data={users} renderItem={({item}) =>
                     <PeopleList person={item} color={generateColor()} click={() => {
                         navigation.navigate("FullProfile", {
                             person: item
@@ -79,7 +79,7 @@ export default function ({ navigation }) {
 const styles = StyleSheet.create({
     invites: {
         alignItems: "center",
-        padding: 30
+        paddingBottom: 30,
     },
     submit: {
         position: 'absolute',
@@ -92,6 +92,6 @@ const styles = StyleSheet.create({
         marginVertical: -20
     },
     list: {
-        marginVertical: -20
+        marginTop: 10
     }
 });
