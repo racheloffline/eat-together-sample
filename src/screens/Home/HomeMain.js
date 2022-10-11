@@ -4,6 +4,7 @@ import Home from "./Home";
 import WhileYouEat from "./WhileYouEat";
 import ReportEvent from "./ReportEvent";
 import EditEvent from "./EditEvent";
+import FullProfile from "../Explore/People/FullProfile";
 
 import Connections from "../Profile/Connections";
 import Requests from "../Profile/Requests";

@@ -46,6 +46,10 @@ const FullCard = ({ route, navigation }) => {
         setHost(doc.data());
       });
     }).then(() => {
+      db.collection("Users").doc(route.params.event.hostID).get().then(doc => {
+        setHost(doc.data());
+      })
+    }).then(() => {
       setLoading(false);
     });
   }, []);
@@ -178,7 +182,8 @@ const FullCard = ({ route, navigation }) => {
             {friend && <Image source={friend.hasImage ? { uri: friend.image } : require("../../../assets/logo.png")} style={styles.profileImg}/>}
             {friend && <NormalText>{friend.firstName + " " + friend.lastName}</NormalText>}
           </View>
-          {route.params.event.tags.length > 0 && <TagsList marginVertical={10} tags={route.params.event.tags} left/>}
+          {route.params.event.tags && route.params.event.tags.length > 0 &&
+            <TagsList marginVertical={10} tags={route.params.event.tags} left/>}
 
           {/* 3 event details (location, date, time} are below */}
 

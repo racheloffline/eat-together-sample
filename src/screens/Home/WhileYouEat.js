@@ -50,6 +50,9 @@ const WhileYouEat = ({ route, navigation }) => {
   const [openAttendance, setOpenAttendance] = useState(false);
   const [openIcebreakers, setOpenIcebreakers] = useState(false);
 
+  // Get the host of the event
+  const [host, setHost] = useState(null);
+
   // Get the current user
   const user = auth.currentUser;
 
