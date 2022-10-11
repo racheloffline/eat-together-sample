@@ -14,7 +14,7 @@ import {View} from "react-native";
 import NormalText from "../../components/NormalText";
 import MediumText from "../../components/MediumText";
 
-export default function ({ navigation }) {
+export default function ({ back, navigation }) {
     const user = firebase.auth().currentUser;
     const [requests, setRequests] = useState([]); // initial state, function used for updating initial state
 
@@ -56,7 +56,7 @@ export default function ({ navigation }) {
                         size={20}
                     />
                 }
-                leftAction={() => navigation.navigate("Me")}
+                leftAction={() => navigation.navigate(back)}
             />
             <View style={styles.switchView}>
                 <HorizontalSwitch left="Connections" right="Requests" current="right" press={(val) => navigation.navigate("Connections")}/>

@@ -16,7 +16,7 @@ const Button = props => {
             marginVertical: props.marginVertical ? props.marginVertical : 0,
             elevation: 5
         }} onPress={props.onPress} disabled={props.disabled}>
-            <MediumText color="white" center
+            <MediumText color={props.color ? props.color : "white"} center
                 size={props.fontSize ? props.fontSize : 20}>
                     {props.children}
             </MediumText>

@@ -157,7 +157,7 @@ export default function ({ navigation }) {
 */
   return (
     <Layout>
-      <Header name="Chat"/>
+      <Header name="Chat" navigation={navigation} connections/>
 
       <View style={styles.content}>
         <View style={styles.searchArea}>

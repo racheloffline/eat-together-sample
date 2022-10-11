@@ -60,7 +60,8 @@ const FullCard = ({ route, navigation }) => {
             </MediumText>
           </View>
 
-          {route.params.event.tags && <TagsList marginVertical={20} tags={route.params.event.tags}/>}
+          {route.params.event.tags && route.params.event.tags.length > 0 &&
+            <TagsList marginVertical={20} tags={route.params.event.tags} left/>}
 
           {/* 3 event details (location, date, time} are below */}
 

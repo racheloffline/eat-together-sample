@@ -1,7 +1,7 @@
 // Full event page
 
 import React, { useState, useEffect } from "react";
-import {View, ScrollView, StyleSheet, ImageBackground, Dimensions, Image, TouchableOpacity} from "react-native";
+import { View, ScrollView, StyleSheet, ImageBackground, Dimensions, Image, TouchableOpacity } from "react-native";
 import { Layout, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -23,6 +23,7 @@ import {Menu, MenuOption, MenuOptions, MenuTrigger} from "react-native-popup-men
 const FullCard = ({ route, navigation }) => {
   const user = auth.currentUser;
 
+  const [friend, setFriend] = useState(null); // Display a friend who is also attending the event
   const [attending, setAttending] = useState(false);
   const [loading, setLoading] = useState(true);
   const [host, setHost] = useState(null);
@@ -34,13 +35,23 @@ const FullCard = ({ route, navigation }) => {
       if (events.includes(route.params.event.id)) {
         setAttending(true);
       }
+
+      if (friendAttending(doc.data())) {
+        db.collection("Users").doc(friendAttending(doc.data())).get().then(doc => {
+          setFriend(doc.data());
+        });
+      }
+    }).then(() => {
+      db.collection("Users").doc(route.params.event.hostID).get().then(doc => {
+        setHost(doc.data());
+      });
     }).then(() => {
       db.collection("Users").doc(route.params.event.hostID).get().then(doc => {
         setHost(doc.data());
       })
     }).then(() => {
       setLoading(false);
-    })
+    });
   }, []);
 
   // Attend an event
@@ -87,6 +98,18 @@ const FullCard = ({ route, navigation }) => {
     navigation.navigate("ReportEvent", {
       eventID: route.params.event.id,
     });
+  }
+
+  const friendAttending = (userInfo) => {
+    let friend = null;
+    userInfo.friendIDs.forEach(f => {
+      if (route.params.event.attendees.includes(f) && f !== route.params.event.hostID) {
+        friend = f;
+        return;
+      }
+    });
+
+    return friend;
   }
 
   return (
@@ -139,7 +162,7 @@ const FullCard = ({ route, navigation }) => {
             {route.params.event.name}
           </LargeText>
           
-          <TouchableOpacity style={{ flexDirection: "row", alignItems: "center" }} onPress={() =>{
+          <TouchableOpacity style={styles.row} onPress={() =>{
             if(host) navigation.navigate("FullProfile", {
               person: host
             })
@@ -152,8 +175,15 @@ const FullCard = ({ route, navigation }) => {
               : route.params.event.hostName)}
             </MediumText>
           </TouchableOpacity>
-
-          {route.params.event.tags && <TagsList marginVertical={20} tags={route.params.event.tags} left/>}
+          
+          <View style={styles.row}>
+            <NormalText>{route.params.event.attendees.length} attendee{route.params.event.attendees.length !== 1 && "s"}</NormalText>
+            {friend && <NormalText>, including: </NormalText>}
+            {friend && <Image source={friend.hasImage ? { uri: friend.image } : require("../../../assets/logo.png")} style={styles.profileImg}/>}
+            {friend && <NormalText>{friend.firstName + " " + friend.lastName}</NormalText>}
+          </View>
+          {route.params.event.tags && route.params.event.tags.length > 0 &&
+            <TagsList marginVertical={10} tags={route.params.event.tags} left/>}
 
           {/* 3 event details (location, date, time} are below */}
 
@@ -193,7 +223,7 @@ const FullCard = ({ route, navigation }) => {
               {loading ? "Loading ..." : route.params.event.hostID === user.uid ? "Your event :)" :
                 attending ? "Withdraw :(" : "Attend!"}
           </Button>
-        </View>        
+        </View>
       </ScrollView>
     </Layout>
   );
@@ -207,6 +237,7 @@ const styles = StyleSheet.create({
 
   row: {
     flexDirection: "row",
+    alignItems: "center",
     marginVertical: 4,
     flexWrap: "wrap"
   },

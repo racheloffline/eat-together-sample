@@ -31,7 +31,9 @@ export default function () {
       <Stack.Screen name="Edit" component={Edit} />
       <Stack.Screen name="EditTags" component={EditTags} />
       <Stack.Screen name="Connections" component={Connections} />
-      <Stack.Screen name="Requests" component={Requests} />
+      <Stack.Screen name="Requests">
+        {props => <Requests {...props} back="Me" />}
+      </Stack.Screen>
 
       <Stack.Screen name="Settings" component={Settings} />
       <Stack.Screen name="FullCard" component={FullCard} />

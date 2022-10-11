@@ -6,6 +6,12 @@ import ReportEvent from "./ReportEvent";
 import EditEvent from "./EditEvent";
 import FullProfile from "../Explore/People/FullProfile";
 
+import Connections from "../Profile/Connections";
+import Requests from "../Profile/Requests";
+import FullProfile from "../Explore/People/FullProfile";
+import FullCard from "../Explore/FullCard";
+import ReportPerson from "../Explore/People/ReportPerson";
+
 const Stack = createStackNavigator();
 
 export default function () {
@@ -21,7 +27,14 @@ export default function () {
       <Stack.Screen name="WhileYouEat" component={WhileYouEat} />
       <Stack.Screen name="ReportEvent" component={ReportEvent} />
       <Stack.Screen name="EditEvent" component={EditEvent} />
+
+      <Stack.Screen name="Connections" component={Connections} />
+      <Stack.Screen name="Requests">
+        {props => <Requests {...props} back="Home" />}
+      </Stack.Screen>
       <Stack.Screen name="FullProfile" component={FullProfile} />
+      <Stack.Screen name="FullCard" component={FullCard} />
+      <Stack.Screen name="ReportPerson" component={ReportPerson} />
     </Stack.Navigator>
   );
 }
