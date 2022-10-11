@@ -39,7 +39,7 @@ const WhileYouEat = ({ route, navigation }) => {
   // Event details
   const [event, setEvent] = useState(route.params.event);
   const [friend, setFriend] = useState(null); // Display a friend who is also attending the event
-  const [host, setHost] = useState(null);
+  const [host, setHost] = useState(null); // Get the host of the event
 
   // Data for the attendees
   const [attendees, setAttendees] = useState([]);
@@ -49,9 +49,6 @@ const WhileYouEat = ({ route, navigation }) => {
   // For tracking opening and closing
   const [openAttendance, setOpenAttendance] = useState(false);
   const [openIcebreakers, setOpenIcebreakers] = useState(false);
-
-  // Get the host of the event
-  const [host, setHost] = useState(null);
 
   // Get the current user
   const user = auth.currentUser;
