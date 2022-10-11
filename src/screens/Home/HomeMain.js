@@ -8,7 +8,6 @@ import FullProfile from "../Explore/People/FullProfile";
 
 import Connections from "../Profile/Connections";
 import Requests from "../Profile/Requests";
-import FullProfile from "../Explore/People/FullProfile";
 import FullCard from "../Explore/FullCard";
 import ReportPerson from "../Explore/People/ReportPerson";
 

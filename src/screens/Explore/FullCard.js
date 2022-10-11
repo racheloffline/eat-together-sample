@@ -46,10 +46,6 @@ const FullCard = ({ route, navigation }) => {
         setHost(doc.data());
       });
     }).then(() => {
-      db.collection("Users").doc(route.params.event.hostID).get().then(doc => {
-        setHost(doc.data());
-      })
-    }).then(() => {
       setLoading(false);
     });
   }, []);
@@ -100,6 +96,7 @@ const FullCard = ({ route, navigation }) => {
     });
   }
 
+  // Determine if a friend is attending the event or not, and return them
   const friendAttending = (userInfo) => {
     let friend = null;
     userInfo.friendIDs.forEach(f => {
