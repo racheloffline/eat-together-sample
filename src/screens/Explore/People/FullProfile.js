@@ -289,7 +289,6 @@ const FullProfile = ({ route, navigation }) => {
 
         <TagsList tags={route.params.person.tags} />
         <MediumText>{route.params.person.bio}</MediumText>
-
         <View style={styles.cards}>
           {events.map((event) => (
             <EventCard

@@ -26,6 +26,7 @@ import * as firebase from "firebase/compat";
 import * as ImagePicker from "expo-image-picker";
 import { db, auth, storage } from "../../provider/Firebase";
 import { cloneDeep } from "lodash";
+import { createNewChat } from "../Chat/Chats";
 import moment from "moment";
 import { checkProfanity } from "../../methods";
 
@@ -132,6 +133,8 @@ export default function ({ navigation }) {
         return ref.getDownloadURL();
     }
 
+    const chatID = String(date) + name; // To be stored in the event
+
     // For posting the event
     const storeEvent = (id, hasImage, image) => {
         db.collection("Public Events").doc(id).set({
@@ -149,7 +152,8 @@ export default function ({ navigation }) {
             attendees: [user.uid], //ONLY start by putting the current user as an attendee
             hasImage,
             image,
-            tags: tagsSelected
+            tags: tagsSelected,
+            chatID: chatID,
         }).then(() => {
             const storeID = {
                 type: "public",
@@ -161,13 +165,17 @@ export default function ({ navigation }) {
                 attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
                 attendedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)
             }).then(() => {
-                setName("");
-                setLocation("");
-                setDate(new Date());
-                setAdditionalInfo("");
-                setTagsSelected([]);
-                alert("Success!");
-                setLoading(false);
+              setName("");
+              setLocation("");
+              setDate(new Date());
+              setAdditionalInfo("");
+              setTagsSelected([]);
+              // Create the in-event group chat
+              // We set userIDs as empty, meaning this chat is open to everyone!
+              createNewChat([], chatID, name, false);
+              // We are finally done!
+              alert("Success!");
+              setLoading(false);
             });
         });
     }
