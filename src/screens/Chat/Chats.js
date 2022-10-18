@@ -18,6 +18,30 @@ import ChatPreview from "../../components/ChatPreview";
 import SearchableDropdown from "../../components/SearchableDropdown";
 import {useIsFocused} from "@react-navigation/native";
 
+export const createNewChat = (
+  userIDs,
+  chatID,
+  chatName,
+  toIncludeOnChatPage
+) => {
+  // Create a new doc in the groups collection on firestore with input
+  db.collection("Groups").doc(chatID).set({
+    uids: userIDs,
+    name: chatName,
+    messages: [],
+  });
+  // If we want to display this chat on the chat page, update each user's data to include this chat
+  if (toIncludeOnChatPage) {
+    userIDs.map((uid) => {
+      db.collection("Users")
+        .doc(uid)
+        .update({
+          groupIDs: firebase.firestore.FieldValue.arrayUnion(chatID),
+        });
+    });
+  }
+};
+
 export default function ({ navigation }) {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [users, setUsers] = useState([]);
@@ -27,7 +51,7 @@ export default function ({ navigation }) {
 
   const isFocused = useIsFocused(); //OMG THIS IS A LIFESAVING HACK
 
-  const createNewChat = () => {
+  const createNewChatDefault = () => {
     userInfo.get().then((currUser) => {
       // Generate group id using the concatenation of all the selected usernames
       let allUsernames = [];
@@ -197,7 +221,7 @@ export default function ({ navigation }) {
             color="black"
             style={{ height: 50 }}
             onPress={() => {
-              createNewChat();
+              createNewChatDefault();
               setSelectedUsers([]);
             }}
           ></Button>

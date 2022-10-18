@@ -9,7 +9,7 @@ import {
   Dimensions,
   TouchableOpacity,
   Alert,
-  Image
+  Image,
 } from "react-native";
 import { Layout, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
@@ -17,7 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import Attendance from "../../components/Attendance";
 import Icebreaker from "../../components/Icebreaker";
 import TagsList from "../../components/TagsList";
-
+import Button from "../../components/Button";
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
@@ -58,18 +58,50 @@ const WhileYouEat = ({ route, navigation }) => {
       getAttendees();
     }
 
-    db.collection("Users").doc(route.params.event.hostID).get().then(doc => {
-      setHost(doc.data());
-    });
+    db.collection("Users")
+      .doc(route.params.event.hostID)
+      .get()
+      .then((doc) => {
+        setHost(doc.data());
+      });
 
-    db.collection("Users").doc(user.uid).get().then(doc => {
-      if (friendAttending(doc.data())) {
-        db.collection("Users").doc(friendAttending(doc.data())).get().then(doc => {
-          setFriend(doc.data());
-        });
-      }
-    });
+    db.collection("Users")
+      .doc(user.uid)
+      .get()
+      .then((doc) => {
+        if (friendAttending(doc.data())) {
+          db.collection("Users")
+            .doc(friendAttending(doc.data()))
+            .get()
+            .then((doc) => {
+              setFriend(doc.data());
+            });
+        }
+      });
   }, []);
+
+  // Function to navigate to the chat for this event
+  const goToEventChat = () => {
+    // TODO: Account for when the event details change
+    const chatID = route.params.event.chatID;
+    if (chatID) {
+      db.collection("Groups")
+        .doc(chatID)
+        .get()
+        .then((doc) => {
+          navigation.navigate("ChatRoom", {
+            group: {
+              groupID: chatID,
+              uids: doc.data().uids,
+              name: doc.data().name,
+              messages: doc.data().messages,
+            },
+          });
+        });
+    } else {
+      alert("This feature is still in development and will be applied to your future events!")
+    }
+  };
 
   // Mark an attendee absent or present
   const markAttendee = (index) => {
@@ -107,8 +139,8 @@ const WhileYouEat = ({ route, navigation }) => {
               attended = true;
             }
 
-            setPeople(people => [...people, data]);
-            setAttendees(attendees => [...attendees, attended]);
+            setPeople((people) => [...people, data]);
+            setAttendees((attendees) => [...attendees, attended]);
           });
       }
     });
@@ -165,12 +197,12 @@ const WhileYouEat = ({ route, navigation }) => {
   }
 
   // Replace event with new details (for editing)
-  const editEvent = newEvent => {
-    setEvent(event => ({
+  const editEvent = (newEvent) => {
+    setEvent((event) => ({
       ...event,
-      ...newEvent
+      ...newEvent,
     }));
-  }
+  };
 
   // Alert the user if they want to withdraw from the event or not
   const withdrawAlert = () => {
@@ -187,27 +219,28 @@ const WhileYouEat = ({ route, navigation }) => {
       ],
       { cancelable: false }
     );
-  }
+  };
 
   // Determine if a friend is attending the event or not, and return them
   const friendAttending = (userInfo) => {
     let friend = null;
-    userInfo.friendIDs.forEach(f => {
-      if (route.params.event.attendees.includes(f) && f !== route.params.event.hostID) {
+    userInfo.friendIDs.forEach((f) => {
+      if (
+        route.params.event.attendees.includes(f) &&
+        f !== route.params.event.hostID
+      ) {
         friend = f;
         return;
       }
     });
 
     return friend;
-  }
+  };
 
   return (
     <Layout>
       <TopNav
-        middleContent={
-          <MediumText center>{event.name}</MediumText>
-        }
+        middleContent={<MediumText center>{event.name}</MediumText>}
         leftContent={
           <Ionicons
             name="chevron-back"
@@ -227,17 +260,32 @@ const WhileYouEat = ({ route, navigation }) => {
                 />
               </MenuTrigger>
               <MenuOptions>
-                {event.hostID !== user.uid && <MenuOption onSelect={() => reportEvent()} style={styles.option}>
-                  <NormalText size={18}>Report Event</NormalText>
-                </MenuOption>}
-                {event.hostID === user.uid && <MenuOption onSelect={() => navigation.navigate("EditEvent", {
-                  event,
-                  editEvent,
-                  editEvent2: route.params.editEvent
-                })}  style={styles.option}>
-                  <NormalText size={18}>Edit Event</NormalText>
-                </MenuOption>}
-                <MenuOption onSelect={() => withdrawAlert()}  style={styles.option}>
+                {event.hostID !== user.uid && (
+                  <MenuOption
+                    onSelect={() => reportEvent()}
+                    style={styles.option}
+                  >
+                    <NormalText size={18}>Report Event</NormalText>
+                  </MenuOption>
+                )}
+                {event.hostID === user.uid && (
+                  <MenuOption
+                    onSelect={() =>
+                      navigation.navigate("EditEvent", {
+                        event,
+                        editEvent,
+                        editEvent2: route.params.editEvent,
+                      })
+                    }
+                    style={styles.option}
+                  >
+                    <NormalText size={18}>Edit Event</NormalText>
+                  </MenuOption>
+                )}
+                <MenuOption
+                  onSelect={() => withdrawAlert()}
+                  style={styles.option}
+                >
                   <NormalText size={18} color="red">
                     Withdraw
                   </NormalText>
@@ -263,28 +311,59 @@ const WhileYouEat = ({ route, navigation }) => {
             {event.name}
           </LargeText>
 
-          <TouchableOpacity style={styles.row} onPress={() =>{
-            if(host) navigation.navigate("FullProfile", {
-              person: host
-            })
-          }}>
-            <Image source={route.params.event.hasHostImage ? { uri: route.params.event.hostImage}
-              : require("../../../assets/logo.png")} style={styles.profileImg}/>
-            <MediumText size={18}>{route.params.event.hostID === user.uid ? "You!"
-              : (route.params.event.hostFirstName ?
-                route.params.event.hostFirstName + " " + route.params.event.hostLastName
-              : route.params.event.hostName)}
+          <TouchableOpacity
+            style={styles.row}
+            onPress={() => {
+              if (host)
+                navigation.navigate("FullProfile", {
+                  person: host,
+                });
+            }}
+          >
+            <Image
+              source={
+                route.params.event.hasHostImage
+                  ? { uri: route.params.event.hostImage }
+                  : require("../../../assets/logo.png")
+              }
+              style={styles.profileImg}
+            />
+            <MediumText size={18}>
+              {route.params.event.hostID === user.uid
+                ? "You!"
+                : route.params.event.hostFirstName
+                ? route.params.event.hostFirstName +
+                  " " +
+                  route.params.event.hostLastName
+                : route.params.event.hostName}
             </MediumText>
           </TouchableOpacity>
-          
+
           <View style={styles.row}>
-            <NormalText>{route.params.event.attendees.length} attendee{route.params.event.attendees.length !== 1 && "s"}</NormalText>
+            <NormalText>
+              {route.params.event.attendees.length} attendee
+              {route.params.event.attendees.length !== 1 && "s"}
+            </NormalText>
             {friend && <NormalText>, including: </NormalText>}
-            {friend && <Image source={friend.hasImage ? { uri: friend.image } : require("../../../assets/logo.png")} style={styles.profileImg}/>}
-            {friend && <NormalText>{friend.firstName + " " + friend.lastName}</NormalText>}
+            {friend && (
+              <Image
+                source={
+                  friend.hasImage
+                    ? { uri: friend.image }
+                    : require("../../../assets/logo.png")
+                }
+                style={styles.profileImg}
+              />
+            )}
+            {friend && (
+              <NormalText>
+                {friend.firstName + " " + friend.lastName}
+              </NormalText>
+            )}
           </View>
-          {event.tags && event.tags.length > 0 &&
-            <TagsList marginVertical={10} tags={event.tags} left/>}
+          {event.tags && event.tags.length > 0 && (
+            <TagsList marginVertical={10} tags={event.tags} left />
+          )}
 
           {/* 3 event details (location, date, time} are below */}
 
@@ -294,7 +373,11 @@ const WhileYouEat = ({ route, navigation }) => {
               <NormalText paddingHorizontal={10} color="black">
                 {event.location}
               </NormalText>
-              <Link onPress={() => openMap({ query: event.location, provider: "google" })}>
+              <Link
+                onPress={() =>
+                  openMap({ query: event.location, provider: "google" })
+                }
+              >
                 (view on map)
               </Link>
             </View>
@@ -318,6 +401,12 @@ const WhileYouEat = ({ route, navigation }) => {
             {event.additionalInfo}
           </NormalText>
 
+          {/* In-event chat button */}
+          <Button width={200} onPress={() => goToEventChat()}>
+            Event Chat
+          </Button>
+          <View style={styles.option} />
+
           {/* Icebreakers dropdown */}
 
           <View style={styles.row}>
@@ -337,56 +426,61 @@ const WhileYouEat = ({ route, navigation }) => {
             </NormalText>
           </View>
           <View style={styles.icebreakers}>
-            {openIcebreakers && event.ice &&
+            {openIcebreakers &&
+              event.ice &&
               event.ice.map((ice, index) => (
                 <Icebreaker number={index + 1} icebreaker={ice} key={index} />
               ))}
           </View>
 
           {/* Attendance dropdown */}
-          {event.hostID === user.uid && <View>
-            <View style={styles.row}>
-              <TouchableOpacity
-                onPress={() => setOpenAttendance(!openAttendance)}
-              >
-                <Ionicons
-                  name={
-                    !openAttendance ? "caret-forward-sharp" : "caret-down-sharp"
-                  }
-                  size={20}
-                  color="black"
-                />
-              </TouchableOpacity>
-
-              <NormalText paddingHorizontal={7} size={17} color="black">
-                Attendance
-              </NormalText>
-            </View>
-
-            {openAttendance && (
-              <View style={{ marginTop: 10 }}>
-                {people.length === 0 ? (
-                  <NormalText paddingHorizontal={25} size={17} color="black">
-                    {"Just yourself"}
-                  </NormalText>
-                ) : (
-                  people.map((person, index) => {
-                    if (person.id !== user.uid) {
-                      return (
-                        <Attendance
-                          size={17}
-                          person={person}
-                          key={person.id}
-                          attending={attendees[index]}
-                          onPress={() => markAttendee(index)}
-                        />
-                      );
+          {event.hostID === user.uid && (
+            <View>
+              <View style={styles.row}>
+                <TouchableOpacity
+                  onPress={() => setOpenAttendance(!openAttendance)}
+                >
+                  <Ionicons
+                    name={
+                      !openAttendance
+                        ? "caret-forward-sharp"
+                        : "caret-down-sharp"
                     }
-                  })
-                )}
+                    size={20}
+                    color="black"
+                  />
+                </TouchableOpacity>
+
+                <NormalText paddingHorizontal={7} size={17} color="black">
+                  Attendance
+                </NormalText>
               </View>
-            )}
-          </View>}
+
+              {openAttendance && (
+                <View style={{ marginTop: 10 }}>
+                  {people.length === 0 ? (
+                    <NormalText paddingHorizontal={25} size={17} color="black">
+                      {"Just yourself"}
+                    </NormalText>
+                  ) : (
+                    people.map((person, index) => {
+                      if (person.id !== user.uid) {
+                        return (
+                          <Attendance
+                            size={17}
+                            person={person}
+                            key={person.id}
+                            attending={attendees[index]}
+                            onPress={() => markAttendee(index)}
+                          />
+                        );
+                      }
+                    })
+                  )}
+                </View>
+              )}
+            </View>
+          )}
         </View>
       </ScrollView>
     </Layout>
@@ -396,18 +490,18 @@ const WhileYouEat = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   infoContainer: {
     marginHorizontal: 30,
-    marginBottom: 50
+    marginBottom: 50,
   },
 
   option: {
-    padding: 10
+    padding: 10,
   },
 
   row: {
     flexDirection: "row",
     alignItems: "center",
     marginVertical: 4,
-    flexWrap: "wrap"
+    flexWrap: "wrap",
   },
 
   profileImg: {
@@ -417,12 +511,12 @@ const styles = StyleSheet.create({
     borderColor: "#5DB075",
     borderWidth: 1,
     backgroundColor: "white",
-    marginRight: 3
+    marginRight: 3,
   },
 
   buttonRow: {
     flexDirection: "row",
-    justifyContent: "center"
+    justifyContent: "center",
   },
 
   imageBackground: {

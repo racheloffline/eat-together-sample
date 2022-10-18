@@ -16,6 +16,7 @@ import HorizontalRow from "../../components/HorizontalRow";
 import Filter from "../../components/Filter";
 
 import { generateColor, isAvailable, randomize3 } from "../../methods";
+import { createNewChat } from "../Chat/Chats";
 
 // Stores image in Firebase Storage
 const storeImage = async (uri, event_id) => {
@@ -64,7 +65,7 @@ async function sendInvites(
         navigation.navigate("OrganizePrivate");
       });
   }
-
+  const chatID = String(invite.date) + invite.name;
   await db
     .collection("Private Events")
     .doc(id)
@@ -83,6 +84,7 @@ async function sendInvites(
       attendees: [user.id], //ONLY start by putting the current user as an attendee
       hasImage: invite.hasImage,
       image,
+      chatID: chatID
     })
     .then(async (docRef) => {
       await attendees.forEach((attendee) => {
@@ -107,6 +109,11 @@ async function sendInvites(
           attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
           attendedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
         });
+
+      // Create the in-event group chat
+      let userIDs = attendees.map(attendee => attendee.id);
+      userIDs.push(user.id);
+      createNewChat(userIDs, chatID, invite.name, false);
 
       alert("Invitations sent!");
     });
