@@ -23,7 +23,7 @@ import getDate from '../../getDate';
 import getTime from '../../getTime';
 import openMap from "react-native-open-maps";
 
-export default function ({ route, navigation}) {
+export default function ({ route, navigation }) {
     //Save the invite as a shorter name
     let invite = route.params.invite;
 
@@ -104,14 +104,15 @@ export default function ({ route, navigation}) {
                         <View style={styles.row}>
                             <Ionicons name="calendar-outline" size={20} />
                             <NormalText paddingHorizontal={10} color="black">
-                                {getDate(invite.date.toDate())}
+                                {invite.startDate ? getDate(invite.startDate.toDate()) : getDate(invite.date.toDate())}
                             </NormalText>
                         </View>
 
                         <View style={styles.row}>
                             <Ionicons name="time-outline" size={20} />
                             <NormalText paddingHorizontal={10} color="black">
-                                {getTime(invite.date.toDate())}
+                                {invite.startDate ? getTime(invite.startDate.toDate()) : getTime(invite.date.toDate())}
+                                {invite.endDate && " - ".concat(getTime(invite.endDate.toDate()))}
                             </NormalText>
                         </View>
                     </View>

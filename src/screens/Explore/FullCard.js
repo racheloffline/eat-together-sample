@@ -159,11 +159,14 @@ const FullCard = ({ route, navigation }) => {
             {route.params.event.name}
           </LargeText>
           
-          <TouchableOpacity style={styles.row} onPress={() =>{
-            if(host) navigation.navigate("FullProfile", {
-              person: host
-            })
-          }}>
+          <TouchableOpacity style={styles.row}
+            onPress={() => {
+              if (host && route.params.event.hostID !== user.uid)
+                navigation.navigate("FullProfile", {
+                  person: host,
+                });
+            }}
+            disabled={route.params.event.hostID === user.uid}>
             <Image source={route.params.event.hasHostImage ? { uri: route.params.event.hostImage}
               : require("../../../assets/logo.png")} style={styles.profileImg}/>
             <MediumText size={18}>{route.params.event.hostID === user.uid ? "You!"
@@ -198,14 +201,15 @@ const FullCard = ({ route, navigation }) => {
             <View style={styles.row}>
               <Ionicons name="calendar-outline" size={20} />
               <NormalText paddingHorizontal={10} color="black">
-                {getDate(route.params.event.date.toDate())}
+                {route.params.event.startDate ? getDate(route.params.event.startDate.toDate()) : getDate(route.params.event.date.toDate())}
               </NormalText>
             </View>
 
             <View style={styles.row}>
               <Ionicons name="time-outline" size={20} />
               <NormalText paddingHorizontal={10} color="black">
-                {getTime(route.params.event.date.toDate())}
+                {route.params.event.startDate ? getTime(route.params.event.startDate.toDate()) : getTime(route.params.event.date.toDate())}
+                {route.params.event.endDate && " - ".concat(getTime(route.params.event.endDate.toDate()))}
               </NormalText>
             </View>
           </View>
