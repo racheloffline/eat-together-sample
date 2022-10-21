@@ -314,11 +314,12 @@ const WhileYouEat = ({ route, navigation }) => {
           <TouchableOpacity
             style={styles.row}
             onPress={() => {
-              if (host)
+              if (host && route.params.event.hostID !== user.uid)
                 navigation.navigate("FullProfile", {
                   person: host,
                 });
             }}
+            disabled={route.params.event.hostID === user.uid}
           >
             <Image
               source={
@@ -385,14 +386,15 @@ const WhileYouEat = ({ route, navigation }) => {
             <View style={styles.row}>
               <Ionicons name="calendar-outline" size={20} />
               <NormalText paddingHorizontal={10} color="black">
-                {getDate(event.date.toDate())}
+                {event.startDate ? getDate(event.startDate.toDate()) : getDate(event.date.toDate())}
               </NormalText>
             </View>
 
             <View style={styles.row}>
               <Ionicons name="time-outline" size={20} />
               <NormalText paddingHorizontal={10} color="black">
-                {getTime(event.date.toDate())}
+                {event.startDate ? getTime(event.startDate.toDate()) : getTime(event.date.toDate())}
+                {event.endDate && " - ".concat(getTime(event.endDate.toDate()))}
               </NormalText>
             </View>
           </View>

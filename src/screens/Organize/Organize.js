@@ -1,3 +1,5 @@
+// The main page for organizing events/meetups.
+
 import React, { useState, useEffect, useRef } from "react";
 import {
     View,
@@ -7,7 +9,7 @@ import {
     ImageBackground,
     Dimensions,
 } from "react-native";
-import { TopNav, Layout, TextInput } from "react-native-rapi-ui";
+import { Layout, TextInput, Picker } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 import eventTags from "../../eventTags";
 
@@ -15,28 +17,43 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import RBSheet from "react-native-raw-bottom-sheet";
 import TagsSection from "../../components/TagsSection";
 
+import Header from "../../components/Header";
 import getDate from "../../getDate";
 import getTime from "../../getTime";
+import HorizontalSwitch from "../../components/HorizontalSwitch";
 import Button from "../../components/Button";
-
-import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
 
+import * as firebase from "firebase/compat";
 import * as ImagePicker from "expo-image-picker";
-import { db, storage } from "../../provider/Firebase";
-import { cloneDeep } from "lodash";
+import { db, auth, storage } from "../../provider/Firebase";
+import _, { cloneDeep } from "lodash";
+import { createNewChat } from "../Chat/Chats";
 import moment from "moment";
+import { checkProfanity } from "../../methods";
 
-export default function ({ route, navigation }) {
+export default function ({ navigation }) {
+    // Current user
+    const user = auth.currentUser;
+    const [userInfo, setUserInfo] = useState({});
+
+    // The type of event (public or private, for now)
+    const [type, setType] = useState("");
+    const items = [
+        { label: 'Public', value: 'public' },
+        { label: 'Private', value: 'private' },
+    ];
+
     // State variables for the inputs
     const [photo, setPhoto] = useState("https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400");
     const [name, setName] = useState("");
     const [location, setLocation] = useState("");
     const [startDate, setStartDate] = useState(new Date());
-    const [endDate, setEndDate] = useState(new Date());
+    const [endDate, setEndDate] = useState(moment(new Date()).add(1, 'hours').toDate());
     const [additionalInfo, setAdditionalInfo] = useState("");
     const [tagsSelected, setTagsSelected] = useState([]);
     const [tagsValue, setTagsValue] = useState("");
+    const [icebreakers, setIcebreakers] = useState([]);
 
     // Other variables
     const [showStartDate, setShowStartDate] = useState(false);
@@ -48,26 +65,34 @@ export default function ({ route, navigation }) {
 
     const refRBSheet = useRef(); // To toggle the bottom drawer on/off
 
-    // Get current event info
+    // Loading notifications
     useEffect(() => {
-        setName(route.params.event.name);
-        setLocation(route.params.event.location);
+        // picks icebreaker set from set of icebreakers randomly
+        const breakOptions = [];
+        db.collection("Icebreakers").onSnapshot((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                breakOptions.push(doc.id);
+            });
 
-        setStartDate(route.params.event.startDate
-            ? route.params.event.startDate.toDate()
-            : route.params.event.date.toDate());
-        setEndDate(route.params.event.endDate
-            ? route.params.event.endDate.toDate()
-            : new Date(moment(route.params.event.date.toDate()).add(1, "hours").toDate()));
+            var num = Math.floor(Math.random()*breakOptions.length);
+            db.collection("Icebreakers").doc(breakOptions[num]).get().then(doc => {
+                setIcebreakers(doc.data().icebreakers);
+            });
+        });
 
-        setAdditionalInfo(route.params.event.additionalInfo);
-        setTagsSelected(route.params.event.tags ? route.params.event.tags : []);
-        setPhoto(route.params.event.image ? route.params.event.image : photo);
+        // Load user info
+        async function fetchData() {
+            await db.collection("Users").doc(user.uid).onSnapshot((doc) => {
+                setUserInfo(doc.data());
+            });
+        }
+
+        fetchData();
     }, []);
 
     // Checks whether we should disable the Post button or not
     useEffect(() => {
-        if (name === "" || location === "") {
+        if (name === "" || location === "" || type === "") {
             setDisabled(true);
         } else {
             setDisabled(false);
@@ -128,51 +153,67 @@ export default function ({ route, navigation }) {
         return ref.getDownloadURL();
     }
 
+    // Empties all fields
+    const clearAll = () => {
+        setName("");
+        setType("");
+        setLocation("");
+        setStartDate(new Date());
+        setEndDate(moment(new Date()).add(1, 'hours').toDate());
+        setAdditionalInfo("");
+        setTagsSelected([]);
+        setTagsValue("");
+        setPhoto("https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400");
+    }
+
+    const chatID = String(startDate) + name; // To be stored in the event
+
     // For posting the event
     const storeEvent = (id, hasImage, image) => {
-        const newEvent = {
+        db.collection("Public Events").doc(id).set({
             id,
             name,
+            hostID: user.uid,
+            hostFirstName: userInfo.firstName,
+            hostLastName: userInfo.lastName,
+            hasHostImage: userInfo.hasImage,
+            hostImage: userInfo.hasImage ? userInfo.image : "",
             location,
             startDate,
             endDate,
             additionalInfo,
+            ice: icebreakers,
+            attendees: [user.uid], //ONLY start by putting the current user as an attendee
             hasImage,
-            image
-        };
+            image,
+            tags: tagsSelected,
+            chatID: chatID,
+        }).then(() => {
+            const storeID = {
+                type: "public",
+                id
+            };
 
-        let table = "Private Events";
+            db.collection("Users").doc(user.uid).update({
+                hostedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
+                attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
+                attendedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)
+            }).then(() => {
+              clearAll(); // Clear all fields
 
-        if (route.params.event.type === "public") {
-            newEvent.tags = tagsSelected;
-            table = "Public Events";
-        }
-
-        db.collection(table).doc(route.params.event.id).update(newEvent).then(() => {
-            newEvent.startDate = moment(startDate);
-            newEvent.endDate = moment(endDate);
-            route.params.editEvent({...newEvent, type: route.params.event.type});
-            route.params.editEvent2({...newEvent, type: route.params.event.type});
-            navigation.goBack();
-            alert("Meal updated!");
+              // Create the in-event group chat
+              // We set userIDs as empty, meaning this chat is open to everyone!
+              createNewChat([], chatID, name, false);
+              // We are finally done!
+              alert("Success!");
+              setLoading(false);
+            });
         });
     }
 
     return (
         <Layout>
-            <TopNav
-                middleContent={
-                    <MediumText center>Edit Event</MediumText>
-                }
-                leftContent={
-                    <Ionicons
-                        name="chevron-back"
-                        color={loading ? "grey" : "black"}
-                        size={20}
-                    />
-                }
-                leftAction={() => navigation.goBack()}
-            />
+            <Header name="Organize"/>
 
             <TouchableOpacity onPress={() => handleChoosePhoto()}>
                 <ImageBackground source={{ uri: photo }} style={styles.image}>
@@ -185,7 +226,7 @@ export default function ({ route, navigation }) {
             <View style={{ flex: 1 }}>
                 <ScrollView style={styles.content}>
                     <TextInput
-                        placeholder="Event Name"
+                        placeholder="Meal Name"
                         value={name}
                         onChangeText={(val) => {
                             setName(val);
@@ -196,22 +237,33 @@ export default function ({ route, navigation }) {
                         containerStyle={styles.input}
                     />
 
-                    <TouchableOpacity onPress={() => {
-                        setShowStartDate(true);
-                        setMode("date");
-                    }} style={styles.input}>
-                        <View pointerEvents="none">
-                            <TextInput
-                                value={getDate(startDate)}
-                                leftContent={
-                                    <Ionicons name="calendar-outline" size={20}/>
-                                }
-                                editable={false}
+                    <View style={styles.multiple}>
+                        <View style={styles.smallInput}>
+                            <Picker
+                                items={items}
+                                value={type}
+                                placeholder="Type of meal"
+                                onValueChange={(val) => setType(val)}
                             />
                         </View>
-                    </TouchableOpacity>
 
-                    <View style={styles.dateTime}>
+                        <TouchableOpacity onPress={() => {
+                            setShowStartDate(true);
+                            setMode("date");
+                        }} style={styles.smallInput}>
+                            <View pointerEvents="none">
+                                <TextInput
+                                    value={getDate(startDate)}
+                                    leftContent={
+                                        <Ionicons name="calendar-outline" size={20}/>
+                                    }
+                                    editable={false}
+                                />
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.multiple}>
                         <TouchableOpacity onPress={() => {
                             setShowStartDate(true);
                             setMode("time");
@@ -240,15 +292,8 @@ export default function ({ route, navigation }) {
                                     editable={false}
                                 />
                             </View>
-                        </TouchableOpacity>
-                    </View>                        
-
-                    <DateTimePickerModal isVisible={showStartDate} date={startDate}
-                        mode={mode} onConfirm={changeStartDate} onCancel={() => setShowStartDate(false)}
-                        minimumDate={new Date()} maximumDate={moment().add(1, "months").toDate()}/>
-                    <DateTimePickerModal isVisible={showEndDate} date={endDate}
-                        mode={mode} onConfirm={changeEndDate} onCancel={() => setShowEndDate(false)}
-                        minimumDate={startDate} maximumDate={moment().add(1, "months").toDate()}/>
+                        </TouchableOpacity> 
+                    </View>
 
                     <TextInput
                         placeholder="Location"
@@ -261,7 +306,14 @@ export default function ({ route, navigation }) {
                         }
                         containerStyle={styles.input}
                     />
-                    
+
+                    <DateTimePickerModal isVisible={showStartDate} date={startDate}
+                        mode={mode} onConfirm={changeStartDate} onCancel={() => setShowStartDate(false)}
+                        minimumDate={new Date()} maximumDate={moment().add(1, "months").toDate()}/>
+                    <DateTimePickerModal isVisible={showEndDate} date={endDate}
+                        mode={mode} onConfirm={changeEndDate} onCancel={() => setShowEndDate(false)}
+                        minimumDate={startDate} maximumDate={moment().add(1, "months").toDate()}/>
+
                     <TextInput
                         placeholder="Additional Info"
                         value={additionalInfo}
@@ -273,7 +325,7 @@ export default function ({ route, navigation }) {
                         }
                     />
 
-                    {route.params.event.type === "public" && <TouchableOpacity onPress={() => refRBSheet.current.open()}
+                    {type === "public" && <TouchableOpacity onPress={() => refRBSheet.current.open()}
                         style={styles.input}>
                         <View pointerEvents="none">
                             <TextInput
@@ -287,29 +339,58 @@ export default function ({ route, navigation }) {
                         </View>
                     </TouchableOpacity>}
 
-                    <Button disabled={disabled || loading} onPress={() => {
-                        setLoading(true);
-                        let hasImage = false;
-                        if (photo !== "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400") {
-                            hasImage = true;
-                            
-                            if (photo !== route.params.event.image) {
-                                storeImage(photo, route.params.event.id).then(() => {
-                                    fetchImage(route.params.event.id).then(uri => {
-                                        storeEvent(route.params.event.id, hasImage, uri);
+                    {type === "public" ? <Button disabled={disabled || loading} onPress={() => {
+                        if (checkProfanity(name)) {
+                            alert("Name has inappropriate words >:(");
+                        } else if (checkProfanity(location)) {
+                            alert("Location has inappropriate words >:(");
+                        } else if (checkProfanity(additionalInfo)) {
+                            alert("Additional info has inappropriate words >:(");
+                        } else {
+                            setLoading(true);
+                            const id = Date.now() + user.uid;
+                            let hasImage = false;
+                            if (photo !== "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400") {
+                                hasImage = true;
+                                storeImage(photo, id).then(() => {
+                                    fetchImage(id).then(uri => {
+                                        storeEvent(id, hasImage, uri);
                                     });
                                 });
                             } else {
-                                storeEvent(route.params.event.id, hasImage, route.params.event.image);
+                                storeEvent(id, hasImage, "");
                             }
-                        } else {
-                            storeEvent(route.params.event.id, hasImage, "");
                         }
-                    }} marginVertical={20}>{loading ? "Updating ..." : "Update"}</Button>
+                    }} marginVertical={20}>{loading ? "Posting ..." : "Post"}</Button> :
+                    <Button disabled={disabled} onPress={() => {
+                        if (checkProfanity(name)) {
+                            alert("Name has inappropriate words >:(");
+                        } else if (checkProfanity(location)) {
+                            alert("Location has inappropriate words >:(");
+                        } else if (checkProfanity(additionalInfo)) {
+                            alert("Additional info has inappropriate words >:(");
+                        } else {
+                            let hasImage = false;
+                            if (photo !== "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400") {
+                                hasImage = true;
+                            }
+                            navigation.navigate("InvitePeople", {
+                                name,
+                                location,
+                                startDate,
+                                endDate,
+                                additionalInfo: additionalInfo,
+                                hasImage: hasImage,
+                                image: hasImage ? photo : "",
+                                icebreakers,
+                                clearAll
+                            });
+                        }
+                    }} marginVertical={20}>See people available!</Button>}
                 </ScrollView>
             </View>
 
-            {route.params.event.type === "public" && <RBSheet
+            <RBSheet
                 height={400}
                 ref={refRBSheet}
                 closeOnDragDown={true}
@@ -332,7 +413,6 @@ export default function ({ route, navigation }) {
                     multi={true}
                     selectedItems={tagsSelected}
                     onItemSelect={(item) => {
-                        console.log("Select");
                         setTagsSelected([...tagsSelected, item]);
                     }}
                     onRemoveItem={(item, index) => {
@@ -343,7 +423,7 @@ export default function ({ route, navigation }) {
                     chip={true}
                     resetValue={false}
                 />
-            </RBSheet>}
+            </RBSheet>
         </Layout>
     );
 }
@@ -371,7 +451,7 @@ const styles = StyleSheet.create({
         height: 150
     },
 
-    dateTime: {
+    multiple: {
         marginTop: 10,
         flexDirection: "row",
         justifyContent: "space-between"

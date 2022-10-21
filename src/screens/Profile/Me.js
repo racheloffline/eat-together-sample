@@ -17,7 +17,7 @@ import NormalText from "../../components/NormalText";
 import TagsList from "../../components/TagsList";
 import EventCard from "../../components/EventCard";
 
-const { width, height } = Dimensions.get('window');
+import { compareDates } from "../../methods";
 
 export default function ({ navigation }) {
   const user = auth.currentUser;
@@ -61,7 +61,7 @@ export default function ({ navigation }) {
                 if (eventsLength === 0) {
                   // Sort events by date
                   newEvents = newEvents.sort((a, b) => {
-                    return a.date.seconds - b.date.seconds;
+                    return compareDates(a, b);
                   });
 
                   setEvents(newEvents);
@@ -71,7 +71,7 @@ export default function ({ navigation }) {
 
                 eventsLength--;
                 newEvents = newEvents.sort((a, b) => {
-                  return a.date.seconds - b.date.seconds;
+                  return compareDates(a, b);
                 });
 
                 setEvents(newEvents);

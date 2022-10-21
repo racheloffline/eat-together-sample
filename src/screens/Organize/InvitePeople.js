@@ -40,14 +40,16 @@ async function sendInvites(
   user,
   id,
   image,
-  icebreakers
+  icebreakers,
+  clearAll
 ) {
   //Send invites to each of the selected users
   async function sendInvitations(ref) {
     ref
       .collection("Invites")
       .add({
-        date: invite.date,
+        startDate: invite.startDate,
+        endDate: invite.endDate,
         description: invite.additionalInfo,
         hostID: user.id,
         hostFirstName: user.firstName,
@@ -65,7 +67,7 @@ async function sendInvites(
         navigation.navigate("OrganizePrivate");
       });
   }
-  const chatID = String(invite.date) + invite.name;
+  const chatID = String(invite.startDate) + invite.name;
   await db
     .collection("Private Events")
     .doc(id)
@@ -78,7 +80,8 @@ async function sendInvites(
       hasHostImage: user.hasImage,
       hostImage: user.image,
       location: invite.location,
-      date: invite.date,
+      startDate: invite.startDate,
+      endDate: invite.endDate,
       additionalInfo: invite.additionalInfo,
       ice: icebreakers,
       attendees: [user.id], //ONLY start by putting the current user as an attendee
@@ -114,7 +117,9 @@ async function sendInvites(
       let userIDs = attendees.map(attendee => attendee.id);
       userIDs.push(user.id);
       createNewChat(userIDs, chatID, invite.name, false);
-
+      
+      navigation.goBack();
+      clearAll();
       alert("Invitations sent!");
     });
 }
@@ -152,8 +157,6 @@ export default function ({ route, navigation }) {
   const [disabled, setDisabled] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  const [icebreakers, setIcebreakers] = useState([]); // Icebreakers
-
   // Filters
   const [curSearch, setCurSearch] = useState("");
   const [available, setAvailable] = useState(true);
@@ -167,21 +170,6 @@ export default function ({ route, navigation }) {
   // Fetch users
   useEffect(async () => {
     async function fetchData() {
-      //      picks icebreaker set from set of icebreakers randomly
-      const breakOptions = [];
-      await db.collection("Icebreakers").onSnapshot((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          breakOptions.push(doc.id);
-        });
-        var num = Math.floor(Math.random() * breakOptions.length);
-        db.collection("Icebreakers")
-          .doc(breakOptions[num])
-          .get()
-          .then((doc) => {
-            setIcebreakers(doc.data().icebreakers);
-          });
-      });
-
       // Fetch users
       const ref = db.collection("Users");
 
@@ -429,7 +417,8 @@ export default function ({ route, navigation }) {
                   userInfo,
                   id,
                   uri,
-                  icebreakers
+                  route.params.icebreakers,
+                  route.params.clearAll
                 ).then(() => {
                   setLoading(false);
                 });
@@ -443,7 +432,8 @@ export default function ({ route, navigation }) {
               userInfo,
               id,
               "",
-              icebreakers
+              route.params.icebreakers,
+              route.params.clearAll
             ).then(() => {
               setLoading(false);
             });
