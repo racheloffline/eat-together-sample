@@ -18,6 +18,30 @@ import ChatPreview from "../../components/ChatPreview";
 import SearchableDropdown from "../../components/SearchableDropdown";
 import {useIsFocused} from "@react-navigation/native";
 
+export const createNewChat = (
+  userIDs,
+  chatID,
+  chatName,
+  toIncludeOnChatPage
+) => {
+  // Create a new doc in the groups collection on firestore with input
+  db.collection("Groups").doc(chatID).set({
+    uids: userIDs,
+    name: chatName,
+    messages: [],
+  });
+  // If we want to display this chat on the chat page, update each user's data to include this chat
+  if (toIncludeOnChatPage) {
+    userIDs.map((uid) => {
+      db.collection("Users")
+        .doc(uid)
+        .update({
+          groupIDs: firebase.firestore.FieldValue.arrayUnion(chatID),
+        });
+    });
+  }
+};
+
 export default function ({ navigation }) {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [users, setUsers] = useState([]);
@@ -27,7 +51,7 @@ export default function ({ navigation }) {
 
   const isFocused = useIsFocused(); //OMG THIS IS A LIFESAVING HACK
 
-  const createNewChat = () => {
+  const createNewChatDefault = () => {
     userInfo.get().then((currUser) => {
       // Generate group id using the concatenation of all the selected usernames
       let allUsernames = [];
@@ -96,14 +120,19 @@ export default function ({ navigation }) {
               data.messages.length != 0
                 ? data.messages[data.messages.length - 1].sentAt
                 : "";
-            // Get rid of your own name and all the ways it can be formatted in group title
-            // let name = data.name.replace(nameCurrent + ", ", "");
-            // if (name.endsWith(", " + nameCurrent)) {
-            //   name = name.slice(0, -1 * (nameCurrent.length + 2));
-            // }
+
+            // Get rid of your own name and all the ways it can be formatted in group title (if it is a DM)
+            let name = data.name;
+            if(data.uids.length == 2) {
+              name = name.replace(nameCurrent + ", ", "");
+              if (name.endsWith(", " + nameCurrent)) {
+                name = name.slice(0, -1 * (nameCurrent.length + 2));
+              }
+            }
+
             temp.push({
               groupID: groupID,
-              name: data.name,
+              name: name,
               uids: data.uids,
               hasImage: data.hasImage,
               message: message,
@@ -152,7 +181,7 @@ export default function ({ navigation }) {
 */
   return (
     <Layout>
-      <Header name="Chat"/>
+      <Header name="Chat" navigation={navigation} connections/>
 
       <View style={styles.content}>
         <View style={styles.searchArea}>
@@ -192,7 +221,7 @@ export default function ({ navigation }) {
             color="black"
             style={{ height: 50 }}
             onPress={() => {
-              createNewChat();
+              createNewChatDefault();
               setSelectedUsers([]);
             }}
           ></Button>

@@ -16,6 +16,7 @@ import Link from "../../components/Link";
 
 import { db, auth } from "../../provider/Firebase";
 import { AuthContext } from "../../provider/AuthProvider";
+import { compareDates } from "../../methods";
 
 export default function ({ navigation }) {
   // Get current user
@@ -76,7 +77,7 @@ export default function ({ navigation }) {
                   if (eventsLength === 0) {
                     // Sort events by date
                     newEvents = newEvents.sort((a, b) => {
-                      return a.date.seconds - b.date.seconds;
+                      return compareDates(a, b);
                     });
 
                     setEvents(newEvents);
@@ -88,7 +89,7 @@ export default function ({ navigation }) {
 
                   eventsLength--;
                   newEvents = newEvents.sort((a, b) => {
-                    return a.date.seconds - b.date.seconds;
+                    return compareDates(a, b);
                   });
 
                   setEvents(newEvents);
@@ -291,7 +292,7 @@ export default function ({ navigation }) {
 
   return (
     <Layout>
-      <Header name="Your Meals" navigation={navigation} hasNotif={unread} />
+      <Header name="Your Meals" navigation={navigation} hasNotif={unread} notifs connections/>
 
       <View style={{ marginTop: 20, paddingHorizontal: 20 }}>
         <Searchbar

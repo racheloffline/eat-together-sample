@@ -17,17 +17,7 @@ import NormalText from "../../components/NormalText";
 import TagsList from "../../components/TagsList";
 import EventCard from "../../components/EventCard";
 
-const { width, height } = Dimensions.get('window');
-
-//Guideline sizes are based on standard ~5" screen mobile device
-const guidelineBaseWidth = 350;
-const guidelineBaseHeight = 680;
-
-const scale = size => width / guidelineBaseWidth * size;
-const verticalScale = size => height / guidelineBaseHeight * size;
-const moderateScale = (size, factor = 0.5) => size + ( scale(size) - size ) * factor;
-
-export {scale, verticalScale, moderateScale};
+import { compareDates } from "../../methods";
 
 export default function ({ navigation }) {
   const user = auth.currentUser;
@@ -48,7 +38,7 @@ export default function ({ navigation }) {
           setMealsAttended(doc.data().attendedEventIDs.length);
           setMealsSignedUp(
             doc.data().attendingEventIDs.length +
-              doc.data().archivedEventIDs.length
+            doc.data().archivedEventIDs.length
           );
 
           let newEvents = [];
@@ -61,31 +51,31 @@ export default function ({ navigation }) {
             }
 
             await db.collection(table)
-                .doc(e.id)
-                .get()
-                .then((event) => {
-                  let data = event.data();
-                  newEvents.push(data);
-                  eventsLength--;
-                  
-                  if (eventsLength === 0) {
-                    // Sort events by date
-                    newEvents = newEvents.sort((a, b) => {
-                      return a.date.seconds - b.date.seconds;
-                    });
-                    
-                    setEvents(newEvents);
-                  }
-                }).catch(e => {
-                  alert("There was an error fetching some of your meals :( try again later");
+              .doc(e.id)
+              .get()
+              .then((event) => {
+                let data = event.data();
+                newEvents.push(data);
+                eventsLength--;
 
-                  eventsLength--;
+                if (eventsLength === 0) {
+                  // Sort events by date
                   newEvents = newEvents.sort((a, b) => {
-                    return a.date.seconds - b.date.seconds;
+                    return compareDates(a, b);
                   });
 
                   setEvents(newEvents);
+                }
+              }).catch(e => {
+                alert("There was an error fetching some of your meals :( try again later");
+
+                eventsLength--;
+                newEvents = newEvents.sort((a, b) => {
+                  return compareDates(a, b);
                 });
+
+                setEvents(newEvents);
+              });
           });
         });
     }
@@ -113,7 +103,7 @@ export default function ({ navigation }) {
       availabilities: newAvailabilities
     }));
   }
-
+  
   return (
     <Layout>
       <ScrollView contentContainerStyle={styles.page}>
@@ -145,7 +135,7 @@ export default function ({ navigation }) {
             }}
           ></Ionicons>
         </View>
-        
+
         <Image
           style={styles.image}
           source={
@@ -174,7 +164,7 @@ export default function ({ navigation }) {
             }}
             marginVertical={10}
           >
-            <Ionicons name="list-circle" size={20} color="#4C6FB1"/>
+            <Ionicons name="list-circle" size={20} color="#4C6FB1" />
             <NormalText color="#4C6FB1"> Connections</NormalText>
           </TouchableOpacity>
 
@@ -188,21 +178,30 @@ export default function ({ navigation }) {
             }}
             marginVertical={10}
           >
-            <Feather name="edit-2" size={20} color="#4C6FB1"/>
+            <Feather name="edit-2" size={20} color="#4C6FB1" />
             <NormalText color="#4C6FB1"> Edit Profile</NormalText>
           </TouchableOpacity>
         </View>
 
         <TagsList tags={userInfo.tags ? userInfo.tags : []} />
         <MediumText center>{userInfo.bio}</MediumText>
-
-        <View style={styles.cards}>
-          {events && events.map((event) => <EventCard event={event} key={event.id} click={() => {
-            navigation.navigate("FullCard", {
-              event
-            });
-          }}/>)}
-        </View>
+        {events.length > 0 && <View style={styles.eventRecordBackground}>
+          <LargeText color="white">Your Event Records</LargeText>
+          <View style={styles.cards}>
+            {
+              events.map((event) => (
+                <EventCard
+                  event={event}
+                  key={event.id}
+                  click={() => {
+                    navigation.navigate("FullCard", {
+                      event,
+                    });
+                  }}
+                />
+              ))}
+          </View>
+        </View>}
       </ScrollView>
     </Layout>
   );
@@ -214,6 +213,14 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
 
+  eventRecordBackground: {
+    backgroundColor: "#808080",
+    width: Dimensions.get("screen").width,
+    alignItems: "center",
+    paddingTop: 20,
+    marginTop: 40,
+  },
+
   page: {
     paddingTop: 30,
     alignItems: "center",
@@ -223,13 +230,13 @@ const styles = StyleSheet.create({
   background: {
     position: "absolute",
     width: Dimensions.get("screen").width,
-    height: verticalScale(150),
+    height: 150,
     backgroundColor: "#5DB075",
   },
 
   image: {
-    width: moderateScale(175),
-    height: verticalScale(175),
+    width: 175,
+    height: 175,
     borderColor: "white",
     borderWidth: 3,
     borderRadius: 100,

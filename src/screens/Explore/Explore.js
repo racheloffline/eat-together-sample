@@ -15,7 +15,7 @@ import Link from "../../components/Link";
 
 import MediumText from "../../components/MediumText";
 
-import { getTimeOfDay, isAvailable } from "../../methods";
+import { getTimeOfDay, isAvailable, compareDates } from "../../methods";
 import { auth, db } from "../../provider/Firebase";
 
 export default function({ navigation }) {
@@ -57,15 +57,22 @@ export default function({ navigation }) {
             await ref.onSnapshot((query) => {
                 let newEvents = [];
                 query.forEach((doc) => {
-                    if (doc.data().date.toDate() > new Date() && 
-                      !userData.blockedIDs.includes(doc.data().hostID)) {
-                        newEvents.push(doc.data());
+                    if (doc.data().startDate) {
+                      if (doc.data().startDate.toDate() > new Date() && 
+                        !userData.blockedIDs.includes(doc.data().hostID)) {
+                          newEvents.push(doc.data());
+                      }
+                    } else {
+                      if (doc.data().date.toDate() > new Date() && 
+                        !userData.blockedIDs.includes(doc.data().hostID)) {
+                          newEvents.push(doc.data());
+                      }
                     }
                 });
                 
                 // Sort events by date
                 newEvents = newEvents.sort((a, b) => {
-                    return a.date.seconds - b.date.seconds;
+                    return compareDates(a, b);
                 });
                 setEvents(newEvents);
                 setFilteredEvents(newEvents);

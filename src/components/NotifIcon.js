@@ -16,7 +16,7 @@ const NotifIcon = (props) => {
       name={iconName}
       size={40}
       color="black"
-      style={{ marginRight: 10 }}
+      style={{ marginRight: 5 }}
     />
   );
 };

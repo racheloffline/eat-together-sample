@@ -15,7 +15,8 @@ import Searchbar from "../../components/Searchbar";
 import HorizontalRow from "../../components/HorizontalRow";
 import Filter from "../../components/Filter";
 
-import { generateColor, isAvailable } from "../../methods";
+import { generateColor, isAvailable, randomize3 } from "../../methods";
+import { createNewChat } from "../Chat/Chats";
 
 // Stores image in Firebase Storage
 const storeImage = async (uri, event_id) => {
@@ -39,14 +40,16 @@ async function sendInvites(
   user,
   id,
   image,
-  icebreakers
+  icebreakers,
+  clearAll
 ) {
   //Send invites to each of the selected users
   async function sendInvitations(ref) {
     ref
       .collection("Invites")
       .add({
-        date: invite.date,
+        startDate: invite.startDate,
+        endDate: invite.endDate,
         description: invite.additionalInfo,
         hostID: user.id,
         hostFirstName: user.firstName,
@@ -64,7 +67,7 @@ async function sendInvites(
         navigation.navigate("OrganizePrivate");
       });
   }
-
+  const chatID = String(invite.startDate) + invite.name;
   await db
     .collection("Private Events")
     .doc(id)
@@ -77,12 +80,14 @@ async function sendInvites(
       hasHostImage: user.hasImage,
       hostImage: user.image,
       location: invite.location,
-      date: invite.date,
+      startDate: invite.startDate,
+      endDate: invite.endDate,
       additionalInfo: invite.additionalInfo,
       ice: icebreakers,
       attendees: [user.id], //ONLY start by putting the current user as an attendee
       hasImage: invite.hasImage,
       image,
+      chatID: chatID
     })
     .then(async (docRef) => {
       await attendees.forEach((attendee) => {
@@ -108,6 +113,13 @@ async function sendInvites(
           attendedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
         });
 
+      // Create the in-event group chat
+      let userIDs = attendees.map(attendee => attendee.id);
+      userIDs.push(user.id);
+      createNewChat(userIDs, chatID, invite.name, false);
+      
+      navigation.goBack();
+      clearAll();
       alert("Invitations sent!");
     });
 }
@@ -145,8 +157,6 @@ export default function ({ route, navigation }) {
   const [disabled, setDisabled] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  const [icebreakers, setIcebreakers] = useState([]); // Icebreakers
-
   // Filters
   const [curSearch, setCurSearch] = useState("");
   const [available, setAvailable] = useState(true);
@@ -160,21 +170,6 @@ export default function ({ route, navigation }) {
   // Fetch users
   useEffect(async () => {
     async function fetchData() {
-      //      picks icebreaker set from set of icebreakers randomly
-      const breakOptions = [];
-      await db.collection("Icebreakers").onSnapshot((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          breakOptions.push(doc.id);
-        });
-        var num = Math.floor(Math.random() * breakOptions.length);
-        db.collection("Icebreakers")
-          .doc(breakOptions[num])
-          .get()
-          .then((doc) => {
-            setIcebreakers(doc.data().icebreakers);
-          });
-      });
-
       // Fetch users
       const ref = db.collection("Users");
 
@@ -191,7 +186,6 @@ export default function ({ route, navigation }) {
             .then((doc) => {
               if (doc) {
                 if (doc.data().friendIDs) {
-                  // TODO FIX: Not all docs have friendIDs in db
                   setMutuals((mutuals) =>
                     mutuals.concat(doc.data().friendIDs)
                   );
@@ -209,6 +203,8 @@ export default function ({ route, navigation }) {
           if (data.verified && data.id !== user.uid && !currUser.blockedIDs.includes(data.id)
             && !data.blockedIDs.includes(user.uid)) { // Only show verified + unblocked users
             data.invited = false;
+            data.color = generateColor();
+            data.selectedTags = randomize3(data.tags);
             list.push(data);
           }
         });
@@ -396,7 +392,6 @@ export default function ({ route, navigation }) {
               navigation={navigation}
               person={item}
               toggleInvite={toggleInvite}
-              color={generateColor()}
             />
           )}
         />)
@@ -422,7 +417,8 @@ export default function ({ route, navigation }) {
                   userInfo,
                   id,
                   uri,
-                  icebreakers
+                  route.params.icebreakers,
+                  route.params.clearAll
                 ).then(() => {
                   setLoading(false);
                 });
@@ -436,7 +432,8 @@ export default function ({ route, navigation }) {
               userInfo,
               id,
               "",
-              icebreakers
+              route.params.icebreakers,
+              route.params.clearAll
             ).then(() => {
               setLoading(false);
             });

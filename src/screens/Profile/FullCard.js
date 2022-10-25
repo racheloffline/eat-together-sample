@@ -60,7 +60,8 @@ const FullCard = ({ route, navigation }) => {
             </MediumText>
           </View>
 
-          {route.params.event.tags && <TagsList marginVertical={20} tags={route.params.event.tags}/>}
+          {route.params.event.tags && route.params.event.tags.length > 0 &&
+            <TagsList marginVertical={20} tags={route.params.event.tags} left/>}
 
           {/* 3 event details (location, date, time} are below */}
 
@@ -78,14 +79,15 @@ const FullCard = ({ route, navigation }) => {
             <View style={styles.row}>
               <Ionicons name="calendar-outline" size={20} />
               <NormalText paddingHorizontal={10} color="black">
-                {getDate(route.params.event.date.toDate())}
+                {route.params.event.startDate ? getDate(route.params.event.startDate.toDate()) : getDate(route.params.event.date.toDate())}
               </NormalText>
             </View>
 
             <View style={styles.row}>
               <Ionicons name="time-outline" size={20} />
               <NormalText paddingHorizontal={10} color="black">
-                {getTime(route.params.event.date.toDate())}
+                {route.params.event.startDate ? getTime(route.params.event.startDate.toDate()) : getTime(route.params.event.date.toDate())}
+                {route.params.event.endDate && " - ".concat(getTime(route.params.event.endDate.toDate()))}
               </NormalText>
             </View>
           </View>

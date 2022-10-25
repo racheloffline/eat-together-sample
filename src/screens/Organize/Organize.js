@@ -1,3 +1,5 @@
+// The main page for organizing events/meetups.
+
 import React, { useState, useEffect, useRef } from "react";
 import {
     View,
@@ -7,7 +9,7 @@ import {
     ImageBackground,
     Dimensions,
 } from "react-native";
-import { Layout, TextInput } from "react-native-rapi-ui";
+import { Layout, TextInput, Picker } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 import eventTags from "../../eventTags";
 
@@ -25,7 +27,7 @@ import NormalText from "../../components/NormalText";
 import * as firebase from "firebase/compat";
 import * as ImagePicker from "expo-image-picker";
 import { db, auth, storage } from "../../provider/Firebase";
-import { cloneDeep } from "lodash";
+import _, { cloneDeep } from "lodash";
 import { createNewChat } from "../Chat/Chats";
 import moment from "moment";
 import { checkProfanity } from "../../methods";
@@ -35,18 +37,27 @@ export default function ({ navigation }) {
     const user = auth.currentUser;
     const [userInfo, setUserInfo] = useState({});
 
+    // The type of event (public or private, for now)
+    const [type, setType] = useState("");
+    const items = [
+        { label: 'Public', value: 'public' },
+        { label: 'Private', value: 'private' },
+    ];
+
     // State variables for the inputs
     const [photo, setPhoto] = useState("https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400");
     const [name, setName] = useState("");
     const [location, setLocation] = useState("");
-    const [date, setDate] = useState(new Date());
+    const [startDate, setStartDate] = useState(new Date());
+    const [endDate, setEndDate] = useState(moment(new Date()).add(1, 'hours').toDate());
     const [additionalInfo, setAdditionalInfo] = useState("");
     const [tagsSelected, setTagsSelected] = useState([]);
     const [tagsValue, setTagsValue] = useState("");
     const [icebreakers, setIcebreakers] = useState([]);
 
     // Other variables
-    const [showDate, setShowDate] = useState(false);
+    const [showStartDate, setShowStartDate] = useState(false);
+    const [showEndDate, setShowEndDate] = useState(false);
     const [mode, setMode] = useState("date");
     const [disabled, setDisabled] = useState(true);
 
@@ -56,8 +67,7 @@ export default function ({ navigation }) {
 
     // Loading notifications
     useEffect(() => {
-
-    //      picks icebreaker set from set of icebreakers randomly
+        // picks icebreaker set from set of icebreakers randomly
         const breakOptions = [];
         db.collection("Icebreakers").onSnapshot((querySnapshot) => {
             querySnapshot.forEach((doc) => {
@@ -69,6 +79,8 @@ export default function ({ navigation }) {
                 setIcebreakers(doc.data().icebreakers);
             });
         });
+
+        // Load user info
         async function fetchData() {
             await db.collection("Users").doc(user.uid).onSnapshot((doc) => {
                 setUserInfo(doc.data());
@@ -80,7 +92,7 @@ export default function ({ navigation }) {
 
     // Checks whether we should disable the Post button or not
     useEffect(() => {
-        if (name === "" || location == "") {
+        if (name === "" || location === "" || type === "") {
             setDisabled(true);
         } else {
             setDisabled(false);
@@ -99,11 +111,19 @@ export default function ({ navigation }) {
         setTagsValue(tags);
     }, [name, location, tagsSelected]);
 
-    // For selecting a date and time
-    const changeDate = (selectedDate) => {
-        const currentDate = selectedDate || date;
-        setDate(currentDate); // Set the date
-        setShowDate(false); // Exit the date/time picker modal
+    // For selecting a start date and time
+    const changeStartDate = (selectedDate) => {
+        const currentDate = selectedDate || startDate;
+        setStartDate(currentDate); // Set the date
+        setEndDate(moment(currentDate).add(1, 'hours').toDate()); // Set the end date to the same as the start date
+        setShowStartDate(false); // Exit the date/time picker modal
+    };
+
+    // For selecting an end date and time
+    const changeEndDate = (selectedDate) => {
+        const currentDate = selectedDate || endDate;
+        setEndDate(currentDate); // Set the date
+        setShowEndDate(false); // Exit the date/time picker modal
     };
 
     // For selecting a photo
@@ -133,7 +153,20 @@ export default function ({ navigation }) {
         return ref.getDownloadURL();
     }
 
-    const chatID = String(date) + name; // To be stored in the event
+    // Empties all fields
+    const clearAll = () => {
+        setName("");
+        setType("");
+        setLocation("");
+        setStartDate(new Date());
+        setEndDate(moment(new Date()).add(1, 'hours').toDate());
+        setAdditionalInfo("");
+        setTagsSelected([]);
+        setTagsValue("");
+        setPhoto("https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400");
+    }
+
+    const chatID = String(startDate) + name; // To be stored in the event
 
     // For posting the event
     const storeEvent = (id, hasImage, image) => {
@@ -146,7 +179,8 @@ export default function ({ navigation }) {
             hasHostImage: userInfo.hasImage,
             hostImage: userInfo.hasImage ? userInfo.image : "",
             location,
-            date,
+            startDate,
+            endDate,
             additionalInfo,
             ice: icebreakers,
             attendees: [user.uid], //ONLY start by putting the current user as an attendee
@@ -165,11 +199,8 @@ export default function ({ navigation }) {
                 attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
                 attendedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)
             }).then(() => {
-              setName("");
-              setLocation("");
-              setDate(new Date());
-              setAdditionalInfo("");
-              setTagsSelected([]);
+              clearAll(); // Clear all fields
+
               // Create the in-event group chat
               // We set userIDs as empty, meaning this chat is open to everyone!
               createNewChat([], chatID, name, false);
@@ -183,7 +214,6 @@ export default function ({ navigation }) {
     return (
         <Layout>
             <Header name="Organize"/>
-            <HorizontalSwitch left="Private" right="Public" current="right" press={(val) => navigation.navigate("OrganizePrivate")}/>
 
             <TouchableOpacity onPress={() => handleChoosePhoto()}>
                 <ImageBackground source={{ uri: photo }} style={styles.image}>
@@ -207,6 +237,64 @@ export default function ({ navigation }) {
                         containerStyle={styles.input}
                     />
 
+                    <View style={styles.multiple}>
+                        <View style={styles.smallInput}>
+                            <Picker
+                                items={items}
+                                value={type}
+                                placeholder="Type of meal"
+                                onValueChange={(val) => setType(val)}
+                            />
+                        </View>
+
+                        <TouchableOpacity onPress={() => {
+                            setShowStartDate(true);
+                            setMode("date");
+                        }} style={styles.smallInput}>
+                            <View pointerEvents="none">
+                                <TextInput
+                                    value={getDate(startDate)}
+                                    leftContent={
+                                        <Ionicons name="calendar-outline" size={20}/>
+                                    }
+                                    editable={false}
+                                />
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.multiple}>
+                        <TouchableOpacity onPress={() => {
+                            setShowStartDate(true);
+                            setMode("time");
+                        }} style={styles.smallInput}>
+                            <View pointerEvents="none">
+                                <TextInput
+                                    value={getTime(startDate)}
+                                    leftContent={
+                                        <Ionicons name="time-outline" size={20}/>
+                                    }
+                                    editable={false}
+                                />
+                            </View>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity onPress={() => {
+                            setShowEndDate(true);
+                            setMode("time");
+                        }} style={styles.smallInput}>
+                            <View pointerEvents="none">
+                                <TextInput
+                                    value={getTime(endDate)}
+                                    leftContent={
+                                        <Ionicons name="time-outline" size={20}/>
+                                    }
+                                    editable={false}
+                                />
+                            </View>
+                        </TouchableOpacity> 
+                    </View>
+
                     <TextInput
                         placeholder="Location"
                         value={location}
@@ -219,41 +307,12 @@ export default function ({ navigation }) {
                         containerStyle={styles.input}
                     />
 
-                    <View style={styles.dateTime}>
-                        <TouchableOpacity onPress={() => {
-                            setShowDate(true);
-                            setMode("date");
-                        }} style={styles.smallInput}>
-                            <View pointerEvents="none">
-                                <TextInput
-                                    value={getDate(date)}
-                                    leftContent={
-                                        <Ionicons name="calendar-outline" size={20}/>
-                                    }
-                                    editable={false}
-                                />
-                            </View>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity onPress={() => {
-                            setShowDate(true);
-                            setMode("time");
-                        }} style={styles.smallInput}>
-                            <View pointerEvents="none">
-                                <TextInput
-                                    value={getTime(date)}
-                                    leftContent={
-                                        <Ionicons name="time-outline" size={20}/>
-                                    }
-                                    editable={false}
-                                />
-                            </View>
-                        </TouchableOpacity>
-                    </View>                        
-
-                    <DateTimePickerModal isVisible={showDate} date={date}
-                        mode={mode} onConfirm={changeDate} onCancel={() => setShowDate(false)}
+                    <DateTimePickerModal isVisible={showStartDate} date={startDate}
+                        mode={mode} onConfirm={changeStartDate} onCancel={() => setShowStartDate(false)}
                         minimumDate={new Date()} maximumDate={moment().add(1, "months").toDate()}/>
+                    <DateTimePickerModal isVisible={showEndDate} date={endDate}
+                        mode={mode} onConfirm={changeEndDate} onCancel={() => setShowEndDate(false)}
+                        minimumDate={startDate} maximumDate={moment().add(1, "months").toDate()}/>
 
                     <TextInput
                         placeholder="Additional Info"
@@ -266,7 +325,7 @@ export default function ({ navigation }) {
                         }
                     />
 
-                    <TouchableOpacity onPress={() => refRBSheet.current.open()}
+                    {type === "public" && <TouchableOpacity onPress={() => refRBSheet.current.open()}
                         style={styles.input}>
                         <View pointerEvents="none">
                             <TextInput
@@ -278,9 +337,9 @@ export default function ({ navigation }) {
                                 editable={false}
                             />
                         </View>
-                    </TouchableOpacity>
+                    </TouchableOpacity>}
 
-                    <Button disabled={disabled || loading} onPress={() => {
+                    {type === "public" ? <Button disabled={disabled || loading} onPress={() => {
                         if (checkProfanity(name)) {
                             alert("Name has inappropriate words >:(");
                         } else if (checkProfanity(location)) {
@@ -302,7 +361,32 @@ export default function ({ navigation }) {
                                 storeEvent(id, hasImage, "");
                             }
                         }
-                    }} marginVertical={20}>{loading ? "Posting ..." : "Post"}</Button>
+                    }} marginVertical={20}>{loading ? "Posting ..." : "Post"}</Button> :
+                    <Button disabled={disabled} onPress={() => {
+                        if (checkProfanity(name)) {
+                            alert("Name has inappropriate words >:(");
+                        } else if (checkProfanity(location)) {
+                            alert("Location has inappropriate words >:(");
+                        } else if (checkProfanity(additionalInfo)) {
+                            alert("Additional info has inappropriate words >:(");
+                        } else {
+                            let hasImage = false;
+                            if (photo !== "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400") {
+                                hasImage = true;
+                            }
+                            navigation.navigate("InvitePeople", {
+                                name,
+                                location,
+                                startDate,
+                                endDate,
+                                additionalInfo: additionalInfo,
+                                hasImage: hasImage,
+                                image: hasImage ? photo : "",
+                                icebreakers,
+                                clearAll
+                            });
+                        }
+                    }} marginVertical={20}>See people available!</Button>}
                 </ScrollView>
             </View>
 
@@ -367,7 +451,7 @@ const styles = StyleSheet.create({
         height: 150
     },
 
-    dateTime: {
+    multiple: {
         marginTop: 10,
         flexDirection: "row",
         justifyContent: "space-between"
