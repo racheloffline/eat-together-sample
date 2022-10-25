@@ -37,6 +37,8 @@ export default function ({ navigation }) {
     const user = auth.currentUser;
     const [userInfo, setUserInfo] = useState({});
 
+    const [unread, setUnread] = useState(false);
+
     // The type of event (public or private, for now)
     const [type, setType] = useState("");
     const items = [
@@ -84,6 +86,7 @@ export default function ({ navigation }) {
         async function fetchData() {
             await db.collection("Users").doc(user.uid).onSnapshot((doc) => {
                 setUserInfo(doc.data());
+                setUnread(doc.data().hasNotif);
             });
         }
 
@@ -213,7 +216,7 @@ export default function ({ navigation }) {
 
     return (
         <Layout>
-            <Header name="Organize"/>
+            <Header name="Organize" navigation={navigation} hasNotif={unread} notifs connections/>
 
             <TouchableOpacity onPress={() => handleChoosePhoto()}>
                 <ImageBackground source={{ uri: photo }} style={styles.image}>
