@@ -13,6 +13,7 @@ import firebase from "firebase";
 import { db } from "../../provider/Firebase";
 import moment from "moment";
 import TextMessage from "../../components/TextMessage";
+import KeyboardAvoidingWrapper from "../../components/KeyboardAvoidingWrapper";
 
 export default function ({ route, navigation }) {
   const [image, setImage] = useState(
@@ -69,6 +70,7 @@ export default function ({ route, navigation }) {
           <TextMessage sentBy={item.sentBy} message={item.message} />
         )}
       />
+      <KeyboardAvoidingWrapper>
       <TextInput
         placeholder="Send Message"
         value={message}
@@ -83,6 +85,7 @@ export default function ({ route, navigation }) {
           </TouchableOpacity>
         }
       />
+      </KeyboardAvoidingWrapper>
     </Layout>
   );
 }
