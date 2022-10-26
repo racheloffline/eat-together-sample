@@ -20,6 +20,7 @@ export default function ({ navigation }) {
   // Fetch current user
   const user = auth.currentUser;
   const [userInfo, setUserInfo] = useState({});
+  const [unread, setUnread] = useState(false); // See if we need to display unread notif icon
 
   const [mutuals, setMutuals] = useState([]); // Mutual friends
 
@@ -49,6 +50,7 @@ export default function ({ navigation }) {
         .then((doc) => {
           setUserInfo(doc.data());
           userData = doc.data();
+          setUnread(doc.data().hasNotif);
 
           doc.data().friendIDs.forEach((id) => {
             db.collection("Users")
@@ -206,7 +208,7 @@ export default function ({ navigation }) {
 
   return (
     <Layout>
-      <Header name="Explore" />
+      <Header name="Explore" navigation={navigation} hasNotif={unread} notifs connections/>
       <HorizontalSwitch
         left="Meals"
         right="People"

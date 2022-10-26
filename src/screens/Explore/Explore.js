@@ -22,6 +22,7 @@ export default function({ navigation }) {
     // Fetch current user
     const user = auth.currentUser;
     const [userInfo, setUserInfo] = useState({});
+    const [unread, setUnread] = useState(false); // See if we need to display unread notif icon
 
     const [events, setEvents] = useState([]); // All public events
     const [filteredEvents, setFilteredEvents] = useState([]); // Filtered events
@@ -51,6 +52,7 @@ export default function({ navigation }) {
             await db.collection("Users").doc(user.uid).onSnapshot(doc => {
                 userData = doc.data();
                 setUserInfo(doc.data());
+                setUnread(doc.data().hasNotif);
             });
 
             const ref = db.collection("Public Events");
@@ -260,7 +262,7 @@ export default function({ navigation }) {
 
     return (
       <Layout>
-        <Header name="Explore"/>
+          <Header name="Explore" navigation={navigation} hasNotif={unread} notifs connections/>
         <HorizontalSwitch
           left="Meals"
           right="People"
