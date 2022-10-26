@@ -253,7 +253,7 @@ export default function ({ navigation }) {
                         }} style={styles.smallInput}>
                             <View pointerEvents="none">
                                 <TextInput
-                                    value={getDate(startDate)}
+                                    value={getDate(startDate, false)}
                                     leftContent={
                                         <Ionicons name="calendar-outline" size={20}/>
                                     }

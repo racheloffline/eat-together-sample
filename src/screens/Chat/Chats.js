@@ -43,67 +43,88 @@ export const createNewChat = (
 };
 
 export default function ({ navigation }) {
+  // Chats with other users
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [users, setUsers] = useState([]);
   const [groups, setGroups] = useState([]);
+
+  // Current user
   const user = firebase.auth().currentUser;
-  const userInfo = db.collection("Users").doc(user.uid);
+  const [userInfo, setUserInfo] = useState(null);
 
   const isFocused = useIsFocused(); //OMG THIS IS A LIFESAVING HACK
 
   const createNewChatDefault = () => {
-    userInfo.get().then((currUser) => {
-      // Generate group id using the concatenation of all the selected usernames
-      let allUsernames = [];
-      let allNames = [];
-      selectedUsers.map((user) => {
-        allUsernames.push(user.username);
-        allNames.push(user.name);
+    // Generate group id using the concatenation of all the selected usernames
+    let allUsernames = [];
+    let allNames = [];
+
+    selectedUsers.map((user) => {
+      allUsernames.push(user.username);
+      allNames.push(user.name);
+    });
+
+    allUsernames.push(userInfo.username);
+    allNames.push(userInfo.firstName + " " + userInfo.lastName);
+    const chatID = allUsernames.sort().join();
+
+    // Get all the uid in this chat
+    let allUIDs = [];
+    selectedUsers.map((user) => {
+      allUIDs.push(user.id);
+    });
+    allUIDs.push(user.uid);
+
+    // Create a new doc in the groups collection on firestore
+    db.collection("Groups")
+      .doc(chatID)
+      .set({
+        uids: allUIDs,
+        name: allNames.join(", "),
+        messages: [],
       });
-      allUsernames.push(currUser.data().username);
-      allNames.push(currUser.data().firstName + " " + currUser.data().lastName);
-      const chatID = allUsernames.sort().join();
-      // Get all the uid in this chat
-      let allUIDs = [];
-      selectedUsers.map((user) => {
-        allUIDs.push(user.id);
-      });
-      allUIDs.push(user.uid);
-      // Create a new doc in the groups collection on firestore
-      db.collection("Groups")
-        .doc(chatID)
-        .set({
-          uids: allUIDs,
-          name: allNames.join(", "),
-          messages: [],
+
+    // Update each user's data to include this chat
+    allUIDs.map((uid) => {
+      db.collection("Users")
+        .doc(uid)
+        .update({
+          groupIDs: firebase.firestore.FieldValue.arrayUnion(chatID),
         });
-      // Update each user's data to include this chat
-      allUIDs.map((uid) => {
-        db.collection("Users")
-          .doc(uid)
-          .update({
-            groupIDs: firebase.firestore.FieldValue.arrayUnion(chatID),
-          });
-      });
-      navigation.navigate("ChatRoom", {
-        group: {
-          groupID: chatID,
-          uids: allUIDs,
-          name: allNames.join(", "),
-          messages: [],
-        },
-      });
+    });
+
+    let name = allNames.join(", ");
+    let currUserName = userInfo.firstName + " " + userInfo.lastName
+    if(allUIDs.length >= 2) {
+      name = name.replace(currUserName + ", ", "");
+      
+      if (name.endsWith(", " + currUserName)) {
+        name = name.slice(0, -1 * (currUserName.length + 2));
+      }
+    }
+
+    navigation.navigate("ChatRoom", {
+      group: {
+        groupID: chatID,
+        uids: allUIDs,
+        name,
+        messages: [],
+      },
     });
   };
 
   // Get your taste buds as search suggestions
   useEffect(() => {
-    userInfo.onSnapshot((doc) => {
+    db.collection("Users").doc(user.uid).onSnapshot((doc) => {
+      setUserInfo(doc.data());
+
       const nameCurrent = doc.data().firstName + " " + doc.data().lastName;
       const friends = doc.data().friendIDs;
       const groups = doc.data().groupIDs;
       // update the groups displayed
       let temp = [];
+      let lenGroups = groups.length;
+
       groups.forEach((groupID) => {
         db.collection("Groups")
           .doc(groupID)
@@ -123,7 +144,7 @@ export default function ({ navigation }) {
 
             // Get rid of your own name and all the ways it can be formatted in group title (if it is a DM)
             let name = data.name;
-            if(data.uids.length == 2) {
+            if(data.uids.length >= 2) {
               name = name.replace(nameCurrent + ", ", "");
               if (name.endsWith(", " + nameCurrent)) {
                 name = name.slice(0, -1 * (nameCurrent.length + 2));
@@ -141,11 +162,14 @@ export default function ({ navigation }) {
             });
           })
           .then(() => {
-            // sort display by time
-            temp.sort((a, b) => {
-              return b.time - a.time;
-            });
-            setGroups(temp);
+            lenGroups--;
+            if (lenGroups == 0) {
+              // sort display by time
+              temp.sort((a, b) => {
+                return b.time - a.time;
+              });
+              setGroups(temp);
+            }
           });
       });
       // prepare the list of all connections for searchbar
@@ -170,15 +194,7 @@ export default function ({ navigation }) {
       });
     });
   }, [isFocused]);
-  /*
-  return (
-    <View style={{ flexGrow: 1, justifyContent: "center", margin: 40 }}>
-      <LargeText center={true}>
-        Our devs are working hard on this feature! Sit tight.
-      </LargeText>
-    </View>
-  );
-*/
+
   return (
     <Layout>
       <Header name="Chat" navigation={navigation} connections/>

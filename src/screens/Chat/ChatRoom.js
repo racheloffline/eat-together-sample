@@ -73,7 +73,7 @@ export default function ({ route, navigation }) {
       <FlatList
         data={messages}
         renderItem={({ item }) => (
-          <TextMessage sentBy={item.sentBy} message={item.message} />
+          <TextMessage {...item}/>
         )}
       />
       <TextInput
@@ -107,6 +107,4 @@ const styles = StyleSheet.create({
     height: 100,
     backgroundColor: "#5DB075",
   },
-
-  messages: {},
 });

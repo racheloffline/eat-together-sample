@@ -17,7 +17,8 @@ import { Ionicons } from "@expo/vector-icons";
 import Attendance from "../../components/Attendance";
 import Icebreaker from "../../components/Icebreaker";
 import TagsList from "../../components/TagsList";
-import Button from "../../components/Button";
+import CircularButton from "../../components/CircularButton";
+
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
@@ -52,6 +53,7 @@ const WhileYouEat = ({ route, navigation }) => {
 
   // Get the current user
   const user = auth.currentUser;
+  const [groupChat, setGroupChat] = useState(null); // Info for the group chat
 
   useEffect(() => {
     if (route.params.event.hostID === user.uid) {
@@ -78,26 +80,30 @@ const WhileYouEat = ({ route, navigation }) => {
             });
         }
       });
+    
+    if (route.params.event.chatID) {
+      db.collection("Groups")
+        .doc(route.params.event.chatID)
+        .get()
+        .then((doc) => {
+          const group = {
+            groupID: route.params.event.chatID,
+            uids: doc.data().uids,
+            name: doc.data().name,
+            messages: doc.data().messages,
+          };
+
+          setGroupChat(group);
+        });
+    }
   }, []);
 
   // Function to navigate to the chat for this event
   const goToEventChat = () => {
-    // TODO: Account for when the event details change
-    const chatID = route.params.event.chatID;
-    if (chatID) {
-      db.collection("Groups")
-        .doc(chatID)
-        .get()
-        .then((doc) => {
-          navigation.navigate("ChatRoom", {
-            group: {
-              groupID: chatID,
-              uids: doc.data().uids,
-              name: doc.data().name,
-              messages: doc.data().messages,
-            },
-          });
-        });
+    if (route.params.event.chatID) {
+      navigation.navigate("ChatRoom", {
+        group: groupChat
+      });
     } else {
       alert("This feature is still in development and will be applied to your future events!")
     }
@@ -296,6 +302,13 @@ const WhileYouEat = ({ route, navigation }) => {
         }
       />
 
+      {/* In-event chat button */}
+      <View style={styles.eventChat}>
+        <CircularButton onPress={() => goToEventChat()}>
+          <Ionicons name="chatbox-ellipses-outline" size={30} />
+        </CircularButton>
+      </View>
+
       <ScrollView>
         <ImageBackground
           source={
@@ -403,12 +416,6 @@ const WhileYouEat = ({ route, navigation }) => {
             {event.additionalInfo}
           </NormalText>
 
-          {/* In-event chat button */}
-          <Button width={200} onPress={() => goToEventChat()}>
-            Event Chat
-          </Button>
-          <View style={styles.option} />
-
           {/* Icebreakers dropdown */}
 
           <View style={styles.row}>
@@ -495,10 +502,6 @@ const styles = StyleSheet.create({
     marginBottom: 50,
   },
 
-  option: {
-    padding: 10,
-  },
-
   row: {
     flexDirection: "row",
     alignItems: "center",
@@ -536,6 +539,12 @@ const styles = StyleSheet.create({
   logistics: {
     marginVertical: 15,
   },
+
+  eventChat: {
+    position: "absolute",
+    bottom: 30,
+    right: 30,
+  }
 });
 
 export default WhileYouEat;
