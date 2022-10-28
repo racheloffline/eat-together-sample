@@ -362,7 +362,7 @@ export default function ({ navigation }) {
                     </TouchableOpacity>}
                     
                     <View style={{ display: "flex", justifyContent: "center", alignItems: "center", marginVertical: 10 }}>
-                        <Link width="20%" onPress={confirmClear}>Clear all details</Link>
+                        <Link width="35%" onPress={confirmClear}>Clear all details</Link>
                     </View>
 
                     {type === "public" ? <Button disabled={disabled || loading} onPress={() => {
