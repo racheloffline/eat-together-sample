@@ -49,6 +49,7 @@ export default function ({ navigation }) {
   const [groups, setGroups] = useState([]);
 
   // Current user
+  const [unread, setUnread] = useState(false); // See if we need to display unread notif icon
   const user = firebase.auth().currentUser;
   const [userInfo, setUserInfo] = useState(null);
 
@@ -121,6 +122,8 @@ export default function ({ navigation }) {
       const nameCurrent = doc.data().firstName + " " + doc.data().lastName;
       const friends = doc.data().friendIDs;
       const groups = doc.data().groupIDs;
+      setUnread(doc.data().hasNotif);
+
       // update the groups displayed
       let temp = [];
       let lenGroups = groups.length;
@@ -197,7 +200,7 @@ export default function ({ navigation }) {
 
   return (
     <Layout>
-      <Header name="Chat" navigation={navigation} connections/>
+      <Header name="Chats" navigation={navigation} hasNotif={unread} notifs connections/>
 
       <View style={styles.content}>
         <View style={styles.searchArea}>
