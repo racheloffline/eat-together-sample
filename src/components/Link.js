@@ -4,7 +4,9 @@ import NormalText from "./NormalText";
 
 const Link = props => {
     return (
-        <TouchableOpacity onPress={props.onPress} disabled={props.disabled}>
+        <TouchableOpacity onPress={props.onPress} disabled={props.disabled} style={{
+            width: props.width ? props.width : "100%",
+        }}>
             <NormalText color="#0398fc"
                 size={props.size ? props.size : null} center>{props.children}</NormalText>
         </TouchableOpacity>

@@ -33,7 +33,8 @@ export default function ({ route, navigation }) {
     messageRef.onSnapshot((doc) => {
       let temp = [];
       doc.data().messages.forEach((message) => {
-        temp.push(message);
+        // insert message at beginning of array
+        temp.unshift(message);
       });
       setMessages(temp);
     });
@@ -75,6 +76,7 @@ export default function ({ route, navigation }) {
         renderItem={({ item }) => (
           <TextMessage {...item}/>
         )}
+        inverted={true}
       />
       <TextInput
         placeholder="Send Message"
@@ -85,6 +87,7 @@ export default function ({ route, navigation }) {
             onPress={() => {
               onSend();
             }}
+            disabled={message.length === 0}
           >
             <Ionicons name="send" size={20} color={"#D3D3D3"} />
           </TouchableOpacity>
@@ -106,5 +109,5 @@ const styles = StyleSheet.create({
     width: Dimensions.get("screen").width,
     height: 100,
     backgroundColor: "#5DB075",
-  },
+  }
 });

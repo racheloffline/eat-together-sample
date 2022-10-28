@@ -8,6 +8,7 @@ import {
     StyleSheet,
     ImageBackground,
     Dimensions,
+    Alert
 } from "react-native";
 import { Layout, TextInput, Picker } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
@@ -20,9 +21,9 @@ import TagsSection from "../../components/TagsSection";
 import Header from "../../components/Header";
 import getDate from "../../getDate";
 import getTime from "../../getTime";
-import HorizontalSwitch from "../../components/HorizontalSwitch";
 import Button from "../../components/Button";
 import NormalText from "../../components/NormalText";
+import Link from "../../components/Link";
 
 import * as firebase from "firebase/compat";
 import * as ImagePicker from "expo-image-picker";
@@ -112,7 +113,7 @@ export default function ({ navigation }) {
         }
 
         setTagsValue(tags);
-    }, [name, location, tagsSelected]);
+    }, [name, location, type, tagsSelected]);
 
     // For selecting a start date and time
     const changeStartDate = (selectedDate) => {
@@ -159,7 +160,6 @@ export default function ({ navigation }) {
     // Empties all fields
     const clearAll = () => {
         setName("");
-        setType("");
         setLocation("");
         setStartDate(new Date());
         setEndDate(moment(new Date()).add(1, 'hours').toDate());
@@ -214,6 +214,23 @@ export default function ({ navigation }) {
         });
     }
 
+    // Alert the user if they want to clear all details or not
+    const confirmClear = () => {
+        Alert.alert(
+            "Clear meal details",
+            "Are you sure you want to clear all fields?",
+            [
+                {
+                    text: "No",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel",
+                },
+                { text: "Yes", onPress: () => clearAll() },
+            ],
+            { cancelable: false }
+        );
+    };
+
     return (
         <Layout>
             <Header name="Organize" navigation={navigation} hasNotif={unread} notifs connections/>
@@ -227,7 +244,7 @@ export default function ({ navigation }) {
             </TouchableOpacity>
             
             <View style={{ flex: 1 }}>
-                <ScrollView style={styles.content}>
+                <ScrollView contentContainerStyle={styles.content}>
                     <TextInput
                         placeholder="Meal Name"
                         value={name}
@@ -271,6 +288,7 @@ export default function ({ navigation }) {
                             setShowStartDate(true);
                             setMode("time");
                         }} style={styles.smallInput}>
+                            <NormalText center>Start time</NormalText>
                             <View pointerEvents="none">
                                 <TextInput
                                     value={getTime(startDate)}
@@ -287,6 +305,7 @@ export default function ({ navigation }) {
                             setMode("time");
                         }} style={styles.smallInput}>
                             <View pointerEvents="none">
+                                <NormalText center>End time</NormalText>
                                 <TextInput
                                     value={getTime(endDate)}
                                     leftContent={
@@ -341,6 +360,10 @@ export default function ({ navigation }) {
                             />
                         </View>
                     </TouchableOpacity>}
+                    
+                    <View style={{ display: "flex", justifyContent: "center", alignItems: "center", marginVertical: 10 }}>
+                        <Link width="20%" onPress={confirmClear}>Clear all details</Link>
+                    </View>
 
                     {type === "public" ? <Button disabled={disabled || loading} onPress={() => {
                         if (checkProfanity(name)) {
@@ -364,7 +387,9 @@ export default function ({ navigation }) {
                                 storeEvent(id, hasImage, "");
                             }
                         }
-                    }} marginVertical={20}>{loading ? "Posting ..." : "Post"}</Button> :
+                    }}>
+                        {loading ? "Posting ..." : "Post"}
+                    </Button> :
                     <Button disabled={disabled} onPress={() => {
                         if (checkProfanity(name)) {
                             alert("Name has inappropriate words >:(");
@@ -389,7 +414,9 @@ export default function ({ navigation }) {
                                 clearAll
                             });
                         }
-                    }} marginVertical={20}>See people available!</Button>}
+                    }}>
+                        See people available!
+                    </Button>}
                 </ScrollView>
             </View>
 
@@ -433,7 +460,8 @@ export default function ({ navigation }) {
 
 const styles = StyleSheet.create({
     content: {
-        paddingHorizontal: 20
+        paddingHorizontal: 20,
+        paddingBottom: 10
     },
 
     imageOverlay: {
