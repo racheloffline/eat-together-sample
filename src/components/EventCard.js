@@ -42,7 +42,7 @@ const EventCard = (props) => {
               : ""}
           </NormalText>
           <SmallText size={12} center>
-            {props.event.location} | {" "}
+            {props.event.location} |{" "}
             {props.event.startDate ? getDate(props.event.startDate.toDate()) : getDate(props.event.date.toDate())} |{" "}
             {props.event.startDate ? getTime(props.event.startDate.toDate()) : getTime(props.event.date.toDate())}
             {props.event.endDate && " - ".concat(getTime(props.event.endDate.toDate()))}
