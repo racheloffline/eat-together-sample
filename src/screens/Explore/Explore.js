@@ -79,12 +79,11 @@ export default function({ navigation }) {
                 setEvents(newEvents);
                 setFilteredEvents(newEvents);
                 setFilteredSearchedEvents(newEvents);
+                setLoading(false);
             });
         }
 
-        fetchData().then(() => {
-          setLoading(false);
-        });
+        fetchData();
     }, []);
 
     // For filters
@@ -391,8 +390,12 @@ export default function({ navigation }) {
         </RBSheet>
 
         <View style={{ flex: 1 }}>
-          {!loading ? 
-            filteredSearchedEvents.length > 0 ? (
+          {loading ?
+            <View style={{ flex: 1, justifyContent: "center" }}>
+              <ActivityIndicator size={100} color="#5DB075"/>
+              <MediumText>Hang tight ...</MediumText>
+            </View>
+            : filteredSearchedEvents.length > 0 ? (
             <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
               data={filteredSearchedEvents} renderItem={({item}) =>
                 <EventCard event={item} click={() => {
@@ -405,11 +408,7 @@ export default function({ navigation }) {
             ) : (
               <View style={{ flex: 1, justifyContent: "center" }}>
                 <MediumText center>Empty 🍽️</MediumText>
-              </View>) : (
-              <View style={{ flex: 1, justifyContent: "center" }}>
-                <ActivityIndicator size={100} color="#5DB075"/>
-              </View>
-          )}
+              </View>)}
         </View>
       </Layout>
     );

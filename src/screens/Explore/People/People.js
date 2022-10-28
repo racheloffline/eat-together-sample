@@ -83,18 +83,18 @@ export default function ({ navigation }) {
         setPeople(users);
         setFilteredPeople(users);
         setFilteredSearchPeople(users);
+        setLoading(false);
       });
     }
 
-    fetchData().then(() => {
-      setLoading(false);
-    });
+    fetchData();
   }, []);
 
 
   // Filters
   useEffect(() => {
     async function filter() {
+      setLoading(true);
       let newPeople = [...people];
   
       if (similarInterests) {
@@ -110,10 +110,11 @@ export default function ({ navigation }) {
       setFilteredSearchPeople(newSearchedPeople);
     }
 
-    setLoading(true);
-    filter().then(() => {
-      setLoading(false);
-    });
+    if (people.length > 0) {
+      filter().then(() => {
+        setLoading(false);
+      });
+    }
   }, [similarInterests, mutualFriends]);
 
   // Get tags in common with current user and user being compared to
@@ -238,8 +239,12 @@ export default function ({ navigation }) {
       </View>
 
       <View style={{ flex: 1, alignItems: "center" }}>
-        {!loading ?
-          filteredSearchedPeople.length > 0 ? (
+        {loading || people.length === 0 ?
+          <View style={{ flex: 1, justifyContent: "center" }}>
+            <ActivityIndicator size={100} color="#5DB075" />
+            <MediumText>Hang tight ...</MediumText>
+          </View>
+          : filteredSearchedPeople.length > 0 ? (
           <FlatList
             keyExtractor={(item) => item.id}
             data={filteredSearchedPeople}
@@ -256,11 +261,7 @@ export default function ({ navigation }) {
           />
           ) : (<View style={{ flex: 1, justifyContent: "center" }}>
             <MediumText center>Empty 🍽️</MediumText>
-          </View>) : (
-          <View style={{ flex: 1, justifyContent: "center" }}>
-            <ActivityIndicator size={100} color="#5DB075" />
-          </View>
-        )}
+          </View>)}
       </View>
     </Layout>
   );

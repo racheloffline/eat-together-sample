@@ -382,8 +382,12 @@ export default function ({ route, navigation }) {
         </HorizontalRow>
       </View>
 
-      {!loadingScreen ?
-        filteredSearchedUsers.length > 0 ? (<FlatList
+      {loadingScreen || users.length === 0 ?
+        <View style={{ flex: 1, justifyContent: "center" }}>
+          <ActivityIndicator size={100} color="#5DB075" />
+          <MediumText center>Hang tight ...</MediumText>
+        </View>
+        : filteredSearchedUsers.length > 0 ? (<FlatList
           contentContainerStyle={styles.invites}
           keyExtractor={(item) => item.id}
           data={filteredSearchedUsers}
@@ -397,9 +401,7 @@ export default function ({ route, navigation }) {
         />)
         : (<View style={{ flex: 1, justifyContent: "center" }}>
           <MediumText center>Empty 🍽️</MediumText>
-        </View>) : (<View style={{ flex: 1, justifyContent: "center" }}>
-        <ActivityIndicator size={100} color="#5DB075" />
-      </View>)}
+        </View>)}
 
       <Button
         disabled={disabled || loading}
