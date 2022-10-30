@@ -6,6 +6,11 @@ import FullCard from "./FullCard";
 import PeopleMain from "./People/PeopleMain";
 import FullProfile from "./People/FullProfile";
 
+import Connections from "../Connections/Connections";
+import Requests from "../Connections/Requests";
+import ReportPerson from "../Explore/People/ReportPerson";
+import ReportEvent from "../Home/ReportEvent";
+
 const Stack = createStackNavigator();
 
 export default function () {
@@ -22,7 +27,16 @@ export default function () {
       <Stack.Screen name="People" component={PeopleMain} screenOptions={{
         animationEnabled: false,
       }} />
-      <Stack.Screen name="FullProfile" component={FullProfile} />
+      <Stack.Screen name="FullProfile">
+        {props => <FullProfile {...props} blockBack="Explore" />}
+      </Stack.Screen>
+
+      <Stack.Screen name="Connections" component={Connections} />
+      <Stack.Screen name="Requests">
+        {props => <Requests {...props} back="Explore" />}
+      </Stack.Screen>
+      <Stack.Screen name="ReportPerson" component={ReportPerson} />
+      <Stack.Screen name="ReportEvent" component={ReportEvent}/>
     </Stack.Navigator>
   );
 }

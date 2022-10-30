@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  View,
   StyleSheet,
   Image,
   Dimensions,
@@ -9,34 +8,39 @@ import {
 } from "react-native";
 import { Layout, TextInput, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
-import firebase from "firebase/compat";
-import { db } from "../../provider/Firebase";
-import moment from "moment";
+
 import TextMessage from "../../components/TextMessage";
-import NormalText from "../../components/NormalText";
 import MediumText from "../../components/MediumText";
 
+import firebase from "firebase/compat";
+import { db, auth } from "../../provider/Firebase";
+import moment from "moment";
+
 export default function ({ route, navigation }) {
-  const [image, setImage] = useState(
-    "https://images.immediate.co.uk/production/volatile/sites/30/2017/01/Bananas-218094b-scaled.jpg"
-  );
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
 
   // Common constant references
   let group = route.params.group;
-  const user = firebase.auth().currentUser;
+  const user = auth.currentUser;
+  const [userInfo, setUserInfo] = useState(null);
   const messageRef = db.collection("Groups").doc(group.groupID);
 
   // On update, push messages
   useEffect(() => {
     messageRef.onSnapshot((doc) => {
-      let temp = [];
-      doc.data().messages.forEach((message) => {
-        // insert message at beginning of array
-        temp.unshift(message);
-      });
-      setMessages(temp);
+      if (doc.data()) { // Checks if doc exists (used to prevent crash after blocking a user)
+        let temp = [];
+        doc.data().messages.forEach((message) => {
+          // insert message at beginning of array
+          temp.unshift(message);
+        });
+        setMessages(temp);
+      }
+    });
+
+    db.collection("Users").doc(user.uid).onSnapshot((doc) => {
+      setUserInfo(doc.data());
     });
   }, []);
 
@@ -47,6 +51,7 @@ export default function ({ route, navigation }) {
           message: message,
           sentAt: moment().unix(),
           sentBy: user.uid,
+          sentName: userInfo.firstName + " " + userInfo.lastName.substring(0, 1) + ".",
         }),
       })
       .then(() => {
@@ -65,7 +70,6 @@ export default function ({ route, navigation }) {
           </TouchableOpacity>
         }
         leftContent={<Ionicons name="chevron-back" size={20} />}
-        rightContent={<Image style={styles.image} source={{ uri: image }} />}
         leftAction={() => {
           // Temporary fix with invalid chat preview, to be fixed in the future for better speed.
           navigation.goBack();

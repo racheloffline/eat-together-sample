@@ -1,18 +1,18 @@
 //Look at your connections and connection requests
 
 import React, {useEffect, useState} from 'react';
-import {Layout, Text, TopNav} from 'react-native-rapi-ui';
-import {Ionicons} from "@expo/vector-icons";
+import { View, FlatList, StyleSheet } from "react-native";
+import { Layout, TopNav } from 'react-native-rapi-ui';
+import { Ionicons } from "@expo/vector-icons";
+
 import HorizontalSwitch from "../../components/HorizontalSwitch";
-import PeopleList from "../../components/PeopleList";
-import {FlatList, StyleSheet} from "react-native";
+import MessageList from "../../components/MessageList";
+import NormalText from "../../components/NormalText";
+import MediumText from "../../components/MediumText";
+
 import {generateColor} from "../../methods";
 import {db} from "../../provider/Firebase";
 import firebase from "firebase/compat";
-import MessageList from "../../components/MessageList";
-import {View} from "react-native";
-import NormalText from "../../components/NormalText";
-import MediumText from "../../components/MediumText";
 
 export default function ({ back, navigation }) {
     const user = firebase.auth().currentUser;

@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
-import {View, StyleSheet, FlatList, Dimensions} from "react-native";
-import {Layout, TextInput, TopNav} from "react-native-rapi-ui";
+import { View, StyleSheet, FlatList } from "react-native";
+import { Layout, TextInput, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
-import { db, auth } from "../../provider/Firebase";
+
 import MediumText from "../../components/MediumText";
 import PeopleList from "../../components/PeopleList";
-import {checkProfanity, generateColor} from "../../methods";
-import NormalText from "../../components/NormalText";
+
+import { db, auth } from "../../provider/Firebase";
+import { checkProfanity, generateColor } from "../../methods";
 
 export default function ({route, navigation}) {
     let group = route.params.group;
@@ -17,17 +18,19 @@ export default function ({route, navigation}) {
 
     useEffect(() => {
         db.collection("Groups").doc(group.groupID).onSnapshot((doc) => {
-            let userIDs;
-            let userList = [];
-            userIDs = doc.data().uids;
-            userIDs.forEach((uid) => {
-                if(uid == user.uid) return;
-                db.collection("Users").doc(uid).get().then((doc) => {
-                    userList.push(doc.data());
-                }).then(() => {
-                    setUsers(userList);
-                });
-            })
+            if (doc.data()) { // Checks if doc exists (used to prevent crash after blocking a user)
+                let userIDs;
+                let userList = [];
+                userIDs = doc.data().uids;
+                userIDs.forEach((uid) => {
+                    if(uid == user.uid) return;
+                    db.collection("Users").doc(uid).get().then((doc) => {
+                        userList.push(doc.data());
+                    }).then(() => {
+                        setUsers(userList);
+                    });
+                })
+            }
         })
     }, [])
     return(
@@ -41,7 +44,7 @@ export default function ({route, navigation}) {
             />
             <View style={styles.chatName}>
                 <View style = {styles.groupName}>
-                    <NormalText>Group name: </NormalText>
+                    <MediumText size={14}>Group name: </MediumText>
                 </View>
                 <TextInput
                     placeholder="Group Name"
@@ -79,14 +82,14 @@ export default function ({route, navigation}) {
 const styles = StyleSheet.create({
     chatName: {
         flexDirection: "row",
-        alignContent: "center",
+        alignItems: "center",
+        justifyContent: "center",
         paddingBottom: 20,
         paddingHorizontal: 20,
         paddingTop: 10
     },
     groupName: {
         paddingRight: 10,
-        paddingTop: 10
     },
     invites: {
         alignItems: "center",

@@ -60,16 +60,15 @@ export default function ({ navigation }) {
             <View style = {styles.noConnectionsView}>
                 <NormalText center={"center"}>{shouldDisplayPlaceholder(users)}</NormalText>
             </View>
-            <View style = {styles.list}>
-                <FlatList contentContainerStyle={styles.invites} keyExtractor={item => item.id}
-                        data={users} renderItem={({item}) =>
-                    <PeopleList person={item} color={generateColor()} click={() => {
-                        navigation.navigate("FullProfile", {
-                            person: item
-                        });
-                    }}/>
-                }/>
-            </View>
+            
+            <FlatList contentContainerStyle={styles.invites} keyExtractor={item => item.id}
+                    data={users} renderItem={({item}) =>
+                <PeopleList person={item} color={generateColor()} click={() => {
+                    navigation.navigate("FullProfile", {
+                        person: item
+                    });
+                }}/>
+            }/>
 
         </Layout>
 
@@ -79,7 +78,6 @@ export default function ({ navigation }) {
 const styles = StyleSheet.create({
     invites: {
         alignItems: "center",
-        paddingBottom: 30,
     },
     submit: {
         position: 'absolute',
@@ -90,8 +88,5 @@ const styles = StyleSheet.create({
     },
     noConnectionsView: {
         marginVertical: -20
-    },
-    list: {
-        marginTop: 10
     }
 });

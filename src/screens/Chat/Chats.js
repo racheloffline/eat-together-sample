@@ -10,12 +10,12 @@ import {
 import { Button, Layout } from "react-native-rapi-ui";
 
 import Header from "../../components/Header";
+import ChatPreview from "../../components/ChatPreview";
+import SearchableDropdown from "../../components/SearchableDropdown";
 
 import { db } from "../../provider/Firebase";
 import firebase from "firebase/compat";
 
-import ChatPreview from "../../components/ChatPreview";
-import SearchableDropdown from "../../components/SearchableDropdown";
 import {useIsFocused} from "@react-navigation/native";
 
 export const createNewChat = (
@@ -198,6 +198,27 @@ export default function ({ navigation }) {
     });
   }, [isFocused]);
 
+  // Check if creating a new chat will override an existing one or not
+  const checkChatExists = () => {
+    return groups.some((group) => {
+      if (group.uids.length != selectedUsers.length + 1) {
+        return false;
+      }
+
+      // Comparing the two uid arrays
+      const groupIDs = group.uids.filter((uid) => uid != user.uid).sort();
+      const selectedIDs = selectedUsers.map((user) => user.id).sort();
+
+      for (let i = 0; i < groupIDs.length; i++) {
+        if (groupIDs[i] != selectedIDs[i]) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }
+
   return (
     <Layout>
       <Header name="Chats" navigation={navigation} hasNotif={unread} notifs connections/>
@@ -240,7 +261,12 @@ export default function ({ navigation }) {
             color="black"
             style={{ height: 50 }}
             onPress={() => {
-              createNewChatDefault();
+              if (checkChatExists()) {
+                alert("Chat already exists!");
+              } else {
+                createNewChatDefault();
+              }
+              
               setSelectedUsers([]);
             }}
           ></Button>
@@ -248,7 +274,6 @@ export default function ({ navigation }) {
         <FlatList
           keyExtractor={(item) => item.id}
           data={groups}
-          contentContainerStyle={styles.list}
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => {
@@ -284,12 +309,10 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 10,
+    flex: 1
   },
   searchArea: {
     flexDirection: "row",
     justifyContent: "space-between",
-  },
-  list: {
-    paddingBottom: 225,
-  },
+  }
 });
