@@ -28,27 +28,69 @@ import {
 import { db, auth } from "../../../provider/Firebase";
 import firebase from "firebase/compat";
 
-const blockPerson = (uid, navigation) => {
-  Alert.alert("Block", "Are you sure you want to block this user?", [
+const blockPerson = (uid, navigation, back) => {
+  Alert.alert("Block", "Are you sure you want to block this user? This can't be undone.", [
     {
       text: "Cancel",
       style: "cancel",
     },
-    { text: "Yes", style: "destructive", onPress: () => databaseStoreBlockAction(uid, navigation) },
+    { text: "Yes", style: "destructive", onPress: () => databaseStoreBlockAction(uid, navigation, back) },
   ]);
 };
 
-const databaseStoreBlockAction = (uid, navigation) => {
+const databaseStoreBlockAction = (uid, navigation, back) => {
   alert("This user has been blocked.");
   const user = auth.currentUser;
-  // update user's blacklist & remove from friends
+
+  // Update user's blacklist & remove from friends
   db.collection("Users")
     .doc(user.uid)
     .update({
       blockedIDs: firebase.firestore.FieldValue.arrayUnion(uid),
       friendIDs: firebase.firestore.FieldValue.arrayRemove(uid),
     });
-  navigation.navigate("Home");
+
+  // Same thing for other user
+  db.collection("Users")
+    .doc(uid)
+    .update({
+      blockedIDs: firebase.firestore.FieldValue.arrayUnion(user.uid),
+      friendIDs: firebase.firestore.FieldValue.arrayRemove(user.uid),
+    });
+  
+  // Remove all chats with this user
+  db.collection("Groups")
+    .where("uids", "array-contains", user.uid)
+    .get()
+    .then(querySnapshot => {
+      querySnapshot.forEach(doc => {
+        if (doc.data().uids.includes(uid)) {
+          db.collection("Users")
+            .doc(user.uid)
+            .update({
+              groupIDs: firebase.firestore.FieldValue.arrayRemove(doc.id),
+            });
+          
+          if (doc.data().uids.length === 2) { // If it's just a 1:1 chat, delete it
+            db.collection("Users")
+              .doc(uid)
+              .update({
+                groupIDs: firebase.firestore.FieldValue.arrayRemove(doc.id),
+              });
+  
+            db.collection("Groups").doc(doc.id).delete();
+          } else {
+            db.collection("Groups")
+            .doc(doc.id)
+            .update({
+              uids: firebase.firestore.FieldValue.arrayRemove(user.uid),
+            });
+          }
+        }
+      });
+    });
+  
+  navigation.navigate(back);
   /*
   Other places this effects:
   -remove from people display
@@ -81,11 +123,12 @@ function databaseRemoveFriend(uid, navigation) {
         db.collection("Users").doc(uid).update({
           friendIDs: firebase.firestore.FieldValue.arrayRemove(user.uid)
         })
-  })
-  navigation.navigate("Home");
+  });
+  
+  navigation.goBack();
 }
 
-const FullProfile = ({ route, navigation }) => {
+const FullProfile = ({ blockBack, route, navigation }) => {
   const [status, setStatus] = useState("Loading");
   const [disabled, setDisabled] = useState(true);
   const [color, setColor] = useState("grey");
@@ -231,7 +274,7 @@ const FullProfile = ({ route, navigation }) => {
                       </NormalText>
                     </MenuOption>
                 }
-                <MenuOption onSelect={() => blockPerson(route.params.person.id, navigation)}>
+                <MenuOption onSelect={() => blockPerson(route.params.person.id, navigation, blockBack)}>
                   <NormalText size={18} color={"red"}>
                     Block
                   </NormalText>

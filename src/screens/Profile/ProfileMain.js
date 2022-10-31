@@ -3,8 +3,8 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Me from "./Me";
 import Edit from "./Edit";
 import EditTags from "./EditTags";
-import Connections from "./Connections";
-import Requests from "./Requests";
+import Connections from "../Connections/Connections";
+import Requests from "../Connections/Requests";
 
 import Settings from "./Settings";
 import FullCard from "./FullCard";
@@ -39,7 +39,9 @@ export default function () {
       <Stack.Screen name="FullCard" component={FullCard} />
       <Stack.Screen name="Report Bug" component={ReportBug} />
       <Stack.Screen name="Suggest Idea" component={SuggestIdea} />
-      <Stack.Screen name="FullProfile" component={FullProfile} />
+      <Stack.Screen name="FullProfile">
+        {props => <FullProfile {...props} blockBack="Me" />}
+      </Stack.Screen>
       <Stack.Screen name="ReportPerson" component={ReportPerson} />
 
       <Stack.Screen name="AvailabilitiesHome" component={AvailabilitiesHome} />

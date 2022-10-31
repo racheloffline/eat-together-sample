@@ -6,8 +6,8 @@ import ReportEvent from "./ReportEvent";
 import EditEvent from "./EditEvent";
 import FullProfile from "../Explore/People/FullProfile";
 
-import Connections from "../Profile/Connections";
-import Requests from "../Profile/Requests";
+import Connections from "../Connections/Connections";
+import Requests from "../Connections/Requests";
 import FullCard from "../Explore/FullCard";
 import ReportPerson from "../Explore/People/ReportPerson";
 import ChatRoom from "../Chat/ChatRoom";
@@ -32,7 +32,9 @@ export default function () {
       <Stack.Screen name="Requests">
         {props => <Requests {...props} back="Home" />}
       </Stack.Screen>
-      <Stack.Screen name="FullProfile" component={FullProfile} />
+      <Stack.Screen name="FullProfile">
+        {props => <FullProfile {...props} blockBack="Home" />}
+      </Stack.Screen>
       <Stack.Screen name="FullCard" component={FullCard} />
       <Stack.Screen name="ReportPerson" component={ReportPerson} />
       <Stack.Screen name="ChatRoom" component={ChatRoom} />

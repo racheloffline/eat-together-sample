@@ -4,6 +4,11 @@ import Organize from "./Organize";
 import InvitePeople from "./InvitePeople";
 import FullProfile from "../Explore/People/FullProfile";
 
+import Connections from "../Connections/Connections";
+import Requests from "../Connections/Requests";
+import FullCard from "../Explore/FullCard";
+import ReportPerson from "../Explore/People/ReportPerson";
+
 const Stack = createStackNavigator();
 
 export default function () {
@@ -17,7 +22,16 @@ export default function () {
     >
       <Stack.Screen name="Organize" component={Organize} />
       <Stack.Screen name="InvitePeople" component={InvitePeople} />
-      <Stack.Screen name="FullProfile" component={FullProfile} />
+      <Stack.Screen name="FullProfile">
+        {props => <FullProfile {...props} blockBack="Organize" />}
+      </Stack.Screen>
+
+      <Stack.Screen name="Connections" component={Connections} />
+      <Stack.Screen name="Requests">
+        {props => <Requests {...props} back="Organize" />}
+      </Stack.Screen>
+      <Stack.Screen name="FullCard" component={FullCard} />
+      <Stack.Screen name="ReportPerson" component={ReportPerson} />
     </Stack.Navigator>
   );
 }
