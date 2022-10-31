@@ -1,5 +1,5 @@
 import React from "react";
-import { Text } from "react-native";
+import { Platform, Text } from "react-native";
 import { useFonts, Inter_400Regular } from '@expo-google-fonts/inter';
 
 const NormalText = props => {
@@ -10,7 +10,7 @@ const NormalText = props => {
             <Text style={{
                 fontSize: props.size ? props.size : 14,
                 fontWeight: props.weight ? props.weight : "normal",
-                fontFamily: 'sans-serif',
+                fontFamily: Platform.os === 'ios' ? 'AppleSDGothicNeo-Regular' : 'sans-serif',
                 color: props.color ? props.color : "black",
                 textAlign: props.center ? "center" : "auto",
                 paddingHorizontal: props.paddingHorizontal ? props.paddingHorizontal : 0,

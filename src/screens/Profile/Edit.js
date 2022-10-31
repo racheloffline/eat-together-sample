@@ -18,8 +18,7 @@ import timeSlots from "../../timeSlots";
 
 import { cloneDeep } from "lodash";
 
-
-export default function ({ route, navigation }) {
+export default function edit({ route, navigation }) {
     // Input fields
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -165,7 +164,7 @@ export default function ({ route, navigation }) {
                 hostImage: image
             });
         });
-    } 
+    }
 
     // Update tags after editing them
     const updateTags = (schoolTags, hobbyTags, foodTags) => {
@@ -187,7 +186,7 @@ export default function ({ route, navigation }) {
                 type: "food"
             }
         });
-        
+
         setTags([...schoolTags, ...hobbyTags, ...foodTags]);
         setTagText(displayTags([...schoolTags, ...hobbyTags, ...foodTags]));
     }
@@ -215,7 +214,7 @@ export default function ({ route, navigation }) {
                             <Feather name="edit-2" size={25} color="black"/>
                         </TouchableOpacity>
                     </View>
-                    
+
                     <View style={styles.name}>
                         <TextInput
                             placeholder="First name"
@@ -236,7 +235,7 @@ export default function ({ route, navigation }) {
                             containerStyle={{ width: "47%" }}
                         />
                     </View>
-                    
+
                     <TextInput
                         placeholder="Pronouns (he/him, she/her, etc.)"
                         onChangeText={(val) => setPronouns(val)}
@@ -263,15 +262,17 @@ export default function ({ route, navigation }) {
                         foodTags: tags.filter(tag => tag.type === "food").map(tag => tag.tag),
                         updateTags
                     })}>
-                        <TextInput
-                            placeholder="Tags"
-                            onChangeText={(val) => setBio(val)}
-                            leftContent={
-                                <Ionicons name="pricetag" size={20}/>
-                            }
-                            value={tagText}
-                            editable={false}
-                        />
+                        <View pointerEvents="none">
+                            <TextInput
+                                placeholder="Tags"
+                                onChangeText={(val) => setBio(val)}
+                                leftContent={
+                                    <Ionicons name="pricetag" size={20}/>
+                                }
+                                value={tagText}
+                                editable={false}
+                            />
+                        </View>
                     </TouchableOpacity>
 
                     <Button onPress={() => navigation.navigate("AvailabilitiesHome",
@@ -335,7 +336,7 @@ const styles = StyleSheet.create({
         marginTop: 30,
         alignItems: "center"
     },
-    
+
     editImage: {
         left: 45,
         bottom: 45,
@@ -351,3 +352,6 @@ const styles = StyleSheet.create({
         marginBottom: 10
     }
 });
+
+
+

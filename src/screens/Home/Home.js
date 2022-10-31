@@ -293,7 +293,7 @@ export default function ({ navigation }) {
               privateEvents ? "Private" : "Type of meal"}/>
           <Filter checked={fromYourself || fromFriends}
             onPress={() => showFromRef.current.open()}
-            text={fromYourself ? "Yourself ;)" : 
+            text={fromYourself ? "Yourself" : 
               fromFriends ? "Friends" : "Hosted by"}/>
           <Filter
             checked={friendsAttending}
@@ -382,7 +382,7 @@ export default function ({ navigation }) {
                   padding: 10
               }
           }}>
-          <Filter checked={fromYourself} text="Yourself ;)" marginBottom={5}
+          <Filter checked={fromYourself} text="Yourself" marginBottom={5}
             onPress={fromYourselfOnly}/>
           <Filter checked={fromFriends} text="Friends" marginBottom={20}
             onPress={fromFriendsOnly}/>
