@@ -9,8 +9,7 @@ import {
 } from "react-native";
 import { Layout, TextInput, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
-import firebase from "firebase";
-import { db } from "../../provider/Firebase";
+import { db, auth } from "../../provider/Firebase";
 import moment from "moment";
 import TextMessage from "../../components/TextMessage";
 import KeyboardAvoidingWrapper from "../../components/KeyboardAvoidingWrapper";
@@ -24,7 +23,7 @@ export default function ({ route, navigation }) {
 
   // Common constant references
   let group = route.params.group;
-  const user = firebase.auth().currentUser;
+  const user = auth.currentUser;
   const messageRef = db.collection("Groups").doc(group.groupID);
 
   // On update, push messages
