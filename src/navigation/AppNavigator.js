@@ -25,13 +25,14 @@ import { AuthContext } from "../provider/AuthProvider";
 
 //Screen for if the user hasn't verified their email
 import VerifyEmail from "../screens/VerifyEmail";
-import firebase from "firebase";
+import firebase from "firebase/compat";
 import { db } from "../provider/Firebase";
 
 //Push notifications functions and imports
 import * as NotificationFunctions from "expo-notifications";
 
 import DeviceToken from "../screens/utils/DeviceToken";
+import {Alert, Linking} from "react-native";
 
 async function registerForPushNotificationsAsync() {
   let token;
@@ -46,7 +47,23 @@ async function registerForPushNotificationsAsync() {
   }
 
   if (finalStatus !== "granted") {
-    alert("Push notifications are not enabled.");
+      Alert.alert(
+          "Push Notification Disabled",
+          "Push notifications for Eat Together have been disabled in Settings. Would you like to open settings and enable them now?",
+          [
+              {
+                  text: "Yes",
+                  onPress:() => {
+                      Linking.openSettings();
+                  },
+                  style: "cancel"
+              },
+              {
+                  text: "No",
+                  onPress: () => {}
+              }
+          ]
+      );
     return;
   }
 
@@ -82,6 +99,10 @@ const MainTabs = () => {
           backgroundColor: "#ffffff",
         },
         showLabel: false,
+      }}
+      screenOptions={{
+        headerShown: false,
+        animationEnabled: false,
       }}
     >
       <Tabs.Screen

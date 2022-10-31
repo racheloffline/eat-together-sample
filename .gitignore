@@ -14,6 +14,8 @@ web-build/
 
 #Env. variables
 .env
+src/provider/Firebase.js
 
 package-lock.json
 .idea/*
+app.json

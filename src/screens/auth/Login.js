@@ -11,7 +11,7 @@ import {
 import {db} from "../../provider/Firebase";
 import {auth} from "../../provider/Firebase";
 import "firebase/firestore"
-import firebase from "firebase";
+import firebase from "firebase/compat";
 
 
 import {
@@ -24,6 +24,7 @@ import Button from "../../components/Button";
 import LargeText from "../../components/LargeText";
 import NormalText from "../../components/NormalText";
 import DeviceToken from "../utils/DeviceToken";
+import MediumText from "../../components/MediumText";
 
 export default function ({ navigation }) {
   const [email, setEmail] = useState("");
@@ -79,7 +80,7 @@ export default function ({ navigation }) {
           </View>
           <View
             style={{
-              flex: 3,
+              flex: 5,
               paddingHorizontal: 20,
               paddingBottom: 20,
               backgroundColor: "white",
@@ -116,24 +117,14 @@ export default function ({ navigation }) {
             <Button onPress={login} marginVertical={10} disabled={loading}>
               {loading ? "Loading" : "Login"}
             </Button>
+            
+            <MediumText center>OR</MediumText>
+            <Button onPress={() => {
+              navigation.navigate("Name");
+            }} marginVertical={10} disabled={loading} backgroundColor="white" color="#5DB075">
+              Register
+            </Button>
 
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginTop: 15,
-                justifyContent: "center",
-              }}
-            >
-              <NormalText>Don't have an account? </NormalText>
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate("Name");
-                }}
-              >
-                <NormalText color="#5DB075">Register here</NormalText>
-              </TouchableOpacity>
-            </View>
             <View
               style={{
                 flexDirection: "row",
@@ -142,12 +133,13 @@ export default function ({ navigation }) {
                 justifyContent: "center",
               }}
             >
+              <NormalText>Forgot password? </NormalText>
               <TouchableOpacity
                 onPress={() => {
                   navigation.navigate("ForgetPassword");
                 }}
               >
-                <NormalText color="#5DB075">Forgot password</NormalText>
+                <NormalText color="#5DB075">Click here</NormalText>
               </TouchableOpacity>
             </View>
           </View>

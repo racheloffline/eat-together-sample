@@ -4,6 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Explore from "./Explore";
 import FullCard from "./FullCard";
 import PeopleMain from "./People/PeopleMain";
+import FullProfile from "./People/FullProfile";
 
 const Stack = createStackNavigator();
 
@@ -13,7 +14,7 @@ export default function () {
       initialRouteName="Explore"
       screenOptions={{
         headerShown: false,
-        animationEnabled: true,
+        animationEnabled: false,
       }}
     >
       <Stack.Screen name="Explore" component={Explore} />
@@ -21,6 +22,7 @@ export default function () {
       <Stack.Screen name="People" component={PeopleMain} screenOptions={{
         animationEnabled: false,
       }} />
+      <Stack.Screen name="FullProfile" component={FullProfile} />
     </Stack.Navigator>
   );
 }

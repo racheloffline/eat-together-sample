@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
     View,
     StyleSheet,
-    Dimensions,
     TouchableOpacity,
     FlatList,
     Alert, Linking
@@ -11,7 +10,7 @@ import { Layout, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from '@expo/vector-icons';
 
 import { db, auth } from "../../provider/Firebase";
-import firebase from "firebase";
+import firebase from "firebase/compat";
 import "firebase/firestore"
 
 import MediumText from "../../components/MediumText";
@@ -67,7 +66,7 @@ export default function ({ navigation }) {
     async function signOut () {
         if (!logoutDisabled) {
             setLogoutDisabled(true);
-            await db.collection("Users").doc(user.uid).update({
+            if (DeviceToken.getToken()) await db.collection("Users").doc(user.uid).update({
                 pushTokens: firebase.firestore.FieldValue.arrayRemove(DeviceToken.getToken())
             });
 
@@ -89,11 +88,17 @@ export default function ({ navigation }) {
                     text: "Yes",
                     onPress: async () => {
                         const uid = user.uid;
+                        db.collection("Users").doc(uid).delete();
+                        db.collection("Usernames").doc(userInfo.username).delete();
+                        
+                        if (userInfo.hasImage) {
+                            const ref = storage.ref().child(`profilePictures/${uid}`);
+                            ref.delete();
+                        }
 
                         await user.delete().then(() => {
                             alert("Account deleted successfully. Sorry to see you go :(");
-                            db.collection("Users").doc(uid).delete();
-                            db.collection("Usernames").doc(userInfo.username).delete();
+                            signOut();
                         }).catch((error) => {
                             signOut().then(() => {
                                 alert("You need to sign in again to proceed.");

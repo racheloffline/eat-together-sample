@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Alert } from 'react-native';
-import { db, auth } from '../provider/Firebase';
+import { db, auth, storage } from '../provider/Firebase';
 
 import Button from '../components/Button';
 import LargeText from '../components/LargeText';
@@ -35,13 +35,19 @@ export default function ({ navigation }) {
                 },
                 {
                     text: "Yes",
-                    onPress: async () => {                        
+                    onPress: async () => {
+                        db.collection("Users").doc(uid).delete();
+                        db.collection("Usernames").doc(userInfo.username).delete();
+
+                        if (userInfo.hasImage) {
+                            const ref = storage.ref().child(`profilePictures/${uid}`);
+                            ref.delete();
+                        }
                         await user.delete().then(() => {
                             alert("Account deleted successfully. Sorry to see you go :(");
-                            db.collection("Users").doc(uid).delete();
-                            db.collection("Usernames").doc(userInfo.username).delete();
+                            auth.signOut();
                         }).catch((error) => {
-                            signOut().then(() => {
+                            auth.signOut().then(() => {
                                 alert("You need to sign in again to proceed.");
                             });
                         });

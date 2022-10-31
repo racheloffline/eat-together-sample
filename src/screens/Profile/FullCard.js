@@ -9,11 +9,13 @@ import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
 import TagsList from "../../components/TagsList";
+import Link from "../../components/Link";
 
 import getDate from "../../getDate";
 import getTime from "../../getTime";
 
 import { auth } from "../../provider/Firebase";
+import openMap from "react-native-open-maps";
 
 const FullCard = ({ route, navigation }) => {
   const user = auth.currentUser;
@@ -58,7 +60,8 @@ const FullCard = ({ route, navigation }) => {
             </MediumText>
           </View>
 
-          {route.params.event.tags && <TagsList marginVertical={20} tags={route.params.event.tags}/>}
+          {route.params.event.tags && route.params.event.tags.length > 0 &&
+            <TagsList marginVertical={20} tags={route.params.event.tags} left/>}
 
           {/* 3 event details (location, date, time} are below */}
 
@@ -68,19 +71,23 @@ const FullCard = ({ route, navigation }) => {
               <NormalText paddingHorizontal={10} color="black">
                 {route.params.event.location}
               </NormalText>
+              <Link onPress={() => openMap({ query: route.params.event.location, provider: "google" })}>
+                (view on map)
+              </Link>
             </View>
 
             <View style={styles.row}>
               <Ionicons name="calendar-outline" size={20} />
               <NormalText paddingHorizontal={10} color="black">
-                {getDate(route.params.event.date.toDate())}
+                {route.params.event.startDate ? getDate(route.params.event.startDate.toDate()) : getDate(route.params.event.date.toDate())}
               </NormalText>
             </View>
 
             <View style={styles.row}>
               <Ionicons name="time-outline" size={20} />
               <NormalText paddingHorizontal={10} color="black">
-                {getTime(route.params.event.date.toDate())}
+                {route.params.event.startDate ? getTime(route.params.event.startDate.toDate()) : getTime(route.params.event.date.toDate())}
+                {route.params.event.endDate && " - ".concat(getTime(route.params.event.endDate.toDate()))}
               </NormalText>
             </View>
           </View>
@@ -103,6 +110,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     marginVertical: 4,
+    flexWrap: "wrap"
   },
 
   profileImg: {

@@ -2,10 +2,11 @@ import React from "react";
 import AppNavigator from "./src/navigation/AppNavigator";
 import { AuthProvider } from "./src/provider/AuthProvider";
 import { ThemeProvider } from "react-native-rapi-ui";
-import {MenuProvider} from "react-native-popup-menu";
+import { MenuProvider } from "react-native-popup-menu";
+import { LogBox } from "react-native";
 
 export default function App() {
-  console.disableYellowBox = true; //DISABLE THOSE STUPID WARNINGS SLAYYYYY
+  LogBox.ignoreAllLogs(); //DISABLE THOSE STUPID WARNINGS SLAYYYYY
 
   const images = [
     require("./assets/icon.png"),

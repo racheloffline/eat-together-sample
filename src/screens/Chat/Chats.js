@@ -5,76 +5,129 @@ import {
   View,
   StyleSheet,
   FlatList,
-  TouchableOpacity,
-  Dimensions,
+  TouchableOpacity
 } from "react-native";
-import { Button, Layout, TopNav } from "react-native-rapi-ui";
+import { Button, Layout } from "react-native-rapi-ui";
+
 import Header from "../../components/Header";
+
 import { db } from "../../provider/Firebase";
-import firebase from "firebase";
+import firebase from "firebase/compat";
+
 import ChatPreview from "../../components/ChatPreview";
 import SearchableDropdown from "../../components/SearchableDropdown";
+import {useIsFocused} from "@react-navigation/native";
+
+export const createNewChat = (
+  userIDs,
+  chatID,
+  chatName,
+  toIncludeOnChatPage
+) => {
+  // Create a new doc in the groups collection on firestore with input
+  db.collection("Groups").doc(chatID).set({
+    uids: userIDs,
+    name: chatName,
+    messages: [],
+  });
+  // If we want to display this chat on the chat page, update each user's data to include this chat
+  if (toIncludeOnChatPage) {
+    userIDs.map((uid) => {
+      db.collection("Users")
+        .doc(uid)
+        .update({
+          groupIDs: firebase.firestore.FieldValue.arrayUnion(chatID),
+        });
+    });
+  }
+};
 
 export default function ({ navigation }) {
+  // Chats with other users
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [users, setUsers] = useState([]);
   const [groups, setGroups] = useState([]);
-  const user = firebase.auth().currentUser;
-  const userInfo = db.collection("Users").doc(user.uid);
 
-  const createNewChat = () => {
-    userInfo.get().then((currUser) => {
-      // Generate group id using the concatenation of all the selected usernames
-      let allUsernames = [];
-      let allNames = [];
-      selectedUsers.map((user) => {
-        allUsernames.push(user.username);
-        allNames.push(user.name);
+  // Current user
+  const [unread, setUnread] = useState(false); // See if we need to display unread notif icon
+  const user = firebase.auth().currentUser;
+  const [userInfo, setUserInfo] = useState(null);
+
+  const isFocused = useIsFocused(); //OMG THIS IS A LIFESAVING HACK
+
+  const createNewChatDefault = () => {
+    // Generate group id using the concatenation of all the selected usernames
+    let allUsernames = [];
+    let allNames = [];
+
+    selectedUsers.map((user) => {
+      allUsernames.push(user.username);
+      allNames.push(user.name);
+    });
+
+    allUsernames.push(userInfo.username);
+    allNames.push(userInfo.firstName + " " + userInfo.lastName);
+    const chatID = allUsernames.sort().join();
+
+    // Get all the uid in this chat
+    let allUIDs = [];
+    selectedUsers.map((user) => {
+      allUIDs.push(user.id);
+    });
+    allUIDs.push(user.uid);
+
+    // Create a new doc in the groups collection on firestore
+    db.collection("Groups")
+      .doc(chatID)
+      .set({
+        uids: allUIDs,
+        name: allNames.join(", "),
+        messages: [],
       });
-      allUsernames.push(currUser.data().username);
-      allNames.push(currUser.data().name);
-      const chatID = allUsernames.sort().join();
-      // Get all the uid in this chat
-      let allUIDs = [];
-      selectedUsers.map((user) => {
-        allUIDs.push(user.id);
-      });
-      allUIDs.push(user.uid);
-      // Create a new doc in the groups collection on firestore
-      db.collection("Groups")
-        .doc(chatID)
-        .set({
-          uids: allUIDs,
-          name: allNames.join(", "),
-          messages: [],
+
+    // Update each user's data to include this chat
+    allUIDs.map((uid) => {
+      db.collection("Users")
+        .doc(uid)
+        .update({
+          groupIDs: firebase.firestore.FieldValue.arrayUnion(chatID),
         });
-      // Update each user's data to include this chat
-      allUIDs.map((uid) => {
-        db.collection("Users")
-          .doc(uid)
-          .update({
-            groupIDs: firebase.firestore.FieldValue.arrayUnion(chatID),
-          });
-      });
-      navigation.navigate("ChatRoom", {
-        group: {
-          groupID: chatID,
-          uids: allUIDs,
-          name: allNames.join(", "),
-          messages: [],
-        },
-      });
+    });
+
+    let name = allNames.join(", ");
+    let currUserName = userInfo.firstName + " " + userInfo.lastName
+    if(allUIDs.length >= 2) {
+      name = name.replace(currUserName + ", ", "");
+      
+      if (name.endsWith(", " + currUserName)) {
+        name = name.slice(0, -1 * (currUserName.length + 2));
+      }
+    }
+
+    navigation.navigate("ChatRoom", {
+      group: {
+        groupID: chatID,
+        uids: allUIDs,
+        name,
+        messages: [],
+      },
     });
   };
 
   // Get your taste buds as search suggestions
   useEffect(() => {
-    userInfo.onSnapshot((doc) => {
-      const nameCurrent = doc.data().name;
+    db.collection("Users").doc(user.uid).onSnapshot((doc) => {
+      setUserInfo(doc.data());
+
+      const nameCurrent = doc.data().firstName + " " + doc.data().lastName;
       const friends = doc.data().friendIDs;
       const groups = doc.data().groupIDs;
+      setUnread(doc.data().hasNotif);
+
       // update the groups displayed
       let temp = [];
+      let lenGroups = groups.length;
+
       groups.forEach((groupID) => {
         db.collection("Groups")
           .doc(groupID)
@@ -91,11 +144,16 @@ export default function ({ navigation }) {
               data.messages.length != 0
                 ? data.messages[data.messages.length - 1].sentAt
                 : "";
-            // Get rid of your own name and all the ways it can be formatted in group title
-            let name = data.name.replace(nameCurrent + ", ", "");
-            if (name.endsWith(", " + nameCurrent)) {
-              name = name.slice(0, -1 * (nameCurrent.length + 2));
+
+            // Get rid of your own name and all the ways it can be formatted in group title (if it is a DM)
+            let name = data.name;
+            if(data.uids.length >= 2) {
+              name = name.replace(nameCurrent + ", ", "");
+              if (name.endsWith(", " + nameCurrent)) {
+                name = name.slice(0, -1 * (nameCurrent.length + 2));
+              }
             }
+
             temp.push({
               groupID: groupID,
               name: name,
@@ -107,11 +165,14 @@ export default function ({ navigation }) {
             });
           })
           .then(() => {
-            // sort display by time
-            temp.sort((a, b) => {
-              return b.time - a.time;
-            });
-            setGroups(temp);
+            lenGroups--;
+            if (lenGroups == 0) {
+              // sort display by time
+              temp.sort((a, b) => {
+                return b.time - a.time;
+              });
+              setGroups(temp);
+            }
           });
       });
       // prepare the list of all connections for searchbar
@@ -125,7 +186,7 @@ export default function ({ navigation }) {
             list.push({
               id: data.id,
               username: data.username,
-              name: data.name,
+              name: data.firstName + " " + data.lastName,
               hasImage: data.hasImage,
               pictureID: data.id,
             });
@@ -135,19 +196,11 @@ export default function ({ navigation }) {
           });
       });
     });
-  }, []);
-  /*
-  return (
-    <View style={{ flexGrow: 1, justifyContent: "center", margin: 40 }}>
-      <LargeText center={true}>
-        Our devs are working hard on this feature! Sit tight.
-      </LargeText>
-    </View>
-  );
-*/
+  }, [isFocused]);
+
   return (
     <Layout>
-      <Header name="Chat"/>
+      <Header name="Chats" navigation={navigation} hasNotif={unread} notifs connections/>
 
       <View style={styles.content}>
         <View style={styles.searchArea}>
@@ -187,7 +240,7 @@ export default function ({ navigation }) {
             color="black"
             style={{ height: 50 }}
             onPress={() => {
-              createNewChat();
+              createNewChatDefault();
               setSelectedUsers([]);
             }}
           ></Button>

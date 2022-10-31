@@ -19,7 +19,9 @@ const PeopleList = props => {
                 <View style={[styles.head, {backgroundColor: props.color}]}>
                     <View style={styles.headleft}>
                         <Image style={styles.image} source={{uri: image}}/>
-                        <MediumText style={{color: 'white'}}>{props.person.name}</MediumText>
+                        <MediumText style={{color: 'white'}}>
+                            {props.person.firstName + " " + props.person.lastName}
+                        </MediumText>
                     </View>
                 </View>
             </TouchableOpacity>

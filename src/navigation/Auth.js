@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
+import firebase from "firebase/compat";
 
 //Login and forgot password pages
 import Login from "../screens/auth/Login";
@@ -73,7 +74,8 @@ const Auth = () => {
       alert("Your username has already been picked, choose another one :(");
     } else {
       try {
-        const response = await auth.createUserWithEmailAndPassword(
+        console.log(firebase.auth());
+        const response = await firebase.auth().createUserWithEmailAndPassword(
           email,
           password
         );

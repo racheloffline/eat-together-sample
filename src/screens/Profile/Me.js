@@ -17,6 +17,8 @@ import NormalText from "../../components/NormalText";
 import TagsList from "../../components/TagsList";
 import EventCard from "../../components/EventCard";
 
+import { compareDates } from "../../methods";
+
 export default function ({ navigation }) {
   const user = auth.currentUser;
 
@@ -36,7 +38,7 @@ export default function ({ navigation }) {
           setMealsAttended(doc.data().attendedEventIDs.length);
           setMealsSignedUp(
             doc.data().attendingEventIDs.length +
-              doc.data().archivedEventIDs.length
+            doc.data().archivedEventIDs.length
           );
 
           let newEvents = [];
@@ -49,31 +51,31 @@ export default function ({ navigation }) {
             }
 
             await db.collection(table)
-                .doc(e.id)
-                .get()
-                .then((event) => {
-                  let data = event.data();
-                  newEvents.push(data);
-                  eventsLength--;
-                  
-                  if (eventsLength === 0) {
-                    // Sort events by date
-                    newEvents = newEvents.sort((a, b) => {
-                      return a.date.seconds - b.date.seconds;
-                    });
-                    
-                    setEvents(newEvents);
-                  }
-                }).catch(e => {
-                  alert("There was an error fetching some of your meals :( try again later");
+              .doc(e.id)
+              .get()
+              .then((event) => {
+                let data = event.data();
+                newEvents.push(data);
+                eventsLength--;
 
-                  eventsLength--;
+                if (eventsLength === 0) {
+                  // Sort events by date
                   newEvents = newEvents.sort((a, b) => {
-                    return a.date.seconds - b.date.seconds;
+                    return compareDates(a, b);
                   });
 
                   setEvents(newEvents);
+                }
+              }).catch(e => {
+                alert("There was an error fetching some of your meals :( try again later");
+
+                eventsLength--;
+                newEvents = newEvents.sort((a, b) => {
+                  return compareDates(a, b);
                 });
+
+                setEvents(newEvents);
+              });
           });
         });
     }
@@ -81,6 +83,7 @@ export default function ({ navigation }) {
     fetchData();
   }, []);
 
+  // Update user profile after editing
   const updateInfo = (newFirstName, newLastName, newPronouns, newBio, newTags, newImage) => {
     setUserInfo((prev) => ({
       ...prev,
@@ -93,6 +96,14 @@ export default function ({ navigation }) {
     }));
   };
 
+  // Update user's availabilities after editing
+  const updateAvailabilities = newAvailabilities => {
+    setUserInfo(prev => ({
+      ...prev,
+      availabilities: newAvailabilities
+    }));
+  }
+  
   return (
     <Layout>
       <ScrollView contentContainerStyle={styles.page}>
@@ -111,7 +122,20 @@ export default function ({ navigation }) {
             }}
           ></Ionicons>
         </View>
-        
+        <View style={styles.calendar}>
+          <Ionicons
+            name="calendar-sharp"
+            size={40}
+            color="white"
+            onPress={() => {
+              navigation.navigate("AvailabilitiesHome", {
+                user: userInfo,
+                updateAvailabilities,
+              });
+            }}
+          ></Ionicons>
+        </View>
+
         <Image
           style={styles.image}
           source={
@@ -140,7 +164,7 @@ export default function ({ navigation }) {
             }}
             marginVertical={10}
           >
-            <Ionicons name="list-circle" size={20} color="#4C6FB1"/>
+            <Ionicons name="list-circle" size={20} color="#4C6FB1" />
             <NormalText color="#4C6FB1"> Connections</NormalText>
           </TouchableOpacity>
 
@@ -154,21 +178,30 @@ export default function ({ navigation }) {
             }}
             marginVertical={10}
           >
-            <Feather name="edit-2" size={20} color="#4C6FB1"/>
+            <Feather name="edit-2" size={20} color="#4C6FB1" />
             <NormalText color="#4C6FB1"> Edit Profile</NormalText>
           </TouchableOpacity>
         </View>
 
         <TagsList tags={userInfo.tags ? userInfo.tags : []} />
         <MediumText center>{userInfo.bio}</MediumText>
-
-        <View style={styles.cards}>
-          {events && events.map((event) => <EventCard event={event} key={event.id} click={() => {
-            navigation.navigate("FullCard", {
-              event
-            });
-          }}/>)}
-        </View>
+        {events.length > 0 && <View style={styles.eventRecordBackground}>
+          <LargeText color="white">Your Event Records</LargeText>
+          <View style={styles.cards}>
+            {
+              events.map((event) => (
+                <EventCard
+                  event={event}
+                  key={event.id}
+                  click={() => {
+                    navigation.navigate("FullCard", {
+                      event,
+                    });
+                  }}
+                />
+              ))}
+          </View>
+        </View>}
       </ScrollView>
     </Layout>
   );
@@ -178,6 +211,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: 20,
     paddingBottom: 40,
+  },
+
+  eventRecordBackground: {
+    backgroundColor: "#808080",
+    width: Dimensions.get("screen").width,
+    alignItems: "center",
+    paddingTop: 20,
+    marginTop: 40,
   },
 
   page: {
@@ -212,6 +253,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 20,
     top: 20,
+  },
+
+  calendar: {
+    position: "absolute",
+    right: 20,
+    top: 70,
   },
 
   connections: {

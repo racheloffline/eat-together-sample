@@ -1,17 +1,25 @@
 import { View, StyleSheet } from "react-native";
-import firebase from "firebase";
-import MediumText from "./MediumText";
+import firebase from "firebase/compat";
+import NormalText from "./NormalText";
+
+import moment from "moment";
+import getDate from "../getDate";
+import getTime from "../getTime";
+
 const TextMessage = props => {
     const user = firebase.auth().currentUser;
+    const messageDate = moment.unix(props.sentAt).toDate();
+
     return (
         <View style={props.sentBy == user.uid ? styles.you : styles.other} borderRadius={20}>
-            <MediumText color="white">{props.message}</MediumText>
+            <NormalText color="#666666">{getDate(messageDate, false)} {getTime(messageDate)}</NormalText>
+            <NormalText color="white" size={16}>{props.message}</NormalText>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    you : {
+    you: {
         backgroundColor: "#5db075",
         borderRadius: 20,
         marginHorizontal: 30,
@@ -21,7 +29,8 @@ const styles = StyleSheet.create({
         alignSelf: "flex-end",
         maxWidth: 200
     },
-    other : {
+    
+    other: {
         backgroundColor: "#C0C0C0",
         borderRadius: 20,
         marginHorizontal: 30,

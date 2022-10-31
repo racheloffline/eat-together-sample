@@ -2,20 +2,10 @@ import React from 'react';
 import { View, StyleSheet, Dimensions, TouchableOpacity, ScrollView } from 'react-native';
 import MediumText from "./MediumText";
 import NormalText from './NormalText';
-import {generateColor} from "../methods";
 
 import Tag from "./Tag";
 
 const ProfileBubble = props => {
-    const shuffledArr = arr => {
-        const shuffled = [...arr]
-            .map(value => ({ value, sort: Math.random() }))
-            .sort((a, b) => a.sort - b.sort)
-            .map(({ value }) => value);
-     
-        return shuffled;
-    }
-
     // Generates text for school tags in common with the user
     const generateSchoolText = tags => {
         const schoolTags = tags.filter(tag => tag.type === "school");
@@ -51,7 +41,7 @@ const ProfileBubble = props => {
     }
 
     return (
-        <View style={[styles.card, {backgroundColor: generateColor()}]}>
+        <View style={[styles.card, {backgroundColor: props.person.color}]}>
             <TouchableOpacity onPress={props.click}>
                 <MediumText color="white">{props.person.bio}</MediumText>
                 <View style={styles.row}>
@@ -61,7 +51,7 @@ const ProfileBubble = props => {
 
                     <ScrollView horizontal={true} style={{ marginLeft: 10 }}>
                         <View onStartShouldSetResponder={() => true} style={{ flexDirection: "row" }}>
-                            {shuffledArr(props.person.tags).slice(0, 2).map(tag =>
+                            {props.person.selectedTags.map(tag =>
                                 <Tag text={tag.tag} key={tag.tag} type={tag.type}/>)}
                         </View>
                     </ScrollView>
@@ -69,12 +59,10 @@ const ProfileBubble = props => {
                 
                 {props.person.inCommon.length > 0 && (<View style={styles.common}>
                     {generateSchoolText(props.person.inCommon) !== "" && (<View style={styles.commonRow}>
-                        <NormalText color="white">🏫 You both are </NormalText>
-                        <MediumText color="white" size={14}>{generateSchoolText(props.person.inCommon)}</MediumText>
+                        <NormalText color="white">🏫 You both are: {generateSchoolText(props.person.inCommon)} </NormalText>
                     </View>)}
                     {generateHobbyFoodText(props.person.inCommon) !== "" && (<View style={styles.commonRow}>
-                        <NormalText color="white">🙂 You both enjoy </NormalText>
-                        <MediumText color="white" size={14}>{generateHobbyFoodText(props.person.inCommon)}</MediumText>
+                        <NormalText color="white">🙂 You both enjoy: {generateHobbyFoodText(props.person.inCommon)} </NormalText>
                     </View>)}
                 </View>)}
             </TouchableOpacity>
@@ -104,6 +92,7 @@ const styles = StyleSheet.create({
     commonRow: {
         flexDirection: "row",
         alignItems: "center",
+        flexWrap: "wrap"
     }
 })
 

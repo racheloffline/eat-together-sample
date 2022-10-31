@@ -16,6 +16,7 @@ import Link from "../../components/Link";
 
 import { db, auth } from "../../provider/Firebase";
 import { AuthContext } from "../../provider/AuthProvider";
+import { compareDates } from "../../methods";
 
 export default function ({ navigation }) {
   // Get current user
@@ -76,7 +77,7 @@ export default function ({ navigation }) {
                   if (eventsLength === 0) {
                     // Sort events by date
                     newEvents = newEvents.sort((a, b) => {
-                      return a.date.seconds - b.date.seconds;
+                      return compareDates(a, b);
                     });
 
                     setEvents(newEvents);
@@ -88,7 +89,7 @@ export default function ({ navigation }) {
 
                   eventsLength--;
                   newEvents = newEvents.sort((a, b) => {
-                    return a.date.seconds - b.date.seconds;
+                    return compareDates(a, b);
                   });
 
                   setEvents(newEvents);
@@ -102,7 +103,12 @@ export default function ({ navigation }) {
     }
 
     fetchEvents().then(() => {
-      setLoading(false);
+      // Verify user when they log in for the first time
+      db.collection("Users").doc(user.uid).update({
+        verified: true
+      });
+
+      setLoading(false); // Stop showing loading screen
     });
   }, []);
 
@@ -136,7 +142,7 @@ export default function ({ navigation }) {
     const newSearchedEvents = search(newEvents, searchQuery);
     setFilteredSearchedEvents(newSearchedEvents);
     setLoading(false);
-  }, [publicEvents, privateEvents, fromFriends, friendsAttending]);
+  }, [publicEvents, privateEvents, fromYourself, fromFriends, friendsAttending]);
 
   // Method to filter out events
   const search = (newEvents, text) => {
@@ -251,21 +257,30 @@ export default function ({ navigation }) {
   const editEvent = newEvent => {
     const newEvents = events.map(e => {
       if (e.id === newEvent.id) {
-        return newEvent;
+        return {
+          ...e,
+          ...newEvent
+        };
       }
       return e;
     });
 
     const newFilteredEvents = filteredEvents.map(e => {
       if (e.id === newEvent.id) {
-        return newEvent;
+        return {
+          ...e,
+          ...newEvent
+        };
       }
       return e;
     });
 
     const newFilteredSearchedEvents = filteredSearchedEvents.map(e => {
       if (e.id === newEvent.id) {
-        return newEvent;
+        return {
+          ...e,
+          ...newEvent
+        };
       }
       return e;
     });
@@ -277,7 +292,7 @@ export default function ({ navigation }) {
 
   return (
     <Layout>
-      <Header name="Your Meals" navigation={navigation} hasNotif={unread} />
+      <Header name="Your Meals" navigation={navigation} hasNotif={unread} notifs connections/>
 
       <View style={{ marginTop: 20, paddingHorizontal: 20 }}>
         <Searchbar
@@ -304,7 +319,7 @@ export default function ({ navigation }) {
       </View>
 
       {!loading ? 
-        filteredEvents.length > 0 ? (
+        filteredSearchedEvents.length > 0 ? (
         <FlatList
           contentContainerStyle={styles.cards}
           keyExtractor={(item) => item.id}

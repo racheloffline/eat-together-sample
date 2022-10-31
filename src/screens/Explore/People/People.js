@@ -11,12 +11,16 @@ import HorizontalRow from "../../../components/HorizontalRow";
 import HorizontalSwitch from "../../../components/HorizontalSwitch";
 import Filter from "../../../components/Filter";
 
+import MediumText from "../../../components/MediumText";
+
+import { generateColor, randomize3 } from "../../../methods";
 import { db, auth } from "../../../provider/Firebase";
 
 export default function ({ navigation }) {
   // Fetch current user
   const user = auth.currentUser;
   const [userInfo, setUserInfo] = useState({});
+  const [unread, setUnread] = useState(false); // See if we need to display unread notif icon
 
   const [mutuals, setMutuals] = useState([]); // Mutual friends
 
@@ -46,6 +50,7 @@ export default function ({ navigation }) {
         .then((doc) => {
           setUserInfo(doc.data());
           userData = doc.data();
+          setUnread(doc.data().hasNotif);
 
           doc.data().friendIDs.forEach((id) => {
             db.collection("Users")
@@ -67,8 +72,10 @@ export default function ({ navigation }) {
         query.forEach((doc) => {
           let data = doc.data();
           if (data.id !== user.uid && data.verified && !userData.blockedIDs.includes(doc.data().id)
-            && !doc.data().blockedIDs.includes(user.uid)) { // Only show verified + unblocked users
+            && !doc.data().blockedIDs.includes(user.uid) && !userData.friendIDs.includes(doc.data().id)) { // Only show verified + unblocked + non-friend users
             data.inCommon = getCommonTags(userData, data);
+            data.color = generateColor();
+            data.selectedTags = randomize3(data.tags);
             users.push(data);
           }
         });
@@ -76,18 +83,18 @@ export default function ({ navigation }) {
         setPeople(users);
         setFilteredPeople(users);
         setFilteredSearchPeople(users);
+        setLoading(false);
       });
     }
 
-    fetchData().then(() => {
-      setLoading(false);
-    });
+    fetchData();
   }, []);
 
 
   // Filters
   useEffect(() => {
     async function filter() {
+      setLoading(true);
       let newPeople = [...people];
   
       if (similarInterests) {
@@ -103,10 +110,11 @@ export default function ({ navigation }) {
       setFilteredSearchPeople(newSearchedPeople);
     }
 
-    setLoading(true);
-    filter().then(() => {
-      setLoading(false);
-    });
+    if (people.length > 0) {
+      filter().then(() => {
+        setLoading(false);
+      });
+    }
   }, [similarInterests, mutualFriends]);
 
   // Get tags in common with current user and user being compared to
@@ -201,7 +209,7 @@ export default function ({ navigation }) {
 
   return (
     <Layout>
-      <Header name="Explore" />
+      <Header name="Explore" navigation={navigation} hasNotif={unread} notifs connections/>
       <HorizontalSwitch
         left="Meals"
         right="People"
@@ -231,7 +239,12 @@ export default function ({ navigation }) {
       </View>
 
       <View style={{ flex: 1, alignItems: "center" }}>
-        {!loading ? (
+        {loading || people.length === 0 ?
+          <View style={{ flex: 1, justifyContent: "center" }}>
+            <ActivityIndicator size={100} color="#5DB075" />
+            <MediumText>Hang tight ...</MediumText>
+          </View>
+          : filteredSearchedPeople.length > 0 ? (
           <FlatList
             keyExtractor={(item) => item.id}
             data={filteredSearchedPeople}
@@ -246,11 +259,9 @@ export default function ({ navigation }) {
               />
             )}
           />
-        ) : (
-          <View style={{ flex: 1, justifyContent: "center" }}>
-            <ActivityIndicator size={100} color="#5DB075" />
-          </View>
-        )}
+          ) : (<View style={{ flex: 1, justifyContent: "center" }}>
+            <MediumText center>Empty 🍽️</MediumText>
+          </View>)}
       </View>
     </Layout>
   );

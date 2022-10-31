@@ -26,7 +26,7 @@ import {
 } from "react-native-popup-menu";
 
 import { db, auth } from "../../../provider/Firebase";
-import firebase from "firebase";
+import firebase from "firebase/compat";
 
 const blockPerson = (uid, navigation) => {
   Alert.alert("Block", "Are you sure you want to block this user?", [
@@ -34,7 +34,7 @@ const blockPerson = (uid, navigation) => {
       text: "Cancel",
       style: "cancel",
     },
-    { text: "YES", onPress: () => databaseStoreBlockAction(uid, navigation) },
+    { text: "Yes", style: "destructive", onPress: () => databaseStoreBlockAction(uid, navigation) },
   ]);
 };
 
@@ -57,6 +57,33 @@ const databaseStoreBlockAction = (uid, navigation) => {
   -remove connection requests from that person
   */
 };
+
+//Remove a friend, if we are already connected with them
+function removeFriend(uid, navigation) {
+  Alert.alert("Remove Friend", "Are you sure you want to remove this friend?", [
+    {
+      text: "Cancel",
+      style: "cancel",
+    },
+    { text: "Yes", style: "destructive" ,onPress: () => databaseRemoveFriend(uid, navigation) },
+  ]);
+}
+
+function databaseRemoveFriend(uid, navigation) {
+  alert("Friend removed.");
+  const user = auth.currentUser;
+  // update user's blacklist & remove from friends
+  db.collection("Users")
+      .doc(user.uid)
+      .update({
+        friendIDs: firebase.firestore.FieldValue.arrayRemove(uid)
+      }).then(() => {
+        db.collection("Users").doc(uid).update({
+          friendIDs: firebase.firestore.FieldValue.arrayRemove(user.uid)
+        })
+  })
+  navigation.navigate("Home");
+}
 
 const FullProfile = ({ route, navigation }) => {
   const [status, setStatus] = useState("Loading");
@@ -197,9 +224,14 @@ const FullProfile = ({ route, navigation }) => {
                 />
               </MenuTrigger>
               <MenuOptions>
-                <MenuOption
-                  onSelect={() => blockPerson(route.params.person.id, navigation)}
-                >
+                { status == "Taste Buds" &&
+                    <MenuOption onSelect={() => removeFriend(route.params.person.id, navigation)}>
+                      <NormalText size={18}>
+                        Remove Friend
+                      </NormalText>
+                    </MenuOption>
+                }
+                <MenuOption onSelect={() => blockPerson(route.params.person.id, navigation)}>
                   <NormalText size={18} color={"red"}>
                     Block
                   </NormalText>
@@ -257,7 +289,6 @@ const FullProfile = ({ route, navigation }) => {
 
         <TagsList tags={route.params.person.tags} />
         <MediumText>{route.params.person.bio}</MediumText>
-
         <View style={styles.cards}>
           {events.map((event) => (
             <EventCard

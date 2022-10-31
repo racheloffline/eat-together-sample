@@ -1,7 +1,7 @@
 // Full event page
 
 import React, { useState, useEffect } from "react";
-import { View, ScrollView, StyleSheet, ImageBackground, Dimensions, Image } from "react-native";
+import { View, ScrollView, StyleSheet, ImageBackground, Dimensions, Image, TouchableOpacity } from "react-native";
 import { Layout, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -10,18 +10,23 @@ import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
 import Button from "../../components/Button";
 import TagsList from "../../components/TagsList";
+import Link from "../../components/Link";
 
 import getDate from "../../getDate";
 import getTime from "../../getTime";
 
 import {db, auth} from "../../provider/Firebase";
-import * as firebase from "firebase";
+import * as firebase from "firebase/compat";
+import openMap from "react-native-open-maps";
+import {Menu, MenuOption, MenuOptions, MenuTrigger} from "react-native-popup-menu";
 
 const FullCard = ({ route, navigation }) => {
   const user = auth.currentUser;
 
+  const [friend, setFriend] = useState(null); // Display a friend who is also attending the event
   const [attending, setAttending] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [host, setHost] = useState(null);
 
   useEffect(() => {
     db.collection("Users").doc(user.uid).get().then(doc => {
@@ -30,9 +35,19 @@ const FullCard = ({ route, navigation }) => {
       if (events.includes(route.params.event.id)) {
         setAttending(true);
       }
+
+      if (friendAttending(doc.data())) {
+        db.collection("Users").doc(friendAttending(doc.data())).get().then(doc => {
+          setFriend(doc.data());
+        });
+      }
+    }).then(() => {
+      db.collection("Users").doc(route.params.event.hostID).get().then(doc => {
+        setHost(doc.data());
+      });
     }).then(() => {
       setLoading(false);
-    })
+    });
   }, []);
 
   // Attend an event
@@ -73,6 +88,27 @@ const FullCard = ({ route, navigation }) => {
     });
   }
 
+  // Report an event that the user feels is offensive in some way
+  //Reporting event function
+  function reportEvent() {
+    navigation.navigate("ReportEvent", {
+      eventID: route.params.event.id,
+    });
+  }
+
+  // Determine if a friend is attending the event or not, and return them
+  const friendAttending = (userInfo) => {
+    let friend = null;
+    userInfo.friendIDs.forEach(f => {
+      if (route.params.event.attendees.includes(f) && f !== route.params.event.hostID) {
+        friend = f;
+        return;
+      }
+    });
+
+    return friend;
+  }
+
   return (
     <Layout>
       <TopNav
@@ -86,6 +122,26 @@ const FullCard = ({ route, navigation }) => {
           />
         }
         leftAction={() => navigation.goBack()}
+        rightContent={
+          <View>
+            <Menu>
+              <MenuTrigger>
+                <Ionicons
+                    name="ellipsis-horizontal"
+                    color={loading ? "grey" : "black"}
+                    size={25}
+                />
+              </MenuTrigger>
+              <MenuOptions>
+                <MenuOption onSelect={() => reportEvent()}  style={styles.option}>
+                  <NormalText size={18} color="red">
+                    Report
+                  </NormalText>
+                </MenuOption>
+              </MenuOptions>
+            </Menu>
+          </View>
+        }
       />
       
       <ScrollView>
@@ -103,7 +159,14 @@ const FullCard = ({ route, navigation }) => {
             {route.params.event.name}
           </LargeText>
           
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <TouchableOpacity style={styles.row}
+            onPress={() => {
+              if (host && route.params.event.hostID !== user.uid)
+                navigation.navigate("FullProfile", {
+                  person: host,
+                });
+            }}
+            disabled={route.params.event.hostID === user.uid}>
             <Image source={route.params.event.hasHostImage ? { uri: route.params.event.hostImage}
               : require("../../../assets/logo.png")} style={styles.profileImg}/>
             <MediumText size={18}>{route.params.event.hostID === user.uid ? "You!"
@@ -111,9 +174,16 @@ const FullCard = ({ route, navigation }) => {
                 route.params.event.hostFirstName + " " + route.params.event.hostLastName
               : route.params.event.hostName)}
             </MediumText>
+          </TouchableOpacity>
+          
+          <View style={styles.row}>
+            <NormalText>{route.params.event.attendees.length} attendee{route.params.event.attendees.length !== 1 && "s"}</NormalText>
+            {friend && <NormalText>, including: </NormalText>}
+            {friend && <Image source={friend.hasImage ? { uri: friend.image } : require("../../../assets/logo.png")} style={styles.profileImg}/>}
+            {friend && <NormalText>{friend.firstName + " " + friend.lastName}</NormalText>}
           </View>
-
-          {route.params.event.tags && <TagsList marginVertical={20} tags={route.params.event.tags} left/>}
+          {route.params.event.tags && route.params.event.tags.length > 0 &&
+            <TagsList marginVertical={10} tags={route.params.event.tags} left/>}
 
           {/* 3 event details (location, date, time} are below */}
 
@@ -123,19 +193,23 @@ const FullCard = ({ route, navigation }) => {
               <NormalText paddingHorizontal={10} color="black">
                 {route.params.event.location}
               </NormalText>
+              <Link onPress={() => openMap({ query: route.params.event.location, provider: "google" })}>
+                (view on map)
+              </Link>
             </View>
 
             <View style={styles.row}>
               <Ionicons name="calendar-outline" size={20} />
               <NormalText paddingHorizontal={10} color="black">
-                {getDate(route.params.event.date.toDate())}
+                {route.params.event.startDate ? getDate(route.params.event.startDate.toDate()) : getDate(route.params.event.date.toDate())}
               </NormalText>
             </View>
 
             <View style={styles.row}>
               <Ionicons name="time-outline" size={20} />
               <NormalText paddingHorizontal={10} color="black">
-                {getTime(route.params.event.date.toDate())}
+                {route.params.event.startDate ? getTime(route.params.event.startDate.toDate()) : getTime(route.params.event.date.toDate())}
+                {route.params.event.endDate && " - ".concat(getTime(route.params.event.endDate.toDate()))}
               </NormalText>
             </View>
           </View>
@@ -150,7 +224,7 @@ const FullCard = ({ route, navigation }) => {
               {loading ? "Loading ..." : route.params.event.hostID === user.uid ? "Your event :)" :
                 attending ? "Withdraw :(" : "Attend!"}
           </Button>
-        </View>        
+        </View>
       </ScrollView>
     </Layout>
   );
@@ -164,7 +238,9 @@ const styles = StyleSheet.create({
 
   row: {
     flexDirection: "row",
+    alignItems: "center",
     marginVertical: 4,
+    flexWrap: "wrap"
   },
 
   profileImg: {

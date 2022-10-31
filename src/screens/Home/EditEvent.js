@@ -32,13 +32,15 @@ export default function ({ route, navigation }) {
     const [photo, setPhoto] = useState("https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400");
     const [name, setName] = useState("");
     const [location, setLocation] = useState("");
-    const [date, setDate] = useState(new Date());
+    const [startDate, setStartDate] = useState(new Date());
+    const [endDate, setEndDate] = useState(new Date());
     const [additionalInfo, setAdditionalInfo] = useState("");
     const [tagsSelected, setTagsSelected] = useState([]);
     const [tagsValue, setTagsValue] = useState("");
 
     // Other variables
-    const [showDate, setShowDate] = useState(false);
+    const [showStartDate, setShowStartDate] = useState(false);
+    const [showEndDate, setShowEndDate] = useState(false);
     const [mode, setMode] = useState("date");
     const [disabled, setDisabled] = useState(true);
 
@@ -50,7 +52,14 @@ export default function ({ route, navigation }) {
     useEffect(() => {
         setName(route.params.event.name);
         setLocation(route.params.event.location);
-        setDate(route.params.event.date.toDate());
+
+        setStartDate(route.params.event.startDate
+            ? route.params.event.startDate.toDate()
+            : route.params.event.date.toDate());
+        setEndDate(route.params.event.endDate
+            ? route.params.event.endDate.toDate()
+            : new Date(moment(route.params.event.date.toDate()).add(1, "hours").toDate()));
+
         setAdditionalInfo(route.params.event.additionalInfo);
         setTagsSelected(route.params.event.tags ? route.params.event.tags : []);
         setPhoto(route.params.event.image ? route.params.event.image : photo);
@@ -58,7 +67,7 @@ export default function ({ route, navigation }) {
 
     // Checks whether we should disable the Post button or not
     useEffect(() => {
-        if (name === "" || location == "") {
+        if (name === "" || location === "") {
             setDisabled(true);
         } else {
             setDisabled(false);
@@ -77,11 +86,19 @@ export default function ({ route, navigation }) {
         setTagsValue(tags);
     }, [name, location, tagsSelected]);
 
-    // For selecting a date and time
-    const changeDate = (selectedDate) => {
-        const currentDate = selectedDate || date;
-        setDate(currentDate); // Set the date
-        setShowDate(false); // Exit the date/time picker modal
+    // For selecting a start date and time
+    const changeStartDate = (selectedDate) => {
+        const currentDate = selectedDate || startDate;
+        setStartDate(currentDate); // Set the date
+        setEndDate(moment(currentDate).add(1, 'hours').toDate()); // Set the end date to the same as the start date
+        setShowStartDate(false); // Exit the date/time picker modal
+    };
+
+    // For selecting an end date and time
+    const changeEndDate = (selectedDate) => {
+        const currentDate = selectedDate || endDate;
+        setEndDate(currentDate); // Set the date
+        setShowEndDate(false); // Exit the date/time picker modal
     };
 
     // For selecting a photo
@@ -116,16 +133,10 @@ export default function ({ route, navigation }) {
         const newEvent = {
             id,
             name,
-            hostID: route.params.event.hostID,
-            hostFirstName: route.params.event.hostFirstName,
-            hostLastName: route.params.event.hostLastName,
-            hasHostImage: route.params.event.hasHostImage,
-            hostImage: route.params.event.hostImage,
             location,
-            date,
+            startDate,
+            endDate,
             additionalInfo,
-            attendees: route.params.event.attendees,
-            ice: route.params.event.ice,
             hasImage,
             image
         };
@@ -137,8 +148,9 @@ export default function ({ route, navigation }) {
             table = "Public Events";
         }
 
-        db.collection(table).doc(route.params.event.id).set(newEvent).then(() => {
-            newEvent.date = moment(date);
+        db.collection(table).doc(route.params.event.id).update(newEvent).then(() => {
+            newEvent.startDate = moment(startDate);
+            newEvent.endDate = moment(endDate);
             route.params.editEvent({...newEvent, type: route.params.event.type});
             route.params.editEvent2({...newEvent, type: route.params.event.type});
             navigation.goBack();
@@ -184,6 +196,60 @@ export default function ({ route, navigation }) {
                         containerStyle={styles.input}
                     />
 
+                    <TouchableOpacity onPress={() => {
+                        setShowStartDate(true);
+                        setMode("date");
+                    }} style={styles.input}>
+                        <View pointerEvents="none">
+                            <TextInput
+                                value={getDate(startDate)}
+                                leftContent={
+                                    <Ionicons name="calendar-outline" size={20}/>
+                                }
+                                editable={false}
+                            />
+                        </View>
+                    </TouchableOpacity>
+
+                    <View style={styles.dateTime}>
+                        <TouchableOpacity onPress={() => {
+                            setShowStartDate(true);
+                            setMode("time");
+                        }} style={styles.smallInput}>
+                            <View pointerEvents="none">
+                                <TextInput
+                                    value={getTime(startDate)}
+                                    leftContent={
+                                        <Ionicons name="time-outline" size={20}/>
+                                    }
+                                    editable={false}
+                                />
+                            </View>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity onPress={() => {
+                            setShowEndDate(true);
+                            setMode("time");
+                        }} style={styles.smallInput}>
+                            <View pointerEvents="none">
+                                <TextInput
+                                    value={getTime(endDate)}
+                                    leftContent={
+                                        <Ionicons name="time-outline" size={20}/>
+                                    }
+                                    editable={false}
+                                />
+                            </View>
+                        </TouchableOpacity>
+                    </View>                        
+
+                    <DateTimePickerModal isVisible={showStartDate} date={startDate}
+                        mode={mode} onConfirm={changeStartDate} onCancel={() => setShowStartDate(false)}
+                        minimumDate={new Date()} maximumDate={moment().add(1, "months").toDate()}/>
+                    <DateTimePickerModal isVisible={showEndDate} date={endDate}
+                        mode={mode} onConfirm={changeEndDate} onCancel={() => setShowEndDate(false)}
+                        minimumDate={startDate} maximumDate={moment().add(1, "months").toDate()}/>
+
                     <TextInput
                         placeholder="Location"
                         value={location}
@@ -195,43 +261,7 @@ export default function ({ route, navigation }) {
                         }
                         containerStyle={styles.input}
                     />
-
-                    <View style={styles.dateTime}>
-                        <TouchableOpacity onPress={() => {
-                            setShowDate(true);
-                            setMode("date");
-                        }} style={styles.smallInput}>
-                            <View pointerEvents="none">
-                                <TextInput
-                                    value={getDate(date)}
-                                    leftContent={
-                                        <Ionicons name="calendar-outline" size={20}/>
-                                    }
-                                    editable={false}
-                                />
-                            </View>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity onPress={() => {
-                            setShowDate(true);
-                            setMode("time");
-                        }} style={styles.smallInput}>
-                            <View pointerEvents="none">
-                                <TextInput
-                                    value={getTime(date)}
-                                    leftContent={
-                                        <Ionicons name="time-outline" size={20}/>
-                                    }
-                                    editable={false}
-                                />
-                            </View>
-                        </TouchableOpacity>
-                    </View>                        
-
-                    <DateTimePickerModal isVisible={showDate} date={date}
-                        mode={mode} onConfirm={changeDate} onCancel={() => setShowDate(false)}
-                        minimumDate={new Date()} maximumDate={moment().add(1, "months").toDate()}/>
-
+                    
                     <TextInput
                         placeholder="Additional Info"
                         value={additionalInfo}
@@ -262,11 +292,16 @@ export default function ({ route, navigation }) {
                         let hasImage = false;
                         if (photo !== "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400") {
                             hasImage = true;
-                            storeImage(photo, route.params.event.id).then(() => {
-                                fetchImage(route.params.event.id).then(uri => {
-                                    storeEvent(route.params.event.id, hasImage, uri);
+                            
+                            if (photo !== route.params.event.image) {
+                                storeImage(photo, route.params.event.id).then(() => {
+                                    fetchImage(route.params.event.id).then(uri => {
+                                        storeEvent(route.params.event.id, hasImage, uri);
+                                    });
                                 });
-                            });
+                            } else {
+                                storeEvent(route.params.event.id, hasImage, route.params.event.image);
+                            }
                         } else {
                             storeEvent(route.params.event.id, hasImage, "");
                         }

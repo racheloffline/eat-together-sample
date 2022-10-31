@@ -6,8 +6,6 @@ import TagsList from './TagsList';
 import MediumText from "./MediumText";
 
 const InvitePerson = props => {
-    const [attendees, setAttendees] = React.useState(props.attendees);
-    const [checkBox, setCheckbox] = React.useState(false);
     const [image, setImage] = React.useState("");
     const [bio, setBio] = React.useState("");
 
@@ -21,16 +19,6 @@ const InvitePerson = props => {
             setBio(props.person.bio);
         }
     });
-
-    // Generate random tags
-    const shuffledArr = arr => {
-        const shuffled = [...arr]
-            .map(value => ({ value, sort: Math.random() }))
-            .sort((a, b) => a.sort - b.sort)
-            .map(({ value }) => value);
-     
-        return shuffled;
-    }
 
     return (
         <View style={styles.outline}>
@@ -46,36 +34,12 @@ const InvitePerson = props => {
                     </View>
                 </TouchableOpacity>
                 <View style={styles.checkbox}>
-                    <CheckBox value={checkBox} onValueChange={(val) => {
-                        setCheckbox(val);
-                        const curr = attendees;
-                        const isName = (elem) => elem == props.person.id;
-                        if (val) { // Add attendee
-                            if (curr.length == 0) { // Undisable the "send invites" button
-                                props.undisable();
-                            }
-
-                            let index = curr.findIndex(isName);
-                            if (index == -1) {
-                                curr.push(props.person.id.toString());
-                            }
-                        } else { // Remove attendee
-                            if (curr.length == 1) { // Disable the "send invites" button
-                                props.disable();
-                            }
-
-                            let index = curr.findIndex(isName);
-                            if (index != -1) {
-                                curr.splice(index, 1);
-                            }
-                        }
-                        setAttendees(curr);
-                    }} />
+                    <CheckBox value={props.person.invited} onValueChange={() => props.toggleInvite(props.person.id)} />
                 </View>
             </View>
-            <View style={[styles.body, {backgroundColor: props.color}]}>
+            <View style={[styles.body, {backgroundColor: props.person.color}]}>
                 <MediumText>{bio}</MediumText>
-                <TagsList tags={shuffledArr(props.person.tags).slice(0, 3)} left/>
+                <TagsList tags={props.person.selectedTags} left/>
             </View>
         </View>
     );

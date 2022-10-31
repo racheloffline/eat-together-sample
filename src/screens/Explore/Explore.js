@@ -15,13 +15,14 @@ import Link from "../../components/Link";
 
 import MediumText from "../../components/MediumText";
 
-import { getTimeOfDay } from "../../methods";
+import { getTimeOfDay, isAvailable, compareDates } from "../../methods";
 import { auth, db } from "../../provider/Firebase";
 
 export default function({ navigation }) {
     // Fetch current user
     const user = auth.currentUser;
     const [userInfo, setUserInfo] = useState({});
+    const [unread, setUnread] = useState(false); // See if we need to display unread notif icon
 
     const [events, setEvents] = useState([]); // All public events
     const [filteredEvents, setFilteredEvents] = useState([]); // Filtered events
@@ -30,10 +31,11 @@ export default function({ navigation }) {
     const [searchQuery, setSearchQuery] = useState("");
 
     // Filters
+    const [similarInterests, setSimilarInterests] = useState(false);
     const [popularity, setPopularity] = useState(false);
+    const [available, setAvailable] = useState(false);
     const [fromFriends, setFromFriends] = useState(false);
     const [friendsAttending, setFriendsAttending] = useState(false);
-    const [similarInterests, setSimilarInterests] = useState(false);
     const [morning, setMorning] = useState(false);
     const [afternoon, setAfternoon] = useState(false);
     const [evening, setEvening] = useState(false);
@@ -50,31 +52,38 @@ export default function({ navigation }) {
             await db.collection("Users").doc(user.uid).onSnapshot(doc => {
                 userData = doc.data();
                 setUserInfo(doc.data());
+                setUnread(doc.data().hasNotif);
             });
 
             const ref = db.collection("Public Events");
             await ref.onSnapshot((query) => {
                 let newEvents = [];
                 query.forEach((doc) => {
-                    if (doc.data().date.toDate() > new Date() && 
-                      !userData.blockedIDs.includes(doc.data().hostID)) {
-                        newEvents.push(doc.data());
+                    if (doc.data().startDate) {
+                      if (doc.data().startDate.toDate() > new Date() && 
+                        !userData.blockedIDs.includes(doc.data().hostID)) {
+                          newEvents.push(doc.data());
+                      }
+                    } else {
+                      if (doc.data().date.toDate() > new Date() && 
+                        !userData.blockedIDs.includes(doc.data().hostID)) {
+                          newEvents.push(doc.data());
+                      }
                     }
                 });
                 
                 // Sort events by date
                 newEvents = newEvents.sort((a, b) => {
-                    return b.date.seconds - a.date.seconds;
+                    return compareDates(a, b);
                 });
                 setEvents(newEvents);
                 setFilteredEvents(newEvents);
                 setFilteredSearchedEvents(newEvents);
+                setLoading(false);
             });
         }
 
-        fetchData().then(() => {
-          setLoading(false);
-        });
+        fetchData();
     }, []);
 
     // For filters
@@ -88,6 +97,10 @@ export default function({ navigation }) {
 
         if (popularity) {
           newEvents = sortByPopularity(newEvents);
+        }
+
+        if (available) {
+          newEvents = filterByAvailability(newEvents);
         }
 
         if (fromFriends) {
@@ -121,6 +134,7 @@ export default function({ navigation }) {
     }, [
       similarInterests,
       popularity,
+      available,
       fromFriends,
       friendsAttending,
       morning,
@@ -128,18 +142,9 @@ export default function({ navigation }) {
       evening,
     ]);
 
-    //Check to see if we should display the "No Events" placeholder text
-    function shouldDisplayPlaceholder(list) {
-      if (list == null || list.length === 0) {
-        return "No events available at this time.";
-      } else {
-        return "";
-      }
-    }
-
     // Method to filter out events
     const search = (newEvents, text) => {
-      return events.filter((e) => isMatch(e, text));
+      return newEvents.filter((e) => isMatch(e, text));
     };
 
     // Determines if an event matches search query or not
@@ -177,6 +182,11 @@ export default function({ navigation }) {
       );
       return newEvents;
     };
+
+    // Display events that match the user's availabilities
+    const filterByAvailability = (newEvents) => {
+      return newEvents.filter(e => isAvailable(userInfo, e));
+    }
 
     // Display events that friends are hosting
     const filterByFriendsHosting = (newEvents) => {
@@ -251,7 +261,7 @@ export default function({ navigation }) {
 
     return (
       <Layout>
-        <Header name="Explore"/>
+          <Header name="Explore" navigation={navigation} hasNotif={unread} notifs connections/>
         <HorizontalSwitch
           left="Meals"
           right="People"
@@ -264,11 +274,13 @@ export default function({ navigation }) {
             value={searchQuery} onChangeText={onChangeText}/>
           
           <HorizontalRow>
+            <Filter checked={available}
+              onPress={() => setAvailable(!available)} text="Fits schedule"/>
             <Filter checked={morning || afternoon || evening}
               onPress={() => showTimeFilterRef.current.open()}
               text={morning ? "Morning" : 
                 afternoon ? "Afternoon" : 
-                evening ? "Evening" :"Time of day"}/>
+                evening ? "Evening" : "Time of day"}/>
             <Filter checked={similarInterests || popularity}
               onPress={() => showSortFilterRef.current.open()}
               text={similarInterests ? "Similar interests"
@@ -378,8 +390,12 @@ export default function({ navigation }) {
         </RBSheet>
 
         <View style={{ flex: 1 }}>
-          {!loading ? 
-            filteredEvents.length > 0 ? (
+          {loading ?
+            <View style={{ flex: 1, justifyContent: "center" }}>
+              <ActivityIndicator size={100} color="#5DB075"/>
+              <MediumText>Hang tight ...</MediumText>
+            </View>
+            : filteredSearchedEvents.length > 0 ? (
             <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
               data={filteredSearchedEvents} renderItem={({item}) =>
                 <EventCard event={item} click={() => {
@@ -392,11 +408,7 @@ export default function({ navigation }) {
             ) : (
               <View style={{ flex: 1, justifyContent: "center" }}>
                 <MediumText center>Empty 🍽️</MediumText>
-              </View>) : (
-              <View style={{ flex: 1, justifyContent: "center" }}>
-                <ActivityIndicator size={100} color="#5DB075"/>
-              </View>
-          )}
+              </View>)}
         </View>
       </Layout>
     );
