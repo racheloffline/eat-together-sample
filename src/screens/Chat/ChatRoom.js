@@ -11,8 +11,8 @@ import { Ionicons } from "@expo/vector-icons";
 
 import TextMessage from "../../components/TextMessage";
 import MediumText from "../../components/MediumText";
-import KeyboardAvoidingWrapper from "../../components/KeyboardAvoidingWrapper";
 
+import firebase from "firebase/compat";
 import { db, auth } from "../../provider/Firebase";
 import moment from "moment";
 
@@ -62,36 +62,41 @@ export default function ({ route, navigation }) {
   return (
     <Layout>
       <TopNav
-        middleContent={group.name}
+        middleContent={
+          <TouchableOpacity onPress={() => navigation.navigate("ChatRoomDetails", {
+              group: group
+          })}>
+              <MediumText>{group.name}</MediumText>
+          </TouchableOpacity>
+        }
         leftContent={<Ionicons name="chevron-back" size={20} />}
         leftAction={() => {
           // Temporary fix with invalid chat preview, to be fixed in the future for better speed.
-          navigation.navigate("Invite");
-          navigation.navigate("Chats");
+          navigation.goBack();
         }}
       />
       <FlatList
         data={messages}
         renderItem={({ item }) => (
-          <TextMessage sentBy={item.sentBy} message={item.message} />
+          <TextMessage {...item}/>
         )}
+        inverted={true}
       />
-      <KeyboardAvoidingWrapper>
-        <TextInput
-          placeholder="Send Message"
-          value={message}
-          onChangeText={(val) => setMessage(val)}
-          rightContent={
-            <TouchableOpacity
-              onPress={() => {
-                onSend();
-              }}
-            >
-              <Ionicons name="send" size={20} color={"#D3D3D3"} />
-            </TouchableOpacity>
-          }
-        />
-      </KeyboardAvoidingWrapper>
+      <TextInput
+        placeholder="Send Message"
+        value={message}
+        onChangeText={(val) => setMessage(val)}
+        rightContent={
+          <TouchableOpacity
+            onPress={() => {
+              onSend();
+            }}
+            disabled={message.length === 0}
+          >
+            <Ionicons name="send" size={20} color={"#D3D3D3"} />
+          </TouchableOpacity>
+        }
+      />
     </Layout>
   );
 }
@@ -108,7 +113,5 @@ const styles = StyleSheet.create({
     width: Dimensions.get("screen").width,
     height: 100,
     backgroundColor: "#5DB075",
-  },
-
-  messages: {},
+  }
 });
