@@ -62,7 +62,7 @@ const Password = props => {
           },
           {
             text: "Read Terms of Service",
-            onPress: () => Linking.openURL("https://www.eat-together.tech/privacy-policy"), //Change this to the TOS
+            onPress: () => Linking.openURL("https://www.eat-together.tech/terms-and-conditions"),
             style: "cancel"
           }
         ]
