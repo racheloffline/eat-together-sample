@@ -33,6 +33,8 @@ import { createNewChat } from "../Chat/Chats";
 import moment from "moment";
 import { checkProfanity } from "../../methods";
 
+import Checkbox from "../../components/Checkbox";
+
 export default function ({ navigation }) {
     // Current user
     const user = auth.currentUser;
@@ -65,6 +67,8 @@ export default function ({ navigation }) {
     const [disabled, setDisabled] = useState(true);
 
     const [loading, setLoading] = useState(false); // Disable button if event is being created in Firebase
+
+    const [semiPrivate, setSemiPrivate] = useState(false); //Checkbox state to see if public event should be semiprivate
 
     const refRBSheet = useRef(); // To toggle the bottom drawer on/off
 
@@ -360,7 +364,15 @@ export default function ({ navigation }) {
                             />
                         </View>
                     </TouchableOpacity>}
-                    
+
+                    {/*Checkbox to determine whether or not this event should be semiprivate*/}
+                    {type === "public" && <View style={styles.multiple}>
+                        <Checkbox checked = {semiPrivate} onPress = {() => {
+                            setSemiPrivate(!semiPrivate);
+                        }}/>
+                        <NormalText>Make this event only visible to my friends</NormalText>
+                    </View>}
+
                     <View style={{ display: "flex", justifyContent: "center", alignItems: "center", marginVertical: 10 }}>
                         <Link width="35%" onPress={confirmClear}>Clear all details</Link>
                     </View>
@@ -415,7 +427,7 @@ export default function ({ navigation }) {
                             });
                         }
                     }}>
-                        See people available!
+                        Invite Friends
                     </Button>}
                 </ScrollView>
             </View>
