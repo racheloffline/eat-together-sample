@@ -1,7 +1,7 @@
 // First page of registration
 
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Dimensions, Image, TouchableOpacity, SafeAreaView } from "react-native";
+import {View, StyleSheet, Dimensions, Image, TouchableOpacity, SafeAreaView, Alert, Linking} from "react-native";
 import { TextInput } from "react-native-rapi-ui";
 import { FontAwesome, Entypo, Ionicons } from '@expo/vector-icons';
 
@@ -44,6 +44,29 @@ const Password = props => {
   const checkEmail = email => {
     const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
     return emailPattern.test(email); 
+  }
+
+  //Alert users that they need to read the Terms of Service
+  function showToS() {
+    Alert.alert(
+        "Terms of Service",
+        "Please make sure that you read and agree to the Eat Together Terms of Service before creating an account.",
+        [
+          {
+            text: "I Agree",
+            onPress: () => props.createUser()
+          },
+          {
+            text: "I Disagree",
+            onPress: () => alert("You must agree to the Terms of Service to create an account.")
+          },
+          {
+            text: "Read Terms of Service",
+            onPress: () => Linking.openURL("https://www.eat-together.tech/terms-and-conditions"),
+            style: "cancel"
+          }
+        ]
+    )
   }
 
   return (
@@ -139,7 +162,7 @@ const Password = props => {
                 password.length < 8 ||
                 !confirmed
               }
-              onPress={() => props.createUser()}
+              onPress={() => showToS()}
               marginHorizontal={10}
             >
               Finish!
