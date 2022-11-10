@@ -11,13 +11,15 @@ const Header = (props) => {
       <LargeText>{props.name}</LargeText>
       <View style={styles.icons}>
         {props.connections && props.navigation && <TouchableOpacity onPress={() => {
-          props.navigation.navigate("Connections");
+          props.navigation.navigate("Requests");
         }}>
           <Ionicons name="people-circle-outline" size={40} color="black" style={{ marginRight: 5 }}/>
         </TouchableOpacity>}
         {props.notifs && props.navigation && <TouchableOpacity
           onPress={() => {
-            props.navigation.navigate("Notifications");
+            props.navigation.navigate("Notifications", {
+              fromNav: false
+            });
           }}
         >
           <NotifIcon hasNotif={props.hasNotif === null ? false : props.hasNotif} />

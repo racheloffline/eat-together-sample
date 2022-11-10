@@ -54,9 +54,7 @@ export default function ({ navigation }) {
                 }
                 leftAction={() => navigation.goBack()}
             />
-            <View style = {styles.switchView}>
-                <HorizontalSwitch left="Connections" right="Requests" current="left" press={(val) => navigation.navigate("Requests")}/>
-            </View>
+
             <View style = {styles.noConnectionsView}>
                 <NormalText center={"center"}>{shouldDisplayPlaceholder(users)}</NormalText>
             </View>
@@ -85,8 +83,5 @@ const styles = StyleSheet.create({
     },
     switchView: {
         marginVertical: 10
-    },
-    noConnectionsView: {
-        marginVertical: -20
     }
 });

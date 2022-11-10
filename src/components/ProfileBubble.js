@@ -41,11 +41,11 @@ const ProfileBubble = props => {
     }
 
     return (
-        <View style={[styles.card, {backgroundColor: props.person.color}]}>
+        <View style={[styles.card, {}]}>
             <TouchableOpacity onPress={props.click}>
-                <MediumText color="white">{props.person.bio}</MediumText>
+                <MediumText size={18}>{props.person.bio}</MediumText>
                 <View style={styles.row}>
-                    <NormalText color="white">
+                    <NormalText>
                         {props.person.firstName + " " + props.person.lastName.substring(0, 1) + "."}
                     </NormalText>
 
@@ -59,10 +59,10 @@ const ProfileBubble = props => {
                 
                 {props.person.inCommon.length > 0 && (<View style={styles.common}>
                     {generateSchoolText(props.person.inCommon) !== "" && (<View style={styles.commonRow}>
-                        <NormalText color="white">🏫 You both are: {generateSchoolText(props.person.inCommon)} </NormalText>
+                        <NormalText>🏫 You both are: {generateSchoolText(props.person.inCommon)} </NormalText>
                     </View>)}
                     {generateHobbyFoodText(props.person.inCommon) !== "" && (<View style={styles.commonRow}>
-                        <NormalText color="white">🙂 You both enjoy: {generateHobbyFoodText(props.person.inCommon)} </NormalText>
+                        <NormalText>🙂 You both enjoy: {generateHobbyFoodText(props.person.inCommon)} </NormalText>
                     </View>)}
                 </View>)}
             </TouchableOpacity>
@@ -76,7 +76,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
         width: Dimensions.get('screen').width - 40,
         borderRadius: 10,
-        marginVertical: 5
+        marginVertical: 5,
+        backgroundColor: "white"
     },
 
     row: {

@@ -5,13 +5,15 @@ import { FlatList, View, StyleSheet } from "react-native";
 import { Layout, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 
+import Header from "../../components/Header";
+import HorizontalSwitch from "../../components/HorizontalSwitch";
 import MediumText from "../../components/MediumText";
 import EventCard from "../../components/EventCard";
 
 import { db } from "../../provider/Firebase";
 import firebase from "firebase/compat";
 
-export default function ({ navigation }) {
+export default function (props) {
   //Get a list of current invites from Firebase up here
   const user = firebase.auth().currentUser;
   const [invites, setInvites] = useState([]); // initial state, function used for updating initial state
@@ -55,11 +57,26 @@ export default function ({ navigation }) {
 
   return (
     <Layout>
-      <TopNav
-        middleContent={<MediumText center>Invites</MediumText>}
-        leftContent={<Ionicons name="chevron-back" size={20} />}
-        leftAction={() => navigation.goBack()}
-      />
+      {props.fromNav ?
+        <Header name="Notifications" navigation={props.navigation} connections/> :
+        <TopNav
+          middleContent={<MediumText center>Notifications</MediumText>}
+          leftContent={
+            <Ionicons
+              name="chevron-back"
+              size={20}
+            />
+          }
+          leftAction={() => props.navigation.goBack()}
+        />
+      }
+      {props.fromNav && <HorizontalSwitch
+        left="Notifications"
+        right="Messages"
+        current="left"
+        press={(val) => props.navigation.navigate("ChatMain")}
+      />}
+
       <View style={{ paddingTop: 30 }}>
         <View style={styles.noInvitesView}>
           <MediumText center={"center"}>
@@ -78,7 +95,7 @@ export default function ({ navigation }) {
                   ...item,
                   id: item.docID,
                 };
-                navigation.navigate("NotificationFull", {
+                props.navigation.navigate("NotificationFull", {
                   invite: inviteToSend,
                   hasPassed:
                     item.date.toDate().getTime() < new Date().getTime(),
