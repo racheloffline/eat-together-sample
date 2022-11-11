@@ -13,7 +13,6 @@ import KeyboardAvoidingWrapper from "../../../components/KeyboardAvoidingWrapper
 const Password = props => {
   const [username, setUsername] = useState(props.username);
   const [usernameValid, setUsernameValid] = useState(false);
-  const [email, setEmail] = useState(props.email);
   const [password, setPassword] = useState(props.password);
   const [confirmPassword, setConfirmPassword] = useState("");
   const [confirmed, setConfirmed] = useState(false);
@@ -29,8 +28,6 @@ const Password = props => {
     } else {
       setUsernameValid(false);
     }
-    
-    props.setEmail(email);
 
     if (password === confirmPassword && password.length >= 8) {
       setConfirmed(true);
@@ -38,20 +35,14 @@ const Password = props => {
     } else {
       setConfirmed(false);
     }
-  }, [username, email, password, confirmPassword]);
-
-  // Check validity of email
-  const checkEmail = email => {
-    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-    return emailPattern.test(email); 
-  }
+  }, [username, password, confirmPassword]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <KeyboardAvoidingWrapper>
         <View style={styles.page}>
           <LargeText center>
-            Finally, set your username, email, and password!
+            Finally, set your username and password!
           </LargeText>
 
           <TextInput
@@ -70,17 +61,6 @@ const Password = props => {
               {!usernameValid ? "Username taken :(" : "Username valid!"}
             </SmallText>
           )}
-
-          <TextInput
-            placeholder="Email"
-            value={email}
-            onChangeText={(val) => {
-              setEmail(val);
-            }}
-            autoComplete="email"
-            keyboardType="email-address"
-            leftContent={<Ionicons name="mail" size={18} />}
-          />
 
           <TextInput
             placeholder="Password (at least 8 characters)"
@@ -133,7 +113,6 @@ const Password = props => {
             <Button
               disabled={
                 props.loading ||
-                !checkEmail(email) ||
                 !usernameValid ||
                 username.length < 4 ||
                 password.length < 8 ||
