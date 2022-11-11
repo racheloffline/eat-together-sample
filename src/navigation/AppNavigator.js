@@ -141,17 +141,17 @@ const MainTabs = () => {
         }}
       />
       <Tabs.Screen
-        name="Chat"
-        component={ChatMain}
+        name="Notifs"
+        component={NotificationsMain}
         options={{
           tabBarLabel: ({ focused }) => (
-            <TabBarText focused={focused} title="Chat" />
+            <TabBarText focused={focused} title="Notifs" />
           ),
           tabBarIcon: ({ focused }) => (
             <TabBarIcon
               focused={focused}
-              icon={"chatbox-outline"}
-              title="Chat"
+              icon={"mail-outline"}
+              title="Notifs"
             />
           ),
         }}

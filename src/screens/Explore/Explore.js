@@ -261,7 +261,7 @@ export default function({ navigation }) {
 
     return (
       <Layout>
-          <Header name="Explore" navigation={navigation} hasNotif={unread} notifs connections/>
+        <Header name="Explore" navigation={navigation} hasNotif={unread} notifs/>
         <HorizontalSwitch
           left="Meals"
           right="People"
