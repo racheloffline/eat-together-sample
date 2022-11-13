@@ -233,7 +233,7 @@ export default function ({ navigation }) {
 
     return (
         <Layout>
-            <Header name="Organize" navigation={navigation} hasNotif={unread} notifs connections/>
+            <Header name="Organize" navigation={navigation} hasNotif={unread} notifs/>
 
             <TouchableOpacity onPress={() => handleChoosePhoto()}>
                 <ImageBackground source={{ uri: photo }} style={styles.image}>

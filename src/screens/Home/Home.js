@@ -292,7 +292,7 @@ export default function ({ navigation }) {
 
   return (
     <Layout>
-      <Header name="Your Meals" navigation={navigation} hasNotif={unread} notifs connections/>
+      <Header name="Your Meals" navigation={navigation} hasNotif={unread} notifs/>
 
       <View style={{ marginTop: 20, paddingHorizontal: 20 }}>
         <Searchbar
