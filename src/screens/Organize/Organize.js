@@ -379,6 +379,14 @@ export default function ({ navigation }) {
                         </View>
                     </TouchableOpacity>}
 
+                    {/*Checkbox to determine whether or not this event should be semiprivate*/}
+                    {type === "public" && <View style={styles.multiple}>
+                        <Checkbox checked = {semiPrivate} onPress = {() => {
+                            setSemiPrivate(!semiPrivate);
+                        }}/>
+                        <NormalText>Make this event only visible to my friends</NormalText>
+                    </View>}
+
                     <View style={{ display: "flex", justifyContent: "center", alignItems: "center", marginVertical: 10 }}>
                         <Link width="35%" onPress={confirmClear}>Clear all details</Link>
                     </View>
@@ -433,7 +441,7 @@ export default function ({ navigation }) {
                             });
                         }
                     }}>
-                        See people available!
+                        Invite Friends
                     </Button>}
                 </ScrollView>
             </View>

@@ -208,7 +208,7 @@ const FullProfile = ({ blockBack, route, navigation }) => {
           query.forEach((doc) => {
             if (
               doc.data().hostID === route.params.person.id &&
-              doc.data().date.toDate() > new Date()
+              (doc.data().endDate.toDate() > new Date() || doc.data().date.toDate() > new Date())
             ) {
               list.push(doc.data());
             }

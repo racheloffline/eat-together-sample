@@ -59,6 +59,9 @@ export default function({ navigation }) {
             await ref.onSnapshot((query) => {
                 let newEvents = [];
                 query.forEach((doc) => {
+                    if(doc.data().visibleTo != null) {
+                        if(!doc.data().visibleTo.includes(user.uid) && !(doc.data().hostID === user.uid)) return;
+                    }
                     if (doc.data().startDate) {
                       if (doc.data().startDate.toDate() > new Date() && 
                         !userData.blockedIDs.includes(doc.data().hostID)) {
