@@ -72,20 +72,9 @@ export default function ({ navigation }) {
 
     const refRBSheet = useRef(); // To toggle the bottom drawer on/off
 
+
     // Loading notifications
     useEffect(() => {
-        // picks icebreaker set from set of icebreakers randomly
-        const breakOptions = [];
-        db.collection("Icebreakers").onSnapshot((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-                breakOptions.push(doc.id);
-            });
-
-            var num = Math.floor(Math.random()*breakOptions.length);
-            db.collection("Icebreakers").doc(breakOptions[num]).get().then(doc => {
-                setIcebreakers(doc.data().icebreakers);
-            });
-        });
 
         // Load user info
         async function fetchData() {
@@ -97,6 +86,25 @@ export default function ({ navigation }) {
 
         fetchData();
     }, []);
+
+//  resets icebreakers for each new event
+    useEffect(() => {
+      // picks icebreaker set from set of icebreakers randomly
+            var breakOptions = [];
+            var usedIce = [];
+            db.collection("Icebreakers").doc("icebreakers").get().then(doc => {
+                while(breakOptions.length < 10) {
+                    var num = Math.floor(Math.random()*(doc.data().icebreakers.length-1));
+                    console.log("this is the num" + num);
+                    if(!usedIce.includes(num)) {
+                        breakOptions.push(doc.data().icebreakers[num]);
+                        usedIce.push(num);
+                    }
+                }
+
+                setIcebreakers(breakOptions);
+            });
+    }, [loading]);
 
     // Checks whether we should disable the Post button or not
     useEffect(() => {
@@ -171,12 +179,12 @@ export default function ({ navigation }) {
         setAdditionalInfo("");
         setTagsSelected([]);
         setTagsValue("");
+        setIcebreakers([]);
         setPhoto("https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400");
     }
 
     const chatID = String(startDate) + name; // To be stored in the event
-
-    // For posting the event
+  // For posting the event
     const storeEvent = (id, hasImage, image) => {
         db.collection("Users").doc(user.uid).get().then((doc) => {
             let userFriends  = semiPrivate? doc.data().friendIDs : null;
@@ -223,6 +231,7 @@ export default function ({ navigation }) {
         });
     }
 
+
     // Alert the user if they want to clear all details or not
     const confirmClear = () => {
         Alert.alert(
@@ -251,7 +260,7 @@ export default function ({ navigation }) {
                     </View>
                 </ImageBackground>
             </TouchableOpacity>
-            
+
             <View style={{ flex: 1 }}>
                 <ScrollView contentContainerStyle={styles.content}>
                     <TextInput
@@ -323,7 +332,7 @@ export default function ({ navigation }) {
                                     editable={false}
                                 />
                             </View>
-                        </TouchableOpacity> 
+                        </TouchableOpacity>
                     </View>
 
                     <TextInput
