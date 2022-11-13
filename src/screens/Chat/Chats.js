@@ -12,6 +12,7 @@ import { Button, Layout } from "react-native-rapi-ui";
 import Header from "../../components/Header";
 import ChatPreview from "../../components/ChatPreview";
 import SearchableDropdown from "../../components/SearchableDropdown";
+import HorizontalSwitch from "../../components/HorizontalSwitch";
 
 import { db } from "../../provider/Firebase";
 import firebase from "firebase/compat";
@@ -221,7 +222,13 @@ export default function ({ navigation }) {
 
   return (
     <Layout>
-      <Header name="Chats" navigation={navigation} hasNotif={unread} notifs connections/>
+      <Header name="Messages" navigation={navigation} connections/>
+      <HorizontalSwitch
+        left="Notifications"
+        right="Messages"
+        current="right"
+        press={(val) => navigation.navigate("Notifications")}
+      />
 
       <View style={styles.content}>
         <View style={styles.searchArea}>

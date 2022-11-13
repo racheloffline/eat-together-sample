@@ -7,22 +7,29 @@ const HorizontalSwitch = props => {
     let style_right = null;
     let action_left = null;
     let action_right = null;
+    let left_color = "black";
+    let right_color = "black";
+
     if (props.current == "left") {
-        style_left = styles.leftCurrent;
-        style_right = styles.rightOther;
+        style_left = styles.current;
+        style_right = styles.other;
         action_right = props.press;
+        left_color = "#5db075";
+        right_color = "black";
     } else {
-        style_left = styles.leftOther;
-        style_right = styles.rightCurrent;
+        style_left = styles.other;
+        style_right = styles.current;
         action_left = props.press;
+        left_color = "black";
+        right_color = "#5db075";
     }
     return (
         <View style={styles.container}>
             <TouchableOpacity style={style_left} onPress={action_left}>
-                <MediumText center color="white" size={16}>{props.left}</MediumText>
+                <MediumText center color={left_color} size={14}>{props.left}</MediumText>
             </TouchableOpacity>
             <TouchableOpacity style={style_right} onPress={action_right}>
-                <MediumText center color="white" size={16}>{props.right}</MediumText>
+                <MediumText center color={right_color} size={14}>{props.right}</MediumText>
             </TouchableOpacity>
         </View>
     );
@@ -38,44 +45,22 @@ const styles = StyleSheet.create({
         justifyContent: "center"
     },
 
-    leftCurrent: {
+    current: {
         height: 40,
         flex: 1,
-        borderBottomLeftRadius: 30,
-        borderTopLeftRadius: 30,
-        backgroundColor: "#5db075",
+        borderBottomColor: "#5db075",
+        borderBottomWidth: 2,
         alignItems: "center",
-        justifyContent: "center"
+        justifyContent: "center",
+        marginHorizontal: 10
     },
 
-    rightCurrent: {
+    other: {
         height: 40,
         flex: 1,
-        borderBottomRightRadius: 30,
-        borderTopRightRadius: 30,
-        backgroundColor: "#5db075",
         alignItems: "center",
-        justifyContent: "center"
-    },
-
-    leftOther: {
-        height: 40,
-        flex: 1,
-        borderBottomLeftRadius: 30,
-        borderTopLeftRadius: 30,
-        backgroundColor: "#C0C0C0",
-        alignItems: "center",
-        justifyContent: "center"
-    },
-
-    rightOther: {
-        height: 40,
-        flex: 1,
-        borderBottomRightRadius: 30,
-        borderTopRightRadius: 30,
-        backgroundColor: "#C0C0C0",
-        alignItems: "center",
-        justifyContent: "center"
+        justifyContent: "center",
+        marginHorizontal: 10
     },
 
     buttonText: {

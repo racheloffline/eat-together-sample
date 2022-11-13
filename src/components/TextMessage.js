@@ -12,8 +12,8 @@ const TextMessage = props => {
 
     return (
         <View style={props.sentBy == user.uid ? styles.you : styles.other} borderRadius={20}>
-            {props.sentName && <NormalText color="#666666" size={14}>{props.sentName}</NormalText>}
-            <NormalText color="#666666" size={14}>{getDate(messageDate, false)} {getTime(messageDate)}</NormalText>
+            {props.sentName && <NormalText color="#666666" size={12}>{props.sentName}</NormalText>}
+            <NormalText color="#666666" size={12}>{getDate(messageDate, false)}, {getTime(messageDate)}</NormalText>
             <NormalText color="white" size={16}>{props.message}</NormalText>
         </View>
     );

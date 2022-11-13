@@ -48,7 +48,7 @@ export default function ({ back, navigation }) {
         <Layout>
             <TopNav
                 middleContent={
-                    <MediumText center>Connections</MediumText>
+                    <MediumText center>Requests</MediumText>
                 }
                 leftContent={
                     <Ionicons
@@ -58,9 +58,7 @@ export default function ({ back, navigation }) {
                 }
                 leftAction={() => navigation.navigate(back)}
             />
-            <View style={styles.switchView}>
-                <HorizontalSwitch left="Connections" right="Requests" current="right" press={(val) => navigation.navigate("Connections")}/>
-            </View>
+
             <View style = {styles.noRequestsView}>
                 <NormalText center={"center"}>{shouldDisplayPlaceholder(requests)}</NormalText>
             </View>
@@ -93,12 +91,6 @@ const styles = StyleSheet.create({
     },
     switchView: {
         marginVertical: 10
-    },
-    noRequestsView: {
-        marginVertical: -20
-    },
-    list: {
-        marginVertical: -20
     }
 });
 
