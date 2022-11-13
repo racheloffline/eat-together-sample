@@ -33,6 +33,8 @@ import { createNewChat } from "../Chat/Chats";
 import moment from "moment";
 import { checkProfanity } from "../../methods";
 
+import Checkbox from "../../components/Checkbox";
+
 export default function ({ navigation }) {
     // Current user
     const user = auth.currentUser;
@@ -65,6 +67,8 @@ export default function ({ navigation }) {
     const [disabled, setDisabled] = useState(true);
 
     const [loading, setLoading] = useState(false); // Disable button if event is being created in Firebase
+
+    const [semiPrivate, setSemiPrivate] = useState(false); //Checkbox state to see if public event should be semiprivate
 
     const refRBSheet = useRef(); // To toggle the bottom drawer on/off
 
@@ -159,6 +163,7 @@ export default function ({ navigation }) {
 
     // Empties all fields
     const clearAll = () => {
+        setSemiPrivate(false);
         setName("");
         setLocation("");
         setStartDate(new Date());
@@ -173,43 +178,47 @@ export default function ({ navigation }) {
 
     // For posting the event
     const storeEvent = (id, hasImage, image) => {
-        db.collection("Public Events").doc(id).set({
-            id,
-            name,
-            hostID: user.uid,
-            hostFirstName: userInfo.firstName,
-            hostLastName: userInfo.lastName,
-            hasHostImage: userInfo.hasImage,
-            hostImage: userInfo.hasImage ? userInfo.image : "",
-            location,
-            startDate,
-            endDate,
-            additionalInfo,
-            ice: icebreakers,
-            attendees: [user.uid], //ONLY start by putting the current user as an attendee
-            hasImage,
-            image,
-            tags: tagsSelected,
-            chatID: chatID,
-        }).then(() => {
-            const storeID = {
-                type: "public",
-                id
-            };
-
-            db.collection("Users").doc(user.uid).update({
-                hostedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
-                attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
-                attendedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)
+        db.collection("Users").doc(user.uid).get().then((doc) => {
+            let userFriends  = semiPrivate? doc.data().friendIDs : null;
+            db.collection("Public Events").doc(id).set({
+                id,
+                name,
+                hostID: user.uid,
+                hostFirstName: userInfo.firstName,
+                hostLastName: userInfo.lastName,
+                hasHostImage: userInfo.hasImage,
+                hostImage: userInfo.hasImage ? userInfo.image : "",
+                location,
+                startDate,
+                endDate,
+                additionalInfo,
+                ice: icebreakers,
+                attendees: [user.uid], //ONLY start by putting the current user as an attendee
+                hasImage,
+                image,
+                tags: tagsSelected,
+                chatID: chatID,
+                visibleTo: userFriends
             }).then(() => {
-              clearAll(); // Clear all fields
+                const storeID = {
+                    type: "public",
+                    id
+                };
 
-              // Create the in-event group chat
-              // We set userIDs as empty, meaning this chat is open to everyone!
-              createNewChat([], chatID, name, false);
-              // We are finally done!
-              alert("Success!");
-              setLoading(false);
+                db.collection("Users").doc(user.uid).update({
+                    hostedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
+                    attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
+                    attendedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)
+                }).then(() => {
+                    clearAll(); // Clear all fields
+
+                    // Create the in-event group chat
+                    // We set userIDs as empty, meaning this chat is open to everyone!
+                    createNewChat([], chatID, name, false);
+                    // We are finally done!
+                    alert("Success!");
+                    setLoading(false);
+                });
             });
         });
     }
@@ -360,7 +369,15 @@ export default function ({ navigation }) {
                             />
                         </View>
                     </TouchableOpacity>}
-                    
+
+                    {/*Checkbox to determine whether or not this event should be semiprivate*/}
+                    {type === "public" && <View style={styles.multiple}>
+                        <Checkbox checked = {semiPrivate} onPress = {() => {
+                            setSemiPrivate(!semiPrivate);
+                        }}/>
+                        <NormalText>Make this event only visible to my friends</NormalText>
+                    </View>}
+
                     <View style={{ display: "flex", justifyContent: "center", alignItems: "center", marginVertical: 10 }}>
                         <Link width="35%" onPress={confirmClear}>Clear all details</Link>
                     </View>
@@ -415,7 +432,7 @@ export default function ({ navigation }) {
                             });
                         }
                     }}>
-                        See people available!
+                        Invite Friends
                     </Button>}
                 </ScrollView>
             </View>
