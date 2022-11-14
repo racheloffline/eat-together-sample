@@ -56,6 +56,8 @@ const WhileYouEat = ({ route, navigation }) => {
   const [groupChat, setGroupChat] = useState(null); // Info for the group chat
 
   useEffect(() => {
+
+    console.log("IN EFFECT");
     if (route.params.event.hostID === user.uid) {
       getAttendees();
     }
@@ -100,6 +102,7 @@ const WhileYouEat = ({ route, navigation }) => {
 
   // Function to navigate to the chat for this event
   const goToEventChat = () => {
+    console.log("ARE WE EVEN HERE");
     if (route.params.event.chatID) {
       navigation.navigate("ChatRoom", {
         group: groupChat
@@ -417,11 +420,10 @@ const WhileYouEat = ({ route, navigation }) => {
           </NormalText>
 
           {/* Icebreakers dropdown */}
-
-          <View style={styles.row}>
-            <TouchableOpacity
-              onPress={() => setOpenIcebreakers(!openIcebreakers)}
-            >
+        <TouchableOpacity
+          onPress={() => setOpenIcebreakers(!openIcebreakers)}
+        >
+            <View style={styles.row}>
               <Ionicons
                 name={
                   !openIcebreakers ? "caret-forward-sharp" : "caret-down-sharp"
@@ -429,11 +431,12 @@ const WhileYouEat = ({ route, navigation }) => {
                 size={20}
                 color="black"
               />
-            </TouchableOpacity>
-            <NormalText paddingHorizontal={7} size={17} color="black">
-              Icebreakers
-            </NormalText>
-          </View>
+              <NormalText paddingHorizontal={7} size={17} color="black">
+                Icebreakers
+              </NormalText>
+            </View>
+        </TouchableOpacity>
+
           <View style={styles.icebreakers}>
             {openIcebreakers &&
               event.ice &&
@@ -445,25 +448,24 @@ const WhileYouEat = ({ route, navigation }) => {
           {/* Attendance dropdown */}
           {event.hostID === user.uid && (
             <View>
-              <View style={styles.row}>
                 <TouchableOpacity
                   onPress={() => setOpenAttendance(!openAttendance)}
                 >
-                  <Ionicons
-                    name={
-                      !openAttendance
-                        ? "caret-forward-sharp"
-                        : "caret-down-sharp"
-                    }
-                    size={20}
-                    color="black"
-                  />
+                    <View style={styles.row}>
+                      <Ionicons
+                        name={
+                          !openAttendance
+                            ? "caret-forward-sharp"
+                            : "caret-down-sharp"
+                        }
+                        size={20}
+                        color="black"
+                      />
+                  <NormalText paddingHorizontal={7} size={17} color="black">
+                    Attendance
+                  </NormalText>
+                  </View>
                 </TouchableOpacity>
-
-                <NormalText paddingHorizontal={7} size={17} color="black">
-                  Attendance
-                </NormalText>
-              </View>
 
               {openAttendance && (
                 <View style={{ marginTop: 10 }}>
@@ -544,6 +546,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 30,
     right: 30,
+    zIndex: 1,
   }
 });
 

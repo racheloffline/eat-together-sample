@@ -31,9 +31,14 @@ export default function ({ navigation }) {
             const friends = doc.data().friendIDs;
             let list = [];
             friends.forEach((uid) => {
-                db.collection("Users").doc(uid).get().then((doc) => {
-                    list.push(doc.data());
-                }).then(() => {
+                const userRef = db.collection('Users').doc(uid);
+                userRef.get().then(onSnapshot => {
+                    if (onSnapshot.exists) {
+                        list.push(onSnapshot.data());
+                    }
+                })
+                .catch(e => console.log(e))
+                .then(() => {
                     setUsers(list);
                 });
             });

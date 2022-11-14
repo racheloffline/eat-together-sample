@@ -56,19 +56,6 @@ export default function ({ navigation }) {
 
     // Loading notifications
     useEffect(() => {
-
-    //      picks icebreaker set from set of icebreakers randomly
-        const breakOptions = [];
-        db.collection("Icebreakers").onSnapshot((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-                breakOptions.push(doc.id);
-            });
-
-            var num = Math.floor(Math.random()*breakOptions.length);
-            db.collection("Icebreakers").doc(breakOptions[num]).get().then(doc => {
-                setIcebreakers(doc.data().icebreakers);
-            });
-        });
         async function fetchData() {
             await db.collection("Users").doc(user.uid).onSnapshot((doc) => {
                 setUserInfo(doc.data());
@@ -77,6 +64,25 @@ export default function ({ navigation }) {
 
         fetchData();
     }, []);
+
+//  resets icebreakers for each new event
+    useEffect(() => {
+      // picks icebreaker set from set of icebreakers randomly
+            var breakOptions = [];
+            var usedIce = [];
+            db.collection("Icebreakers").doc("icebreakers").get().then(doc => {
+                while(breakOptions.length < 10) {
+                    var num = Math.floor(Math.random()*(doc.data().icebreakers.length-1));
+                    console.log("this is the num" + num);
+                    if(!usedIce.includes(num)) {
+                        breakOptions.push(doc.data().icebreakers[num]);
+                        usedIce.push(num);
+                    }
+                }
+
+                setIcebreakers(breakOptions);
+            });
+    }, [loading]);
 
     // Checks whether we should disable the Post button or not
     useEffect(() => {
