@@ -279,30 +279,28 @@ export default function ({ navigation }) {
           ></Button>
         </View>
         <FlatList
+          contentContainerStyle={styles.chats}
           keyExtractor={(item) => item.id}
           data={groups}
           renderItem={({ item }) => (
-            <TouchableOpacity
+            <ChatPreview
+              group={item}
               onPress={() => {
                 navigation.navigate("ChatRoom", {
                   group: item,
                 });
               }}
-            >
-              <ChatPreview
-                group={item}
-                click={() => {
-                  db.collection("Users")
-                    .doc(item.id)
-                    .get()
-                    .then((doc) => {
-                      navigation.navigate("FullProfile", {
-                        person: doc.data(),
-                      });
+              click={() => {
+                db.collection("Users")
+                  .doc(item.id)
+                  .get()
+                  .then((doc) => {
+                    navigation.navigate("FullProfile", {
+                      person: doc.data(),
                     });
-                }}
-              />
-            </TouchableOpacity>
+                  });
+              }}
+            />
           )}
         />
       </View>
@@ -315,11 +313,13 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   content: {
-    paddingHorizontal: 10,
     flex: 1
   },
   searchArea: {
     flexDirection: "row",
     justifyContent: "space-between",
+  },
+  chats: {
+    paddingHorizontal: 20,
   }
 });

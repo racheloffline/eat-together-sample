@@ -103,14 +103,14 @@ export default function ({ route, navigation }) {
 
                         <View style={styles.row}>
                             <Ionicons name="calendar-outline" size={20} />
-                            <NormalText paddingHorizontal={10} color="black">
+                            <NormalText paddingHorizontal={10} color={route.params.hasPassed ? "red" : "black"}>
                                 {invite.startDate ? getDate(invite.startDate.toDate()) : getDate(invite.date.toDate())}
                             </NormalText>
                         </View>
 
                         <View style={styles.row}>
                             <Ionicons name="time-outline" size={20} />
-                            <NormalText paddingHorizontal={10} color="black">
+                            <NormalText paddingHorizontal={10} color={route.params.hasPassed ? "red" : "black"}>
                                 {invite.startDate ? getTime(invite.startDate.toDate()) : getTime(invite.date.toDate())}
                                 {invite.endDate && " - ".concat(getTime(invite.endDate.toDate()))}
                             </NormalText>

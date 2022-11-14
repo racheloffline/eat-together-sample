@@ -1,7 +1,7 @@
 //Meet other people
 
 import React, { useEffect, useState } from "react";
-import { FlatList, View, ActivityIndicator } from "react-native";
+import { FlatList, View, ActivityIndicator, StyleSheet } from "react-native";
 import { Layout } from "react-native-rapi-ui";
 
 import Searchbar from "../../../components/Searchbar";
@@ -246,6 +246,7 @@ export default function ({ navigation }) {
           </View>
           : filteredSearchedPeople.length > 0 ? (
           <FlatList
+            contentContainerStyle={styles.people}
             keyExtractor={(item) => item.id}
             data={filteredSearchedPeople}
             renderItem={({ item }) => (
@@ -266,3 +267,11 @@ export default function ({ navigation }) {
     </Layout>
   );
 }
+
+const styles = StyleSheet.create({
+  people: {
+    alignItems: "center",
+    paddingBottom: 20,
+    paddingHorizontal: 20
+  }
+})
