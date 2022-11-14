@@ -74,7 +74,6 @@ const Auth = () => {
       alert("Your username has already been picked, choose another one :(");
     } else {
       try {
-        console.log(firebase.auth());
         const response = await firebase.auth().createUserWithEmailAndPassword(
           email,
           password

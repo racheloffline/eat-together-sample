@@ -8,10 +8,11 @@ import { Ionicons } from "@expo/vector-icons";
 import Header from "../../components/Header";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
 import MediumText from "../../components/MediumText";
-import EventCard from "../../components/EventCard";
+import Notification from "../../components/Notification";
 
 import { db } from "../../provider/Firebase";
 import firebase from "firebase/compat";
+import { compareDates } from "../../methods";
 
 export default function (props) {
   //Get a list of current invites from Firebase up here
@@ -47,7 +48,7 @@ export default function (props) {
           });
         });
         list = list.sort((a, b) => {
-          return a.date.seconds - b.date.seconds;
+          return compareDates(a, b);
         });
         setInvites(list);
       });
@@ -88,9 +89,9 @@ export default function (props) {
           keyExtractor={(item) => item.id}
           data={invites}
           renderItem={({ item }) => (
-            <EventCard
-              event={item}
-              click={() => {
+            <Notification
+              notif={item}
+              onPress={() => {
                 let inviteToSend = {
                   ...item,
                   id: item.docID,
@@ -98,7 +99,8 @@ export default function (props) {
                 props.navigation.navigate("NotificationFull", {
                   invite: inviteToSend,
                   hasPassed:
-                    item.date.toDate().getTime() < new Date().getTime(),
+                    (item.endDate ? item.endDate.toDate().getTime()
+                    : item.date.toDate().getTime()) < new Date().getTime(),
                 });
               }}
             />

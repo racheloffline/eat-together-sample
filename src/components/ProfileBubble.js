@@ -77,7 +77,14 @@ const styles = StyleSheet.create({
         width: Dimensions.get('screen').width - 40,
         borderRadius: 10,
         marginVertical: 5,
-        backgroundColor: "white"
+        backgroundColor: "white",
+        shadowColor: "#000000",
+        shadowOpacity: 0.25,
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        elevation: 10
     },
 
     row: {
