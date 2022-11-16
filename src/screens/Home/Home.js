@@ -318,8 +318,7 @@ export default function ({ navigation }) {
         </HorizontalRow>
       </View>
 
-      {!loading ? 
-        filteredSearchedEvents.length > 0 ? (
+      {!loading ? filteredSearchedEvents.length > 0 ?
         <FlatList
           contentContainerStyle={styles.cards}
           keyExtractor={(item) => item.id}
@@ -337,15 +336,15 @@ export default function ({ navigation }) {
             />
           )}
         />
-      ) : (
+      :
         <View style={{ flex: 1, justifyContent: "center" }}>
           <MediumText center>Empty 🍽️</MediumText>
-        </View>)
-      : (
+        </View>
+      :
         <View style={{ flex: 1, justifyContent: "center" }}>
           <ActivityIndicator size={100} color="#5DB075" />
         </View>
-      )}
+      }
 
       <RBSheet
           height={300}

@@ -141,7 +141,7 @@ export default function ({ route, navigation }) {
                                     attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)
                                 }).then(() => {
                                     ref.delete().then(r => {
-                                        alert("Invite accepted! It will now appear under Your Events.")
+                                        alert("Invite accepted! Check the homepage for more details.")
                                         navigation.goBack();
                                     })
                                 });
@@ -168,7 +168,7 @@ export default function ({ route, navigation }) {
                                     attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)
                                 }).then(() => {
                                     ref.delete().then(r => {
-                                        alert("Invite declined. It will be removed from your list of invites.");
+                                        alert("Invite declined. It will be removed from your notifications.");
                                         navigation.goBack();
                                     })
                                 })

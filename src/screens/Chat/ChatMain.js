@@ -5,7 +5,6 @@ import ChatRoom from "./ChatRoom";
 import ChatRoomDetails from "./ChatRoomDetails";
 import FullProfile from "../Explore/People/FullProfile";
 
-import Connections from "../Connections/Connections";
 import Requests from "../Connections/Requests";
 import FullCard from "../Explore/FullCard";
 import ReportPerson from "../Explore/People/ReportPerson";
@@ -29,7 +28,6 @@ export default function () {
         {props => <FullProfile {...props} blockBack="Chats" />}
       </Stack.Screen>
 
-      <Stack.Screen name="Connections" component={Connections}/>
       <Stack.Screen name="Requests">
         {props => <Requests {...props} back="Chats"/>}
       </Stack.Screen>

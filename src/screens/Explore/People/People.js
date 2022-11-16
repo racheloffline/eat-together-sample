@@ -43,7 +43,7 @@ export default function ({ navigation }) {
       const ref = db.collection("Users");
       let userData;
 
-      // This is causing the page to crash, needs fix ASAP
+      // Finds mutual friends
       await ref
         .doc(user.uid)
         .get()
@@ -57,8 +57,7 @@ export default function ({ navigation }) {
               .doc(id)
               .get()
               .then((doc) => {
-                if (doc && doc.data().friendIDs) {
-                  // TODO FIX: Not all docs have friendIDs in db
+                if (doc && doc.data().friendIDs) { // Necessary check to prevent crash
                   setMutuals((mutuals) =>
                     mutuals.concat(doc.data().friendIDs)
                   );
@@ -66,7 +65,8 @@ export default function ({ navigation }) {
               });
           });
         });
-
+      
+      // Get all users
       await ref.onSnapshot((query) => {
         let users = [];
         query.forEach((doc) => {
@@ -244,7 +244,7 @@ export default function ({ navigation }) {
             <ActivityIndicator size={100} color="#5DB075" />
             <MediumText>Hang tight ...</MediumText>
           </View>
-          : filteredSearchedPeople.length > 0 ? (
+        : filteredSearchedPeople.length > 0 ? 
           <FlatList
             contentContainerStyle={styles.people}
             keyExtractor={(item) => item.id}
@@ -260,9 +260,11 @@ export default function ({ navigation }) {
               />
             )}
           />
-          ) : (<View style={{ flex: 1, justifyContent: "center" }}>
+        : 
+          <View style={{ flex: 1, justifyContent: "center" }}>
             <MediumText center>Empty 🍽️</MediumText>
-          </View>)}
+          </View>
+        }
       </View>
     </Layout>
   );

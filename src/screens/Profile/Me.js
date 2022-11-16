@@ -186,7 +186,7 @@ export default function ({ navigation }) {
         <TagsList tags={userInfo.tags ? userInfo.tags : []} />
         <MediumText center>{userInfo.bio}</MediumText>
         {events.length > 0 && <View style={styles.eventRecordBackground}>
-          <LargeText color="white">Your Event Records</LargeText>
+          <LargeText color="white">Archives</LargeText>
           <View style={styles.cards}>
             {
               events.map((event) => (

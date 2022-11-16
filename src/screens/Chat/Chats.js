@@ -5,7 +5,7 @@ import {
   View,
   StyleSheet,
   FlatList,
-  TouchableOpacity
+  ActivityIndicator
 } from "react-native";
 import { Button, Layout } from "react-native-rapi-ui";
 
@@ -13,6 +13,7 @@ import Header from "../../components/Header";
 import ChatPreview from "../../components/ChatPreview";
 import SearchableDropdown from "../../components/SearchableDropdown";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
+import MediumText from "../../components/MediumText";
 
 import { db } from "../../provider/Firebase";
 import firebase from "firebase/compat";
@@ -50,9 +51,10 @@ export default function ({ navigation }) {
   const [groups, setGroups] = useState([]);
 
   // Current user
-  const [unread, setUnread] = useState(false); // See if we need to display unread notif icon
   const user = firebase.auth().currentUser;
   const [userInfo, setUserInfo] = useState(null);
+
+  const [loading, setLoading] = useState(true); // Loading state for the page
 
   const isFocused = useIsFocused(); //OMG THIS IS A LIFESAVING HACK
 
@@ -123,7 +125,6 @@ export default function ({ navigation }) {
       const nameCurrent = doc.data().firstName + " " + doc.data().lastName;
       const friends = doc.data().friendIDs;
       const groups = doc.data().groupIDs;
-      setUnread(doc.data().hasNotif);
 
       // update the groups displayed
       let temp = [];
@@ -167,7 +168,7 @@ export default function ({ navigation }) {
           })
           .then(() => {
             lenGroups--;
-            if (lenGroups == 0) {
+            if (lenGroups === 0) {
               // sort display by time
               temp.sort((a, b) => {
                 return b.time - a.time;
@@ -178,6 +179,7 @@ export default function ({ navigation }) {
       });
       // prepare the list of all connections for searchbar
       let list = [];
+      let numFriends = friends.length;
       friends.forEach((uid) => {
         db.collection("Users")
           .doc(uid)
@@ -194,8 +196,17 @@ export default function ({ navigation }) {
           })
           .then(() => {
             setUsers(list);
+            numFriends--;
+
+            if (numFriends === 0) {
+              setLoading(false);
+            }
           });
       });
+
+      if (numFriends === 0) {
+        setLoading(false);
+      }
     });
   }, [isFocused]);
 
@@ -278,31 +289,42 @@ export default function ({ navigation }) {
             }}
           ></Button>
         </View>
-        <FlatList
-          contentContainerStyle={styles.chats}
-          keyExtractor={(item) => item.id}
-          data={groups}
-          renderItem={({ item }) => (
-            <ChatPreview
-              group={item}
-              onPress={() => {
-                navigation.navigate("ChatRoom", {
-                  group: item,
-                });
-              }}
-              click={() => {
-                db.collection("Users")
-                  .doc(item.id)
-                  .get()
-                  .then((doc) => {
-                    navigation.navigate("FullProfile", {
-                      person: doc.data(),
-                    });
+        {loading ? 
+          <View style={styles.noChatsView}>
+            <ActivityIndicator size={100} color="#5DB075" />
+            <MediumText>Hang tight ...</MediumText>
+          </View>
+        : groups.length > 0 ? 
+          <FlatList
+            contentContainerStyle={styles.chats}
+            keyExtractor={(item) => item.id}
+            data={groups}
+            renderItem={({ item }) => (
+              <ChatPreview
+                group={item}
+                onPress={() => {
+                  navigation.navigate("ChatRoom", {
+                    group: item,
                   });
-              }}
-            />
-          )}
-        />
+                }}
+                click={() => {
+                  db.collection("Users")
+                    .doc(item.id)
+                    .get()
+                    .then((doc) => {
+                      navigation.navigate("FullProfile", {
+                        person: doc.data(),
+                      });
+                    });
+                }}
+              />
+            )}
+          />
+        :
+          <View style={styles.noChatsView}>
+            <MediumText center>No chats yet; create one above!</MediumText>
+          </View>
+        }
       </View>
     </Layout>
   );
@@ -321,5 +343,10 @@ const styles = StyleSheet.create({
   },
   chats: {
     paddingHorizontal: 20,
+  },
+  noChatsView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   }
 });

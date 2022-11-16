@@ -56,8 +56,6 @@ const WhileYouEat = ({ route, navigation }) => {
   const [groupChat, setGroupChat] = useState(null); // Info for the group chat
 
   useEffect(() => {
-
-    console.log("IN EFFECT");
     if (route.params.event.hostID === user.uid) {
       getAttendees();
     }
@@ -102,7 +100,6 @@ const WhileYouEat = ({ route, navigation }) => {
 
   // Function to navigate to the chat for this event
   const goToEventChat = () => {
-    console.log("ARE WE EVEN HERE");
     if (route.params.event.chatID) {
       navigation.navigate("ChatRoom", {
         group: groupChat

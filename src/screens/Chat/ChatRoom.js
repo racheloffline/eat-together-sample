@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
-  Image,
   Dimensions,
   TouchableOpacity,
   FlatList,
@@ -11,7 +10,6 @@ import { Ionicons } from "@expo/vector-icons";
 
 import TextMessage from "../../components/TextMessage";
 import MediumText from "../../components/MediumText";
-import KeyboardAvoidingWrapper from "../../components/KeyboardAvoidingWrapper";
 
 import firebase from "firebase/compat";
 import { db, auth } from "../../provider/Firebase";
@@ -84,23 +82,21 @@ export default function ({ route, navigation }) {
         inverted={true}
       />
 
-      <KeyboardAvoidingWrapper>
-          <TextInput
-            placeholder="Send Message"
-            value={message}
-            onChangeText={(val) => setMessage(val)}
-            rightContent={
-              <TouchableOpacity
-                onPress={() => {
-                  onSend();
-                }}
-                disabled={message.length === 0}
-              >
-                <Ionicons name="send" size={20} color={"#D3D3D3"} />
-              </TouchableOpacity>
-            }
-          />
-      </KeyboardAvoidingWrapper>
+      <TextInput
+        placeholder="Send Message"
+        value={message}
+        onChangeText={(val) => setMessage(val)}
+        rightContent={
+          <TouchableOpacity
+            onPress={() => {
+              onSend();
+            }}
+            disabled={message.length === 0}
+          >
+            <Ionicons name="send" size={20} color={"#D3D3D3"} />
+          </TouchableOpacity>
+        }
+      />
     </Layout>
   );
 }
