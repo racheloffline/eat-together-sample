@@ -95,7 +95,7 @@ export default function ({ navigation }) {
             db.collection("Icebreakers").doc("icebreakers").get().then(doc => {
                 while(breakOptions.length < 10) {
                     var num = Math.floor(Math.random()*(doc.data().icebreakers.length-1));
-                    console.log("this is the num" + num);
+                    
                     if(!usedIce.includes(num)) {
                         breakOptions.push(doc.data().icebreakers[num]);
                         usedIce.push(num);
@@ -380,14 +380,14 @@ export default function ({ navigation }) {
                     </TouchableOpacity>}
 
                     {/*Checkbox to determine whether or not this event should be semiprivate*/}
-                    {type === "public" && <View style={styles.multiple}>
+                    {type === "public" && <View style={styles.center}>
                         <Checkbox checked = {semiPrivate} onPress = {() => {
                             setSemiPrivate(!semiPrivate);
                         }}/>
-                        <NormalText>Make this event only visible to my friends</NormalText>
+                        <NormalText>Make this event only visible to friends</NormalText>
                     </View>}
 
-                    <View style={{ display: "flex", justifyContent: "center", alignItems: "center", marginVertical: 10 }}>
+                    <View style={styles.center}>
                         <Link width="35%" onPress={confirmClear}>Clear all details</Link>
                     </View>
 
@@ -515,6 +515,13 @@ const styles = StyleSheet.create({
     },
 
     smallInput: {
-        width: "47%"
+        width: "48%"
+    },
+
+    center: {
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        marginVertical: 10
     }
 });

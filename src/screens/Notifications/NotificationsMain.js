@@ -3,6 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Notifications from "./Notifications";
 import NotificationFull from "./NotificationFull";
 import ReportInvite from "./ReportInvite";
+import Requests from "../Connections/Requests";
 import ChatMain from "../Chat/ChatMain";
 
 const Stack = createStackNavigator();
@@ -21,6 +22,7 @@ export default function ({ route }) {
       </Stack.Screen>
       <Stack.Screen name="NotificationFull" component={NotificationFull} />
       <Stack.Screen name="ReportInvite" component={ReportInvite} />
+      <Stack.Screen name="Requests" component={Requests}/>
       <Stack.Screen name="ChatMain" component={ChatMain} />
     </Stack.Navigator>
   );

@@ -1,7 +1,7 @@
 //View invites to private events
 
 import React, { useEffect, useState } from "react";
-import { FlatList, View, StyleSheet } from "react-native";
+import { FlatList, View, StyleSheet, ActivityIndicator } from "react-native";
 import { Layout, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -17,16 +17,8 @@ import { compareDates } from "../../methods";
 export default function (props) {
   //Get a list of current invites from Firebase up here
   const user = firebase.auth().currentUser;
-  const [invites, setInvites] = useState([]); // initial state, function used for updating initial state
-
-  //Check to see if we should display the "No Invites" placeholder text
-  function shouldDisplayPlaceholder(list) {
-    if (list == null || list.length === 0) {
-      return "No invites as of yet. Explore some public events!";
-    } else {
-      return "";
-    }
-  }
+  const [notifications, setNotifications] = useState([]); // Notifications
+  const [loading, setLoading] = useState(true); // Loading state for the page
 
   useEffect(() => {
     async function fetchData() {
@@ -50,10 +42,13 @@ export default function (props) {
         list = list.sort((a, b) => {
           return compareDates(a, b);
         });
-        setInvites(list);
+        setNotifications(list);
       });
     }
-    fetchData();
+
+    fetchData().then(() => {
+      setLoading(false);
+    });
   }, []);
 
   return (
@@ -78,16 +73,17 @@ export default function (props) {
         press={(val) => props.navigation.navigate("ChatMain")}
       />}
 
-      <View style={{ paddingTop: 30 }}>
+      
+      {loading ?
         <View style={styles.noInvitesView}>
-          <MediumText center={"center"}>
-            {shouldDisplayPlaceholder(invites)}
-          </MediumText>
+          <ActivityIndicator size={100} color="#5DB075" />
+          <MediumText>Hang tight ...</MediumText>
         </View>
+      : notifications.length > 0 ? 
         <FlatList
           contentContainerStyle={styles.cards}
           keyExtractor={(item) => item.id}
-          data={invites}
+          data={notifications}
           renderItem={({ item }) => (
             <Notification
               notif={item}
@@ -106,14 +102,21 @@ export default function (props) {
             />
           )}
         />
-      </View>
+      : 
+        <View style={styles.noInvitesView}>
+          <MediumText center>No new notifications!</MediumText>
+        </View>
+      }
     </Layout>
   );
 }
 
 const styles = StyleSheet.create({
   noInvitesView: {
-    marginVertical: -20,
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center"
   },
   listView: {
     marginLeft: -15,

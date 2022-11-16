@@ -5,7 +5,7 @@ import { KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from 'react-
 
 const KeyboardAvoidingWrapper = props => {
     return (
-        <KeyboardAvoidingView behavior="position" keyboardVerticalOffset= {0}>
+        <KeyboardAvoidingView behavior="position">
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
                 {props.children}
             </TouchableWithoutFeedback>
