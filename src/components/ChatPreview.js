@@ -20,18 +20,23 @@ const ChatPreview = (props) => {
         });
     }
   }, []);
+
   let time = moment.unix(props.group.time).fromNow(true);
 
   return (
     <TouchableOpacity style={styles.outline} onPress={props.onPress}>
       <View style={styles.head}>
+        {props.group.unread && <View style={styles.unread}/>}
+
         <View style={styles.headleft}>
           <Image style={styles.image} source={{ uri: image }} />
           <View style={styles.textContainer}>
             <MediumText>{props.group.name}</MediumText>
-            {props.group.message !== "" && <SmallText>{props.group.message}</SmallText>}
+            {props.group.message !== "" &&
+              <SmallText weight={props.group.unread ? "bold" : "normal"}>{props.group.message}</SmallText>}
           </View>
         </View>
+
         {props.group.time !== "" && <SmallText>{time}</SmallText>}
       </View>
     </TouchableOpacity>
@@ -43,6 +48,7 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: "center"
   },
+  
   head: {
     width: Dimensions.get('window').width * 0.95,
     height: 80,
@@ -51,17 +57,21 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 20
+    paddingLeft: 20,
+    paddingRight: 30
   },
+
   headleft: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
+
   textContainer: {
     flexDirection: "column",
     maxWidth: 200,
   },
+
   image: {
     width: 60,
     height: 60,
@@ -70,9 +80,20 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     marginRight: 20,
   },
+
   name: {
     marginRight: 20,
   },
+
+  unread: {
+    width: 10,
+    height: 10,
+    borderRadius: 10,
+    backgroundColor: "#5DB075",
+    position: "absolute",
+    top: 35,
+    right: 10
+  }
 });
 
 export default ChatPreview;

@@ -399,7 +399,7 @@ export default function({ navigation }) {
           {loading ?
             <View style={{ flex: 1, justifyContent: "center" }}>
               <ActivityIndicator size={100} color="#5DB075"/>
-              <MediumText>Hang tight ...</MediumText>
+              <MediumText center>Hang tight ...</MediumText>
             </View>
           : filteredSearchedEvents.length > 0 ? 
             <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}

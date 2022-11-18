@@ -15,8 +15,10 @@ import firebase from "firebase/compat";
 import { compareDates } from "../../methods";
 
 export default function (props) {
-  //Get a list of current invites from Firebase up here
+  // Current user stuff
   const user = firebase.auth().currentUser;
+  const [unread, setUnread] = useState(false);
+
   const [notifications, setNotifications] = useState([]); // Notifications
   const [loading, setLoading] = useState(true); // Loading state for the page
 
@@ -24,6 +26,10 @@ export default function (props) {
     async function fetchData() {
       await db.collection("Users").doc(user.uid).update({
         hasNotif: false,
+      });
+
+      await db.collection("Users").doc(user.uid).onSnapshot(doc => {
+        setUnread(doc.data().hasUnreadMessages)
       });
 
       let ref = db
@@ -71,8 +77,8 @@ export default function (props) {
         right="Messages"
         current="left"
         press={(val) => props.navigation.navigate("ChatMain")}
+        pingRight={unread}
       />}
-
       
       {loading ?
         <View style={styles.noInvitesView}>
@@ -118,9 +124,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center"
   },
+
   listView: {
     marginLeft: -15,
   },
+
   listMainText: {
     padding: 12,
     marginLeft: -12,
@@ -128,16 +136,19 @@ const styles = StyleSheet.create({
     textAlign: "left",
     fontSize: 24,
   },
+
   listSubText: {
     marginLeft: 20,
     display: "flex",
     textAlign: "left",
     fontSize: 18,
   },
+
   buttons: {
     justifyContent: "center",
     flexDirection: "row",
   },
+  
   cards: {
     alignItems: "center",
     paddingTop: 20,
