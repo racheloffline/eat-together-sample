@@ -21,34 +21,48 @@ export default function (props) {
   const [loading, setLoading] = useState(true); // Loading state for the page
 
   useEffect(() => {
+    // async function fetchData() {
+    //   await db.collection("Users").doc(user.uid).update({
+    //     hasNotif: false,
+    //   });
+    //
+    //   let ref = db
+    //     .collection("User Invites")
+    //     .doc(user.uid)
+    //     .collection("Invites");
+    //   ref.onSnapshot((query) => {
+    //     let list = [];
+    //     query.forEach((doc) => {
+    //       let data = doc.data();
+    //       list.push({
+    //         ...data,
+    //         docID: doc.id,
+    //       });
+    //     });
+    //     list = list.sort((a, b) => {
+    //       return compareDates(a, b);
+    //     });
+    //     setNotifications(list);
+    //   });
+    // }
+    //
     async function fetchData() {
+      //Show that the user has no unreads
       await db.collection("Users").doc(user.uid).update({
-        hasNotif: false,
-      });
+        hasNotif: false
+      })
 
-      let ref = db
-        .collection("User Invites")
-        .doc(user.uid)
-        .collection("Invites");
-      ref.onSnapshot((query) => {
-        let list = [];
-        query.forEach((doc) => {
-          let data = doc.data();
-          list.push({
-            ...data,
-            docID: doc.id,
-          });
-        });
-        list = list.sort((a, b) => {
-          return compareDates(a, b);
-        });
-        setNotifications(list);
-      });
+      //Get the list of notifications from the backend
+      db.collection("Users").doc(user.uid).get().then((snap) => {
+        let data = snap.data();
+        setNotifications(data.notifications.reverse());
+      })
     }
 
     fetchData().then(() => {
       setLoading(false);
     });
+
   }, []);
 
   return (
@@ -87,17 +101,40 @@ export default function (props) {
           renderItem={({ item }) => (
             <Notification
               notif={item}
+              showButton={!(item.type) ? false : true}
               onPress={() => {
-                let inviteToSend = {
-                  ...item,
-                  id: item.docID,
-                };
-                props.navigation.navigate("NotificationFull", {
-                  invite: inviteToSend,
-                  hasPassed:
-                    (item.endDate ? item.endDate.toDate().getTime()
-                    : item.date.toDate().getTime()) < new Date().getTime(),
-                });
+                switch (item.type) {
+                  case "invite":
+                    db.collection("User Invites").doc(user.uid).collection("Invites").doc(item.id).get().then((ss) => {
+                      let inviteToSend = {
+                        ...ss.data(),
+                        id: ss.id,
+                      };
+                      props.navigation.navigate("NotificationFull", {
+                        invite: inviteToSend,
+                        hasPassed:
+                            (ss.data().endDate ? ss.data().endDate.toDate().getTime()
+                                : ss.data().date.toDate().getTime()) < new Date().getTime(),
+                      });
+                    });
+                    break;
+                  case "private event":
+                    db.collection("Private Events").doc(item.id).get().then((ss) => {
+                      props.navigation.navigate("FullCard", {
+                        event: ss.data()
+                      });
+                    });
+                    break;
+                  case "public event":
+                    db.collection("Public Events").doc(item.id).get().then((ss) => {
+                      props.navigation.navigate("FullCard", {
+                        event: ss.data()
+                      });
+                    });
+                    break;
+                  case "user profile": //I'll do this this weekend
+                    break;
+                }
               }}
             />
           )}
