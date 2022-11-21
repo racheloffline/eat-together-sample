@@ -54,7 +54,7 @@ const Availabilities = props => {
         <View style={styles.buttons}>
           <Button onPress={() => props.navigation.goBack()}
             marginHorizontal={10}>Back</Button>
-          <Button onPress={() => props.navigation.navigate("Password")}
+          <Button onPress={() => props.navigation.navigate("Email")}
             marginHorizontal={10}>Next</Button>
         </View>
     </ScrollView>
@@ -64,7 +64,7 @@ const Availabilities = props => {
 const styles = StyleSheet.create({
   page: {
     paddingHorizontal: 20,
-    paddingVertical: 30
+    paddingTop: 10
   },
 
   dates: {

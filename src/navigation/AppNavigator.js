@@ -94,15 +94,16 @@ const MainTabs = () => {
   const profileImageUri = useContext(AuthContext).profileImageUri;
   return (
     <Tabs.Navigator
-      tabBarOptions={{
-        style: {
-          backgroundColor: "#ffffff",
-        },
-        showLabel: false,
-      }}
       screenOptions={{
         headerShown: false,
         animationEnabled: false,
+        tabBarShowLabel: false,
+        tabBarStyle: [
+          {
+            backgroundColor: "#ffffff",
+          },
+          null
+        ]
       }}
     >
       <Tabs.Screen
@@ -159,9 +160,6 @@ const MainTabs = () => {
       <Tabs.Screen
         name="Profile"
         component={ProfileMain}
-        tabBarOptions={{
-          showLabel: false,
-        }}
         options={{
           tabBarIcon: () => <ProfilePic size={38} uri={profileImageUri} />,
         }}

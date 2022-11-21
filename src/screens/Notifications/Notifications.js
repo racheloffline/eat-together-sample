@@ -1,36 +1,35 @@
 //View invites to private events
 
 import React, { useEffect, useState } from "react";
-import { FlatList, View, StyleSheet } from "react-native";
+import { FlatList, View, StyleSheet, ActivityIndicator } from "react-native";
 import { Layout, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 
 import Header from "../../components/Header";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
 import MediumText from "../../components/MediumText";
-import EventCard from "../../components/EventCard";
+import Notification from "../../components/Notification";
 
 import { db } from "../../provider/Firebase";
 import firebase from "firebase/compat";
+import { compareDates } from "../../methods";
 
 export default function (props) {
-  //Get a list of current invites from Firebase up here
+  // Current user stuff
   const user = firebase.auth().currentUser;
-  const [invites, setInvites] = useState([]); // initial state, function used for updating initial state
+  const [unread, setUnread] = useState(false);
 
-  //Check to see if we should display the "No Invites" placeholder text
-  function shouldDisplayPlaceholder(list) {
-    if (list == null || list.length === 0) {
-      return "No invites as of yet. Explore some public events!";
-    } else {
-      return "";
-    }
-  }
+  const [notifications, setNotifications] = useState([]); // Notifications
+  const [loading, setLoading] = useState(true); // Loading state for the page
 
   useEffect(() => {
     async function fetchData() {
       await db.collection("Users").doc(user.uid).update({
         hasNotif: false,
+      });
+
+      await db.collection("Users").doc(user.uid).onSnapshot(doc => {
+        setUnread(doc.data().hasUnreadMessages)
       });
 
       let ref = db
@@ -47,12 +46,15 @@ export default function (props) {
           });
         });
         list = list.sort((a, b) => {
-          return a.date.seconds - b.date.seconds;
+          return compareDates(a, b);
         });
-        setInvites(list);
+        setNotifications(list);
       });
     }
-    fetchData();
+
+    fetchData().then(() => {
+      setLoading(false);
+    });
   }, []);
 
   return (
@@ -75,22 +77,23 @@ export default function (props) {
         right="Messages"
         current="left"
         press={(val) => props.navigation.navigate("ChatMain")}
+        pingRight={unread}
       />}
-
-      <View style={{ paddingTop: 30 }}>
+      
+      {loading ?
         <View style={styles.noInvitesView}>
-          <MediumText center={"center"}>
-            {shouldDisplayPlaceholder(invites)}
-          </MediumText>
+          <ActivityIndicator size={100} color="#5DB075" />
+          <MediumText>Hang tight ...</MediumText>
         </View>
+      : notifications.length > 0 ? 
         <FlatList
           contentContainerStyle={styles.cards}
           keyExtractor={(item) => item.id}
-          data={invites}
+          data={notifications}
           renderItem={({ item }) => (
-            <EventCard
-              event={item}
-              click={() => {
+            <Notification
+              notif={item}
+              onPress={() => {
                 let inviteToSend = {
                   ...item,
                   id: item.docID,
@@ -98,24 +101,34 @@ export default function (props) {
                 props.navigation.navigate("NotificationFull", {
                   invite: inviteToSend,
                   hasPassed:
-                    item.date.toDate().getTime() < new Date().getTime(),
+                    (item.endDate ? item.endDate.toDate().getTime()
+                    : item.date.toDate().getTime()) < new Date().getTime(),
                 });
               }}
             />
           )}
         />
-      </View>
+      : 
+        <View style={styles.noInvitesView}>
+          <MediumText center>No new notifications!</MediumText>
+        </View>
+      }
     </Layout>
   );
 }
 
 const styles = StyleSheet.create({
   noInvitesView: {
-    marginVertical: -20,
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center"
   },
+
   listView: {
     marginLeft: -15,
   },
+
   listMainText: {
     padding: 12,
     marginLeft: -12,
@@ -123,16 +136,19 @@ const styles = StyleSheet.create({
     textAlign: "left",
     fontSize: 24,
   },
+
   listSubText: {
     marginLeft: 20,
     display: "flex",
     textAlign: "left",
     fontSize: 18,
   },
+
   buttons: {
     justifyContent: "center",
     flexDirection: "row",
   },
+  
   cards: {
     alignItems: "center",
     paddingTop: 20,

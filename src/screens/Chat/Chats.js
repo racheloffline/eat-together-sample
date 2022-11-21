@@ -5,7 +5,7 @@ import {
   View,
   StyleSheet,
   FlatList,
-  TouchableOpacity
+  ActivityIndicator
 } from "react-native";
 import { Button, Layout } from "react-native-rapi-ui";
 
@@ -13,6 +13,7 @@ import Header from "../../components/Header";
 import ChatPreview from "../../components/ChatPreview";
 import SearchableDropdown from "../../components/SearchableDropdown";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
+import MediumText from "../../components/MediumText";
 
 import { db } from "../../provider/Firebase";
 import firebase from "firebase/compat";
@@ -50,9 +51,10 @@ export default function ({ navigation }) {
   const [groups, setGroups] = useState([]);
 
   // Current user
-  const [unread, setUnread] = useState(false); // See if we need to display unread notif icon
   const user = firebase.auth().currentUser;
   const [userInfo, setUserInfo] = useState(null);
+
+  const [loading, setLoading] = useState(true); // Loading state for the page
 
   const isFocused = useIsFocused(); //OMG THIS IS A LIFESAVING HACK
 
@@ -117,13 +119,16 @@ export default function ({ navigation }) {
 
   // Get your taste buds as search suggestions
   useEffect(() => {
+    db.collection("Users").doc(user.uid).update({
+      hasUnreadMessages: false
+    });
+
     db.collection("Users").doc(user.uid).onSnapshot((doc) => {
       setUserInfo(doc.data());
 
       const nameCurrent = doc.data().firstName + " " + doc.data().lastName;
       const friends = doc.data().friendIDs;
       const groups = doc.data().groupIDs;
-      setUnread(doc.data().hasNotif);
 
       // update the groups displayed
       let temp = [];
@@ -137,10 +142,18 @@ export default function ({ navigation }) {
             // now store all the chat rooms
             let data = doc.data();
             // store most recent message in variable
-            let message =
-              data.messages.length != 0
-                ? data.messages[data.messages.length - 1].message
-                : "";
+
+            let message = "";
+            let unread = false;
+
+            if (data.messages.length > 0) {
+              const lastMessage = data.messages[data.messages.length - 1];
+              message = lastMessage.message;
+              if (lastMessage.unread && lastMessage.sentBy !== user.uid) {
+                unread = lastMessage.unread.filter(u => u.uid === user.uid)[0].unread;
+              }
+            }
+
             let time =
               data.messages.length != 0
                 ? data.messages[data.messages.length - 1].sentAt
@@ -148,7 +161,7 @@ export default function ({ navigation }) {
 
             // Get rid of your own name and all the ways it can be formatted in group title (if it is a DM)
             let name = data.name;
-            if(data.uids.length >= 2) {
+            if (data.uids.length >= 2) {
               name = name.replace(nameCurrent + ", ", "");
               if (name.endsWith(", " + nameCurrent)) {
                 name = name.slice(0, -1 * (nameCurrent.length + 2));
@@ -161,13 +174,14 @@ export default function ({ navigation }) {
               uids: data.uids,
               hasImage: data.hasImage,
               message: message,
+              unread: unread,
               time: time,
               pictureID: data.id,
             });
           })
           .then(() => {
             lenGroups--;
-            if (lenGroups == 0) {
+            if (lenGroups === 0) {
               // sort display by time
               temp.sort((a, b) => {
                 return b.time - a.time;
@@ -178,6 +192,7 @@ export default function ({ navigation }) {
       });
       // prepare the list of all connections for searchbar
       let list = [];
+      let numFriends = friends.length;
       friends.forEach((uid) => {
         db.collection("Users")
           .doc(uid)
@@ -194,8 +209,17 @@ export default function ({ navigation }) {
           })
           .then(() => {
             setUsers(list);
+            numFriends--;
+
+            if (numFriends === 0) {
+              setLoading(false);
+            }
           });
       });
+
+      if (numFriends === 0) {
+        setLoading(false);
+      }
     });
   }, [isFocused]);
 
@@ -278,19 +302,24 @@ export default function ({ navigation }) {
             }}
           ></Button>
         </View>
-        <FlatList
-          keyExtractor={(item) => item.id}
-          data={groups}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate("ChatRoom", {
-                  group: item,
-                });
-              }}
-            >
+        {loading ? 
+          <View style={styles.noChatsView}>
+            <ActivityIndicator size={100} color="#5DB075" />
+            <MediumText>Hang tight ...</MediumText>
+          </View>
+        : groups.length > 0 ? 
+          <FlatList
+            contentContainerStyle={styles.chats}
+            keyExtractor={(item) => item.id}
+            data={groups}
+            renderItem={({ item }) => (
               <ChatPreview
                 group={item}
+                onPress={() => {
+                  navigation.navigate("ChatRoom", {
+                    group: item,
+                  });
+                }}
                 click={() => {
                   db.collection("Users")
                     .doc(item.id)
@@ -302,9 +331,13 @@ export default function ({ navigation }) {
                     });
                 }}
               />
-            </TouchableOpacity>
-          )}
-        />
+            )}
+          />
+        :
+          <View style={styles.noChatsView}>
+            <MediumText center>No chats yet; create one above!</MediumText>
+          </View>
+        }
       </View>
     </Layout>
   );
@@ -315,11 +348,18 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   content: {
-    paddingHorizontal: 10,
     flex: 1
   },
   searchArea: {
     flexDirection: "row",
     justifyContent: "space-between",
+  },
+  chats: {
+    paddingHorizontal: 20,
+  },
+  noChatsView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   }
 });

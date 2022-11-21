@@ -103,14 +103,14 @@ export default function ({ route, navigation }) {
 
                         <View style={styles.row}>
                             <Ionicons name="calendar-outline" size={20} />
-                            <NormalText paddingHorizontal={10} color="black">
+                            <NormalText paddingHorizontal={10} color={route.params.hasPassed ? "red" : "black"}>
                                 {invite.startDate ? getDate(invite.startDate.toDate()) : getDate(invite.date.toDate())}
                             </NormalText>
                         </View>
 
                         <View style={styles.row}>
                             <Ionicons name="time-outline" size={20} />
-                            <NormalText paddingHorizontal={10} color="black">
+                            <NormalText paddingHorizontal={10} color={route.params.hasPassed ? "red" : "black"}>
                                 {invite.startDate ? getTime(invite.startDate.toDate()) : getTime(invite.date.toDate())}
                                 {invite.endDate && " - ".concat(getTime(invite.endDate.toDate()))}
                             </NormalText>
@@ -141,7 +141,7 @@ export default function ({ route, navigation }) {
                                     attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)
                                 }).then(() => {
                                     ref.delete().then(r => {
-                                        alert("Invite accepted! It will now appear under Your Events.")
+                                        alert("Invite accepted! Check the homepage for more details.")
                                         navigation.goBack();
                                     })
                                 });
@@ -168,7 +168,7 @@ export default function ({ route, navigation }) {
                                     attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)
                                 }).then(() => {
                                     ref.delete().then(r => {
-                                        alert("Invite declined. It will be removed from your list of invites.");
+                                        alert("Invite declined. It will be removed from your notifications.");
                                         navigation.goBack();
                                     })
                                 })

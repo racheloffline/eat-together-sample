@@ -59,10 +59,11 @@ export default function({ navigation }) {
             await ref.onSnapshot((query) => {
                 let newEvents = [];
                 query.forEach((doc) => {
-                    if(doc.data().visibleTo != null) {
-                        if(!doc.data().visibleTo.includes(user.uid) && !(doc.data().hostID === user.uid)) return;
+                    if (doc.data().visibleTo != null) { // For events that are visible to friends only
+                        if (!doc.data().visibleTo.includes(user.uid) && !(doc.data().hostID === user.uid)) return;
                     }
-                    if (doc.data().startDate) {
+
+                    if (doc.data().startDate) { // Same logic as else statement, but for different data structure
                       if (doc.data().startDate.toDate() > new Date() && 
                         !userData.blockedIDs.includes(doc.data().hostID)) {
                           newEvents.push(doc.data());
@@ -92,6 +93,7 @@ export default function({ navigation }) {
     // For filters
     useEffect(() => {
       async function filter() {
+        setLoading(true);
         let newEvents = [...events];
 
         if (similarInterests) {
@@ -132,8 +134,9 @@ export default function({ navigation }) {
         setFilteredSearchedEvents(newSearchedEvents);
       }
 
-      setLoading(true);
-      filter().then(() => setLoading(false));
+      if (events.length > 0) {
+        filter().then(() => setLoading(false));
+      }
     }, [
       similarInterests,
       popularity,
@@ -396,9 +399,9 @@ export default function({ navigation }) {
           {loading ?
             <View style={{ flex: 1, justifyContent: "center" }}>
               <ActivityIndicator size={100} color="#5DB075"/>
-              <MediumText>Hang tight ...</MediumText>
+              <MediumText center>Hang tight ...</MediumText>
             </View>
-            : filteredSearchedEvents.length > 0 ? (
+          : filteredSearchedEvents.length > 0 ? 
             <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
               data={filteredSearchedEvents} renderItem={({item}) =>
                 <EventCard event={item} click={() => {
@@ -408,10 +411,11 @@ export default function({ navigation }) {
                   });
                 }}/>
             }/>
-            ) : (
-              <View style={{ flex: 1, justifyContent: "center" }}>
-                <MediumText center>Empty 🍽️</MediumText>
-              </View>)}
+          :
+            <View style={{ flex: 1, justifyContent: "center" }}>
+              <MediumText center>Empty 🍽️</MediumText>
+            </View>
+          }
         </View>
       </Layout>
     );

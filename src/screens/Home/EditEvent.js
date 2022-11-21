@@ -217,6 +217,7 @@ export default function ({ route, navigation }) {
                             setMode("time");
                         }} style={styles.smallInput}>
                             <View pointerEvents="none">
+                                <NormalText center>Start time</NormalText>
                                 <TextInput
                                     value={getTime(startDate)}
                                     leftContent={
@@ -232,6 +233,7 @@ export default function ({ route, navigation }) {
                             setMode("time");
                         }} style={styles.smallInput}>
                             <View pointerEvents="none">
+                                <NormalText center>End time</NormalText>
                                 <TextInput
                                     value={getTime(endDate)}
                                     leftContent={

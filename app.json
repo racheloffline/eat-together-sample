@@ -2,9 +2,9 @@
   "expo": {
     "name": "Eat Together!",
     "owner": "eat-together-team",
-    "slug": "eat-together-softlaunch",
+    "slug": "eat-together",
     "description": "Connecting students through shared meals.",
-    "version": "0.7.0",
+    "version": "0.8.0",
     "orientation": "portrait",
     "icon": "./assets/big_logo.png",
     "splash": {
@@ -15,12 +15,10 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.eattogether.eattogethersoftlaunch"
+      "bundleIdentifier": "com.eat.together"
     },
     "web": {
       "favicon": "./assets/big_logo.png"
@@ -35,10 +33,9 @@
       ]
     ],
     "android": {
-      "permissions": [
-        "android.permission.RECORD_AUDIO"
-      ],
-      "package": "com.eattogether.eattogethersoftlaunch"
+      "permissions": ["android.permission.RECORD_AUDIO"],
+      "package": "com.eat.together",
+      "versionCode": 4
     }
   }
 }
