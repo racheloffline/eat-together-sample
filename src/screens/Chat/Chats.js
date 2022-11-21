@@ -283,7 +283,7 @@ export default function ({ navigation }) {
             chip={false}
             resetValue={true}
             textInputProps={{
-              placeholder: "Search for taste buds",
+              placeholder: "Search for connections",
             }}
           />
           <Button
