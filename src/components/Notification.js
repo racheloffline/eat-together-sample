@@ -11,12 +11,25 @@ import CustomButton from "./CustomButton";
 import NormalText from "./NormalText";
 import SmallText from "./SmallText";
 import MediumText from "./MediumText";
+import {db} from "../provider/Firebase";
 
+function whichIcon(type) {
+    switch (type) {
+        case "invite":
+        default:
+            return "mail-outline";
+        case "private event":
+        case "public event":
+            return "fast-food-outline";
+        case "user profile":
+            return "person-add-outline";
+    }
+}
 const Notification = (props) => {
     return (
         <View style={styles.outline}>
             <View style={styles.head}>
-                <Ionicons name="mail-outline" size={50} style={styles.icon} color="black" />
+                <Ionicons name={whichIcon(props.notif.type)} size={50} style={styles.icon} color="black" />
                 
                 <View style={styles.textContainer}>
                     <MediumText size={14}>{props.notif.title}</MediumText>

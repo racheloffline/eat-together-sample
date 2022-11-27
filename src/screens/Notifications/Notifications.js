@@ -132,7 +132,17 @@ export default function (props) {
                       });
                     });
                     break;
-                  case "user profile": //I'll do this this weekend
+                  case "user profile":
+                    db.collection("Usernames").doc(item.id).get().then((ss) => {
+                      db.collection("Users").doc(ss.data().id).get().then((ss2) => {
+                        props.navigation.navigate("FullProfile", {
+                          person: ss2.data()
+                        })
+                      })
+                    })
+                    break;
+                  default:
+                    alert("Sorry, an error has occurred.");
                     break;
                 }
               }}

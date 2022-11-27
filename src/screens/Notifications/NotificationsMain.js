@@ -6,6 +6,7 @@ import ReportInvite from "./ReportInvite";
 import Requests from "../Connections/Requests";
 import ChatMain from "../Chat/ChatMain";
 import FullCard from "../Profile/FullCard";
+import FullProfile from "../Explore/People/FullProfile";
 
 const Stack = createStackNavigator();
 
@@ -22,9 +23,10 @@ export default function ({ route }) {
         {props => <Notifications {...props} fromNav={route.params ? route.params.fromNav : true}/>}
       </Stack.Screen>
       <Stack.Screen name="NotificationFull" component={NotificationFull} />
-      <Stack.Screen name="FullCard" component={FullCard}/>
+      <Stack.Screen name="FullCard" component={FullCard} />
+      <Stack.Screen name="FullProfile" component={FullProfile} />
       <Stack.Screen name="ReportInvite" component={ReportInvite} />
-      <Stack.Screen name="Requests" component={Requests}/>
+      <Stack.Screen name="Requests" component={Requests} />
       <Stack.Screen name="ChatMain" component={ChatMain} />
     </Stack.Navigator>
   );
