@@ -30,6 +30,7 @@ const HorizontalSwitch = props => {
             </TouchableOpacity>
             <TouchableOpacity style={style_right} onPress={action_right}>
                 <MediumText center color={right_color} size={14}>{props.right}</MediumText>
+                {props.pingRight && <View style={styles.unread}/>}
             </TouchableOpacity>
         </View>
     );
@@ -66,6 +67,16 @@ const styles = StyleSheet.create({
     buttonText: {
         textAlign: "center",
         color: "white"
+    },
+
+    unread: {
+        width: 10,
+        height: 10,
+        borderRadius: 10,
+        backgroundColor: "#5DB075",
+        position: "absolute",
+        top: 5,
+        right: 5
     }
 });
 

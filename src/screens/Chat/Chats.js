@@ -119,6 +119,10 @@ export default function ({ navigation }) {
 
   // Get your taste buds as search suggestions
   useEffect(() => {
+    db.collection("Users").doc(user.uid).update({
+      hasUnreadMessages: false
+    });
+
     db.collection("Users").doc(user.uid).onSnapshot((doc) => {
       setUserInfo(doc.data());
 
@@ -138,10 +142,18 @@ export default function ({ navigation }) {
             // now store all the chat rooms
             let data = doc.data();
             // store most recent message in variable
-            let message =
-              data.messages.length != 0
-                ? data.messages[data.messages.length - 1].message
-                : "";
+
+            let message = "";
+            let unread = false;
+
+            if (data.messages.length > 0) {
+              const lastMessage = data.messages[data.messages.length - 1];
+              message = lastMessage.message;
+              if (lastMessage.unread && lastMessage.sentBy !== user.uid) {
+                unread = lastMessage.unread.filter(u => u.uid === user.uid)[0].unread;
+              }
+            }
+
             let time =
               data.messages.length != 0
                 ? data.messages[data.messages.length - 1].sentAt
@@ -149,7 +161,7 @@ export default function ({ navigation }) {
 
             // Get rid of your own name and all the ways it can be formatted in group title (if it is a DM)
             let name = data.name;
-            if(data.uids.length >= 2) {
+            if (data.uids.length >= 2) {
               name = name.replace(nameCurrent + ", ", "");
               if (name.endsWith(", " + nameCurrent)) {
                 name = name.slice(0, -1 * (nameCurrent.length + 2));
@@ -162,6 +174,7 @@ export default function ({ navigation }) {
               uids: data.uids,
               hasImage: data.hasImage,
               message: message,
+              unread: unread,
               time: time,
               pictureID: data.id,
             });
@@ -270,7 +283,7 @@ export default function ({ navigation }) {
             chip={false}
             resetValue={true}
             textInputProps={{
-              placeholder: "Search for taste buds",
+              placeholder: "Search for connections",
             }}
           />
           <Button

@@ -164,7 +164,7 @@ const FullProfile = ({ blockBack, route, navigation }) => {
 
           if (thisData.friendIDs.includes(data.id)) {
             setDisabled(true);
-            setStatus("Taste Buds");
+            setStatus("Connections");
             setColor("gold");
           } else {
             // STEP 2: Check if you have already requested to connect with user.
@@ -193,7 +193,7 @@ const FullProfile = ({ blockBack, route, navigation }) => {
                   } else {
                     // STEP 4: Set to default
                     setDisabled(false);
-                    setStatus("Add Taste Bud");
+                    setStatus("Add Connection");
                     setColor("#5DB075");
                   }
                 });
@@ -267,7 +267,7 @@ const FullProfile = ({ blockBack, route, navigation }) => {
                 />
               </MenuTrigger>
               <MenuOptions>
-                { status == "Taste Buds" &&
+                { status == "Connections" &&
                     <MenuOption onSelect={() => removeFriend(route.params.person.id, navigation)}>
                       <NormalText size={18}>
                         Remove Friend

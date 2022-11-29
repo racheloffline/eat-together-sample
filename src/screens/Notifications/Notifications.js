@@ -15,54 +15,30 @@ import firebase from "firebase/compat";
 import { compareDates } from "../../methods";
 
 export default function (props) {
-  //Get a list of current invites from Firebase up here
+  // Current user stuff
   const user = firebase.auth().currentUser;
+  const [unread, setUnread] = useState(false);
+
   const [notifications, setNotifications] = useState([]); // Notifications
   const [loading, setLoading] = useState(true); // Loading state for the page
 
   useEffect(() => {
-    // async function fetchData() {
-    //   await db.collection("Users").doc(user.uid).update({
-    //     hasNotif: false,
-    //   });
-    //
-    //   let ref = db
-    //     .collection("User Invites")
-    //     .doc(user.uid)
-    //     .collection("Invites");
-    //   ref.onSnapshot((query) => {
-    //     let list = [];
-    //     query.forEach((doc) => {
-    //       let data = doc.data();
-    //       list.push({
-    //         ...data,
-    //         docID: doc.id,
-    //       });
-    //     });
-    //     list = list.sort((a, b) => {
-    //       return compareDates(a, b);
-    //     });
-    //     setNotifications(list);
-    //   });
-    // }
-    //
     async function fetchData() {
-      //Show that the user has no unreads
+      // Show that the user has no unreads
       await db.collection("Users").doc(user.uid).update({
         hasNotif: false
-      })
+      });
 
-      //Get the list of notifications from the backend
+      // Get the list of notifications from the backend
       db.collection("Users").doc(user.uid).get().then((snap) => {
         let data = snap.data();
         setNotifications(data.notifications.reverse());
-      })
+      });
     }
 
     fetchData().then(() => {
       setLoading(false);
     });
-
   }, []);
 
   return (
@@ -85,8 +61,8 @@ export default function (props) {
         right="Messages"
         current="left"
         press={(val) => props.navigation.navigate("ChatMain")}
+        pingRight={unread}
       />}
-
       
       {loading ?
         <View style={styles.noInvitesView}>
@@ -165,9 +141,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center"
   },
+
   listView: {
     marginLeft: -15,
   },
+
   listMainText: {
     padding: 12,
     marginLeft: -12,
@@ -175,16 +153,19 @@ const styles = StyleSheet.create({
     textAlign: "left",
     fontSize: 24,
   },
+
   listSubText: {
     marginLeft: 20,
     display: "flex",
     textAlign: "left",
     fontSize: 18,
   },
+
   buttons: {
     justifyContent: "center",
     flexDirection: "row",
   },
+  
   cards: {
     alignItems: "center",
     paddingTop: 20,

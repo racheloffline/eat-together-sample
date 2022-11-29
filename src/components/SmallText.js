@@ -9,6 +9,7 @@ const SmallText = props => {
         return (
             <Text style={{
                 fontSize: props.size ? props.size : 10,
+                fontWeight: props.weight ? props.weight : "normal",
                 fontFamily: Platform.os === 'ios' ? 'AppleSDGothicNeo-Light' : 'sans-serif-light',
                 color: props.color ? props.color : "black",
                 textAlign: props.center ? "center" : "auto",
@@ -22,6 +23,7 @@ const SmallText = props => {
     return (
         <Text style={{
             fontSize: props.size ? props.size : 10,
+            fontWeight: props.weight ? props.weight : "normal",
             fontFamily: 'Inter_200ExtraLight',
             color: props.color ? props.color : "black",
             textAlign: props.center ? "center" : "auto",
