@@ -1,15 +1,15 @@
 import React from 'react';
-import { View, StyleSheet, Image} from 'react-native';
-import {CheckBox} from 'react-native-rapi-ui';
-import LargeText from "./LargeText";
-import MediumText from "./MediumText";
+import { View, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import {Ionicons} from "@expo/vector-icons";
-import {TouchableOpacity} from "react-native";
+
+import MediumText from "./MediumText";
+
 import firebase from "firebase/compat";
-import {db} from "../provider/Firebase";
+import { auth, db } from "../provider/Firebase";
 
 const MessageList = props => {
-    const [checkBox, setCheckbox] = React.useState(false);
+    const user = auth.currentUser;
+    
     return (
         <View style={styles.outline}>
             <View style={styles.head}>
@@ -21,12 +21,10 @@ const MessageList = props => {
                 </TouchableOpacity>
                 <View style={styles.response}>
                     <TouchableOpacity onPress={() => {
-                        const user = firebase.auth().currentUser;
-                        let requestedUser = db.collection("Usernames").doc(props.person.username);
-                        requestedUser.get().then((doc) => {
-                            db.collection("User Invites").doc(user.uid).collection("Connections").doc(doc.data().id).delete().then(() => {
-                                alert("Request Declined");
-                            });
+                        db.collection("User Invites").doc(user.uid).collection("Connections").doc(props.person.id).delete().then(() => {
+                            alert("Request Declined");
+                        }).catch(() => {
+                            alert("Couldn't delete request, try again later.");
                         });
                     }}>
                         <Ionicons name={"close-circle-outline"} color={"white"} size={40}/>
@@ -48,6 +46,8 @@ const MessageList = props => {
                                     });
                                 })
                             })
+                        }).catch(() => {
+                            alert("This user seems to no longer exist :(");
                         })
                     }}>
                         <Ionicons name={"checkmark-circle-outline"} color={"white"} size={40}/>
