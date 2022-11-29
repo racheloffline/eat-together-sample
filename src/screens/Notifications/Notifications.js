@@ -92,6 +92,8 @@ export default function (props) {
                             (ss.data().endDate ? ss.data().endDate.toDate().getTime()
                                 : ss.data().date.toDate().getTime()) < new Date().getTime(),
                       });
+                    }).catch(() => {
+                      alert("There seems to be an error fetching this invite. Please try again later.");
                     });
                     break;
                   case "private event":
@@ -99,6 +101,8 @@ export default function (props) {
                       props.navigation.navigate("FullCard", {
                         event: ss.data()
                       });
+                    }).catch(() => {
+                      alert("There seems to be an error fetching this event. Please try again later.");
                     });
                     break;
                   case "public event":
@@ -106,6 +110,8 @@ export default function (props) {
                       props.navigation.navigate("FullCard", {
                         event: ss.data()
                       });
+                    }).catch(() => {
+                      alert("There seems to be an error fetching this event. Please try again later.");
                     });
                     break;
                   case "user profile":
@@ -115,7 +121,9 @@ export default function (props) {
                           person: ss2.data()
                         })
                       })
-                    })
+                    }).catch(() => {
+                      alert("This user doesn't seem to exist :(");
+                    });
                     break;
                   default:
                     alert("Sorry, an error has occurred.");

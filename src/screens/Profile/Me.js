@@ -136,8 +136,6 @@ export default function ({ navigation }) {
           ></Ionicons>
         </View>
 
-//        crash for "userInfo" when deleting acccount bc user doesn't exist
-
         <Image
           style={styles.image}
           source={

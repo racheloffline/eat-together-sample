@@ -52,12 +52,12 @@ const styles = StyleSheet.create({
     },
     head: {
         width: Dimensions.get('window').width * 0.95,
-        height: 80,
         backgroundColor: "white",
         borderRadius: 15,
         flexDirection: "row",
         alignItems: "center",
-        paddingHorizontal: 20
+        paddingHorizontal: 20,
+        paddingVertical: 10
     },
     textContainer: {
         flexDirection: "column",

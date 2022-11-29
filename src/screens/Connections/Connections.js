@@ -1,4 +1,4 @@
-//Look at your connections and connection requests
+//Look at your connections
 
 import React, {useEffect, useState} from 'react';
 import {Layout, Text, TopNav} from 'react-native-rapi-ui';
