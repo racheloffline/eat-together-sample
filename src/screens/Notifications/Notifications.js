@@ -12,7 +12,6 @@ import Notification from "../../components/Notification";
 
 import { db } from "../../provider/Firebase";
 import firebase from "firebase/compat";
-import { compareDates } from "../../methods";
 
 export default function (props) {
   // Current user stuff
@@ -30,8 +29,9 @@ export default function (props) {
       });
 
       // Get the list of notifications from the backend
-      db.collection("Users").doc(user.uid).get().then((snap) => {
+      db.collection("Users").doc(user.uid).onSnapshot((snap) => {
         let data = snap.data();
+        setUnread(data.hasUnreadMessages);
         setNotifications(data.notifications.reverse());
       });
     }
@@ -60,7 +60,7 @@ export default function (props) {
         left="Notifications"
         right="Messages"
         current="left"
-        press={(val) => props.navigation.navigate("ChatMain")}
+        press={() => props.navigation.navigate("ChatMain")}
         pingRight={unread}
       />}
       

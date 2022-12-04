@@ -36,6 +36,11 @@ export default function ({ back, navigation }) {
         });
     }, []);
 
+    const deleteRequest = (id) => {
+        const newRequests = requests.filter((request) => request.id !== id);
+        setRequests(newRequests);
+    }
+
     return (
         <Layout>
             <TopNav
@@ -71,7 +76,7 @@ export default function ({ back, navigation }) {
                         }).catch(() => {
                             alert("This user seems to no longer exist :(");
                         });
-                    }}/>
+                    }} delete={deleteRequest}/>
                 }/>
             :
                 <View style={styles.noRequestsView}>

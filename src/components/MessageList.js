@@ -42,6 +42,7 @@ const MessageList = props => {
                                 }).then(() => {
                                     // STEP 3: Delete invite
                                     db.collection("User Invites").doc(user.uid).collection("Connections").doc(doc.data().id).delete().then(() => {
+                                        props.delete(props.person.id);
                                         alert("Taste Bud Added");
                                     });
                                 })
