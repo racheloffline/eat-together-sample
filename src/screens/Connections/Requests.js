@@ -1,4 +1,4 @@
-//Look at your connections and connection requests
+//Look at your connection requests
 
 import React, {useEffect, useState} from 'react';
 import { View, FlatList, StyleSheet, ActivityIndicator } from "react-native";
@@ -6,7 +6,6 @@ import { Layout, TopNav } from 'react-native-rapi-ui';
 import { Ionicons } from "@expo/vector-icons";
 
 import MessageList from "../../components/MessageList";
-import NormalText from "../../components/NormalText";
 import MediumText from "../../components/MediumText";
 
 import {generateColor} from "../../methods";
@@ -31,10 +30,16 @@ export default function ({ back, navigation }) {
                     profile: data.profile
                 });
             });
+
             setRequests(list);
             setLoading(false);
         });
     }, []);
+
+    const deleteRequest = (id) => {
+        const newRequests = requests.filter((request) => request.id !== id);
+        setRequests(newRequests);
+    }
 
     return (
         <Layout>
@@ -61,11 +66,17 @@ export default function ({ back, navigation }) {
                         data={requests} renderItem={({item}) =>
                     <MessageList person={item} color={generateColor()} click={() => {
                         db.collection("Users").doc(item.id).get().then((doc) => {
-                            navigation.navigate("FullProfile", {
-                                person: doc.data()
-                            });
-                        })
-                    }}/>
+                            if (doc.data()) {
+                                navigation.navigate("FullProfile", {
+                                    person: doc.data()
+                                });
+                            } else {
+                                alert("This user seems to no longer exist :(");
+                            }
+                        }).catch(() => {
+                            alert("This user seems to no longer exist :(");
+                        });
+                    }} delete={deleteRequest}/>
                 }/>
             :
                 <View style={styles.noRequestsView}>
