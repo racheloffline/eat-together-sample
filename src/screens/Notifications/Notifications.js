@@ -73,7 +73,7 @@ export default function (props) {
         left="Notifications"
         right="Messages"
         current="left"
-        press={(val) => props.navigation.navigate("ChatMain")}
+        press={() => props.navigation.navigate("ChatMain")}
         pingRight={unread}
       />}
       
