@@ -29,10 +29,23 @@ export default function (props) {
       });
 
       // Get the list of notifications from the backend
-      db.collection("Users").doc(user.uid).onSnapshot((snap) => {
+      await db.collection("Users").doc(user.uid).get().then((snap) => {
         let data = snap.data();
-        setUnread(data.hasUnreadMessages);
-        setNotifications(data.notifications.reverse());
+        let notifications = data.notifications;
+
+        //Loop through every notif and set them to read
+        notifications.forEach((notif) => {
+          if(notif.readAt == null) {
+            notif.readAt = new Date();
+          }
+        });
+
+        //Replace the old notif array with the new, updated array (with read times)
+        db.collection("Users").doc(user.uid).update({
+          notifications: notifications
+        }).then(() => {
+          setNotifications(notifications.reverse());
+        });
       });
     }
 
