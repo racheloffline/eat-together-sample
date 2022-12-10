@@ -72,7 +72,7 @@ export default function ({ navigation }) {
         query.forEach((doc) => {
           let data = doc.data();
           if (data.id !== user.uid && data.verified && !userData.blockedIDs.includes(doc.data().id)
-            && !doc.data().blockedIDs.includes(user.uid) && !userData.friendIDs.includes(doc.data().id)) { // Only show verified + unblocked + non-friend users
+            && !doc.data().blockedIDs.includes(user.uid) && !userData.friendIDs.includes(doc.data().id)) { // Only show verified + unblocked + non-friend users + non-private accounts
             data.inCommon = getCommonTags(userData, data);
             data.color = generateColor();
             data.selectedTags = randomize3(data.tags);
@@ -82,7 +82,7 @@ export default function ({ navigation }) {
 
         setPeople(users);
         setFilteredPeople(users);
-        setFilteredSearchPeople(users);
+        setFilteredSearchPeople(users.filter(person => (person.settings.privateAccount == null || !person.settings.privateAccount)));
         setLoading(false);
       });
     }
@@ -158,7 +158,8 @@ export default function ({ navigation }) {
   // Method called when a new query is typed in/deleted
   const onChangeText = (text) => {
     setSearchQuery(text);
-    const newPeople = search(filteredPeople, text);
+    const searchedPeople = search(filteredPeople, text);
+    const newPeople = searchedPeople.filter(person => (person.settings.privateAccount == null || (!person.settings.privateAccount || text === person.username)))
     setFilteredSearchPeople(newPeople);
   };
 

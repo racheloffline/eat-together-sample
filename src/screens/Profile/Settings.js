@@ -156,7 +156,7 @@ export default function ({ navigation }) {
         },
         {
             name: " Private Account" + (privAcct ? " (ON)" : " (OFF)"),
-            icon: "notifications",
+            icon: "shield",
             func: () => changePrivacySettings()
         },
         {
