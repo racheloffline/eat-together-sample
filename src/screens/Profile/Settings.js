@@ -42,6 +42,7 @@ export default function ({ navigation }) {
                 {
                     text: "Yes",
                     onPress: async () => {
+                        if(notifs) return; //Don't display a "changed" animation and alert if nothing changed
                         await db.collection("Users").doc(user.uid).update({
                             "settings.notifications": true
                         });
@@ -53,6 +54,7 @@ export default function ({ navigation }) {
                 {
                     text: "No",
                     onPress: async () => {
+                        if(!notifs) return; //Don't display a "changed" animation and alert if nothing changed
                         await db.collection("Users").doc(user.uid).update({
                             "settings.notifications": false
                         });
@@ -73,6 +75,7 @@ export default function ({ navigation }) {
                 {
                     text: "Yes",
                     onPress: async () => {
+                        if(privAcct) return; //Don't display a "changed" animation and alert if nothing changed
                         await db.collection("Users").doc(user.uid).update({
                             "settings.privateAccount": true
                         });
@@ -84,6 +87,7 @@ export default function ({ navigation }) {
                 {
                     text: "No",
                     onPress: async () => {
+                        if(!privAcct) return; //Don't display a "changed" animation and alert if nothing changed
                         await db.collection("Users").doc(user.uid).update({
                             "settings.privateAccount": false
                         });
