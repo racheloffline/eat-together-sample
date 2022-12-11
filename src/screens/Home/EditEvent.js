@@ -90,7 +90,7 @@ export default function ({ route, navigation }) {
     const changeStartDate = (selectedDate) => {
         const currentDate = selectedDate || startDate;
         setStartDate(currentDate); // Set the date
-        setEndDate(moment(currentDate).add(1, 'hours').toDate()); // Set the end date to the same as the start date
+        setEndDate(moment(currentDate).add(1, 'hours').toDate()); // Set the end date to 1-hour ahead the start date
         setShowStartDate(false); // Exit the date/time picker modal
     };
 

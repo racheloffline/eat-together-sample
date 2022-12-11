@@ -10,9 +10,10 @@ import ForgetPassword from "../screens/auth/ForgetPassword";
 import Name from "../screens/auth/Registration/Name";
 import Email from "../screens/auth/Registration/Email";
 import Tags from "../screens/auth/Registration/Tags";
-import Availabilities from "../screens/auth/Registration/Availabilities";
 import Password from "../screens/auth/Registration/Password";
 
+import AvailabilitiesHome from "../screens/auth/Registration/AvailabilitiesHome";
+import Availabilities from "../screens/auth/Registration/Availabilities";
 import Day from "../screens/auth/Registration/Day";
 import timeSlots from "../timeSlots";
 
@@ -249,6 +250,11 @@ const Auth = () => {
         {(props) => <Email {...props} email={email} setEmail={setEmail} />}
       </Stack.Screen>
 
+      <Stack.Screen
+        name="AvailabilitiesHome"
+        options={{ headerShown: false }}
+        component={AvailabilitiesHome}
+      />
       <Stack.Screen
         name="Availabilities"
         options={{ headerShown: false }}
