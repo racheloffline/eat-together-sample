@@ -12,7 +12,6 @@ import Notification from "../../components/Notification";
 
 import { db } from "../../provider/Firebase";
 import firebase from "firebase/compat";
-import { compareDates } from "../../methods";
 
 export default function (props) {
   // Current user stuff
@@ -24,31 +23,29 @@ export default function (props) {
 
   useEffect(() => {
     async function fetchData() {
+      // Show that the user has no unreads
       await db.collection("Users").doc(user.uid).update({
-        hasNotif: false,
+        hasNotif: false
       });
 
-      await db.collection("Users").doc(user.uid).onSnapshot(doc => {
-        setUnread(doc.data().hasUnreadMessages)
-      });
+      // Get the list of notifications from the backend
+      await db.collection("Users").doc(user.uid).get().then((snap) => {
+        let data = snap.data();
+        let notifications = data.notifications;
 
-      let ref = db
-        .collection("User Invites")
-        .doc(user.uid)
-        .collection("Invites");
-      ref.onSnapshot((query) => {
-        let list = [];
-        query.forEach((doc) => {
-          let data = doc.data();
-          list.push({
-            ...data,
-            docID: doc.id,
-          });
+        //Loop through every notif and set them to read
+        notifications.forEach((notif) => {
+          if(notif.readAt == null) {
+            notif.readAt = new Date();
+          }
         });
-        list = list.sort((a, b) => {
-          return compareDates(a, b);
+
+        //Replace the old notif array with the new, updated array (with read times)
+        db.collection("Users").doc(user.uid).update({
+          notifications: notifications
+        }).then(() => {
+          setNotifications(notifications.reverse());
         });
-        setNotifications(list);
       });
     }
 
@@ -76,7 +73,7 @@ export default function (props) {
         left="Notifications"
         right="Messages"
         current="left"
-        press={(val) => props.navigation.navigate("ChatMain")}
+        press={() => props.navigation.navigate("ChatMain")}
         pingRight={unread}
       />}
       
@@ -93,17 +90,58 @@ export default function (props) {
           renderItem={({ item }) => (
             <Notification
               notif={item}
+              showButton={!(item.type) ? false : true}
               onPress={() => {
-                let inviteToSend = {
-                  ...item,
-                  id: item.docID,
-                };
-                props.navigation.navigate("NotificationFull", {
-                  invite: inviteToSend,
-                  hasPassed:
-                    (item.endDate ? item.endDate.toDate().getTime()
-                    : item.date.toDate().getTime()) < new Date().getTime(),
-                });
+                switch (item.type) {
+                  case "invite":
+                    db.collection("User Invites").doc(user.uid).collection("Invites").doc(item.id).get().then((ss) => {
+                      let inviteToSend = {
+                        ...ss.data(),
+                        id: ss.id,
+                      };
+                      props.navigation.navigate("NotificationFull", {
+                        invite: inviteToSend,
+                        hasPassed:
+                            (ss.data().endDate ? ss.data().endDate.toDate().getTime()
+                                : ss.data().date.toDate().getTime()) < new Date().getTime(),
+                      });
+                    }).catch(() => {
+                      alert("There seems to be an error fetching this invite. Please try again later.");
+                    });
+                    break;
+                  case "private event":
+                    db.collection("Private Events").doc(item.id).get().then((ss) => {
+                      props.navigation.navigate("FullCard", {
+                        event: ss.data()
+                      });
+                    }).catch(() => {
+                      alert("There seems to be an error fetching this event. Please try again later.");
+                    });
+                    break;
+                  case "public event":
+                    db.collection("Public Events").doc(item.id).get().then((ss) => {
+                      props.navigation.navigate("FullCard", {
+                        event: ss.data()
+                      });
+                    }).catch(() => {
+                      alert("There seems to be an error fetching this event. Please try again later.");
+                    });
+                    break;
+                  case "user profile":
+                    db.collection("Usernames").doc(item.id).get().then((ss) => {
+                      db.collection("Users").doc(ss.data().id).get().then((ss2) => {
+                        props.navigation.navigate("FullProfile", {
+                          person: ss2.data()
+                        })
+                      })
+                    }).catch(() => {
+                      alert("This user doesn't seem to exist :(");
+                    });
+                    break;
+                  default:
+                    alert("Sorry, an error has occurred.");
+                    break;
+                }
               }}
             />
           )}

@@ -17,6 +17,7 @@ const hobbyTags = [
     'Gymnastics',
     'Pool',
     'Darts',
+    'Dance',
     'Bowling',
     'Concerts',
     'Rave',

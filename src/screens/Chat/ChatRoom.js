@@ -154,7 +154,7 @@ export default function ({ route, navigation }) {
             onPress={() => {
               onSend();
             }}
-            disabled={message.length === 0 || loading}
+            disabled={message.length === 0}
           >
             <Ionicons name="send" size={20} color={"#D3D3D3"} />
           </TouchableOpacity>
