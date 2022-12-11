@@ -29,7 +29,7 @@ export default function (props) {
       });
 
       // Get the list of notifications from the backend
-      await db.collection("Users").doc(user.uid).get().then((snap) => {
+      await db.collection("Users").doc(user.uid).onSnapshot((snap) => {
         let data = snap.data();
         let notifications = data.notifications;
 
@@ -101,6 +101,7 @@ export default function (props) {
                       };
                       props.navigation.navigate("NotificationFull", {
                         invite: inviteToSend,
+                        notif: item,
                         hasPassed:
                             (ss.data().endDate ? ss.data().endDate.toDate().getTime()
                                 : ss.data().date.toDate().getTime()) < new Date().getTime(),

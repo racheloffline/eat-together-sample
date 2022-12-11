@@ -138,7 +138,8 @@ export default function ({ route, navigation }) {
                                 };
 
                                 db.collection("Users").doc(user.uid).update({
-                                    attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)
+                                    attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
+                                    notifications: firebase.firestore.FieldValue.arrayRemove(route.params.notif)
                                 }).then(() => {
                                     ref.delete().then(r => {
                                         alert("Invite accepted! Check the homepage for more details.")
@@ -162,7 +163,8 @@ export default function ({ route, navigation }) {
                             };
 
                             db.collection("Users").doc(user.uid).update({
-                                attendingEventIDs: firebase.firestore.FieldValue.arrayRemove(storeID)
+                                attendingEventIDs: firebase.firestore.FieldValue.arrayRemove(storeID),
+                                notifications: firebase.firestore.FieldValue.arrayRemove(route.params.notif)
                             }).then(() => {
                                 db.collection("Private Events").doc(invite.inviteID).update({
                                     attendees: firebase.firestore.FieldValue.arrayRemove(user.uid)
