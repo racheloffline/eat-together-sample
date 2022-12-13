@@ -115,11 +115,7 @@ const Availabilities = props => {
     <Layout style={styles.page}>
         <LargeText center size={28}>Preferred eating times!</LargeText>
 
-        <Button
-          marginVertical={10}
-          onPress={() => refRBSheet.current.open()}>
-            + Add preferred time
-        </Button>
+        
 
         <ScrollView contentContainerStyle={styles.dates}>
           <View style={styles.day}>
@@ -178,6 +174,12 @@ const Availabilities = props => {
             </View>}
           </View>
         </ScrollView>
+
+        <Button
+          marginVertical={20}
+          onPress={() => refRBSheet.current.open()}>
+            + Add preferred time
+        </Button>
 
         <RBSheet
             height={400}
@@ -261,11 +263,11 @@ const styles = StyleSheet.create({
   },
 
   dates: {
-    justifyContent: "center",
+    marginTop: 20
   },
 
   day: {
-    marginBottom: 15
+    marginBottom: 20
   },
 
   timeSlots: {
@@ -280,9 +282,9 @@ const styles = StyleSheet.create({
   },
 
   row: {
-      marginTop: 10,
-      flexDirection: "row",
-      justifyContent: "space-between"
+    marginTop: 10,
+    flexDirection: "row",
+    justifyContent: "space-between"
   },
 
   smallInput: {

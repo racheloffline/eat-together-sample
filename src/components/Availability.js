@@ -19,9 +19,9 @@ const Availability = props => {
             marginBottom: 5,
             elevation: 5
         }}>
-            <NormalText size={12}>{getTime(props.time.startTime)} - {getTime(props.time.endTime)}</NormalText>
-            <TouchableOpacity onPress={props.delete}>
-                <Ionicons name="trash" size={20} color="black" />
+            <NormalText size={10}>{getTime(props.time.startTime)} - {getTime(props.time.endTime)}</NormalText>
+            <TouchableOpacity onPress={props.delete} style={{marginLeft: 5}}>
+                <Ionicons name="trash" size={24} color="black" />
             </TouchableOpacity>
         </View>
     );
