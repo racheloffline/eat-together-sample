@@ -1,6 +1,6 @@
 // Specify availabilities for days of the week
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { View, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import { Layout, TextInput } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
@@ -35,7 +35,40 @@ const Availabilities = props => {
   const [showEndTime, setShowEndTime] = useState(false);
   const [daySelected, setDaySelected] = useState("Monday");
 
-  const refRBSheet = useRef(); // To toggle the bottom drawer on/off
+  const timeSheet = useRef(); // To toggle the add time drawer on/off
+  const editSheet = useRef(); // To toggle the edit drawer on/off
+
+  useEffect(() => {
+    if (props.route.params && props.route.params.freeTimes) {
+      props.route.params.freeTimes.forEach(time => {
+        const startTime = new Date(time.start);
+        const endTime = new Date(time.end);
+        switch (time.dayOfWeek) {
+          case 1:
+            setMonday(prev => [...prev, { startTime, endTime }]);
+            break;
+          case 2:
+            setTuesday(prev => [...prev, { startTime, endTime }]);
+            break;
+          case 3:
+            setWednesday(prev => [...prev, { startTime, endTime }]);
+            break;
+          case 4:
+            setThursday(prev => [...prev, { startTime, endTime }]);
+            break;
+          case 5:
+            setFriday(prev => [...prev, { startTime, endTime }]);
+            break;
+          case 6:
+            setSaturday(prev => [...prev, { startTime, endTime }]);
+            break;
+          case 7:
+            setSunday(prev => [...prev, { startTime, endTime }]);
+            break;
+        }
+      });
+    }
+  }, []);
 
   // For selecting a start time
   const changeStartTime = (time) => {
@@ -56,7 +89,7 @@ const Availabilities = props => {
     if (startTime >= endTime) {
       alert("End time must be after start time!");
     } else {
-      refRBSheet.current.close();
+      timeSheet.current.close();
 
       switch (daySelected) {
         case "Monday":
@@ -115,14 +148,12 @@ const Availabilities = props => {
     <Layout style={styles.page}>
         <LargeText center size={28}>Preferred eating times!</LargeText>
 
-        
-
         <ScrollView contentContainerStyle={styles.dates}>
           <View style={styles.day}>
             <MediumText>Monday</MediumText>
             {monday.length === 0 ? <NormalText>None</NormalText>
             : <View style={styles.timeSlots}>
-              {monday.map((time, index) => <Availability time={time} index={index} delete={() => deleteTime(index, "Monday")}/>)}
+              {monday.map((time, index) => <Availability time={time} index={index} key={index} delete={() => deleteTime(index, "Monday")}/>)}
             </View>}
           </View>
 
@@ -130,7 +161,7 @@ const Availabilities = props => {
             <MediumText>Tuesday</MediumText>
             {tuesday.length === 0 ? <NormalText>None</NormalText>
             : <View style={styles.timeSlots}>
-              {tuesday.map((time, index) => <Availability time={time} index={index} delete={() => deleteTime(index, "Tuesday")}/>)}
+              {tuesday.map((time, index) => <Availability time={time} index={index} key={index} delete={() => deleteTime(index, "Tuesday")}/>)}
             </View>}
           </View>
             
@@ -138,7 +169,7 @@ const Availabilities = props => {
             <MediumText>Wednesday</MediumText>
             {wednesday.length === 0 ? <NormalText>None</NormalText>
             : <View style={styles.timeSlots}>
-              {wednesday.map((time, index) => <Availability time={time} index={index} delete={() => deleteTime(index, "Wednesday")}/>)}
+              {wednesday.map((time, index) => <Availability time={time} index={index} key={index} delete={() => deleteTime(index, "Wednesday")}/>)}
             </View>}
           </View>
 
@@ -146,7 +177,7 @@ const Availabilities = props => {
             <MediumText>Thursday</MediumText>
             {thursday.length === 0 ? <NormalText>None</NormalText>
             : <View style={styles.timeSlots}>
-              {thursday.map((time, index) => <Availability time={time} index={index} delete={() => deleteTime(index, "Thursday")}/>)}
+              {thursday.map((time, index) => <Availability time={time} index={index} key={index} delete={() => deleteTime(index, "Thursday")}/>)}
             </View>}
           </View>
 
@@ -154,7 +185,7 @@ const Availabilities = props => {
             <MediumText>Friday</MediumText>
             {friday.length === 0 ? <NormalText>None</NormalText>
             : <View style={styles.timeSlots}>
-              {friday.map((time, index) => <Availability time={time} index={index} delete={() => deleteTime(index, "Friday")}/>)}
+              {friday.map((time, index) => <Availability time={time} index={index} key={index} delete={() => deleteTime(index, "Friday")}/>)}
             </View>}
           </View>
 
@@ -162,7 +193,7 @@ const Availabilities = props => {
             <MediumText>Saturday</MediumText>
             {saturday.length === 0 ? <NormalText>None</NormalText>
             : <View style={styles.timeSlots}>
-              {saturday.map((time, index) => <Availability time={time} index={index} delete={() => deleteTime(index, "Saturday")}/>)}
+              {saturday.map((time, index) => <Availability time={time} index={index} key={index} delete={() => deleteTime(index, "Saturday")}/>)}
             </View>}
           </View>
 
@@ -170,20 +201,20 @@ const Availabilities = props => {
             <MediumText>Sunday</MediumText>
             {sunday.length === 0 ? <NormalText>None</NormalText>
             : <View style={styles.timeSlots}>
-              {sunday.map((time, index) => <Availability time={time} index={index} delete={() => deleteTime(index, "Sunday")}/>)}
+              {sunday.map((time, index) => <Availability time={time} index={index} key={index} delete={() => deleteTime(index, "Sunday")}/>)}
             </View>}
           </View>
         </ScrollView>
 
         <Button
           marginVertical={20}
-          onPress={() => refRBSheet.current.open()}>
+          onPress={() => timeSheet.current.open()}>
             + Add preferred time
         </Button>
 
         <RBSheet
             height={400}
-            ref={refRBSheet}
+            ref={timeSheet}
             closeOnDragDown={true}
             closeOnPressMask={false}
             customStyles={{
