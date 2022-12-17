@@ -120,7 +120,7 @@ export default function ({ navigation }) {
             
             <MediumText center>OR</MediumText>
             <Button onPress={() => {
-              navigation.navigate("AvailabilitiesHome");
+              navigation.navigate("Name");
             }} marginVertical={10} disabled={loading} backgroundColor="white" color="#5DB075">
               Register
             </Button>

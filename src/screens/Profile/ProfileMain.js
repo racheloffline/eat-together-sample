@@ -14,7 +14,7 @@ import FullProfile from "../Explore/People/FullProfile";
 import ReportPerson from "../Explore/People/ReportPerson";
 
 import AvailabilitiesHome from "./Availabilities/AvailabilitiesHome";
-import EditDay from "./Availabilities/EditDay";
+import Availabilities from "./Availabilities/Availabilities";
 
 const Stack = createStackNavigator();
 
@@ -45,7 +45,7 @@ export default function () {
       <Stack.Screen name="ReportPerson" component={ReportPerson} />
 
       <Stack.Screen name="AvailabilitiesHome" component={AvailabilitiesHome} />
-      <Stack.Screen name="EditDay" component={EditDay} />
+      <Stack.Screen name="Availabilities" component={Availabilities} />
     </Stack.Navigator>
   );
 }

@@ -17,16 +17,25 @@ import Availability from "../../../components/Availability";
 
 import getTime from "../../../getTime";
 import moment from "moment";
+import { db } from "../../../provider/Firebase";
 
 const Availabilities = props => {
+  // Convert Firebase timestamps in timeslots to moment objects
+  const convert = day => {
+    return day.map(d => ({
+      startTime: !(d.startTime instanceof Date) ? d.startTime.toDate() : d.startTime,
+      endTime: !(d.endTime instanceof Date) ? d.endTime.toDate() : d.endTime
+    }));
+  }
+
   // Preferred times for days of the week
-  const [monday, setMonday] = useState(props.monday);
-  const [tuesday, setTuesday] = useState(props.tuesday);
-  const [wednesday, setWednesday] = useState(props.wednesday);
-  const [thursday, setThursday] = useState(props.thursday);
-  const [friday, setFriday] = useState(props.friday);
-  const [saturday, setSaturday] = useState(props.saturday);
-  const [sunday, setSunday] = useState(props.sunday);
+  const [monday, setMonday] = useState(convert(props.route.params.user.availabilities.monday));
+  const [tuesday, setTuesday] = useState(convert(props.route.params.user.availabilities.tuesday));
+  const [wednesday, setWednesday] = useState(convert(props.route.params.user.availabilities.wednesday));
+  const [thursday, setThursday] = useState(convert(props.route.params.user.availabilities.thursday));
+  const [friday, setFriday] = useState(convert(props.route.params.user.availabilities.friday));
+  const [saturday, setSaturday] = useState(convert(props.route.params.user.availabilities.saturday));
+  const [sunday, setSunday] = useState(convert(props.route.params.user.availabilities.sunday));
 
   // For the bottom drawer
   const [startTime, setStartTime] = useState(new Date());
@@ -74,18 +83,6 @@ const Availabilities = props => {
       });
     }
   }, []);
-
-  // Saves availabilities
-  const saveAvailabilities = () => {
-    props.setMonday(monday);
-    props.setTuesday(tuesday);
-    props.setWednesday(wednesday);
-    props.setThursday(thursday);
-    props.setFriday(friday);
-    props.setSaturday(saturday);
-    props.setSunday(sunday);
-    props.navigation.navigate("Email");
-  }
 
   // For selecting a start time
   const changeStartTime = (time) => {
@@ -243,6 +240,27 @@ const Availabilities = props => {
           break;
       }
     }
+  }
+
+  // Save the user's free times to the database
+  const saveAvailabilities = async () => {
+    const newAvailabilities = {
+      monday,
+      tuesday,
+      wednesday,
+      thursday,
+      friday,
+      saturday,
+      sunday,
+    };
+
+    db.collection("Users").doc(props.route.params.user.id).update({
+      availabilities: newAvailabilities
+    });
+
+    props.route.params.updateAvailabilities(newAvailabilities);
+    props.navigation.goBack();
+    alert("Saved successfully!");
   }
 
   return (
@@ -466,10 +484,12 @@ const Availabilities = props => {
         <DateTimePickerModal isVisible={showEndTime} date={endTime}
             mode="time" onConfirm={changeEndTime} onCancel={() => setShowEndTime(false)}/>
 
-        <Button onPress={() => props.navigation.goBack()}
-          marginHorizontal={10}>Cancel</Button> 
-        <Button onPress={saveAvailabilities}
-          marginHorizontal={10}>Save</Button>
+        <View style={styles.buttons}>
+          <Button onPress={() => props.navigation.goBack()}
+            marginHorizontal={10}>Cancel</Button>
+          <Button onPress={saveAvailabilities}
+            marginHorizontal={10}>Save</Button>
+        </View>
     </Layout>
   );
 }

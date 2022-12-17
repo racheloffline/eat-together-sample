@@ -131,7 +131,6 @@ export default function ({ navigation }) {
     const changeStartDate = (selectedDate) => {
         const currentDate = selectedDate || startDate;
         setStartDate(currentDate); // Set the date
-        setEndDate(moment(currentDate).add(1, 'hours').toDate()); // Set the end date to 1-hour ahead the start date
         setShowStartDate(false); // Exit the date/time picker modal
     };
 
@@ -392,7 +391,9 @@ export default function ({ navigation }) {
                     </View>
 
                     {type === "public" ? <Button disabled={disabled || loading} onPress={() => {
-                        if (checkProfanity(name)) {
+                        if (startDate > endDate) {
+                            alert("Start time must be before end time");
+                        } else if (checkProfanity(name)) {
                             alert("Name has inappropriate words >:(");
                         } else if (checkProfanity(location)) {
                             alert("Location has inappropriate words >:(");
@@ -417,7 +418,9 @@ export default function ({ navigation }) {
                         {loading ? "Posting ..." : "Post"}
                     </Button> :
                     <Button disabled={disabled} onPress={() => {
-                        if (checkProfanity(name)) {
+                        if (startDate > endDate) {
+                            alert("Start time must be before end time");
+                        } else if (checkProfanity(name)) {
                             alert("Name has inappropriate words >:(");
                         } else if (checkProfanity(location)) {
                             alert("Location has inappropriate words >:(");

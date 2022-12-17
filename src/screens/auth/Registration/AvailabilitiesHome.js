@@ -9,7 +9,7 @@ import MediumText from "../../../components/MediumText";
 import NormalText from "../../../components/NormalText";
 import Button from "../../../components/Button";
 
-import { getFreeTimes } from "./availabilitiesAlgo";
+import { getFreeTimes } from "../../../methods";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import {
@@ -17,7 +17,6 @@ import {
   GOOGLE_AUTH_CLIENT_ID_ANDROID,
   GOOGLE_AUTH_CLIENT_ID_IOS
 } from "@env"; //Enviroment variables
-import moment from "moment";
 
 WebBrowser.maybeCompleteAuthSession();
 

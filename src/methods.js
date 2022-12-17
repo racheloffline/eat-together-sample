@@ -40,30 +40,31 @@ export const checkProfanity = word => {
  * Determines if a user is available for a particular event/meal.
  */
 export const isAvailable = (user, event) => {
-    let date;
+    let startDate, endDate;
     if (event.startDate) {
-        date = (event.startDate instanceof Date) ? event.startDate : event.startDate.toDate();
+        startDate = (event.startDate instanceof Date) ? event.startDate : event.startDate.toDate();
+        endDate = (event.endDate instanceof Date) ? event.endDate : event.endDate.toDate();
     } else {
-        date = (event.date instanceof Date) ? event.date : event.date.toDate();
+        startDate = (event.date instanceof Date) ? event.date : event.date.toDate();
+        endDate = new Date(startDate);
+        endDate.setHours(endDate.getHours() + 1);
     }
-    
-    const hour = date.getHours();
 
-    switch (new Date(date).getDay()) { // Days of the week
+    switch (new Date(startDate).getDay()) { // Days of the week
         case 0: // Sunday
-            return isMatch(hour, user.availabilities.sunday);
+            return isMatch(startDate, endDate, user.availabilities.sunday);
         case 1: // Monday
-            return isMatch(hour, user.availabilities.monday);
+            return isMatch(startDate, endDate, user.availabilities.monday);
         case 2: // Tuesday
-            return isMatch(hour, user.availabilities.tuesday);
+            return isMatch(startDate, endDate, user.availabilities.tuesday);
         case 3: // Wednesday
-            return isMatch(hour, user.availabilities.wednesday);
+            return isMatch(startDate, endDate, user.availabilities.wednesday);
         case 4: // Thursday
-            return isMatch(hour, user.availabilities.thursday);
+            return isMatch(startDate, endDate, user.availabilities.thursday);
         case 5: // Friday
-            return isMatch(hour, user.availabilities.friday);
+            return isMatch(startDate, endDate, user.availabilities.friday);
         case 6: // Saturday
-            return isMatch(hour, user.availabilities.saturday);
+            return isMatch(startDate, endDate, user.availabilities.saturday);
     }
 }
 
@@ -71,19 +72,30 @@ export const isAvailable = (user, event) => {
  * Helper function to determine if a user's schedule matches with an event/meal.
  * Returns: true if match, false if not.
  */
-const isMatch = (hour, availabilities) => {
-    let result = false;
-    availabilities.forEach(availability => {
-        if (availability.startTime.toDate().getHours() === hour) {
-            if (availability.available) {
-                result = true;
-            }
+const isMatch = (startDate, endDate, availabilities) => {
+    let match = false;
 
+    availabilities.forEach(availability => {
+        // Set start and end times to same day as date
+        let startTime = availability.startTime.toDate();
+        startTime.setFullYear(startDate.getFullYear());
+        startTime.setMonth(startDate.getMonth());
+        startTime.setDate(startDate.getDate());
+        startTime.setSeconds(0);
+        
+        let endTime = availability.endTime.toDate();
+        endTime.setFullYear(endDate.getFullYear());
+        endTime.setMonth(endDate.getMonth());
+        endTime.setDate(endDate.getDate());
+        endTime.setSeconds(59);
+        
+        if (startTime <= startDate && endDate <= endTime) {
+            match = true;
             return;
         }
     });
 
-    return result;
+    return match;
 }
 
 /**
@@ -122,4 +134,83 @@ export const compareDates = (a, b) => {
     }
 
     return aSeconds - bSeconds;
+}
+
+/**
+ * @param {Array} list of events
+ * Given a list of events, return a list of free times for each of Monday to Sunday (multiple free times per day are possible)
+ */
+export const getFreeTimes = (events) => {
+    let freeTimes = [];
+
+    // Do this for each day of the week
+    for (let i = 1; i <= 7; i++) {
+        let index = i;
+        if (i === 7) {
+            index = 0;
+        }
+
+        const currDayEvents = events.filter((e) => e.dayOfWeek === index).sort((a, b) => a.start - b.start);            
+
+        // Set the start and end times for the day
+        let startTime, endTime;
+
+        // If there are no events on this day, add the entire day to the list of free times
+        if (currDayEvents.length === 0) {
+            startTime = new Date();
+            startTime.setHours(9);
+            startTime.setMinutes(0);
+            endTime = new Date();
+            endTime.setHours(21);
+            endTime.setMinutes(0);
+
+            freeTimes.push({
+                dayOfWeek: index,
+                start: startTime,
+                end: endTime
+            });
+        } else {
+            startTime = new Date(currDayEvents[0].start);
+            startTime.setHours(9);
+            startTime.setMinutes(0);
+            startTime.setSeconds(0);
+            endTime = new Date(currDayEvents[0].start);
+            endTime.setHours(21);
+            endTime.setMinutes(0);
+            endTime.setSeconds(0);
+
+            let currIndex = 0;
+            while (currIndex < currDayEvents.length) {
+                const currEvent = currDayEvents[currIndex];
+
+                // If the event starts after the current time, add the free time to the list
+                if (currEvent.start > startTime) {
+                    let end = currEvent.start;
+                    end.setMinutes(currEvent.start.getMinutes() - 15);
+
+                    freeTimes.push({
+                        dayOfWeek: index,
+                        start: startTime,
+                        end: currEvent.start
+                    });
+                }
+
+                // Set the start time to the end time of the event
+                startTime = currEvent.end;
+                startTime.setMinutes(currEvent.end.getMinutes() + 15);
+                currIndex++;
+            }
+
+            // If the last event ends before the end of the day, add the free time to the list
+            if (startTime < endTime) {
+                freeTimes.push({
+                    dayOfWeek: index,
+                    start: startTime,
+                    end: endTime
+                });
+            }
+        }
+    }
+
+    return freeTimes;
 }
