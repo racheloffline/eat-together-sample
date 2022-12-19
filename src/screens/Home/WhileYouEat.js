@@ -308,7 +308,6 @@ const WhileYouEat = ({ route, navigation }) => {
           <Ionicons name="chatbox-ellipses-outline" size={30} />
         </CircularButton>
       </View>
-
       <ScrollView>
         <ImageBackground
           source={
@@ -319,11 +318,15 @@ const WhileYouEat = ({ route, navigation }) => {
           style={styles.imageBackground}
           resizeMode="cover"
         ></ImageBackground>
+        <CircularButton width={110} marginHorizontal={20} marginVertical={10}>
+            <MediumText size={26} color ={"white"}>
+                {"+ Add"}
+            </MediumText>
+        </CircularButton>
         <View style={styles.infoContainer}>
           <LargeText size={24} marginBottom={10}>
             {event.name}
           </LargeText>
-
           <TouchableOpacity
             style={styles.row}
             onPress={() => {
