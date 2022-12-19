@@ -20,6 +20,7 @@ export default function ({ navigation }) {
     const user = auth.currentUser;
     const [userInfo, setUserInfo] = useState({});
     let [notifs, setNotifs] = useState(false);
+    let [privAcct, setPrivAcct] = useState(false);
     let [logoutDisabled, setLogoutDisabled] = useState(false); // Prevent the user from logging out "more than once"
 
     // Fetch current user info
@@ -28,6 +29,7 @@ export default function ({ navigation }) {
             db.collection("Users").doc(user.uid).get().then(doc => {
                 setUserInfo(doc.data());
                 setNotifs(doc.data().settings.notifications);
+                setPrivAcct(doc.data().settings.privateAccount ? doc.data().settings.privateAccount : false);
             });
         }
     });
@@ -40,6 +42,7 @@ export default function ({ navigation }) {
                 {
                     text: "Yes",
                     onPress: async () => {
+                        if(notifs) return; //Don't display a "changed" animation and alert if nothing changed
                         await db.collection("Users").doc(user.uid).update({
                             "settings.notifications": true
                         });
@@ -51,12 +54,46 @@ export default function ({ navigation }) {
                 {
                     text: "No",
                     onPress: async () => {
+                        if(!notifs) return; //Don't display a "changed" animation and alert if nothing changed
                         await db.collection("Users").doc(user.uid).update({
                             "settings.notifications": false
                         });
 
                         setNotifs(false);
                         alert("Notification preference updated!");
+                    }
+                }
+            ]
+        );
+    }
+
+    function changePrivacySettings() {
+        Alert.alert(
+            "Update Account Status",
+            "Would you like to make your account private? This will prevent your profile from matching with other users on the Explore page; however, you will still be able to be found if a user searches your exact username.",
+            [
+                {
+                    text: "Yes",
+                    onPress: async () => {
+                        if(privAcct) return; //Don't display a "changed" animation and alert if nothing changed
+                        await db.collection("Users").doc(user.uid).update({
+                            "settings.privateAccount": true
+                        });
+
+                        setPrivAcct(true);
+                        alert("Account status updated!");
+                    }
+                },
+                {
+                    text: "No",
+                    onPress: async () => {
+                        if(!privAcct) return; //Don't display a "changed" animation and alert if nothing changed
+                        await db.collection("Users").doc(user.uid).update({
+                            "settings.privateAccount": false
+                        });
+
+                        setPrivAcct(false);
+                        alert("Account status updated!");
                     }
                 }
             ]
@@ -88,12 +125,12 @@ export default function ({ navigation }) {
                     text: "Yes",
                     onPress: async () => {
                         const uid = user.uid;
-                        db.collection("Users").doc(uid).delete();
-                        db.collection("Usernames").doc(userInfo.username).delete();
+                        await db.collection("Users").doc(uid).delete();
+                        await db.collection("Usernames").doc(userInfo.username).delete();
                         
                         if (userInfo.hasImage) {
                             const ref = storage.ref().child(`profilePictures/${uid}`);
-                            ref.delete();
+                            await ref.delete();
                         }
 
                         await user.delete().then(() => {
@@ -116,6 +153,11 @@ export default function ({ navigation }) {
             name: " Notification Preferences" + (notifs ? " (ON)" : " (OFF)"),
             icon: "notifications",
             func: () => changeNotifSettings()
+        },
+        {
+            name: " Private Account" + (privAcct ? " (ON)" : " (OFF)"),
+            icon: "shield",
+            func: () => changePrivacySettings()
         },
         {
             name: " Privacy Policy",
