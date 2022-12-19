@@ -127,10 +127,27 @@ export default function ({ navigation }) {
         setTagsValue(tags);
     }, [name, location, type, tagsSelected]);
 
+    useEffect(() => {
+        console.log(endDate);
+    }, [endDate]);
+
     // For selecting a start date and time
     const changeStartDate = (selectedDate) => {
-        const currentDate = selectedDate || startDate;
-        setStartDate(currentDate); // Set the date
+        const start = cloneDeep(selectedDate) || startDate;
+
+        if (mode === "date") { // Set end date to same day as start date
+            let end = cloneDeep(selectedDate) || endDate;
+            end.setHours(endDate.getHours());
+            end.setMinutes(endDate.getMinutes());
+            end.setSeconds(59);
+            setEndDate(end);
+
+            start.setHours(startDate.getHours());
+            start.setMinutes(startDate.getMinutes());
+            start.setSeconds(0);
+        }
+
+        setStartDate(start); // Set the date
         setShowStartDate(false); // Exit the date/time picker modal
     };
 
