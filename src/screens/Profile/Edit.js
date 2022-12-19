@@ -172,7 +172,7 @@ export default function edit({ route, navigation }) {
     }
 
     return (
-        <Layout style = {styles.page}>
+        <Layout>
             <TopNav
                 middleContent={
                     <MediumText>Edit Profile</MediumText>
