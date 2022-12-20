@@ -36,6 +36,13 @@ import {
 } from "react-native-popup-menu";
 import openMap from "react-native-open-maps";
 
+import * as Google from "expo-auth-session/providers/google";
+import {
+  GOOGLE_AUTH_CLIENT_ID,
+  GOOGLE_AUTH_CLIENT_ID_ANDROID,
+  GOOGLE_AUTH_CLIENT_ID_IOS
+} from "@env"; //Enviroment variables
+
 const WhileYouEat = ({ route, navigation }) => {
   // Event details
   const [event, setEvent] = useState(route.params.event);
@@ -194,6 +201,37 @@ const WhileYouEat = ({ route, navigation }) => {
         });
     }
   }
+    const oauth2Client = new google.auth.OAuth2('clientID', 'clientSecret');
+      oauth2Client.setCredentials({
+        access_token: 'google access token',
+        refresh_token: 'google refresh token',
+        expiry_date: 'token expiry date',
+      });
+
+    const calendar = google.calendar({ version: "v3", oauth2Client });
+
+    const event = {
+       summary: 'Event name',
+       description: "Event details.",
+       start: {
+         dateTime: '2022-12-28T01:00:00-07:00',
+         timeZone: 'Asia/kolkata',
+       },
+       end: {
+         dateTime: '2022-12-28T05:00:00-07:00',
+         timeZone: 'Asia/Kolkata',
+       },
+     };
+
+  function exportEvent() {
+      calendar.events.insert({
+        auth: oauth2Client,
+        calendarId: "primary",
+        resource: event,
+      })
+      .then((event) =>  console.log('Event created: %s', event.htmlLink))
+      .catch((error) => console.log('Some error occured', error));
+  }
 
   //Reporting event function
   function reportEvent() {
@@ -318,7 +356,11 @@ const WhileYouEat = ({ route, navigation }) => {
           style={styles.imageBackground}
           resizeMode="cover"
         ></ImageBackground>
-        <CircularButton width={110} marginHorizontal={20} marginVertical={10}>
+        <CircularButton width={110} marginHorizontal={20} marginVertical={10}
+            onPress={() => {
+                exportEvent();
+            }}
+            >
             <MediumText size={26} color ={"white"}>
                 {"+ Add"}
             </MediumText>
