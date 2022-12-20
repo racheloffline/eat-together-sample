@@ -1,164 +1,180 @@
-// FOR JOSH: homepage for availabilities, figure out how to fetch the user's availabilities
+// Homepage for the availabilities screen (where you choose between linking with GCalendar or entering manually)
 
-import React, {useState} from "react";
-import { View, ScrollView, StyleSheet } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, StyleSheet, ActivityIndicator, Alert } from "react-native";
+import { Layout, TopNav } from "react-native-rapi-ui";
+import { Ionicons } from "@expo/vector-icons";
 
-import LargeText from "../../../components/LargeText";
+import MediumText from "../../../components/MediumText";
 import Button from "../../../components/Button";
 
-import { db } from "../../../provider/Firebase";
-import moment from "moment";
+import { getFreeTimes } from "../../../methods";
+import * as WebBrowser from "expo-web-browser";
+import * as Google from "expo-auth-session/providers/google";
+import {
+  GOOGLE_AUTH_CLIENT_ID,
+  GOOGLE_AUTH_CLIENT_ID_ANDROID,
+  GOOGLE_AUTH_CLIENT_ID_IOS
+} from "@env"; //Enviroment variables
+
+WebBrowser.maybeCompleteAuthSession();
 
 const AvailabilitiesHome = props => {
-  // Convert Firebase timestamps in timeslots to moment objects
-  const convert = day => {
-    return day.map(d => ({
-      startTime: !(d.startTime instanceof Date) ? moment(d.startTime.toDate()) : moment(d.startTime),
-      endTime: !(d.endTime instanceof Date) ? moment(d.endTime.toDate()) : moment(d.endTime),
-      available: d.available
-    }));
-  }
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    expoClientId: GOOGLE_AUTH_CLIENT_ID,
+    iosClientId: GOOGLE_AUTH_CLIENT_ID_IOS,
+    androidClientId: GOOGLE_AUTH_CLIENT_ID_ANDROID,
+    scopes: ["https://www.googleapis.com/auth/calendar"]
+  }); // For Google Calendar API
 
-  // Days
-  const [monday, setMonday] = useState(convert(props.route.params.user.availabilities.monday));
-  const [tuesday, setTuesday] = useState(convert(props.route.params.user.availabilities.tuesday));
-  const [wednesday, setWednesday] = useState(convert(props.route.params.user.availabilities.wednesday));
-  const [thursday, setThursday] = useState(convert(props.route.params.user.availabilities.thursday));
-  const [friday, setFriday] = useState(convert(props.route.params.user.availabilities.friday));
-  const [saturday, setSaturday] = useState(convert(props.route.params.user.availabilities.saturday));
-  const [sunday, setSunday] = useState(convert(props.route.params.user.availabilities.sunday));
+  const [freeTimes, setFreeTimes] = useState([]); // List of user's available times
+  const [loading, setLoading] = useState(false); // Loading state
 
-  // Save edited availabilities to Firebase
-  const saveAvailabilities = (day, times) => {
-    let newTimes;
+  // Connection with Google Calendar API
+  useEffect(() => {
+    async function fetchData() {
+      if (response?.type === 'success') {
+        setLoading(true);
+        const accessToken = response.authentication.accessToken;
+        const email = await fetchEmail(accessToken);
 
-    switch (day) {
-      case "Monday":
-        newTimes = convertToDate([times, tuesday, wednesday, thursday, friday, saturday, sunday]);
-        break;
-      case "Tuesday":
-        newTimes = convertToDate([monday, times, wednesday, thursday, friday, saturday, sunday]);
-        break;
-      case "Wednesday":
-        newTimes = convertToDate([monday, tuesday, times, thursday, friday, saturday, sunday]);
-        break;
-      case "Thursday":
-        newTimes = convertToDate([monday, tuesday, wednesday, times, friday, saturday, sunday]);
-        break;
-      case "Friday":
-        newTimes = convertToDate([monday, tuesday, wednesday, thursday, times, saturday, sunday]);
-        break;
-      case "Saturday":
-        newTimes = convertToDate([monday, tuesday, wednesday, thursday, friday, times, sunday]);
-        break;
-      case "Sunday":
-        newTimes = convertToDate([monday, tuesday, wednesday, thursday, friday, saturday, times]);
-        break;
-    }
+        // Get the Monday and Sunday occuring the week of the current date
+        const date = new Date(); // Today
+        const start = date.getDate() - date.getDay() + 1;
+        const end = start + 6;
+        const startDate = new Date(date.setDate(start));
+        const endDate = new Date(date.setDate(end));
 
-    const newAvailabilities = {
-      monday: newTimes[0],
-      tuesday: newTimes[1],
-      wednesday: newTimes[2],
-      thursday: newTimes[3],
-      friday: newTimes[4],
-      saturday: newTimes[5],
-      sunday: newTimes[6],
-    };
-
-    db.collection("Users").doc(props.route.params.user.id).update({
-      availabilities: newAvailabilities
-    });
-
-    props.route.params.updateAvailabilities(newAvailabilities);
-  }
-
-  // Convert from moment to firebase timestamp
-  const convertToDate = (days) => {
-    let newList = [];
-    days.forEach(list => {
-      let newDay = [];
-      list.forEach(time => {
-        newDay.push({
-          startTime: time.startTime.toDate(),
-          endTime: time.endTime.toDate(),
-          available: time.available
+        const events = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${email}/events?access_token=${accessToken}
+          &timeMin=${startDate.toISOString()}&timeMax=${endDate.toISOString()}`,
+        {
+          method: "GET",
+          headers: new Headers({
+            Authorization: `Bearer ${accessToken}`,
+          }),
+        })
+        .then(function (res) {
+          return res.json();
+        })
+        .then(function (res) {
+          return res.items;
         });
+
+        // Clean up events
+        const filtered = events.filter((e) => e.start && e.start.dateTime && e.end && e.end.dateTime);
+        const result = filtered.map((e) => {
+          // Set start and end to same day of the week but this week
+          console.log(e.summary);
+          const startDate = new Date(e.start.dateTime);
+          const endDate = new Date(e.end.dateTime);
+
+          const dayDiff = startDate.getDay() - new Date().getDay();
+          const start = new Date();
+          const end = new Date();
+          
+          start.setDate(start.getDate() + dayDiff);
+          end.setDate(end.getDate() + dayDiff);
+          start.setHours(startDate.getHours());
+          start.setMinutes(startDate.getMinutes());
+          start.setSeconds(0);
+          end.setHours(endDate.getHours());
+          end.setMinutes(endDate.getMinutes());
+          end.setSeconds(0);
+
+          return {
+            dayOfWeek: new Date(e.start.dateTime).getDay(),
+            start: start,
+            end: end
+          }
+        });
+        
+        // Algorithm to get the user's free times
+        setFreeTimes(getFreeTimes(result));
+      }
+    }
+    
+    fetchData();
+  }, [response]);
+
+  // If the user has linked with GCalendar, go to the availabilities screen
+  useEffect(() => {
+    setLoading(false);
+    if (freeTimes.length > 0 && response !== null) {
+      props.navigation.navigate("Availabilities", {
+        freeTimes: freeTimes,
+        user: props.route.params.user,
+        updateAvailabilities: props.route.params.updateAvailabilities
+      });
+    }
+  }, [freeTimes]);
+
+  // Get the user's email
+  const fetchEmail = async (accessToken) => {
+    const response = await fetch(
+      `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${accessToken}`,
+      {
+        method: "GET",
+        headers: new Headers({
+          Authorization: `Bearer ${accessToken}`,
+        }),
+      }).then(function (res) {
+        return res.json();
       });
 
-      newList.push(newDay);
-    });
-    
-    return newList;
+    return response.email;
   }
 
   return (
-    <ScrollView style={styles.page}>
-        <LargeText center size={28}>See/edit your preferred eating times!</LargeText>
+    <Layout style={styles.page}>
+        {loading && (
+          <View style={styles.overlay}>
+            <ActivityIndicator size={100} color="#5DB075"/>
+          </View>
+        )}
 
-        <View style={styles.dates}>
-            <Button onPress={() => props.navigation.navigate("EditDay", {
-              times: monday,
-              setTimes: setMonday,
-              day: "Monday",
-              saveAvailabilities
-            })} marginVertical={5}>Monday</Button>
-            <Button onPress={() => props.navigation.navigate("EditDay", {
-              times: tuesday,
-              setTimes: setTuesday,
-              day: "Tuesday",
-              saveAvailabilities
-            })} marginVertical={5}>Tuesday</Button>
-            <Button onPress={() => props.navigation.navigate("EditDay", {
-              times: wednesday,
-              setTimes: setWednesday,
-              day: "Wednesday",
-              saveAvailabilities
-            })} marginVertical={5}>Wednesday</Button>
-            <Button onPress={() => props.navigation.navigate("EditDay", {
-              times: thursday,
-              setTimes: setThursday,
-              day: "Thursday",
-              saveAvailabilities
-            })} marginVertical={5}>Thursday</Button>
-            <Button onPress={() => props.navigation.navigate("EditDay", {
-              times: friday,
-              setTimes: setFriday,
-              day: "Friday",
-              saveAvailabilities
-            })} marginVertical={5}>Friday</Button>
-            <Button onPress={() => props.navigation.navigate("EditDay", {
-              times: saturday,
-              setTimes: setSaturday,
-              day: "Saturday",
-              saveAvailabilities
-            })} marginVertical={5}>Saturday</Button>
-            <Button onPress={() => props.navigation.navigate("EditDay", {
-              times: sunday,
-              setTimes: setSunday,
-              day: "Sunday",
-              saveAvailabilities
-            })} marginVertical={5}>Sunday</Button>
-        </View>
+        <TopNav
+            middleContent={
+                <MediumText>Edit Eating Times</MediumText>
+            }
+            leftContent={
+                <Ionicons
+                    name="chevron-back"
+                    size={20}
+                />
+            }
+            leftAction={() => props.navigation.goBack()}
+        />
 
-        <View style={styles.buttons}>
-          <Button onPress={() => props.navigation.goBack()}
-            marginHorizontal={10}>Back</Button>
+        <View style={styles.main}>
+            <Button disabled={!request} marginVertical={10} onPress={() => promptAsync()}>Link with Google Calendar</Button>
+            <MediumText center>OR</MediumText>
+            <Button marginVertical={10} onPress={() => props.navigation.navigate("Availabilities", {
+              user: props.route.params.user,
+              updateAvailabilities: props.route.params.updateAvailabilities
+            })}>Edit manually</Button>
         </View>
-    </ScrollView>
+    </Layout>
   );
 }
 
 const styles = StyleSheet.create({
-  page: {
-    paddingHorizontal: 20,
-    paddingVertical: 20
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    zIndex: 10
   },
 
-  dates: {
+  main: {
+    flex: 1,
     paddingHorizontal: 40,
     marginTop: 20,
-    marginBottom: 40
+    justifyContent: "center"
   },
 
   buttons: {

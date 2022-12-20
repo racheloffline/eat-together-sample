@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import firebase from "firebase/compat";
 
-//Login and forgot password pages
+// Login and forgot password pages
 import Login from "../screens/auth/Login";
 import ForgetPassword from "../screens/auth/ForgetPassword";
 
@@ -10,13 +10,12 @@ import ForgetPassword from "../screens/auth/ForgetPassword";
 import Name from "../screens/auth/Registration/Name";
 import Email from "../screens/auth/Registration/Email";
 import Tags from "../screens/auth/Registration/Tags";
-import Availabilities from "../screens/auth/Registration/Availabilities";
 import Password from "../screens/auth/Registration/Password";
 
+import AvailabilitiesHome from "../screens/auth/Registration/AvailabilitiesHome";
+import Availabilities from "../screens/auth/Registration/Availabilities";
 import Day from "../screens/auth/Registration/Day";
-import timeSlots from "../timeSlots";
 
-import { cloneDeep } from "lodash";
 import { db, auth, storage } from "../provider/Firebase";
 
 const Stack = createStackNavigator();
@@ -37,13 +36,13 @@ const Auth = () => {
   const [email, setEmail] = useState("");
 
   // Days
-  const [monday, setMonday] = useState(cloneDeep(timeSlots));
-  const [tuesday, setTuesday] = useState(cloneDeep(timeSlots));
-  const [wednesday, setWednesday] = useState(cloneDeep(timeSlots));
-  const [thursday, setThursday] = useState(cloneDeep(timeSlots));
-  const [friday, setFriday] = useState(cloneDeep(timeSlots));
-  const [saturday, setSaturday] = useState(cloneDeep(timeSlots));
-  const [sunday, setSunday] = useState(cloneDeep(timeSlots));
+  const [monday, setMonday] = useState([]);
+  const [tuesday, setTuesday] = useState([]);
+  const [wednesday, setWednesday] = useState([]);
+  const [thursday, setThursday] = useState([]);
+  const [friday, setFriday] = useState([]);
+  const [saturday, setSaturday] = useState([]);
+  const [sunday, setSunday] = useState([]);
 
   // Password
   const [username, setUsername] = useState("");
@@ -249,6 +248,11 @@ const Auth = () => {
         {(props) => <Email {...props} email={email} setEmail={setEmail} />}
       </Stack.Screen>
 
+      <Stack.Screen
+        name="AvailabilitiesHome"
+        options={{ headerShown: false }}
+        component={AvailabilitiesHome}
+      />
       <Stack.Screen
         name="Availabilities"
         options={{ headerShown: false }}
