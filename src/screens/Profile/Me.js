@@ -23,6 +23,7 @@ export default function ({ navigation }) {
   const user = auth.currentUser;
 
   const [userInfo, setUserInfo] = useState({});
+  const [banner, setBanner] = useState({});
   const [mealsAttended, setMealsAttended] = useState(0);
   const [mealsSignedUp, setMealsSignedUp] = useState(0);
 
@@ -35,6 +36,15 @@ export default function ({ navigation }) {
         .doc(user.uid)
         .onSnapshot(async (doc) => {
           setUserInfo(doc.data());
+          if (doc.data().settings.banner) {
+            console.log("Here", doc.data().settings.banner)
+            setBanner(doc.data().settings.banner);
+          } else {
+            db.collection("Users").doc(user.uid).update({
+              "settings.banner": '#5DB075'
+            });
+            setBanner('#5DB075')
+          }
           setMealsAttended(doc.data().attendedEventIDs.length);
           setMealsSignedUp(
             doc.data().attendingEventIDs.length +
@@ -92,9 +102,11 @@ export default function ({ navigation }) {
       pronouns: newPronouns,
       bio: newBio,
       tags: newTags,
-      image: newImage
+      image: newImage,
     }));
   };
+
+
 
   // Update user's availabilities after editing
   const updateAvailabilities = newAvailabilities => {
@@ -103,11 +115,31 @@ export default function ({ navigation }) {
       availabilities: newAvailabilities
     }));
   }
-  
+
+  // Update user's banner after editing
+  const updateBanner = newBanner => {
+    setBanner(() => ({
+      banner: newBanner
+    }));
+  }
+
   return (
     <Layout>
       <ScrollView contentContainerStyle={styles.page}>
-        <View style={styles.background} />
+        <View style={[styles.background, {backgroundColor: banner}]} />
+        <View style={styles.palette}>
+          <Ionicons
+            name="aperture"
+            size={40}
+            color="white"
+            onPress={() => {
+              navigation.navigate("ColorPicker", {
+                oldbanner: banner,
+                updateBanner,
+              });
+            }}
+          ></Ionicons>
+        </View>
         <View style={styles.settings}>
           <Ionicons
             name="settings-sharp"
@@ -231,7 +263,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: Dimensions.get("screen").width,
     height: 150,
-    backgroundColor: "#5DB075",
+    // backgroundColor: this.state.userInfo.banner,
   },
 
   image: {
@@ -247,6 +279,12 @@ const styles = StyleSheet.create({
     width: "100%",
     marginVertical: 20,
     alignItems: "center",
+  },
+
+  palette: {
+    position: "absolute",
+    left: 20,
+    top: 20,
   },
 
   settings: {
