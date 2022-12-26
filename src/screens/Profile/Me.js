@@ -37,7 +37,6 @@ export default function ({ navigation }) {
         .onSnapshot(async (doc) => {
           setUserInfo(doc.data());
           if (doc.data().settings.banner) {
-            console.log("Here", doc.data().settings.banner)
             setBanner(doc.data().settings.banner);
           } else {
             db.collection("Users").doc(user.uid).update({
@@ -263,7 +262,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: Dimensions.get("screen").width,
     height: 150,
-    // backgroundColor: this.state.userInfo.banner,
   },
 
   image: {

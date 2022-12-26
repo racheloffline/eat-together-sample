@@ -1,3 +1,6 @@
+// This is the colorpicker for banner color, it will allow user
+// to click and pick a color and set the chosen color to be their
+// new banner color and also update the database
 import { ColorPicker } from 'react-native-color-picker'
 import React, { useState, useEffect } from "react";
 import { Ionicons, Feather } from "@expo/vector-icons";
