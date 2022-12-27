@@ -112,5 +112,14 @@ export default () => {
 ```
 
 ## Common Bugs & Fixes 🐛
-While there are many bugs that can arise while setting up the project, here are a few of the most common ones. Note that this list is not compreensive nor final.
+While there are many bugs that can arise while setting up the project, here are a few of the most common ones. Note that this list is not comprehensive nor final.
 - Mac users: if `npm install` does not work and displays a long series of errors, it is often because of your computer's security permissions. Try `sudo npm install`, which will prompt you for your password. This will run the install as admin, which should work.
+- Mac users: if attempting to launch via simulator and you get the error `Error: xcrun exited with non-zero code: 2
+An error was encountered processing the command (domain=NSPOSIXErrorDomain, code=2):
+Unable to boot device because we cannot determine the runtime bundle.
+No such file or directory`, run the following command in Terminal:
+
+	```
+	open -a simulator 
+	```
+	Once the simulator boots up, immediately quit the simulator app. Run `npm start` or `yarn start` again from the project directory, and open 		simulator. It should then be resolved.
