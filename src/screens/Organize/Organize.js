@@ -127,11 +127,27 @@ export default function ({ navigation }) {
         setTagsValue(tags);
     }, [name, location, type, tagsSelected]);
 
+    useEffect(() => {
+        console.log(endDate);
+    }, [endDate]);
+
     // For selecting a start date and time
     const changeStartDate = (selectedDate) => {
-        const currentDate = selectedDate || startDate;
-        setStartDate(currentDate); // Set the date
-        setEndDate(moment(currentDate).add(1, 'hours').toDate()); // Set the end date to the same as the start date
+        const start = cloneDeep(selectedDate) || startDate;
+
+        if (mode === "date") { // Set end date to same day as start date
+            let end = cloneDeep(selectedDate) || endDate;
+            end.setHours(endDate.getHours());
+            end.setMinutes(endDate.getMinutes());
+            end.setSeconds(59);
+            setEndDate(end);
+
+            start.setHours(startDate.getHours());
+            start.setMinutes(startDate.getMinutes());
+            start.setSeconds(0);
+        }
+
+        setStartDate(start); // Set the date
         setShowStartDate(false); // Exit the date/time picker modal
     };
 
@@ -392,7 +408,9 @@ export default function ({ navigation }) {
                     </View>
 
                     {type === "public" ? <Button disabled={disabled || loading} onPress={() => {
-                        if (checkProfanity(name)) {
+                        if (startDate > endDate) {
+                            alert("Start time must be before end time");
+                        } else if (checkProfanity(name)) {
                             alert("Name has inappropriate words >:(");
                         } else if (checkProfanity(location)) {
                             alert("Location has inappropriate words >:(");
@@ -417,7 +435,9 @@ export default function ({ navigation }) {
                         {loading ? "Posting ..." : "Post"}
                     </Button> :
                     <Button disabled={disabled} onPress={() => {
-                        if (checkProfanity(name)) {
+                        if (startDate > endDate) {
+                            alert("Start time must be before end time");
+                        } else if (checkProfanity(name)) {
                             alert("Name has inappropriate words >:(");
                         } else if (checkProfanity(location)) {
                             alert("Location has inappropriate words >:(");

@@ -1,6 +1,5 @@
 import React from "react";
 import { TouchableOpacity } from "react-native";
-import MediumText from "./MediumText";
 
 const CircularButton = props => {
     return (

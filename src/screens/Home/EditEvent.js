@@ -24,6 +24,7 @@ import NormalText from "../../components/NormalText";
 
 import * as ImagePicker from "expo-image-picker";
 import { db, storage } from "../../provider/Firebase";
+import { checkProfanity } from "../../methods";
 import { cloneDeep } from "lodash";
 import moment from "moment";
 
@@ -88,9 +89,21 @@ export default function ({ route, navigation }) {
 
     // For selecting a start date and time
     const changeStartDate = (selectedDate) => {
-        const currentDate = selectedDate || startDate;
-        setStartDate(currentDate); // Set the date
-        setEndDate(moment(currentDate).add(1, 'hours').toDate()); // Set the end date to the same as the start date
+        const start = cloneDeep(selectedDate) || startDate;
+
+        if (mode === "date") { // Set end date to same day as start date
+            let end = cloneDeep(selectedDate) || endDate;
+            end.setHours(endDate.getHours());
+            end.setMinutes(endDate.getMinutes());
+            end.setSeconds(59);
+            setEndDate(end);
+
+            start.setHours(startDate.getHours());
+            start.setMinutes(startDate.getMinutes());
+            start.setSeconds(0);
+        }
+
+        setStartDate(start); // Set the date
         setShowStartDate(false); // Exit the date/time picker modal
     };
 
@@ -290,22 +303,32 @@ export default function ({ route, navigation }) {
                     </TouchableOpacity>}
 
                     <Button disabled={disabled || loading} onPress={() => {
-                        setLoading(true);
-                        let hasImage = false;
-                        if (photo !== "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400") {
-                            hasImage = true;
-                            
-                            if (photo !== route.params.event.image) {
-                                storeImage(photo, route.params.event.id).then(() => {
-                                    fetchImage(route.params.event.id).then(uri => {
-                                        storeEvent(route.params.event.id, hasImage, uri);
-                                    });
-                                });
-                            } else {
-                                storeEvent(route.params.event.id, hasImage, route.params.event.image);
-                            }
+                        if (startDate > endDate) {
+                            alert("Start time must be before end time");
+                        } else if (checkProfanity(name)) {
+                            alert("Name has inappropriate words >:(");
+                        } else if (checkProfanity(location)) {
+                            alert("Location has inappropriate words >:(");
+                        } else if (checkProfanity(additionalInfo)) {
+                            alert("Additional info has inappropriate words >:(");
                         } else {
-                            storeEvent(route.params.event.id, hasImage, "");
+                            setLoading(true);
+                            let hasImage = false;
+                            if (photo !== "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400") {
+                                hasImage = true;
+                                
+                                if (photo !== route.params.event.image) {
+                                    storeImage(photo, route.params.event.id).then(() => {
+                                        fetchImage(route.params.event.id).then(uri => {
+                                            storeEvent(route.params.event.id, hasImage, uri);
+                                        });
+                                    });
+                                } else {
+                                    storeEvent(route.params.event.id, hasImage, route.params.event.image);
+                                }
+                            } else {
+                                storeEvent(route.params.event.id, hasImage, "");
+                            }
                         }
                     }} marginVertical={20}>{loading ? "Updating ..." : "Update"}</Button>
                 </ScrollView>
@@ -334,7 +357,6 @@ export default function ({ route, navigation }) {
                     multi={true}
                     selectedItems={tagsSelected}
                     onItemSelect={(item) => {
-                        console.log("Select");
                         setTagsSelected([...tagsSelected, item]);
                     }}
                     onRemoveItem={(item, index) => {

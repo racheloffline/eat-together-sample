@@ -7,6 +7,7 @@
     "version": "0.8.1",
     "orientation": "portrait",
     "icon": "./assets/big_logo.png",
+    "scheme": "com.eat.together",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
