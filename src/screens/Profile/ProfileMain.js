@@ -15,6 +15,7 @@ import ReportPerson from "../Explore/People/ReportPerson";
 
 import AvailabilitiesHome from "./Availabilities/AvailabilitiesHome";
 import Availabilities from "./Availabilities/Availabilities";
+import Colorpicker from "./ColorPicker";
 
 const Stack = createStackNavigator();
 
@@ -46,6 +47,7 @@ export default function () {
 
       <Stack.Screen name="AvailabilitiesHome" component={AvailabilitiesHome} />
       <Stack.Screen name="Availabilities" component={Availabilities} />
+      <Stack.Screen name="ColorPicker" component={Colorpicker} />
     </Stack.Navigator>
   );
 }
