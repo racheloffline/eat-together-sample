@@ -28,7 +28,7 @@ Other (less but kinda) important files/folders to know:
 
 ## React Native Expo Installation
 
-1. Install [node.js](https://nodejs.org/en/). To ensure that you properly downloaded it, type `npm -v` in the terminal.
+1. Install [node.js](https://nodejs.org/en/). To ensure that you properly downloaded it, type `npm -v` in the terminal. This will diplsay the currently installed version, if any.
 2. Install Expo:
 
    ```jsx
@@ -41,7 +41,7 @@ Other (less but kinda) important files/folders to know:
    ```jsx
    npm install
    ```
-   for mac users use yarn instead:
+   for mac users who are unable to use npm, use yarn instead:
    ```
    npm install --global yarn
    yarn install
@@ -52,7 +52,11 @@ Other (less but kinda) important files/folders to know:
    ```jsx
    npm start
    ```
-   for mac users use yarn instead:
+   or start directly from expo:
+   ```
+   expo start
+   ```
+   for yarn users, use the following command:
    ```
    yarn start
    ```
@@ -106,3 +110,7 @@ export default () => {
 	);
 };
 ```
+
+## Common Bugs & Fixes 🐛
+While there are many bugs that can arise while setting up the project, here are a few of the most common ones. Note that this list is not compreensive nor final.
+- Mac users: if `npm install` does not work and displays a long series of errors, it is often because of your computer's security permissions. Try `sudo npm install`, which will prompt you for your password. This will run the install as admin, which should work.
