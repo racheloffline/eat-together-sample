@@ -2,8 +2,6 @@ import { useFonts, Inter_600SemiBold } from "@expo-google-fonts/inter";
 import { StyleSheet, TextInput as ReactNativeTextInput, Keyboard, Platform, View, TouchableOpacity } from "react-native"
 import { Ionicons } from "@expo/vector-icons";
 
-// Accessible props: 
-// value, placeholder, color, fontSize, onChangeText, onSubmitEditing, width, height, multiline
 function TextInput(props) {
 
     // Affects the TextInput
@@ -20,6 +18,8 @@ function TextInput(props) {
     // Affects the container
     // Restricts TextInput into a fixed rectangle defined by width and height
     const backgroundColor = props.backgroundColor ? props.backgroundColor : "#5DB075";
+    const borderColor = props.borderColor ? props.borderColor : "";
+    const borderWidth = props.borderWidth ? props.borderWidth : "";
     const width = props.width ? props.width : "30%";
     const minWidth = width;
     const maxWidth = width;
@@ -29,7 +29,6 @@ function TextInput(props) {
    
     const multiline = props.multiline ? props.multiline : false;
     
-
     // Affects icons
     const displayLeftIcon = multiline ? "none" : "flex";
     const displayRightIcon = displayLeftIcon;
@@ -61,17 +60,18 @@ function TextInput(props) {
         maxHeight: maxHeight,
         backgroundColor: backgroundColor,
         borderRadius: "10%",
-        borderColor: ""
+        borderColor: borderColor,
+        borderWidth: borderWidth,
       }, leftContainer: {
         display: displayLeftIcon,
         fontSize: iconLeftFontSize,
         marginLeft: "3%",
         justifyContent: "center",
       }, rightContainer: {
-            display: displayRightIcon,
-            fontSize: iconRightFontSize,
-            marginRight: "3%",
-            justifyContent: "center",
+        display: displayRightIcon,
+        fontSize: iconRightFontSize,
+        marginRight: "3%",
+        justifyContent: "center",
       },
     });
   
