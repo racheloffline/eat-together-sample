@@ -46,7 +46,7 @@ export default function ({ navigation }) {
                         await db.collection("Users").doc(user.uid).update({
                             "settings.notifications": true
                         });
-                        
+
                         setNotifs(true);
                         alert("Notification preference updated!");
                     }
@@ -125,9 +125,9 @@ export default function ({ navigation }) {
                     text: "Yes",
                     onPress: async () => {
                         const uid = user.uid;
-                        await db.collection("Users").doc(uid).delete();
-                        await db.collection("Usernames").doc(userInfo.username).delete();
-                        
+                        db.collection("Users").doc(uid).delete();
+                        db.collection("Usernames").doc(userInfo.username).delete();
+
                         if (userInfo.hasImage) {
                             const ref = storage.ref().child(`profilePictures/${uid}`);
                             await ref.delete();
