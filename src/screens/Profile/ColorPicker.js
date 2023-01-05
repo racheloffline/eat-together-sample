@@ -25,7 +25,7 @@ export default function Colorpicker({ navigation, route }) {
           navigation.navigate("Me");
         }}
       />
-      <MediumText color="white">Rotate the palette and click the bar to customize your banner color!</MediumText>
+      <MediumText color="white">Rotate the palette and click the right side of the bar below to save your new banner color!</MediumText>
       <TriangleColorPicker
         oldColor={route.params.oldbanner}
         onColorSelected={color => {
@@ -41,8 +41,5 @@ export default function Colorpicker({ navigation, route }) {
         style={{flex: 1}}
       />
     </View>
-
   );
 }
-
-
