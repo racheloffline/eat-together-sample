@@ -1,13 +1,12 @@
 // This is the colorpicker for banner color, it will allow user
 // to click and pick a color and set the chosen color to be their
 // new banner color and also update the database
-import { ColorPicker } from 'react-native-color-picker'
-import React, { useState, useEffect } from "react";
-import { Ionicons, Feather } from "@expo/vector-icons";
+import { TriangleColorPicker } from 'react-native-color-picker'
+import React from "react";
+import { Ionicons} from "@expo/vector-icons";
+import MediumText from "../../components/MediumText";
 import {
     View,
-    StyleSheet,
-    Text,
 } from 'react-native';
 
 import { db, auth } from "../../provider/Firebase";
@@ -15,14 +14,6 @@ import "firebase/firestore"
 
 export default function Colorpicker({ navigation, route }) {
   const user = auth.currentUser;
-  // Fetch current user info
-  useEffect(() => {
-      if (user) {
-          db.collection("Users").doc(user.uid).get().then(doc => {
-              setBanner(doc.data().settings.banner);
-          });
-      }
-  });
 
   return (
     <View style={{flex: 1, padding: 45, backgroundColor: 'black'}}>
@@ -34,8 +25,8 @@ export default function Colorpicker({ navigation, route }) {
           navigation.navigate("Me");
         }}
       />
-      <Text style={styles.name}>Rotate the palette and click to customize your banner color!</Text>
-      <ColorPicker
+      <MediumText color="white">Rotate the palette and click the bar to customize your banner color!</MediumText>
+      <TriangleColorPicker
         oldColor={route.params.oldbanner}
         onColorSelected={color => {
           db.collection("Users").doc(user.uid).update({
@@ -53,15 +44,5 @@ export default function Colorpicker({ navigation, route }) {
 
   );
 }
-
-const styles = StyleSheet.create({
-  name: {
-    width: "100%",
-    marginVertical: 20,
-    alignItems: "center",
-    color: 'white',
-    fontSize:20
-  },
-});
 
 
