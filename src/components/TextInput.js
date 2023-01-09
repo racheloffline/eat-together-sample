@@ -16,6 +16,7 @@ function TextInput(props) {
         secureTextEntry = false,
         autoComplete="off",
         autoCorrect=false,
+        editable=true,
         onChangeText = () => {},
         onSubmitEditing = () => {},
         
@@ -47,12 +48,6 @@ function TextInput(props) {
     let [fontsLoaded] = useFonts({ Inter_600SemiBold, Inter_400Regular });
     const fontFamily = fontsLoaded ? (bold ? "Inter_600SemiBold" : "Inter_400Regular") : (Platform.OS === "ios" ? "AppleSDGothicNeo-Medium" : "sans-serif-medium");
     
-    // mainContainer: Restricts TextInput into a fixed rectangle defined by width and height
-    const minWidth = width;
-    const maxWidth = width;
-    const minHeight = height;
-    const maxHeight = height;
-    
     // Show icons if single line and sets icon's default size to the fontSize
     const displayLeftIcon = multiline ? "none" : "flex";
     const displayRightIcon = displayLeftIcon;
@@ -72,11 +67,9 @@ function TextInput(props) {
             color: color,
       },
         mainContainer: {
-            flexDirection: 'row', 
-            minWidth: minWidth,
-            minHeight: minHeight,
-            maxWidth: maxWidth,
-            maxHeight: maxHeight,
+            flexDirection: 'row',
+            height: height,
+            width: width, 
             backgroundColor: backgroundColor,
             borderRadius: "10%",
             borderColor: borderColor,
@@ -117,6 +110,7 @@ function TextInput(props) {
                 blurOnSubmit={true}
                 onSubmitEditing={(e) => {Keyboard.dismiss(); onSubmitEditing(e);} }
                 secureTextEntry={secureTextEntry}
+                editable={editable}
             />
             <TouchableOpacity onPress={iconRightOnPress} style={styles.rightContainer}>
                 {iconRightType === "Ionicons" && <Ionicons style={{fontSize: iconFontSize}} name={iconRight} />}

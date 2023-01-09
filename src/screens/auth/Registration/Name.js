@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
 
   name: {
     width:"100%",
-    height:"10%",
+    height: "10%",
     flexDirection: "row",
     justifyContent: "space-between",
   },
