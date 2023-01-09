@@ -1,6 +1,6 @@
 import { useFonts, Inter_600SemiBold } from "@expo-google-fonts/inter";
 import { StyleSheet, TextInput as ReactNativeTextInput, Keyboard, Platform, View, TouchableOpacity } from "react-native"
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, FontAwesome } from "@expo/vector-icons";
 
 function TextInput(props) {
     
@@ -31,6 +31,9 @@ function TextInput(props) {
         multiline = false,
         
         // Affects icons
+        iconRightType = "Ionicons",
+        iconLeftType = "Ionicons",
+        iconFontSize = fontSize,
         iconLeft = "",
         iconRight = "",
         iconRightOnPress = () => {},        
@@ -52,8 +55,6 @@ function TextInput(props) {
     // Show icons if single line and sets icon's default size to the fontSize
     const displayLeftIcon = multiline ? "none" : "flex";
     const displayRightIcon = displayLeftIcon;
-    const iconLeftFontSize = iconLeftFontSize ? iconLeftFontSize : fontSize;
-    const iconRightFontSize = iconRightFontSize ? iconRightFontSize : fontSize;
 
     const styles = StyleSheet.create({
         textInput: {
@@ -99,7 +100,8 @@ function TextInput(props) {
     return (
         <View style={styles.mainContainer}>
             <View style={styles.leftContainer}>
-                <Ionicons style={{fontSize: iconLeftFontSize}} name={iconLeft} />
+                {iconLeftType === "Ionicons" && <Ionicons style={{fontSize: iconFontSize}} name={iconLeft} />}
+                {iconLeftType === "FontAwesome" && <FontAwesome size={iconFontSize} name={iconLeft} />}
             </View>
             <ReactNativeTextInput 
                 style={styles.textInput}
@@ -116,7 +118,8 @@ function TextInput(props) {
                 secureTextEntry={secureTextEntry}
             />
             <TouchableOpacity onPress={iconRightOnPress} style={styles.rightContainer}>
-                <Ionicons style={{fontSize: iconRightFontSize}} name={iconRight} />
+                {iconRightType === "Ionicons" && <Ionicons style={{fontSize: iconFontSize}} name={iconRight} />}
+                {iconRightType === "FontAwesome" && <FontAwesome size={iconFontSize} name={iconRight} />}
             </TouchableOpacity>
         </View>
     );
