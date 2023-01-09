@@ -17,7 +17,6 @@ import firebase from "firebase/compat";
 import {
   Layout,
 } from "react-native-rapi-ui";
-import { Ionicons, Entypo } from "@expo/vector-icons";
 
 import Button from "../../components/Button";
 import TextInput from "../../components/TextInput";
@@ -89,13 +88,13 @@ export default function ({ navigation }) {
             <LargeText center>Welcome!</LargeText>
 
             <TextInput
-              style={{marginTop:"10%"}}
               iconLeft="mail"
               placeholder="Enter your email"
               width="100%"
               height="10%"
               marginTop="9%"
               value={email}
+              bold={true}
               onChangeText={(newEmail) => setEmail(newEmail)}
             />
 
@@ -109,6 +108,7 @@ export default function ({ navigation }) {
               marginTop="4%"
               marginBottom="4%"
               value={password}
+              bold={true}
               onChangeText={(newPassword) => setPassword(newPassword)}
               secureTextEntry={!showPass ? true : false}
             />

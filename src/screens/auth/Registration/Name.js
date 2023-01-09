@@ -2,17 +2,16 @@
 
 import React, { useState } from "react";
 import { View, StyleSheet, Dimensions, Image, TouchableOpacity, SafeAreaView } from "react-native";
-import TextInput from "../../../components/TextInput";
 import { Feather } from '@expo/vector-icons';
 
 import * as ImagePicker from 'expo-image-picker';
 
+import TextInput from "../../../components/TextInput";
 import LargeText from "../../../components/LargeText";
 import Button from "../../../components/Button";
 import KeyboardAvoidingWrapper from "../../../components/KeyboardAvoidingWrapper";
 
 import { checkProfanity } from "../../../methods";
-import { color } from "react-native-reanimated";
 
 const Name = props => {
   // Input fields
@@ -116,7 +115,6 @@ const Name = props => {
               marginTop="3%"
               height="10%"
               onChangeText={(val) => setBio(val)}
-              containerStyle={{ marginTop: 10 }}
               iconLeftType="FontAwesome"
               iconLeft="exclamation"
             />
