@@ -100,7 +100,7 @@ export default function ({ navigation }) {
 
             <TextInput
               iconLeft="lock-closed"
-              iconRight={!showPass ? "eye-off" : "eye"}
+              iconRight={!showPass ? "eye" : "eye-off"}
               iconRightOnPress={() => {setShowPass(!showPass)}}
               placeholder="Enter your password"
               width="100%"

@@ -17,6 +17,7 @@ function TextInput(props) {
         autoComplete="off",
         autoCorrect=false,
         editable=true,
+        keyboardType="default",
         onChangeText = () => {},
         onSubmitEditing = () => {},
         
@@ -111,6 +112,7 @@ function TextInput(props) {
                 onSubmitEditing={(e) => {Keyboard.dismiss(); onSubmitEditing(e);} }
                 secureTextEntry={secureTextEntry}
                 editable={editable}
+                keyboardType={keyboardType}
             />
             <TouchableOpacity onPress={iconRightOnPress} style={styles.rightContainer}>
                 {iconRightType === "Ionicons" && <Ionicons style={{fontSize: iconFontSize}} name={iconRight} />}
