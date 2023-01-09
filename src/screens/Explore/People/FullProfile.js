@@ -291,7 +291,9 @@ const FullProfile = ({ blockBack, route, navigation }) => {
       />
 
       <ScrollView contentContainerStyle={styles.page}>
-        <View style={styles.background} />
+        <View style={[styles.background, {
+          backgroundColor: route.params.person.settings.banner ? route.params.person.settings.banner : "#5DB075"
+        }]} />
         <Image
           style={styles.image}
           source={
@@ -360,8 +362,7 @@ const styles = StyleSheet.create({
   background: {
     position: "absolute",
     width: Dimensions.get("screen").width,
-    height: 100,
-    backgroundColor: "#5DB075",
+    height: 100
   },
 
   image: {

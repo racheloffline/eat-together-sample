@@ -63,5 +63,17 @@
   },
   "private": true,
   "name": "eat-together",
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "description": "Connecting students through shared meals. Our app allows you to create and join food meetups with ease.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eat-together-team/eat-together.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/eat-together-team/eat-together/issues"
+  },
+  "homepage": "https://github.com/eat-together-team/eat-together#readme"
 }
