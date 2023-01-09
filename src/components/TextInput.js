@@ -1,4 +1,4 @@
-import { useFonts, Inter_600SemiBold } from "@expo-google-fonts/inter";
+import { useFonts, Inter_600SemiBold, Inter_400Regular } from "@expo-google-fonts/inter";
 import { StyleSheet, TextInput as ReactNativeTextInput, Keyboard, Platform, View, TouchableOpacity } from "react-native"
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
 
@@ -8,6 +8,7 @@ function TextInput(props) {
     const {
         
         // Affects the TextInput
+        bold = false,
         value = "",
         color = "black",
         fontSize = "15",
@@ -43,8 +44,8 @@ function TextInput(props) {
     
 
     // Loads appropriate font
-    let [fontsLoaded] = useFonts({ Inter_600SemiBold });
-    const fontFamily = fontsLoaded ? "Inter_600SemiBold" : (Platform.OS === "ios" ? "AppleSDGothicNeo-Medium" : "sans-serif-medium");
+    let [fontsLoaded] = useFonts({ Inter_600SemiBold, Inter_400Regular });
+    const fontFamily = fontsLoaded ? (bold ? "Inter_600SemiBold" : "Inter_400Regular") : (Platform.OS === "ios" ? "AppleSDGothicNeo-Medium" : "sans-serif-medium");
     
     // mainContainer: Restricts TextInput into a fixed rectangle defined by width and height
     const minWidth = width;
