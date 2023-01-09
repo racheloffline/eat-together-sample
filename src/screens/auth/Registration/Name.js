@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import { View, StyleSheet, Dimensions, Image, TouchableOpacity, SafeAreaView } from "react-native";
-import { TextInput } from "react-native-rapi-ui";
-import { Feather, FontAwesome } from '@expo/vector-icons';
+import TextInput from "../../../components/TextInput";
+import { Feather } from '@expo/vector-icons';
 
 import * as ImagePicker from 'expo-image-picker';
 
@@ -12,6 +12,7 @@ import Button from "../../../components/Button";
 import KeyboardAvoidingWrapper from "../../../components/KeyboardAvoidingWrapper";
 
 import { checkProfanity } from "../../../methods";
+import { color } from "react-native-reanimated";
 
 const Name = props => {
   // Input fields
@@ -80,19 +81,19 @@ const Name = props => {
               <TextInput
                 placeholder="First name"
                 value={firstName}
-                maxLength={20}
+                width = "47%"
+                height = "100%"
                 onChangeText={(val) => setFirstName(val)}
-                containerStyle={{ width: "47%" }}
-                leftContent={<FontAwesome name="user" size={18} />}
+                iconLeft = "person"
                 autoComplete="name"
               />
               <TextInput
                 placeholder="Last name"
                 value={lastName}
-                maxLength={30}
+                width = "47%"
+                height = "100%"
                 onChangeText={(val) => setLastName(val)}
-                containerStyle={{ width: "47%" }}
-                leftContent={<FontAwesome name="user" size={18} />}
+                iconLeft = "person"
                 autoComplete="name"
               />
             </View>
@@ -100,18 +101,24 @@ const Name = props => {
             <TextInput
               placeholder="Pronouns (he/him, she/her, etc.)"
               value={pronouns}
+              marginTop="3%"
+              width="100%"
+              height="10%"
               onChangeText={(val) => setPronouns(val)}
-              containerStyle={{ marginTop: 10 }}
-              leftContent={<FontAwesome name="quote-left" size={18} />}
+              iconLeftType="FontAwesome"
+              iconLeft="quote-left"
             />
 
             <TextInput
               placeholder="Fun fact (10 to 100 characters)"
               value={bio}
-              maxLength={100}
+              width="100%"
+              marginTop="3%"
+              height="10%"
               onChangeText={(val) => setBio(val)}
               containerStyle={{ marginTop: 10 }}
-              leftContent={<FontAwesome name="exclamation" size={18} />}
+              iconLeftType="FontAwesome"
+              iconLeft="exclamation"
             />
 
             <View style={styles.buttons}>
@@ -169,11 +176,12 @@ const styles = StyleSheet.create({
 
   content: {
     paddingHorizontal: 20,
-    alignItems: "center"
+    alignItems: "center",
   },
 
   name: {
-    width: "100%",
+    width:"100%",
+    height:"10%",
     flexDirection: "row",
     justifyContent: "space-between",
   },
@@ -192,7 +200,7 @@ const styles = StyleSheet.create({
     marginTop: "30%",
     display: "flex",
     flexDirection: "row",
-    justifyContent: "center"
+    justifyContent: "center",
   }
 });
 
