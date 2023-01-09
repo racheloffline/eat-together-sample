@@ -3,40 +3,57 @@ import { StyleSheet, TextInput as ReactNativeTextInput, Keyboard, Platform, View
 import { Ionicons } from "@expo/vector-icons";
 
 function TextInput(props) {
+    
+    // Destructure all props and set default values
+    const {
+        
+        // Affects the TextInput
+        value = "",
+        color = "black",
+        fontSize = "15",
+        placeholder = "",
+        secureTextEntry = false,
+        autoComplete="off",
+        autoCorrect=false,
+        onChangeText = () => {},
+        onSubmitEditing = () => {},
+        
+        // Affects the container
+        backgroundColor = "white",
+        borderColor = "lightgrey",
+        borderWidth = "1%",
+        height = "7%",
+        width = "30%",
+        marginTop = "0%",
+        marginBottom = "0%",
+        marginRight = "0%",
+        marginLeft = "0%",
+        multiline = false,
+        
+        // Affects icons
+        iconLeft = "",
+        iconRight = "",
+        iconRightOnPress = () => {},        
+        
+        ...restOfProps
+    } = props;
+    
 
-    // Affects the TextInput
+    // Loads appropriate font
     let [fontsLoaded] = useFonts({ Inter_600SemiBold });
-    const value = props.value ? props.value : "";
-    const placeholder = props.placeholder ? props.placeholder : "";
-    const color = props.color ? props.color : "black";
-    const fontSize = props.fontSize ? props.fontSize : 15;
     const fontFamily = fontsLoaded ? "Inter_600SemiBold" : (Platform.OS === "ios" ? "AppleSDGothicNeo-Medium" : "sans-serif-medium");
-
-    const onChangeText = props.onChangeText ? props.onChangeText : () => {};
-    const onSubmitEditing = props.onSubmitEditing ? props.onSubmitEditing : () => {};
-  
-    // Affects the container
-    // Restricts TextInput into a fixed rectangle defined by width and height
-    const backgroundColor = props.backgroundColor ? props.backgroundColor : "white";
-    const borderColor = props.borderColor ? props.borderColor : "lightgrey";
-    const borderWidth = props.borderWidth ? props.borderWidth : "1%";
-    const width = props.width ? props.width : "30%";
+    
+    // mainContainer: Restricts TextInput into a fixed rectangle defined by width and height
     const minWidth = width;
     const maxWidth = width;
-    const height = props.height ? props.height : "7%";
     const minHeight = height;
     const maxHeight = height;
-   
-    const multiline = props.multiline ? props.multiline : false;
     
-    // Affects icons
+    // Show icons if single line and sets icon's default size to the fontSize
     const displayLeftIcon = multiline ? "none" : "flex";
     const displayRightIcon = displayLeftIcon;
-    const iconLeft = props.iconLeft ? props.iconLeft : "";
-    const iconLeftFontSize = props.iconLeftFontSize ? iconLeftFontSize : fontSize;
-    const iconRight = props.iconRight ? props.iconRight : "";
-    const iconRightFontSize = props.iconRightFontSize ? iconRightFontSize : fontSize;
-    const iconRightOnPress = props.iconRightOnPress ? props.iconRightOnPress : () => {};
+    const iconLeftFontSize = iconLeftFontSize ? iconLeftFontSize : fontSize;
+    const iconRightFontSize = iconRightFontSize ? iconRightFontSize : fontSize;
 
     const styles = StyleSheet.create({
         textInput: {
@@ -62,16 +79,18 @@ function TextInput(props) {
             borderRadius: "10%",
             borderColor: borderColor,
             borderWidth: borderWidth,
+            marginTop: marginTop,
+            marginRight: marginRight,
+            marginLeft: marginLeft,
+            marginBottom: marginBottom,
       }, 
         leftContainer: {
             display: displayLeftIcon,
-            fontSize: iconLeftFontSize,
             marginLeft: "3%",
             justifyContent: "center",
       }, 
         rightContainer: {
             display: displayRightIcon,
-            fontSize: iconRightFontSize,
             marginRight: "3%",
             justifyContent: "center",
       },
@@ -80,7 +99,7 @@ function TextInput(props) {
     return (
         <View style={styles.mainContainer}>
             <View style={styles.leftContainer}>
-                <Ionicons name={iconLeft} />
+                <Ionicons style={{fontSize: iconLeftFontSize}} name={iconLeft} />
             </View>
             <ReactNativeTextInput 
                 style={styles.textInput}
@@ -88,13 +107,16 @@ function TextInput(props) {
                 placeholder={placeholder}
                 placeholderTextColor={"darkgrey"}
                 autoCapitalize={false}
+                autoComplete={autoComplete}
+                autoCorrect={autoCorrect}
                 value={value}
                 multiline={multiline}
                 blurOnSubmit={true}
                 onSubmitEditing={(e) => {Keyboard.dismiss(); onSubmitEditing(e);} }
+                secureTextEntry={secureTextEntry}
             />
             <TouchableOpacity onPress={iconRightOnPress} style={styles.rightContainer}>
-                <Ionicons name={iconRight} />
+                <Ionicons style={{fontSize: iconRightFontSize}} name={iconRight} />
             </TouchableOpacity>
         </View>
     );
