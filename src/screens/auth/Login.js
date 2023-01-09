@@ -16,11 +16,11 @@ import firebase from "firebase/compat";
 
 import {
   Layout,
-  TextInput
 } from "react-native-rapi-ui";
 import { Ionicons, Entypo } from "@expo/vector-icons";
 
 import Button from "../../components/Button";
+import TextInput from "../../components/TextInput";
 import LargeText from "../../components/LargeText";
 import NormalText from "../../components/NormalText";
 import DeviceToken from "../utils/DeviceToken";
@@ -89,31 +89,30 @@ export default function ({ navigation }) {
             <LargeText center>Welcome!</LargeText>
 
             <TextInput
-              leftContent={<Ionicons name="mail" size={18}/>}
-              containerStyle={{ marginTop: 30 }}
+              style={{marginTop:"10%"}}
+              iconLeft="mail"
               placeholder="Enter your email"
+              width="100%"
+              height="10%"
+              marginTop="9%"
               value={email}
-              autoCapitalize="none"
-              autoCompleteType="off"
-              autoCorrect={false}
-              keyboardType="email-address"
-              onChangeText={(text) => setEmail(text)}
+              onChangeText={(newEmail) => setEmail(newEmail)}
             />
 
             <TextInput
-              leftContent={<Entypo name="lock" size={18}/>}
-              containerStyle={{ marginVertical: 15 }}
+              iconLeft="lock-closed"
+              iconRight={!showPass ? "eye-off" : "eye"}
+              iconRightOnPress={() => {setShowPass(!showPass)}}
               placeholder="Enter your password"
+              width="100%"
+              height="10%"
+              marginTop="4%"
+              marginBottom="4%"
               value={password}
-              autoCapitalize="none"
-              autoCompleteType="off"
-              autoCorrect={false}
+              onChangeText={(newPassword) => setPassword(newPassword)}
               secureTextEntry={!showPass ? true : false}
-              onChangeText={(text) => setPassword(text)}
-              rightContent={<TouchableOpacity onPress={() => setShowPass(!showPass)}>
-                <Ionicons name={!showPass ? "eye" : "eye-off"} size={22}/>
-              </TouchableOpacity>}
             />
+
             <Button onPress={login} marginVertical={10} disabled={loading}>
               {loading ? "Loading" : "Login"}
             </Button>
