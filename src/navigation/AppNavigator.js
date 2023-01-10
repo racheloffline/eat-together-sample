@@ -146,13 +146,13 @@ const MainTabs = () => {
         component={NotificationsMain}
         options={{
           tabBarLabel: ({ focused }) => (
-            <TabBarText focused={focused} title="Notifs" />
+            <TabBarText focused={focused} title="Inbox" />
           ),
           tabBarIcon: ({ focused }) => (
             <TabBarIcon
               focused={focused}
               icon={"mail-outline"}
-              title="Notifs"
+              title="Inbox"
             />
           ),
         }}

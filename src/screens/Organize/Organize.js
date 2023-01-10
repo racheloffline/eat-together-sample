@@ -461,7 +461,7 @@ export default function ({ navigation }) {
                             });
                         }
                     }}>
-                        Invite Friends
+                        Invite Others
                     </Button>}
                 </ScrollView>
             </View>
