@@ -200,8 +200,7 @@ export default function ({ route, navigation }) {
         const list = [];
         query.forEach((doc) => {
           let data = doc.data();
-          if (data.verified && data.id !== user.uid && !currUser.blockedIDs.includes(data.id)
-            && !data.blockedIDs.includes(user.uid)) { // Only show verified + unblocked users
+          if (data.verified && data.id !== user.uid && !currUser.blockedIDs.includes(data.id) && !data.blockedIDs.includes(user.uid) && (!data.settings.privateAccount || currUser.friendIDs.includes(data.id))) { // Only show verified + unblocked + nonprivate users
             data.invited = false;
             data.color = generateColor();
             data.selectedTags = randomize3(data.tags);
