@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import {View, StyleSheet, Dimensions, Image, TouchableOpacity, SafeAreaView, Alert, Linking} from "react-native";
-import { TextInput } from "react-native-rapi-ui";
+// import { TextInput } from "react-native-rapi-ui";
 import { FontAwesome, Entypo, Ionicons } from '@expo/vector-icons';
 
+import TextInput from "../../../components/TextInput";
 import LargeText from "../../../components/LargeText";
 import SmallText from "../../../components/SmallText";
 import Button from "../../../components/Button";
@@ -71,9 +72,13 @@ const Password = props => {
           <TextInput
             placeholder="Username (at least 4 characters)"
             value={username}
-            onChangeText={(val) => setUsername(val.replace(/\s+/g, ""))}
-            containerStyle={{ marginTop: 30, marginBottom: 10 }}
-            leftContent={<FontAwesome name="user" size={18} />}
+            onChangeText={(newUserName) => setUsername(newUserName.replace(/\s+/g, ""))}
+            marginTop={30}
+            marginBottom={10}
+            height={40}
+            width="100%"
+            iconLeftType="FontAwesome"
+            iconLeft="user"
           />
 
           {username.length >= 4 && (
@@ -92,32 +97,26 @@ const Password = props => {
             onChangeText={(val) => {
               setPassword(val);
             }}
-            containerStyle={{ marginTop: 10 }}
-            leftContent={<Entypo name="lock" size={18} />}
-            rightContent={
-              <TouchableOpacity onPress={() => setShowPass(!showPass)}>
-                <Ionicons name={!showPass ? "eye" : "eye-off"} size={22} />
-              </TouchableOpacity>
-            }
+            width="100%"
+            marginTop={10}
+            height={40}
+            iconLeft="lock-closed"
+            iconRight={!showPass ? "eye" : "eye-off"}
+            iconRightOnPress={() => setShowPass(!showPass)}
           />
 
           <TextInput
             placeholder="Confirm password"
             value={confirmPassword}
+            width="100%"
             secureTextEntry={!showConfirmPass ? true : false}
             onChangeText={(val) => setConfirmPassword(val)}
-            containerStyle={{ marginVertical: 10 }}
-            leftContent={<Entypo name="lock" size={18} />}
-            rightContent={
-              <TouchableOpacity
-                onPress={() => setShowConfirmPass(!showConfirmPass)}
-              >
-                <Ionicons
-                  name={!showConfirmPass ? "eye" : "eye-off"}
-                  size={22}
-                />
-              </TouchableOpacity>
-            }
+            marginTop={10}
+            marginBottom={10}
+            height={40}
+            iconLeft="lock-closed"
+            iconRight={!showConfirmPass ? "eye" : "eye-off"}
+            iconRightOnPress={() => setShowConfirmPass(!showConfirmPass)}
           />
 
           {password.length >= 8 && (
