@@ -76,7 +76,8 @@ export default function ({ navigation }) {
                   setEvents(newEvents);
                 }
               }).catch(e => {
-                alert("There was an error fetching some of your meals :( try again later");
+                // Still activates after logout for some accounts, commented for now
+                //alert("There was an error fetching some of your meals :( try again later");
 
                 eventsLength--;
                 newEvents = newEvents.sort((a, b) => {
