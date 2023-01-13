@@ -20,6 +20,7 @@ function TextInput(props) {
         keyboardType="default",
         onChangeText = () => {},
         onSubmitEditing = () => {},
+        textInputStyle = {},
         
         // Affects the container
         backgroundColor = "white",
@@ -32,6 +33,7 @@ function TextInput(props) {
         marginRight = "0%",
         marginLeft = "0%",
         multiline = false,
+        mainContainerStyle = {},
         
         // Affects icons
         iconRightType = "Ionicons",
@@ -40,7 +42,9 @@ function TextInput(props) {
         iconLeft = "",
         iconRight = "",
         iconRightOnPress = () => {},        
-        
+        leftContainerStyle = {},
+        rightContainerStyle = {},
+
         ...restOfProps
     } = props;
     
@@ -66,6 +70,8 @@ function TextInput(props) {
             fontSize: fontSize,
             fontFamily: fontFamily,
             color: color,
+
+            ...textInputStyle,
       },
         mainContainer: {
             flexDirection: 'row',
@@ -79,16 +85,19 @@ function TextInput(props) {
             marginRight: marginRight,
             marginLeft: marginLeft,
             marginBottom: marginBottom,
+            ...mainContainerStyle
       }, 
         leftContainer: {
             display: displayLeftIcon,
             marginLeft: "3%",
             justifyContent: "center",
+            ...leftContainerStyle
       }, 
         rightContainer: {
             display: displayRightIcon,
             marginRight: "3%",
             justifyContent: "center",
+            ...rightContainerStyle
       },
     });
   
