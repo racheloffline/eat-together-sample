@@ -66,7 +66,6 @@ function TextInput(props) {
             // Placeholder is top left of TextInput if multiline, else centered (single line)
             textAlignVertical: multiline ? "top" : "center",
             
-            fontWeight: "bold",
             fontSize: fontSize,
             fontFamily: fontFamily,
             color: color,
