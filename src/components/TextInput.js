@@ -26,7 +26,7 @@ function TextInput(props) {
         backgroundColor = "white",
         borderColor = "lightgrey",
         borderWidth = 1,
-        height = "7%",
+        height = 40,
         width = "30%",
         marginTop = "0%",
         marginBottom = "0%",
