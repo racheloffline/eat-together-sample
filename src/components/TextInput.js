@@ -41,6 +41,8 @@ function TextInput(props) {
         iconFontSize = fontSize,
         iconLeft = "",
         iconRight = "",
+        displayLeftIcon = iconLeft !== "" ? "flex" : "none",
+        displayRightIcon = iconRight !== "" ? "flex" : "none",
         iconRightOnPress = () => {},        
         leftContainerStyle = {},
         rightContainerStyle = {},
@@ -52,19 +54,14 @@ function TextInput(props) {
     // Loads appropriate font
     let [fontsLoaded] = useFonts({ Inter_600SemiBold, Inter_400Regular });
     const fontFamily = fontsLoaded ? (bold ? "Inter_600SemiBold" : "Inter_400Regular") : (Platform.OS === "ios" ? "AppleSDGothicNeo-Medium" : "sans-serif-medium");
-    
-    // Show icons if single line and sets icon's default size to the fontSize
-    const displayLeftIcon = multiline ? "none" : "flex";
-    const displayRightIcon = displayLeftIcon;
 
     const styles = StyleSheet.create({
         textInput: {
             flex: 1,
             margin: "0%",
             paddingHorizontal: "3%",
-            
-            // Placeholder is top left of TextInput if multiline, else centered (single line)
-            textAlignVertical: multiline ? "top" : "center",
+
+            textAlignVertical: "center",
             
             fontSize: fontSize,
             fontFamily: fontFamily,
@@ -84,6 +81,8 @@ function TextInput(props) {
             marginRight: marginRight,
             marginLeft: marginLeft,
             marginBottom: marginBottom,
+            alignItems: "center",
+
             ...mainContainerStyle
       }, 
         leftContainer: {
