@@ -116,8 +116,7 @@ function TextInput(props) {
                 autoCorrect={autoCorrect}
                 value={value}
                 multiline={multiline}
-                blurOnSubmit={true}
-                onSubmitEditing={(e) => {Keyboard.dismiss(); onSubmitEditing(e);} }
+                onSubmitEditing={onSubmitEditing}
                 secureTextEntry={secureTextEntry}
                 editable={editable}
                 keyboardType={keyboardType}
