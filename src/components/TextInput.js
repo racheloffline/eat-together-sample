@@ -21,6 +21,8 @@ function TextInput(props) {
         onChangeText = () => {},
         onSubmitEditing = () => {},
         textInputStyle = {},
+        scrollEnabled = true,
+        
         
         // Affects the container
         backgroundColor = "white",
@@ -119,6 +121,7 @@ function TextInput(props) {
                 secureTextEntry={secureTextEntry}
                 editable={editable}
                 keyboardType={keyboardType}
+                scrollEnabled={scrollEnabled}
             />
             <TouchableOpacity onPress={iconRightOnPress} style={styles.rightContainer}>
                 {iconRightType === "Ionicons" && <Ionicons size={iconFontSize} name={iconRight} />}
