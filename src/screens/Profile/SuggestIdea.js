@@ -38,7 +38,7 @@ const SuggestIdea = ({ route, navigation }) => {
                 <View style={styles.header}>
                     <LargeText style={{padding: 20}} center>Please describe your new idea or feature.</LargeText>
                 </View>
-                <TextInput multiline={true} width={"100%"} height={130} placeholder="Enter explanation here" value={report} onChangeText={val => setReport(val)}/>
+                <TextInput multiline={true} width={"100%"} height={130} mainContainerStyle={{alignItems: "flex-start"}} placeholder="Enter explanation here" value={report} onChangeText={val => setReport(val)}/>
                 <Button style={{marginTop: 20}} text="Submit" onPress={() => {
                     admin
                         .firestore()
