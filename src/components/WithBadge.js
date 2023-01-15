@@ -4,10 +4,19 @@ import {Ionicons} from "@expo/vector-icons";
 
 const styles = StyleSheet.create({
     icon: {
-        width: 50,
-        height: 50,
-        marginRight: 20
+        position: "absolute",
+        right: 295,
+        top: 60,
     },
+
+    image: {
+        width: 175,
+        height: 175,
+        borderColor: "white",
+        borderWidth: 3,
+        borderRadius: 100,
+        backgroundColor: "white",
+      },
 });
 
 const WithBadge = props => {
@@ -29,7 +38,13 @@ const WithBadge = props => {
 
     //Return the actual icon
     return (
-        <Ionicons name = {whichIcon()[0]} color = {whichIcon()[1]} size = {100}/>
+        <View style={styles.icon}>
+          <Ionicons
+            name={whichIcon()[0]}
+            color={whichIcon()[1]}
+            size={80}
+          ></Ionicons>
+        </View>
     );
   }
 

@@ -18,9 +18,6 @@ import NormalText from "../../components/NormalText";
 import TagsList from "../../components/TagsList";
 import EventCard from "../../components/EventCard";
 
-// Added here
-// import Icon from 'react-native-ionicons';
-
 import { compareDates } from "../../methods";
 
 export default function ({ navigation }) {
@@ -143,15 +140,8 @@ export default function ({ navigation }) {
             }}
           ></Ionicons>
         </View>
-
-        {/* <View style={styles.icons}>
-          <MediumText style={styles.titleText}>
-              ICON
-          </MediumText>
-        </View> */}
         
-        <WithBadge mealsAttended={mealsAttended} mealsSignedUp={10}/>
-
+        <WithBadge mealsAttended={mealsAttended} mealsSignedUp={mealsSignedUp}/>
 
         <View style={styles.settings}>
           <Ionicons
@@ -325,18 +315,5 @@ const styles = StyleSheet.create({
     top: -25,
     flexDirection: "row",
     alignItems: "center",
-  },
-
-  titleText: {
-    fontSize: 50,
-    fontWeight: 'bold',
-    left: -20,
-    top: 15,
-  },
-
-  icons: {
-    position: "absolute",
-    right: 140,
-    top: 10,
   },
 });
