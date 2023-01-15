@@ -273,7 +273,6 @@ export default function ({ navigation }) {
             <KeyboardAvoidingWrapper
                 style={{ flex: 1 }}
                 behavior={Platform.OS === "ios" ? "padding" : ""}
-                keyboardVerticalOffset={-9999}
             >
                 <View style={{ flex: 1 }}>
                     <Header name="Organize" navigation={navigation} hasNotif={unread} notifs/>
@@ -468,42 +467,42 @@ export default function ({ navigation }) {
                                 Invite Others
                             </Button>}
                         </ScrollView>
-                    </View>
+                    <RBSheet
+                        height={400}
+                        ref={refRBSheet}
+                        closeOnDragDown={true}
+                        closeOnPressMask={false}
+                        customStyles={{
+                            wrapper: {
+                                backgroundColor: "rgba(0,0,0,0.5)",
+                            },
+                            draggableIcon: {
+                                backgroundColor: "#5DB075"
+                            },
+                            container: {
+                                borderTopLeftRadius: 20,
+                                borderTopRightRadius: 20,
+                                padding: 10
+                            }
+                        }}>
+                        <NormalText center marginBottom={10}>Add as many tags as you want!</NormalText>
+                        <TagsSection
+                            multi={true}
+                            selectedItems={tagsSelected}
+                            onItemSelect={(item) => {
+                                setTagsSelected([...tagsSelected, item]);
+                            }}
+                            onRemoveItem={(item, index) => {
+                                const newTags = tagsSelected.filter((tag, i) => i !== index);
+                                setTagsSelected(newTags);
+                            }}
+                            items={cloneDeep(eventTags)}
+                            chip={true}
+                            resetValue={false}
+                        />
+                    </RBSheet>
+                </View>
             </KeyboardAvoidingWrapper>
-            <RBSheet
-                height={400}
-                ref={refRBSheet}
-                closeOnDragDown={true}
-                closeOnPressMask={false}
-                customStyles={{
-                    wrapper: {
-                        backgroundColor: "rgba(0,0,0,0.5)",
-                    },
-                    draggableIcon: {
-                        backgroundColor: "#5DB075"
-                    },
-                    container: {
-                        borderTopLeftRadius: 20,
-                        borderTopRightRadius: 20,
-                        padding: 10
-                    }
-                }}>
-                <NormalText center marginBottom={10}>Add as many tags as you want!</NormalText>
-                <TagsSection
-                    multi={true}
-                    selectedItems={tagsSelected}
-                    onItemSelect={(item) => {
-                        setTagsSelected([...tagsSelected, item]);
-                    }}
-                    onRemoveItem={(item, index) => {
-                        const newTags = tagsSelected.filter((tag, i) => i !== index);
-                        setTagsSelected(newTags);
-                    }}
-                    items={cloneDeep(eventTags)}
-                    chip={true}
-                    resetValue={false}
-                />
-            </RBSheet>
         </Layout>
     );
 }
