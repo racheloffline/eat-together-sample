@@ -34,9 +34,9 @@ import moment from "moment";
 import { checkProfanity } from "../../methods";
 
 import Checkbox from "../../components/Checkbox";
-import { KeyboardAvoidingView } from "react-native";
 import TextInput from "../../components/TextInput";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import KeyboardAvoidingWrapper from "../../components/KeyboardAvoidingWrapper";
+import { useHeaderHeight } from "@react-navigation/elements"
 
 export default function ({ navigation }) {
     // Current user
@@ -269,208 +269,207 @@ export default function ({ navigation }) {
     };
 
     return (
-        <Layout>
-        <View style={{ flex: 1 }}>
-                <Header name="Organize" navigation={navigation} hasNotif={unread} notifs/>
+        <Layout style={{ flex: 1 }}>
+            <KeyboardAvoidingWrapper
+                style={{ flex: 1 }}
+                behavior={Platform.OS === "ios" ? "padding" : ""}
+                keyboardVerticalOffset={-9999}
+            >
+                <View style={{ flex: 1 }}>
+                    <Header name="Organize" navigation={navigation} hasNotif={unread} notifs/>
 
-                <TouchableOpacity onPress={() => handleChoosePhoto()}>
-                    <ImageBackground source={{ uri: photo }} style={styles.image}>
-                        <View style={styles.imageOverlay}>
-                            <Ionicons name="md-image-outline" color="white" size={30}></Ionicons>
-                        </View>
-                    </ImageBackground>
-                </TouchableOpacity>
-
-                <KeyboardAwareScrollView
-                    style={{ flex: 1 }}
-                    contentContainerStyle={styles.content}
-                    keyboardOpeningTime={Number.MAX_SAFE_INTEGER}
-                    enableResetScrollToCoords={false}
-                >
-                    <TextInput
-                        placeholder="Meal Name"
-                        value={name}
-                        width="100%"
-                        onChangeText={(val) => {
-                            setName(val);
-                        }}
-                        iconLeft="chatbubble-outline"
-                        mainContainerStyle={styles.input}
-                    />
-
-                    <View style={styles.multiple}>
-                        <View style={styles.smallInput}>
-                            <Picker
-                                items={items}
-                                value={type}
-                                placeholder="Type of meal"
-                                onValueChange={(val) => setType(val)}
-                            />
-                        </View>
-
-                        <TouchableOpacity onPress={() => {
-                            setShowStartDate(true);
-                            setMode("date");
-                        }} style={styles.smallInput}>
-                            <View pointerEvents="none" style={{flex: 1}}>
-                                <TextInput
-                                    value={getDate(startDate, false)}
-                                    width="100%"
-                                    height="100%"
-                                    iconLeft="calendar-outline"
-                                    editable={false}
-                                />
-                            </View>
+                        <TouchableOpacity onPress={() => handleChoosePhoto()}>
+                            <ImageBackground source={{ uri: photo }} style={styles.image}>
+                                <View style={styles.imageOverlay}>
+                                    <Ionicons name="md-image-outline" color="white" size={30}></Ionicons>
+                                </View>
+                            </ImageBackground>
                         </TouchableOpacity>
-                    </View>
-
-                    <View style={styles.multiple}>
-                        <TouchableOpacity onPress={() => {
-                            setShowStartDate(true);
-                            setMode("time");
-                        }} style={styles.smallInput}>
-                            <NormalText center>Start time</NormalText>
-                            <View pointerEvents="none">
-                                <TextInput
-                                    value={getTime(startDate)}
-                                    iconLeft="time-outline"
-                                    width="100%"
-                                    editable={false}
-                                />
-                            </View>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity onPress={() => {
-                            setShowEndDate(true);
-                            setMode("time");
-                        }} style={styles.smallInput}>
-                            <View pointerEvents="none">
-                                <NormalText center>End time</NormalText>
-                                <TextInput
-                                    value={getTime(endDate)}
-                                    iconLeft="time-outline"
-                                    width="100%"
-                                    editable={false}
-                                />
-                            </View>
-                        </TouchableOpacity>
-                    </View>
-
-                    <TextInput
-                        placeholder="Location"
-                        value={location}
-                        onChangeText={(val) => {
-                            setLocation(val);
-                        }}
-                        width="100%"
-                        iconLeft="location-outline"
-                        mainContainerStyle={styles.input}
-                    />
-
-                    <DateTimePickerModal isVisible={showStartDate} date={startDate}
-                        mode={mode} onConfirm={changeStartDate} onCancel={() => setShowStartDate(false)}
-                        minimumDate={new Date()} maximumDate={moment().add(1, "months").toDate()}/>
-                    <DateTimePickerModal isVisible={showEndDate} date={endDate}
-                        mode={mode} onConfirm={changeEndDate} onCancel={() => setShowEndDate(false)}
-                        minimumDate={startDate} maximumDate={moment().add(1, "months").toDate()}/>
-
-                    <TextInput
-                        placeholder="Additional Info"
-                        value={additionalInfo}
-                        onChangeText={(val) => setAdditionalInfo(val)}
-                        multiline={true}
-                        width="100%"
-                        iconLeft="document-text-outline"
-                        mainContainerStyle={{
-                            marginTop: 10, minHeight:65, height:"auto", 
-                        }}
-                        scrollEnabled={false}
-                    />
-
-                    {type === "public" && <TouchableOpacity onPress={() => refRBSheet.current.open()}
-                        style={styles.input}>
-                        <View pointerEvents="none">
+                        <ScrollView contentContainerStyle={styles.content}>
                             <TextInput
-                                placeholder="Tags"
-                                value={tagsValue}
+                                placeholder="Meal Name"
+                                value={name}
                                 width="100%"
-                                iconLeft="pricetags-outline"
-                                editable={false}
+                                onChangeText={(val) => {
+                                    setName(val);
+                                }}
+                                iconLeft="chatbubble-outline"
+                                mainContainerStyle={styles.input}
                             />
-                        </View>
-                    </TouchableOpacity>}
 
-                    {/*Checkbox to determine whether or not this event should be semiprivate*/}
-                    {type === "public" && <View style={styles.center}>
-                        <Checkbox checked = {semiPrivate} onPress = {() => {
-                            setSemiPrivate(!semiPrivate);
-                        }}/>
-                        <NormalText>Make this event only visible to friends</NormalText>
-                    </View>}
+                            <View style={styles.multiple}>
+                                <View style={styles.smallInput}>
+                                    <Picker
+                                        items={items}
+                                        value={type}
+                                        placeholder="Type of meal"
+                                        onValueChange={(val) => setType(val)}
+                                    />
+                                </View>
 
-                    <View style={styles.center}>
-                        <Link width="35%" onPress={confirmClear}>Clear all details</Link>
-                    </View>
+                                <TouchableOpacity onPress={() => {
+                                    setShowStartDate(true);
+                                    setMode("date");
+                                }} style={styles.smallInput}>
+                                    <View pointerEvents="none" style={{flex: 1}}>
+                                        <TextInput
+                                            value={getDate(startDate, false)}
+                                            width="100%"
+                                            height="100%"
+                                            iconLeft="calendar-outline"
+                                            editable={false}
+                                        />
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
 
-                    {type === "public" ? <Button disabled={disabled || loading} onPress={() => {
-                        if (startDate > endDate) {
-                            alert("Start time must be before end time");
-                        } else if (checkProfanity(name)) {
-                            alert("Name has inappropriate words >:(");
-                        } else if (checkProfanity(location)) {
-                            alert("Location has inappropriate words >:(");
-                        } else if (checkProfanity(additionalInfo)) {
-                            alert("Additional info has inappropriate words >:(");
-                        } else {
-                            setLoading(true);
-                            const id = Date.now() + user.uid;
-                            let hasImage = false;
-                            if (photo !== "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400") {
-                                hasImage = true;
-                                storeImage(photo, id).then(() => {
-                                    fetchImage(id).then(uri => {
-                                        storeEvent(id, hasImage, uri);
+                            <View style={styles.multiple}>
+                                <TouchableOpacity onPress={() => {
+                                    setShowStartDate(true);
+                                    setMode("time");
+                                }} style={styles.smallInput}>
+                                    <NormalText center>Start time</NormalText>
+                                    <View pointerEvents="none">
+                                        <TextInput
+                                            value={getTime(startDate)}
+                                            iconLeft="time-outline"
+                                            width="100%"
+                                            editable={false}
+                                        />
+                                    </View>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity onPress={() => {
+                                    setShowEndDate(true);
+                                    setMode("time");
+                                }} style={styles.smallInput}>
+                                    <View pointerEvents="none">
+                                        <NormalText center>End time</NormalText>
+                                        <TextInput
+                                            value={getTime(endDate)}
+                                            iconLeft="time-outline"
+                                            width="100%"
+                                            editable={false}
+                                        />
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+
+                            <TextInput
+                                placeholder="Location"
+                                value={location}
+                                onChangeText={(val) => {
+                                    setLocation(val);
+                                }}
+                                width="100%"
+                                iconLeft="location-outline"
+                                mainContainerStyle={styles.input}
+                            />
+
+                            <DateTimePickerModal isVisible={showStartDate} date={startDate}
+                                mode={mode} onConfirm={changeStartDate} onCancel={() => setShowStartDate(false)}
+                                minimumDate={new Date()} maximumDate={moment().add(1, "months").toDate()}/>
+                            <DateTimePickerModal isVisible={showEndDate} date={endDate}
+                                mode={mode} onConfirm={changeEndDate} onCancel={() => setShowEndDate(false)}
+                                minimumDate={startDate} maximumDate={moment().add(1, "months").toDate()}/>
+
+                            <TextInput
+                                placeholder="Additional Info"
+                                value={additionalInfo}
+                                onChangeText={(val) => setAdditionalInfo(val)}
+                                multiline={true}
+                                width="100%"
+                                iconLeft="document-text-outline"
+                                mainContainerStyle={{
+                                    marginTop: 10, minHeight:65, height:"auto", 
+                                }}
+                                scrollEnabled={false}
+                            />
+
+                            {type === "public" && <TouchableOpacity onPress={() => refRBSheet.current.open()}
+                                style={styles.input}>
+                                <View pointerEvents="none">
+                                    <TextInput
+                                        placeholder="Tags"
+                                        value={tagsValue}
+                                        width="100%"
+                                        iconLeft="pricetags-outline"
+                                        editable={false}
+                                    />
+                                </View>
+                            </TouchableOpacity>}
+
+                            {/*Checkbox to determine whether or not this event should be semiprivate*/}
+                            {type === "public" && <View style={styles.center}>
+                                <Checkbox checked = {semiPrivate} onPress = {() => {
+                                    setSemiPrivate(!semiPrivate);
+                                }}/>
+                                <NormalText>Make this event only visible to friends</NormalText>
+                            </View>}
+
+                            <View style={styles.center}>
+                                <Link width="35%" onPress={confirmClear}>Clear all details</Link>
+                            </View>
+
+                            {type === "public" ? <Button disabled={disabled || loading} onPress={() => {
+                                if (startDate > endDate) {
+                                    alert("Start time must be before end time");
+                                } else if (checkProfanity(name)) {
+                                    alert("Name has inappropriate words >:(");
+                                } else if (checkProfanity(location)) {
+                                    alert("Location has inappropriate words >:(");
+                                } else if (checkProfanity(additionalInfo)) {
+                                    alert("Additional info has inappropriate words >:(");
+                                } else {
+                                    setLoading(true);
+                                    const id = Date.now() + user.uid;
+                                    let hasImage = false;
+                                    if (photo !== "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400") {
+                                        hasImage = true;
+                                        storeImage(photo, id).then(() => {
+                                            fetchImage(id).then(uri => {
+                                                storeEvent(id, hasImage, uri);
+                                            });
+                                        });
+                                    } else {
+                                        storeEvent(id, hasImage, "");
+                                    }
+                                }
+                            }}>
+                                {loading ? "Posting ..." : "Post"}
+                            </Button> :
+                            <Button disabled={disabled} onPress={() => {
+                                if (startDate > endDate) {
+                                    alert("Start time must be before end time");
+                                } else if (checkProfanity(name)) {
+                                    alert("Name has inappropriate words >:(");
+                                } else if (checkProfanity(location)) {
+                                    alert("Location has inappropriate words >:(");
+                                } else if (checkProfanity(additionalInfo)) {
+                                    alert("Additional info has inappropriate words >:(");
+                                } else {
+                                    let hasImage = false;
+                                    if (photo !== "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400") {
+                                        hasImage = true;
+                                    }
+                                    navigation.navigate("InvitePeople", {
+                                        name,
+                                        location,
+                                        startDate,
+                                        endDate,
+                                        additionalInfo: additionalInfo,
+                                        hasImage: hasImage,
+                                        image: hasImage ? photo : "",
+                                        icebreakers,
+                                        clearAll
                                     });
-                                });
-                            } else {
-                                storeEvent(id, hasImage, "");
-                            }
-                        }
-                    }}>
-                        {loading ? "Posting ..." : "Post"}
-                    </Button> :
-                    <Button disabled={disabled} onPress={() => {
-                        if (startDate > endDate) {
-                            alert("Start time must be before end time");
-                        } else if (checkProfanity(name)) {
-                            alert("Name has inappropriate words >:(");
-                        } else if (checkProfanity(location)) {
-                            alert("Location has inappropriate words >:(");
-                        } else if (checkProfanity(additionalInfo)) {
-                            alert("Additional info has inappropriate words >:(");
-                        } else {
-                            let hasImage = false;
-                            if (photo !== "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400") {
-                                hasImage = true;
-                            }
-                            navigation.navigate("InvitePeople", {
-                                name,
-                                location,
-                                startDate,
-                                endDate,
-                                additionalInfo: additionalInfo,
-                                hasImage: hasImage,
-                                image: hasImage ? photo : "",
-                                icebreakers,
-                                clearAll
-                            });
-                        }
-                    }}>
-                        Invite Others
-                    </Button>}
-                </KeyboardAwareScrollView>
-
-            </View>
+                                }
+                            }}>
+                                Invite Others
+                            </Button>}
+                        </ScrollView>
+                    </View>
+            </KeyboardAvoidingWrapper>
             <RBSheet
                 height={400}
                 ref={refRBSheet}
