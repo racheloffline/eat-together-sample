@@ -11,11 +11,15 @@ import { Layout } from "react-native-rapi-ui";
 import { Ionicons, Feather } from "@expo/vector-icons";
 import { db, auth } from "../../provider/Firebase";
 
+import WithBadge from "../../components/WithBadge";
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
 import TagsList from "../../components/TagsList";
 import EventCard from "../../components/EventCard";
+
+// Added here
+// import Icon from 'react-native-ionicons';
 
 import { compareDates } from "../../methods";
 
@@ -139,6 +143,16 @@ export default function ({ navigation }) {
             }}
           ></Ionicons>
         </View>
+
+        {/* <View style={styles.icons}>
+          <MediumText style={styles.titleText}>
+              ICON
+          </MediumText>
+        </View> */}
+        
+        <WithBadge mealsAttended={mealsAttended} mealsSignedUp={10}/>
+
+
         <View style={styles.settings}>
           <Ionicons
             name="settings-sharp"
@@ -311,5 +325,18 @@ const styles = StyleSheet.create({
     top: -25,
     flexDirection: "row",
     alignItems: "center",
+  },
+
+  titleText: {
+    fontSize: 50,
+    fontWeight: 'bold',
+    left: -20,
+    top: 15,
+  },
+
+  icons: {
+    position: "absolute",
+    right: 140,
+    top: 10,
   },
 });
