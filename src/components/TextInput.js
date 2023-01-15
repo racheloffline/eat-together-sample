@@ -48,6 +48,9 @@ function TextInput(props) {
         iconFontSize = fontSize,
         iconLeft = "",
         iconRight = "",
+        iconLeftColor = "black",
+        iconRightColor = "black",
+        iconRightDisabled = false,
         displayLeftIcon = iconLeft !== "" ? "flex" : "none",
         displayRightIcon = iconRight !== "" ? "flex" : "none",
         iconRightOnPress = () => {},        
@@ -109,8 +112,11 @@ function TextInput(props) {
     return (
         <View style={styles.mainContainer}>
             <View style={styles.leftContainer}>
-                {iconLeftType === "Ionicons" && <Ionicons size={iconFontSize} name={iconLeft} />}
-                {iconLeftType === "FontAwesome" && <FontAwesome size={iconFontSize} name={iconLeft} />}
+                {iconLeftType === "Ionicons" && 
+                <Ionicons size={iconFontSize} name={iconLeft} color={iconLeftColor}/>}
+
+                {iconLeftType === "FontAwesome" && 
+                <FontAwesome size={iconFontSize} name={iconLeft} color={iconLeftColor}/>}
             </View>
             <ReactNativeTextInput 
                 style={styles.textInput}
@@ -133,9 +139,12 @@ function TextInput(props) {
 
                 {...textInputProps}
             />
-            <TouchableOpacity onPress={iconRightOnPress} style={styles.rightContainer}>
-                {iconRightType === "Ionicons" && <Ionicons size={iconFontSize} name={iconRight} />}
-                {iconRightType === "FontAwesome" && <FontAwesome size={iconFontSize} name={iconRight} />}
+            <TouchableOpacity disabled={iconRightDisabled} onPress={iconRightOnPress} style={styles.rightContainer}>
+                {iconRightType === "Ionicons" && 
+                <Ionicons size={iconFontSize} name={iconRight} color={iconRightColor}/>}
+
+                {iconRightType === "FontAwesome" && 
+                <FontAwesome size={iconFontSize} name={iconRight} color={iconRightColor}/>}
             </TouchableOpacity>
         </View>
     );
