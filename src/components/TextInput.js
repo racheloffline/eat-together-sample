@@ -18,10 +18,15 @@ function TextInput(props) {
         autoCorrect=false,
         editable=true,
         keyboardType="default",
+        scrollEnabled = true,
+        
+        textInputStyle = {},
+        textInputProps={},
+        onEndEditing = () => {},
         onChangeText = () => {},
         onSubmitEditing = () => {},
-        textInputStyle = {},
-        scrollEnabled = true,
+        onBlur = () => {},
+        onFocus = () => {},
         
         
         // Affects the container
@@ -122,6 +127,11 @@ function TextInput(props) {
                 editable={editable}
                 keyboardType={keyboardType}
                 scrollEnabled={scrollEnabled}
+                onBlur={onBlur}
+                onEndEditing={onEndEditing}
+                onFocus={onFocus}
+
+                {...textInputProps}
             />
             <TouchableOpacity onPress={iconRightOnPress} style={styles.rightContainer}>
                 {iconRightType === "Ionicons" && <Ionicons size={iconFontSize} name={iconRight} />}
