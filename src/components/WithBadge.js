@@ -1,49 +1,36 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
-import {Ionicons} from "@expo/vector-icons";
+import { StyleSheet, View, Image } from "react-native";
 
 const styles = StyleSheet.create({
     icon: {
         position: "absolute",
-        right: 295,
-        top: 60,
+        right: 285,
+        top: 70,
     },
 
     image: {
-        width: 175,
-        height: 175,
-        borderColor: "white",
+        resizeMode: 'contain',
+        width: 70,
+        height: 70,
+        borderColor: "red",
         borderWidth: 3,
-        borderRadius: 100,
+        // borderRadius: 100,
         backgroundColor: "white",
       },
 });
 
 const WithBadge = props => {
-
-    //Choose which icon to display
-    const whichIcon = () => {
-        if(props.mealsSignedUp >= 50) {
-            return ["arrow-round-up", "gold"];
-        } else if(props.mealsSignedUp >= 10) {
-            if(props.mealsAttended >= 0.75) {
-                return ["checkmark-circle", "green"];
-            } else {
-                return ["close-circle", "red"];
-            }
-        } else {
-            return ["pause", "blue"];
-        }
-    }
-
-    //Return the actual icon
     return (
         <View style={styles.icon}>
-          <Ionicons
-            name={whichIcon()[0]}
-            color={whichIcon()[1]}
-            size={80}
-          ></Ionicons>
+          <Image style={styles.image}
+                source={ (props.mealsSignedUp >= 50) ? require( "../../assets/food.jpg") :
+                            ( (props.mealsSignedUp >= 10) && (props.mealsAttended >= 0.75) ? require( "../../assets/foodBackground.png") :
+                                    ( (props.mealsSignedUp >= 10) ? require ( "../../assets/register.png")
+                                                                  : require ( "../../assets/forget.png") 
+                                    )
+                            )
+                        }
+            />
         </View>
     );
   }
