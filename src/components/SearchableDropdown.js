@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
 import {
-  Text,
   FlatList,
   View,
   TouchableOpacity,
-  Keyboard,
   StyleSheet
 } from 'react-native';
-// import { TextInput } from 'react-native-rapi-ui';
+
 import TextInput from './TextInput';
 import { Ionicons } from '@expo/vector-icons';
 import NormalText from './NormalText';
@@ -246,7 +244,7 @@ export default class SearchableDropDown extends Component {
       >
         { this.renderSelectedItems() }
         { this.renderTextInput() }
-        {this.renderListType()}
+        { this.renderListType() }
       </View>
     );
   };

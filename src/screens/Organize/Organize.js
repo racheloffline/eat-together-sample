@@ -276,7 +276,6 @@ export default function ({ navigation }) {
             >
                 <View style={{ flex: 1 }}>
                     <Header name="Organize" navigation={navigation} hasNotif={unread} notifs/>
-
                         <TouchableOpacity onPress={() => handleChoosePhoto()}>
                             <ImageBackground source={{ uri: photo }} style={styles.image}>
                                 <View style={styles.imageOverlay}>
@@ -284,7 +283,7 @@ export default function ({ navigation }) {
                                 </View>
                             </ImageBackground>
                         </TouchableOpacity>
-                        <ScrollView contentContainerStyle={styles.content}>
+                        <ScrollView style={styles.content} >
                             <TextInput
                                 placeholder="Meal Name"
                                 value={name}
@@ -510,7 +509,8 @@ export default function ({ navigation }) {
 const styles = StyleSheet.create({
     content: {
         paddingHorizontal: 20,
-        paddingBottom: 10
+        paddingBottom: 10,
+        flexGrow: 1
     },
 
     imageOverlay: {
