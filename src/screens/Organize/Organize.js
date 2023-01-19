@@ -36,7 +36,6 @@ import { checkProfanity } from "../../methods";
 import Checkbox from "../../components/Checkbox";
 import TextInput from "../../components/TextInput";
 import KeyboardAvoidingWrapper from "../../components/KeyboardAvoidingWrapper";
-import { useHeaderHeight } from "@react-navigation/elements"
 
 export default function ({ navigation }) {
     // Current user

@@ -3,16 +3,11 @@ import {View, StyleSheet, Image, Dimensions, ScrollView} from "react-native";
 import {
     Layout,
     TopNav,
-    Text,
-    themeColor,
-    useTheme,
     Button
 } from "react-native-rapi-ui";
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
-import NormalText from "../../components/NormalText";
-import {FontAwesome, Ionicons} from "@expo/vector-icons";
-import getDate from "../../getDate";
+import {Ionicons} from "@expo/vector-icons";
 import admin from "firebase/compat";
 import firebase from "firebase/compat";
 
