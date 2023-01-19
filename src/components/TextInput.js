@@ -18,20 +18,29 @@ function TextInput(props) {
         autoCorrect=false,
         editable=true,
         keyboardType="default",
+        scrollEnabled = true,
+        
+        textInputStyle = {},
+        textInputProps={},
+        onEndEditing = () => {},
         onChangeText = () => {},
         onSubmitEditing = () => {},
+        onBlur = () => {},
+        onFocus = () => {},
+        
         
         // Affects the container
         backgroundColor = "white",
         borderColor = "lightgrey",
         borderWidth = 1,
-        height = "7%",
+        height = 40,
         width = "30%",
         marginTop = "0%",
         marginBottom = "0%",
         marginRight = "0%",
         marginLeft = "0%",
         multiline = false,
+        mainContainerStyle = {},
         
         // Affects icons
         iconRightType = "Ionicons",
@@ -39,8 +48,15 @@ function TextInput(props) {
         iconFontSize = fontSize,
         iconLeft = "",
         iconRight = "",
+        iconLeftColor = "black",
+        iconRightColor = "black",
+        iconRightDisabled = false,
+        displayLeftIcon = iconLeft !== "" ? "flex" : "none",
+        displayRightIcon = iconRight !== "" ? "flex" : "none",
         iconRightOnPress = () => {},        
-        
+        leftContainerStyle = {},
+        rightContainerStyle = {},
+
         ...restOfProps
     } = props;
     
@@ -48,24 +64,20 @@ function TextInput(props) {
     // Loads appropriate font
     let [fontsLoaded] = useFonts({ Inter_600SemiBold, Inter_400Regular });
     const fontFamily = fontsLoaded ? (bold ? "Inter_600SemiBold" : "Inter_400Regular") : (Platform.OS === "ios" ? "AppleSDGothicNeo-Medium" : "sans-serif-medium");
-    
-    // Show icons if single line and sets icon's default size to the fontSize
-    const displayLeftIcon = multiline ? "none" : "flex";
-    const displayRightIcon = displayLeftIcon;
 
     const styles = StyleSheet.create({
         textInput: {
             flex: 1,
             margin: "0%",
             paddingHorizontal: "3%",
+
+            textAlignVertical: "center",
             
-            // Placeholder is top left of TextInput if multiline, else centered (single line)
-            textAlignVertical: multiline ? "top" : "center",
-            
-            fontWeight: "bold",
             fontSize: fontSize,
             fontFamily: fontFamily,
             color: color,
+
+            ...textInputStyle,
       },
         mainContainer: {
             flexDirection: 'row',
@@ -79,24 +91,32 @@ function TextInput(props) {
             marginRight: marginRight,
             marginLeft: marginLeft,
             marginBottom: marginBottom,
+            alignItems: "center",
+
+            ...mainContainerStyle
       }, 
         leftContainer: {
             display: displayLeftIcon,
             marginLeft: "3%",
             justifyContent: "center",
+            ...leftContainerStyle
       }, 
         rightContainer: {
             display: displayRightIcon,
             marginRight: "3%",
             justifyContent: "center",
+            ...rightContainerStyle
       },
     });
   
     return (
         <View style={styles.mainContainer}>
             <View style={styles.leftContainer}>
-                {iconLeftType === "Ionicons" && <Ionicons size={iconFontSize} name={iconLeft} />}
-                {iconLeftType === "FontAwesome" && <FontAwesome size={iconFontSize} name={iconLeft} />}
+                {iconLeftType === "Ionicons" && 
+                <Ionicons size={iconFontSize} name={iconLeft} color={iconLeftColor}/>}
+
+                {iconLeftType === "FontAwesome" && 
+                <FontAwesome size={iconFontSize} name={iconLeft} color={iconLeftColor}/>}
             </View>
             <ReactNativeTextInput 
                 style={styles.textInput}
@@ -108,15 +128,23 @@ function TextInput(props) {
                 autoCorrect={autoCorrect}
                 value={value}
                 multiline={multiline}
-                blurOnSubmit={true}
-                onSubmitEditing={(e) => {Keyboard.dismiss(); onSubmitEditing(e);} }
+                onSubmitEditing={onSubmitEditing}
                 secureTextEntry={secureTextEntry}
                 editable={editable}
                 keyboardType={keyboardType}
+                scrollEnabled={scrollEnabled}
+                onBlur={onBlur}
+                onEndEditing={onEndEditing}
+                onFocus={onFocus}
+
+                {...textInputProps}
             />
-            <TouchableOpacity onPress={iconRightOnPress} style={styles.rightContainer}>
-                {iconRightType === "Ionicons" && <Ionicons size={iconFontSize} name={iconRight} />}
-                {iconRightType === "FontAwesome" && <FontAwesome size={iconFontSize} name={iconRight} />}
+            <TouchableOpacity disabled={iconRightDisabled} onPress={iconRightOnPress} style={styles.rightContainer}>
+                {iconRightType === "Ionicons" && 
+                <Ionicons size={iconFontSize} name={iconRight} color={iconRightColor}/>}
+
+                {iconRightType === "FontAwesome" && 
+                <FontAwesome size={iconFontSize} name={iconRight} color={iconRightColor}/>}
             </TouchableOpacity>
         </View>
     );

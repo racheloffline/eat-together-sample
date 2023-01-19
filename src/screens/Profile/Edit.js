@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
 import { View, StyleSheet, Image, Dimensions, TouchableOpacity } from 'react-native';
-import { Layout, TopNav, TextInput } from "react-native-rapi-ui";
+import { Layout, TopNav } from "react-native-rapi-ui";
 import { Ionicons, Feather, FontAwesome } from '@expo/vector-icons';
 
 import * as ImagePicker from 'expo-image-picker';
 import { db, storage } from "../../provider/Firebase";
 
+import TextInput from "../../components/TextInput";
 import Button from "../../components/Button";
 import MediumText from "../../components/MediumText";
 import DeviceToken from "../utils/DeviceToken";
@@ -199,41 +200,39 @@ export default function edit({ route, navigation }) {
                         <TextInput
                             placeholder="First name"
                             onChangeText={(val) => setFirstName(val)}
-                            leftContent={
-                                <Ionicons name="person-circle-outline" size={20} />
-                            }
+                            iconLeft="person-circle-outline"
                             value={firstName}
-                            containerStyle={{ width: "47%" }}
+                            width={"47%"}
+                            height={40}
                         />
                         <TextInput
                             placeholder="Last name"
                             onChangeText={(val) => setLastName(val)}
-                            leftContent={
-                                <Ionicons name="person-circle-outline" size={20} />
-                            }
+                            iconLeft="person-circle-outline"
                             value={lastName}
-                            containerStyle={{ width: "47%" }}
+                            width={"47%"}
+                            height={40}
                         />
                     </View>
 
                     <TextInput
                         placeholder="Pronouns (he/him, she/her, etc.)"
                         onChangeText={(val) => setPronouns(val)}
-                        leftContent={
-                            <FontAwesome name="quote-left" size={20}/>
-                        }
+                        width={"100%"}
+                        iconLeftType="FontAwesome"
+                        iconLeft="quote-left"
                         value={pronouns}
-                        containerStyle={{ marginBottom: 10 }}
+                        marginBottom={10}
                     />
 
                     <TextInput
                         placeholder="Fun fact (10 to 100 characters)"
                         onChangeText={(val) => setBio(val)}
-                        leftContent={
-                            <FontAwesome name="exclamation" size={20}/>
-                        }
+                        width={"100%"}
+                        iconLeftType="FontAwesome"
+                        iconLeft="exclamation"
                         value={bio}
-                        containerStyle={{ marginBottom: 10 }}
+                        marginBottom={10}
                     />
 
                     <TouchableOpacity onPress={() => navigation.navigate("EditTags", {
@@ -246,9 +245,8 @@ export default function edit({ route, navigation }) {
                             <TextInput
                                 placeholder="Tags"
                                 onChangeText={(val) => setBio(val)}
-                                leftContent={
-                                    <Ionicons name="pricetag" size={20}/>
-                                }
+                                width={"100%"}
+                                iconLeft="pricetag"
                                 value={tagText}
                                 editable={false}
                             />

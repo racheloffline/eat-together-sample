@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import {
-  Text,
   FlatList,
   View,
   TouchableOpacity,
-  Keyboard,
   StyleSheet
 } from 'react-native';
-import { TextInput } from 'react-native-rapi-ui';
+
+import TextInput from './TextInput';
 import { Ionicons } from '@expo/vector-icons';
 import NormalText from './NormalText';
 
@@ -217,9 +216,11 @@ export default class SearchableDropDown extends Component {
     return (
       <TextInput
         { ...textInputProps }
-        leftContent={
-          <Ionicons name="search" size={20}/>
-        }
+        iconLeft="search"
+        iconLeftType="FontAwesome"
+        iconLeftFontSize={20}
+        width="100%"
+        height={this.props.height ? this.props.height : 50}
         onBlur={(e) => {
           if (this.props.onBlur) {
             this.props.onBlur(e);
@@ -243,7 +244,7 @@ export default class SearchableDropDown extends Component {
       >
         { this.renderSelectedItems() }
         { this.renderTextInput() }
-        {this.renderListType()}
+        { this.renderListType() }
       </View>
     );
   };
