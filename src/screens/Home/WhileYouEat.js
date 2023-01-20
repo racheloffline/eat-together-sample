@@ -65,12 +65,13 @@ const WhileYouEat = ({ route, navigation }) => {
   const user = auth.currentUser;
   const [groupChat, setGroupChat] = useState(null); // Info for the group chat
 
+  const [accessToken, setAccessToken] = useState(null);
   const [request, response, promptAsync] = Google.useAuthRequest({
     expoClientId: GOOGLE_AUTH_CLIENT_ID,
     iosClientId: GOOGLE_AUTH_CLIENT_ID_IOS,
     androidClientId: GOOGLE_AUTH_CLIENT_ID_ANDROID,
     scopes: ["https://www.googleapis.com/auth/calendar"]
-  }); // For Google Calendar API
+  });
 
   useEffect(() => {
     if (route.params.event.hostID === user.uid) {
@@ -150,16 +151,6 @@ const WhileYouEat = ({ route, navigation }) => {
              timeZone: 'Asia/Kolkata',
            },
          };
-
-      function exportEvent() {
-          calendar.events.insert({
-            auth: oauth2Client,
-            calendarId: "primary",
-            resource: event,
-          })
-          .then((event) =>  console.log('Event created: %s', event.htmlLink))
-          .catch((error) => console.log('Some error occured', error));
-      }
 
         calendar.events.insert({
             auth: oauth2Client,
@@ -270,27 +261,6 @@ const WhileYouEat = ({ route, navigation }) => {
         });
     }
   }
-    const oauth2Client = new google.auth.OAuth2('clientID', 'clientSecret');
-      oauth2Client.setCredentials({
-        access_token: 'google access token',
-        refresh_token: 'google refresh token',
-        expiry_date: 'token expiry date',
-      });
-
-    const calendar = google.calendar({ version: "v3", oauth2Client });
-
-    const event = {
-       summary: 'Event name',
-       description: "Event details.",
-       start: {
-         dateTime: '2022-12-28T01:00:00-07:00',
-         timeZone: 'Asia/kolkata',
-       },
-       end: {
-         dateTime: '2022-12-28T05:00:00-07:00',
-         timeZone: 'Asia/Kolkata',
-       },
-     };
 
   //Reporting event function
   function reportEvent() {
