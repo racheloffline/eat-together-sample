@@ -142,8 +142,10 @@ export default function ({ navigation }) {
           ></Ionicons>
         </View>
         
-        <WithBadge mealsAttended={mealsAttended} mealsSignedUp={mealsSignedUp}/>
-
+        <View style={styles.badge}>
+          <WithBadge mealsAttended={mealsAttended} mealsSignedUp={mealsSignedUp}/>
+        </View>
+        
         <View style={styles.settings}>
           <Ionicons
             name="settings-sharp"
@@ -288,6 +290,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 20,
     top: 20,
+  },
+
+  badge: {
+    position: "absolute",
+    left: 20,
+    top: 70,
   },
 
   settings: {
