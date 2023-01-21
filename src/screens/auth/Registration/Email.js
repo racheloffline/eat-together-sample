@@ -2,9 +2,9 @@
 
 import React, { useState } from "react";
 import { View, StyleSheet, Dimensions, Image, TouchableOpacity } from "react-native";
-import { Layout, TextInput } from "react-native-rapi-ui";
-import { Ionicons } from "@expo/vector-icons";
+import { Layout } from "react-native-rapi-ui";
 
+import TextInput from "../../../components/TextInput";
 import MediumText from "../../../components/MediumText";
 import Button from "../../../components/Button";
 import NormalText from "../../../components/NormalText";
@@ -20,11 +20,11 @@ const Email = props => {
 
   const verifyEmail = () => {
     const isAcademic = email.split("@");
-    //if (isAcademic[isAcademic.length-1] === "uw.edu" || isAcademic[isAcademic.length-1] === "cs.washington.edu") {
+    if (isAcademic[isAcademic.length-1] === "uw.edu" || isAcademic[isAcademic.length-1] === "cs.washington.edu") {
       setVerified(true);
-    /*} else {
+    } else {
       setVerified(false);
-    }*/
+    }
   }
 
   return (
@@ -35,13 +35,15 @@ const Email = props => {
         </View>
 
         <TextInput placeholder="Enter email address ..." value={email}
-          onChangeText={val => {
-            setEmail(val);
+          onChangeText={newEmail => {
+            setEmail(newEmail);
             setVerified(null);
-          }} containerStyle={{marginBottom: 20}}
-          autoComplete="email" keyboardType="email-address"
-          leftContent={<Ionicons name="mail" size={18}/>}/>
-
+          }} 
+          width="100%"
+          autoComplete="email" 
+          keyboardType="email-address"
+          iconLeft="mail"
+        />
         <Button disabled={!checkEmail(email)} onPress={verifyEmail} marginVertical={15}>Verify</Button>
         {verified !== null &&
         <NormalText color={verified ? "#5DB075" : "red"}>

@@ -7,7 +7,10 @@ import {
     ImageBackground,
     Dimensions,
 } from "react-native";
-import { TopNav, Layout, TextInput } from "react-native-rapi-ui";
+
+import KeyboardAvoidingWrapper from "../../components/KeyboardAvoidingWrapper";
+import TextInput from "../../components/TextInput";
+import { TopNav, Layout } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 import eventTags from "../../eventTags";
 
@@ -186,195 +189,196 @@ export default function ({ route, navigation }) {
                 }
                 leftAction={() => navigation.goBack()}
             />
-
-            <TouchableOpacity onPress={() => handleChoosePhoto()}>
-                <ImageBackground source={{ uri: photo }} style={styles.image}>
-                    <View style={styles.imageOverlay}>
-                        <Ionicons name="md-image-outline" color="white" size={30}></Ionicons>
-                    </View>
-                </ImageBackground>
-            </TouchableOpacity>
-            
-            <View style={{ flex: 1 }}>
-                <ScrollView style={styles.content}>
-                    <TextInput
-                        placeholder="Event Name"
-                        value={name}
-                        onChangeText={(val) => {
-                            setName(val);
-                        }}
-                        leftContent={
-                            <Ionicons name="chatbubble-outline" size={20} />
-                        }
-                        containerStyle={styles.input}
-                    />
-
-                    <TouchableOpacity onPress={() => {
-                        setShowStartDate(true);
-                        setMode("date");
-                    }} style={styles.input}>
-                        <View pointerEvents="none">
-                            <TextInput
-                                value={getDate(startDate)}
-                                leftContent={
-                                    <Ionicons name="calendar-outline" size={20}/>
-                                }
-                                editable={false}
-                            />
-                        </View>
+            <KeyboardAvoidingWrapper
+                style={{ flex: 1 }}
+                behavior={Platform.OS === "ios" ? "padding" : ""}
+            >
+                <View style={{flex: 1}}>
+                    <TouchableOpacity onPress={() => handleChoosePhoto()}>
+                        <ImageBackground source={{ uri: photo }} style={styles.image}>
+                            <View style={styles.imageOverlay}>
+                                <Ionicons name="md-image-outline" color="white" size={30}></Ionicons>
+                            </View>
+                        </ImageBackground>
                     </TouchableOpacity>
-
-                    <View style={styles.dateTime}>
-                        <TouchableOpacity onPress={() => {
-                            setShowStartDate(true);
-                            setMode("time");
-                        }} style={styles.smallInput}>
-                            <View pointerEvents="none">
-                                <NormalText center>Start time</NormalText>
-                                <TextInput
-                                    value={getTime(startDate)}
-                                    leftContent={
-                                        <Ionicons name="time-outline" size={20}/>
-                                    }
-                                    editable={false}
-                                />
-                            </View>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity onPress={() => {
-                            setShowEndDate(true);
-                            setMode("time");
-                        }} style={styles.smallInput}>
-                            <View pointerEvents="none">
-                                <NormalText center>End time</NormalText>
-                                <TextInput
-                                    value={getTime(endDate)}
-                                    leftContent={
-                                        <Ionicons name="time-outline" size={20}/>
-                                    }
-                                    editable={false}
-                                />
-                            </View>
-                        </TouchableOpacity>
-                    </View>                        
-
-                    <DateTimePickerModal isVisible={showStartDate} date={startDate}
-                        mode={mode} onConfirm={changeStartDate} onCancel={() => setShowStartDate(false)}
-                        minimumDate={new Date()} maximumDate={moment().add(1, "months").toDate()}/>
-                    <DateTimePickerModal isVisible={showEndDate} date={endDate}
-                        mode={mode} onConfirm={changeEndDate} onCancel={() => setShowEndDate(false)}
-                        minimumDate={startDate} maximumDate={moment().add(1, "months").toDate()}/>
-
-                    <TextInput
-                        placeholder="Location"
-                        value={location}
-                        onChangeText={(val) => {
-                            setLocation(val);
-                        }}
-                        leftContent={
-                            <Ionicons name="location-outline" size={20}/>
-                        }
-                        containerStyle={styles.input}
-                    />
                     
-                    <TextInput
-                        placeholder="Additional Info"
-                        value={additionalInfo}
-                        onChangeText={(val) => setAdditionalInfo(val)}
-                        containerStyle={{...styles.input, paddingBottom: 40}}
-                        multiline={true}
-                        leftContent={
-                            <Ionicons name="document-text-outline" size={20}/>
-                        }
-                    />
-
-                    {route.params.event.type === "public" && <TouchableOpacity onPress={() => refRBSheet.current.open()}
-                        style={styles.input}>
-                        <View pointerEvents="none">
+                    <View style={{ flex: 1 }}>
+                        <ScrollView style={styles.content}>
                             <TextInput
-                                placeholder="Tags"
-                                value={tagsValue}
-                                leftContent={
-                                    <Ionicons name="pricetags-outline" size={20}/>
-                                }
-                                editable={false}
+                                placeholder="Event Name"
+                                value={name}
+                                onChangeText={(val) => {
+                                    setName(val);
+                                }}
+                                iconLeft="chatbubble-outline"
+                                mainContainerStyle={styles.input}
                             />
-                        </View>
-                    </TouchableOpacity>}
 
-                    <Button disabled={disabled || loading} onPress={() => {
-                        if (startDate > endDate) {
-                            alert("Start time must be before end time");
-                        } else if (checkProfanity(name)) {
-                            alert("Name has inappropriate words >:(");
-                        } else if (checkProfanity(location)) {
-                            alert("Location has inappropriate words >:(");
-                        } else if (checkProfanity(additionalInfo)) {
-                            alert("Additional info has inappropriate words >:(");
-                        } else {
-                            setLoading(true);
-                            let hasImage = false;
-                            if (photo !== "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400") {
-                                hasImage = true;
-                                
-                                if (photo !== route.params.event.image) {
-                                    storeImage(photo, route.params.event.id).then(() => {
-                                        fetchImage(route.params.event.id).then(uri => {
-                                            storeEvent(route.params.event.id, hasImage, uri);
-                                        });
-                                    });
+                            <TouchableOpacity onPress={() => {
+                                setShowStartDate(true);
+                                setMode("date");
+                            }} style={styles.input}>
+                                <View pointerEvents="none">
+                                    <TextInput
+                                        value={getDate(startDate)}
+                                        iconLeft="calendar-outline"
+                                        editable={false}
+                                        width="100%"
+                                    />
+                                </View>
+                            </TouchableOpacity>
+
+                            <View style={styles.dateTime}>
+                                <TouchableOpacity onPress={() => {
+                                    setShowStartDate(true);
+                                    setMode("time");
+                                }} style={styles.smallInput}>
+                                    <View pointerEvents="none">
+                                        <NormalText center>Start time</NormalText>
+                                        <TextInput
+                                            value={getTime(startDate)}
+                                            iconLeft="time-outline"
+                                            width="100%"
+                                            editable={false}
+                                        />
+                                    </View>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity onPress={() => {
+                                    setShowEndDate(true);
+                                    setMode("time");
+                                }} style={styles.smallInput}>
+                                    <View pointerEvents="none">
+                                        <NormalText center>End time</NormalText>
+                                        <TextInput
+                                            value={getTime(endDate)}
+                                            iconLeft="time-outline"
+                                            width="100%"
+                                            editable={false}
+                                        />
+                                    </View>
+                                </TouchableOpacity>
+                            </View>                        
+
+                            <DateTimePickerModal isVisible={showStartDate} date={startDate}
+                                mode={mode} onConfirm={changeStartDate} onCancel={() => setShowStartDate(false)}
+                                minimumDate={new Date()} maximumDate={moment().add(1, "months").toDate()}/>
+                            <DateTimePickerModal isVisible={showEndDate} date={endDate}
+                                mode={mode} onConfirm={changeEndDate} onCancel={() => setShowEndDate(false)}
+                                minimumDate={startDate} maximumDate={moment().add(1, "months").toDate()}/>
+
+                            <TextInput
+                                placeholder="Location"
+                                value={location}
+                                onChangeText={(val) => {
+                                    setLocation(val);
+                                }}
+                                iconLeft="location-outline"
+                                mainContainerStyle={styles.input}
+                            />
+                            
+                            <TextInput
+                                placeholder="Additional Info"
+                                value={additionalInfo}
+                                onChangeText={(val) => setAdditionalInfo(val)}
+                                mainContainerStyle={{
+                                    ...styles.input, minHeight:65, height: "auto"
+                                }}
+                                height={100}
+                                multiline={true}
+                                iconLeft="document-text-outline"
+                                scrollEnabled={false}
+                            />
+
+                            {route.params.event.type === "public" && <TouchableOpacity onPress={() => refRBSheet.current.open()}
+                                style={styles.input}>
+                                <View pointerEvents="none">
+                                    <TextInput
+                                        placeholder="Tags"
+                                        value={tagsValue}
+                                        iconLeft="pricetags-outline"
+                                        editable={false}
+                                        width="100%"
+                                    />
+                                </View>
+                            </TouchableOpacity>}
+
+                            <Button disabled={disabled || loading} onPress={() => {
+                                if (startDate > endDate) {
+                                    alert("Start time must be before end time");
+                                } else if (checkProfanity(name)) {
+                                    alert("Name has inappropriate words >:(");
+                                } else if (checkProfanity(location)) {
+                                    alert("Location has inappropriate words >:(");
+                                } else if (checkProfanity(additionalInfo)) {
+                                    alert("Additional info has inappropriate words >:(");
                                 } else {
-                                    storeEvent(route.params.event.id, hasImage, route.params.event.image);
+                                    setLoading(true);
+                                    let hasImage = false;
+                                    if (photo !== "https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1400") {
+                                        hasImage = true;
+                                        
+                                        if (photo !== route.params.event.image) {
+                                            storeImage(photo, route.params.event.id).then(() => {
+                                                fetchImage(route.params.event.id).then(uri => {
+                                                    storeEvent(route.params.event.id, hasImage, uri);
+                                                });
+                                            });
+                                        } else {
+                                            storeEvent(route.params.event.id, hasImage, route.params.event.image);
+                                        }
+                                    } else {
+                                        storeEvent(route.params.event.id, hasImage, "");
+                                    }
                                 }
-                            } else {
-                                storeEvent(route.params.event.id, hasImage, "");
-                            }
-                        }
-                    }} marginVertical={20}>{loading ? "Updating ..." : "Update"}</Button>
-                </ScrollView>
-            </View>
+                            }} marginVertical={20}>{loading ? "Updating ..." : "Update"}</Button>
+                        </ScrollView>
+                    </View>
 
-            {route.params.event.type === "public" && <RBSheet
-                height={400}
-                ref={refRBSheet}
-                closeOnDragDown={true}
-                closeOnPressMask={false}
-                customStyles={{
-                    wrapper: {
-                        backgroundColor: "rgba(0,0,0,0.5)",
-                    },
-                    draggableIcon: {
-                        backgroundColor: "#5DB075"
-                    },
-                    container: {
-                        borderTopLeftRadius: 20,
-                        borderTopRightRadius: 20,
-                        padding: 10
-                    }
-                }}>
-                <NormalText center marginBottom={10}>Add as many tags as you want!</NormalText>
-                <TagsSection
-                    multi={true}
-                    selectedItems={tagsSelected}
-                    onItemSelect={(item) => {
-                        setTagsSelected([...tagsSelected, item]);
-                    }}
-                    onRemoveItem={(item, index) => {
-                        const newTags = tagsSelected.filter((tag, i) => i !== index);
-                        setTagsSelected(newTags);
-                    }}
-                    items={cloneDeep(eventTags)}
-                    chip={true}
-                    resetValue={false}
-                />
-            </RBSheet>}
+                    {route.params.event.type === "public" && <RBSheet
+                        height={400}
+                        ref={refRBSheet}
+                        closeOnDragDown={true}
+                        closeOnPressMask={false}
+                        customStyles={{
+                            wrapper: {
+                                backgroundColor: "rgba(0,0,0,0.5)",
+                            },
+                            draggableIcon: {
+                                backgroundColor: "#5DB075"
+                            },
+                            container: {
+                                borderTopLeftRadius: 20,
+                                borderTopRightRadius: 20,
+                                padding: 10
+                            }
+                        }}>
+                        <NormalText center marginBottom={10}>Add as many tags as you want!</NormalText>
+                        <TagsSection
+                            multi={true}
+                            selectedItems={tagsSelected}
+                            onItemSelect={(item) => {
+                                setTagsSelected([...tagsSelected, item]);
+                            }}
+                            onRemoveItem={(item, index) => {
+                                const newTags = tagsSelected.filter((tag, i) => i !== index);
+                                setTagsSelected(newTags);
+                            }}
+                            items={cloneDeep(eventTags)}
+                            chip={true}
+                            resetValue={false}
+                        />
+                    </RBSheet>}
+                </View>
+            </KeyboardAvoidingWrapper>
         </Layout>
     );
 }
 
 const styles = StyleSheet.create({
     content: {
-        paddingHorizontal: 20
+        paddingHorizontal: 20,
+        flexGrow: 1
     },
 
     imageOverlay: {
@@ -387,7 +391,8 @@ const styles = StyleSheet.create({
     },
 
     input: {
-        marginTop: 10
+        marginTop: 10,
+        width: "100%"
     },
 
     image: {

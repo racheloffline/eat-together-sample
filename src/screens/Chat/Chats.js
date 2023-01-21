@@ -276,6 +276,7 @@ export default function ({ navigation }) {
               borderRadius: 5,
               marginTop: 2,
             }}
+            height={50}
             itemTextStyle={{ color: "#222" }}
             itemsContainerStyle={{ maxHeight: 140 }}
             items={users}
