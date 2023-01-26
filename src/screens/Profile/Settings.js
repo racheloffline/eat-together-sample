@@ -14,6 +14,7 @@ import firebase from "firebase/compat";
 import "firebase/firestore"
 
 import MediumText from "../../components/MediumText";
+import NormalText from "../../components/NormalText";
 import DeviceToken from "../utils/DeviceToken";
 
 export default function ({ navigation }) {
@@ -191,9 +192,9 @@ export default function ({ navigation }) {
             <View style={styles.listView}>
                 <Ionicons name = {item.icon} size = {25}
                     color={item.name.toLowerCase().includes("delete") ? "red" : "black"}/>
-                <MediumText color={item.name.toLowerCase().includes("delete") ? "red" : "black"}>
-                        {item.name}
-                </MediumText>
+                <NormalText size={16} color={item.name.toLowerCase().includes("delete") ? "red" : "black"}>
+                    {item.name}
+                </NormalText>
             </View>
         </TouchableOpacity>
     )
@@ -220,8 +221,10 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         marginHorizontal: 10
     },
+
     listView: {
         flexDirection: "row",
-        paddingVertical: 15
+        paddingVertical: 15,
+        alignItems: "center",
     }
 });
