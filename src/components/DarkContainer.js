@@ -1,5 +1,4 @@
 import React from "react";
-import { Dimensions } from "react-native";
 import { Section } from "react-native-rapi-ui";
 
 const DarkContainer = props => {

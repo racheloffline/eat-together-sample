@@ -11,6 +11,7 @@ import { Layout } from "react-native-rapi-ui";
 import { Ionicons, Feather } from "@expo/vector-icons";
 import { db, auth } from "../../provider/Firebase";
 
+import WithBadge from "../../components/WithBadge";
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
@@ -140,6 +141,11 @@ export default function ({ navigation }) {
             }}
           ></Ionicons>
         </View>
+        
+        <View style={styles.badge}>
+          <WithBadge mealsAttended={mealsAttended} mealsSignedUp={mealsSignedUp}/>
+        </View>
+        
         <View style={styles.settings}>
           <Ionicons
             name="settings-sharp"
@@ -284,6 +290,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 20,
     top: 20,
+  },
+
+  badge: {
+    position: "absolute",
+    left: 20,
+    top: 70,
   },
 
   settings: {

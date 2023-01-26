@@ -13,7 +13,10 @@ import Header from "../../components/Header";
 import ChatPreview from "../../components/ChatPreview";
 import SearchableDropdown from "../../components/SearchableDropdown";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
+
+import NormalText from "../../components/NormalText";
 import MediumText from "../../components/MediumText";
+import CustomButton from "../../components/CustomButton";
 
 import { db } from "../../provider/Firebase";
 import firebase from "firebase/compat";
@@ -287,11 +290,10 @@ export default function ({ navigation }) {
               placeholder: "Search for connections",
             }}
           />
-          <Button
-            text="New Chat"
+          <CustomButton
+            height={50}
+            paddingHorizontal={10}
             disabled={selectedUsers.length == 0}
-            color="black"
-            style={{ height: 50 }}
             onPress={() => {
               if (checkChatExists()) {
                 alert("Chat already exists!");
@@ -301,7 +303,9 @@ export default function ({ navigation }) {
               
               setSelectedUsers([]);
             }}
-          ></Button>
+          >
+            <NormalText color="white">New Chat</NormalText>
+          </CustomButton>
         </View>
         {loading ? 
           <View style={styles.noChatsView}>
