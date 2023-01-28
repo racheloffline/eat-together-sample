@@ -143,7 +143,7 @@ export default function ({ navigation }) {
         </View>
         
         <View style={styles.badge}>
-          <WithBadge mealsAttended={mealsAttended} mealsSignedUp={mealsSignedUp}/>
+          <WithBadge mealsAttended={mealsAttended} mealsSignedUp={mealsSignedUp} color={"pink"}/>
         </View>
         
         <View style={styles.settings}>
