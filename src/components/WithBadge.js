@@ -11,8 +11,7 @@ const WithBadge = props => {
             resizeMode: 'contain',
             width: 50,
             height: 50,
-            borderRadius: 100,
-            backgroundColor: color,
+            borderRadius: 100
           },
     });
 
