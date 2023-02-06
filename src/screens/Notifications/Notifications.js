@@ -12,6 +12,7 @@ import Notification from "../../components/Notification";
 
 import { db } from "../../provider/Firebase";
 import firebase from "firebase/compat";
+import moment from "moment";
 
 export default function (props) {
   // Current user stuff
@@ -20,6 +21,14 @@ export default function (props) {
 
   const [notifications, setNotifications] = useState([]); // Notifications
   const [loading, setLoading] = useState(true); // Loading state for the page
+
+  const [recommendation, setRecommendation] = useState({
+    name: "Cafe on the Ave",
+    suggestedAttendees: ["0chp0zXVEeXywPjMNUu08lC1gIY2", "c01Lzorh3EccO0aQlqa9mZeysf23"],
+    startDate: moment(),
+    endDate: moment(),
+    menu: ["Ice cream", "Boba", "Coffee", "Milkshake"],
+  }); // Recommendations
 
   useEffect(() => {
     async function fetchData() {
@@ -40,11 +49,16 @@ export default function (props) {
           }
         });
 
-        //Replace the old notif array with the new, updated array (with read times)
+        // Replace the old notif array with the new, updated array (with read times)
         db.collection("Users").doc(user.uid).update({
           notifications: notifications
         }).then(() => {
-          setNotifications(notifications.reverse());
+          setNotifications([...notifications.reverse(), {
+            id: "aoisdjfij",
+            body: "Bruh",
+            title: "Bruh",
+            type: "recommendation",
+          }]);
         });
       });
     }
@@ -137,6 +151,11 @@ export default function (props) {
                       })
                     }).catch(() => {
                       alert("This user doesn't seem to exist :(");
+                    });
+                    break;
+                  case "recommendation":
+                    props.navigation.navigate("Recommendation", {
+                      event: recommendation,
                     });
                     break;
                   default:
