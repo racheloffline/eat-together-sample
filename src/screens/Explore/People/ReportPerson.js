@@ -7,8 +7,9 @@ import {
   themeColor,
   useTheme,
   Button,
-  TextInput,
 } from "react-native-rapi-ui";
+
+import TextInput from "../../../components/TextInput";
 import LargeText from "../../../components/LargeText";
 import MediumText from "../../../components/MediumText";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
@@ -36,7 +37,9 @@ const ReportPerson = ({ route, navigation }) => {
         </View>
         <TextInput
           multiline={true}
-          containerStyle={{ paddingBottom: 70 }}
+          mainContainerStyle={{alignItems: "flex-start"}}
+          width="100%"
+          height={130}
           placeholder="Enter explanation here"
           value={report}
           onChangeText={(val) => setReport(val)}
