@@ -8,9 +8,8 @@ import {
   Keyboard,
   StyleSheet
 } from 'react-native';
-import { TextInput } from 'react-native-rapi-ui';
-import { Ionicons } from '@expo/vector-icons';
 
+import TextInput from './TextInput';
 import Tag from './Tag';
 import TagsList from './TagsList';
 import NormalText from "./NormalText";
@@ -194,10 +193,10 @@ export default class TagsSection extends Component {
     return (
       <TextInput
         { ...textInputProps }
-        placeholder="Type a tag ..."
-        leftContent={
-            <Ionicons name="pricetag" size={20}/>
-        }
+        placeholder="Type a tag..."
+        iconLeft="pricetag"
+        iconLeftFontSize={20}
+        width="100%"
         onBlur={(e) => {
             if (this.props.onBlur) {
                 this.props.onBlur(e);
@@ -209,7 +208,7 @@ export default class TagsSection extends Component {
             
             this.setState({ focus: false, item: this.props.selectedItems });
         }}
-        containerStyle={{ marginBottom: 10 }}
+        marginBottom={10}
       />
     )
   }

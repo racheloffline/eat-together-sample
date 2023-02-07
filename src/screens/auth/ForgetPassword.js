@@ -13,11 +13,10 @@ import * as firebase from "firebase/compat";
 
 import {
   Layout,
-  Text,
-  TextInput
 } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 
+import TextInput from "../../components/TextInput";
 import Button from "../../components/Button";
 import LargeText from "../../components/LargeText";
 import NormalText from "../../components/NormalText";
@@ -76,15 +75,17 @@ export default function ({ navigation }) {
           >
             <LargeText center>Reset Password</LargeText>
             <TextInput
-              leftContent={<Ionicons name="mail" size={18}/>}
-              containerStyle={{ marginTop: 15 }}
+              width="100%"
+              height={40}
+              iconLeft="mail"
+              marginTop={15}
               placeholder="Enter your email"
               value={email}
               autoCapitalize="none"
               autoCompleteType="off"
               autoCorrect={false}
               keyboardType="email-address"
-              onChangeText={(text) => setEmail(text)}
+              onChangeText={(newEmail) => setEmail(newEmail)}
             />
             <Button onPress={forget} disabled={loading} marginVertical={10}>
               {loading ? "Loading" : "Send email"}

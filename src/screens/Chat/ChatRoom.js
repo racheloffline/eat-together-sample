@@ -5,11 +5,15 @@ import {
   Dimensions,
   TouchableOpacity,
   FlatList,
-  ActivityIndicator
+  ActivityIndicator,
+  Platform
 } from "react-native";
-import { Layout, TextInput, TopNav } from "react-native-rapi-ui";
+import { Layout, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 
+import { KeyboardAvoidingView } from "react-native";
+
+import TextInput from "../../components/TextInput";
 import TextMessage from "../../components/TextMessage";
 import MediumText from "../../components/MediumText";
 
@@ -113,8 +117,10 @@ export default function ({ route, navigation }) {
     });
   };
 
+
+
   return (
-    <Layout>
+    <Layout style={{flex: 1}}>
       <TopNav
         middleContent={
           <TouchableOpacity onPress={() => navigation.navigate("ChatRoomDetails", {
@@ -134,32 +140,35 @@ export default function ({ route, navigation }) {
           <ActivityIndicator size={100} color="#5DB075" />
           <MediumText center>Hang tight ...</MediumText>
         </View>
-      :  
-        <FlatList
-          data={messages}
-          renderItem={({ item }) => (
-            <TextMessage {...item}/>
-          )}
-          inverted={true}
-          keyExtractor={(item) => item.sentAt.toString()}
-        />
-      }
+      :
 
-      <TextInput
-        placeholder="Send Message"
-        value={message}
-        onChangeText={(val) => setMessage(val)}
-        rightContent={
-          <TouchableOpacity
-            onPress={() => {
-              onSend();
-            }}
-            disabled={message.length === 0}
-          >
-            <Ionicons name="send" size={20} color={"#D3D3D3"} />
-          </TouchableOpacity>
-        }
-      />
+        <KeyboardAvoidingView 
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : ""}
+        >
+          <FlatList
+            data={messages}
+            renderItem={({ item }) => (
+              <TextMessage {...item}/>
+            )}
+            inverted={true}
+            keyExtractor={(item) => item.sentAt.toString()}
+          />
+        
+          <TextInput
+            placeholder="Send Message"
+            value={message}
+            onChangeText={(val) => setMessage(val)}
+            width="100%"
+            iconRight="send"
+            iconRightColor="#D3D3D3"
+            iconRightFontSize={20}
+            iconRightDisabled={message.length === 0}
+            iconRightOnPress={() => { onSend() }}
+          />
+        </KeyboardAvoidingView>
+
+      }
     </Layout>
   );
 }
