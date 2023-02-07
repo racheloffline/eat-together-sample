@@ -21,7 +21,7 @@
     ],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "org.name.EatTogether"
+      "bundleIdentifier": "com.eat.together"
     },
     "web": {
       "favicon": "./assets/big_logo.png"

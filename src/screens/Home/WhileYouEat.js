@@ -42,7 +42,7 @@ import {
   GOOGLE_AUTH_CLIENT_ID,
   GOOGLE_AUTH_CLIENT_ID_ANDROID,
   GOOGLE_AUTH_CLIENT_ID_IOS
-} from "@env"; //Enviroment variables
+} from "@env"; //Environment variables
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -116,6 +116,32 @@ const WhileYouEat = ({ route, navigation }) => {
     }
   }, []);
 
+    const publishEventsToGoogleCalendar = async (calendarId) => {
+      if (generatedSchedule.length > 0) {
+        console.log(generatedSchedule)
+        const google_event_objects = generatedSchedule.map((activity) => {
+          return {
+            start: { dateTime: moment(activity.start_time, "YYYY-M-D H:mm:s").toDate() },
+            end: { dateTime: moment(activity.end_time, "YYYY-M-D H:mm:s").toDate() },
+            endTimeUnspecified: !activity.end_time,
+            summary: activity.name,
+            location: Array.isArray(activity.location) ? `${activity.location[0] || activity.location[1]} - ${activity.location[activity.location.length -1] || activity.location[activity.location.length -2]}` : activity.location,
+          };
+        });
+
+        for (let i = 0; i < Math.ceil(google_event_objects.length / 3); i++) {
+          console.log("helloo...", google_event_objects.slice(i * 3,(i+1)*3))
+          await Promise.all(
+              google_event_objects.slice(i * 3,(i+1)*3).map((event) =>
+                insertEventToGoogleCalendar(calendarId, event)
+              )
+            );
+            await new Promise(r => setTimeout(r, 1000));
+        }
+      }
+    };
+
+
   useEffect(() => {
     async function fetchData() {
       if (response?.type === 'success') {
@@ -123,14 +149,18 @@ const WhileYouEat = ({ route, navigation }) => {
         const accessToken = response.authentication.accessToken;
         const email = await fetchEmail(accessToken);
 
-        // Get the Monday and Sunday occuring the week of the current date
-        const date = new Date(); // Today
-        const start = date.getDate() - date.getDay() + 1;
-        const end = start + 6;
-        const startDate = new Date(date.setDate(start));
-        const endDate = new Date(date.setDate(end));
+        const startTime = new Date(route.params.event.startDate * 1000);
+        const endTime = new Date(route.params.event.endDate * 1000);
+        const eventName = route.params.event.name;
+        const info = route.params.event.additionalInfo;
 
-        const oauth2Client = new google.auth.OAuth2('clientID', 'clientSecret');
+        console.log(startTime.toString());
+        console.log(route.params.event.startDate*1000);
+        console.log(endTime.toString());
+        console.log(eventName);
+        console.log(info);
+
+        const oauth2Client = new Google.auth.OAuth2('clientID', 'clientSecret');
           oauth2Client.setCredentials({
             access_token: 'google access token',
             refresh_token: 'google refresh token',
@@ -140,8 +170,8 @@ const WhileYouEat = ({ route, navigation }) => {
         const calendar = google.calendar({ version: "v3", oauth2Client });
 
         const event = {
-           summary: 'Event name',
-           description: "Event details.",
+           summary: eventName,
+           description: info,
            start: {
              dateTime: '2022-12-28T01:00:00-07:00',
              timeZone: 'Asia/kolkata',
@@ -152,11 +182,14 @@ const WhileYouEat = ({ route, navigation }) => {
            },
          };
 
-        calendar.events.insert({
-            auth: oauth2Client,
-            calendarId: "primary",
-            resource: event,
-        })
+         request = gapi.client.calendar.events.insert({
+           'calendarId': 'primary',
+           'resource': event
+         })
+//        calendar.events.insert({
+//            calendarId: "primary",
+//            resource: event,
+//        })
         .then((event) =>  console.log('Event created: %s', event.htmlLink))
         .catch((error) => console.log('Some error occured', error));
       }
@@ -164,6 +197,22 @@ const WhileYouEat = ({ route, navigation }) => {
 
     fetchData();
   }, [response]);
+
+    // Get the user's email
+    const fetchEmail = async (accessToken) => {
+      const response = await fetch(
+        `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${accessToken}`,
+        {
+          method: "GET",
+          headers: new Headers({
+            Authorization: `Bearer ${accessToken}`,
+          }),
+        }).then(function (res) {
+          return res.json();
+        });
+
+      return response.email;
+    }
 
   // Function to navigate to the chat for this event
   const goToEventChat = () => {
