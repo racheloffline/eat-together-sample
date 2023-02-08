@@ -8,7 +8,7 @@ const DarkContainer = props => {
             width: props.width ? props.width : "auto",
             paddingVertical: 20,
             paddingHorizontal: 20
-        }}>
+        }} borderRadius={20}>
             {props.children}
         </Section>
     );

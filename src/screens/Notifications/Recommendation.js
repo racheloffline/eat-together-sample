@@ -11,6 +11,7 @@ import NormalText from "../../components/NormalText";
 
 import Container from "../../components/Container";
 import Button from "../../components/Button";
+import BorderedButton from "../../components/BorderedButton";
 import TagsList from "../../components/TagsList";
 import Link from "../../components/Link";
 
@@ -68,9 +69,13 @@ const Recommendation = ({ route, navigation }) => {
       />
       <ScrollView>
         <View style={styles.infoContainer}>
-          <NormalText center marginBottom={10}>Based on your interests and availability ...</NormalText>
-          
+          <NormalText size={16} center marginBottom={10}>Based on your interests and availability ...</NormalText>
+
           <Container>
+            <Image
+              style={styles.image}
+              source={route.params.event.hasImage ? {uri: route.params.event.image} : require("../../../assets/stockEvent.png")}
+            />
             <View style={styles.row}>
                 <LargeText size={24} marginBottom={10}>
                     {route.params.event.name}
@@ -103,6 +108,11 @@ const Recommendation = ({ route, navigation }) => {
                 </View>
             </View>
           </Container>
+
+          <View style={styles.buttonRow}>
+            <Button marginHorizontal={5}>Attend!</Button>
+            <BorderedButton color="red" marginHorizontal={5}>Remove</BorderedButton>
+          </View>
         </View>
       </ScrollView>
     </Layout>
@@ -110,6 +120,12 @@ const Recommendation = ({ route, navigation }) => {
 }
 
 const styles = StyleSheet.create({
+  image: {
+    width: "100%",
+    height: 150,
+    borderRadius: 10
+  },
+
   infoContainer: {
     marginHorizontal: 30,
     marginBottom: 50,
@@ -135,7 +151,8 @@ const styles = StyleSheet.create({
 
   buttonRow: {
     flexDirection: "row",
-    justifyContent: "center"
+    justifyContent: "center",
+    marginTop: 30
   },
 
   imageBackground: {
