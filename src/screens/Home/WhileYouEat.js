@@ -23,6 +23,7 @@ import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
 import Link from "../../components/Link";
+import Toggle from "../../components/Toggle";
 
 import getDate from "../../getDate";
 import getTime from "../../getTime";
@@ -417,22 +418,11 @@ const WhileYouEat = ({ route, navigation }) => {
           </NormalText>
 
           {/* Icebreakers dropdown */}
-        <TouchableOpacity
-          onPress={() => setOpenIcebreakers(!openIcebreakers)}
-        >
-            <View style={styles.row}>
-              <Ionicons
-                name={
-                  !openIcebreakers ? "caret-forward-sharp" : "caret-down-sharp"
-                }
-                size={20}
-                color="black"
-              />
-              <NormalText paddingHorizontal={7} size={17} color="black">
-                Icebreakers
-              </NormalText>
-            </View>
-        </TouchableOpacity>
+          <Toggle 
+            open={openIcebreakers}
+            onPress={() => setOpenIcebreakers(!openIcebreakers)}
+            title="Icebreakers"
+          />
 
           <View style={styles.icebreakers}>
             {openIcebreakers &&
@@ -443,26 +433,14 @@ const WhileYouEat = ({ route, navigation }) => {
           </View>
 
           {/* Attendance dropdown */}
-          {event.hostID === user.uid && (
+          
+          {(event.hostID === user.uid || event.type === "recommendation") && (
             <View>
-                <TouchableOpacity
-                  onPress={() => setOpenAttendance(!openAttendance)}
-                >
-                    <View style={styles.row}>
-                      <Ionicons
-                        name={
-                          !openAttendance
-                            ? "caret-forward-sharp"
-                            : "caret-down-sharp"
-                        }
-                        size={20}
-                        color="black"
-                      />
-                  <NormalText paddingHorizontal={7} size={17} color="black">
-                    Attendance
-                  </NormalText>
-                  </View>
-                </TouchableOpacity>
+              <Toggle 
+                open={openAttendance}
+                onPress={() => setOpenAttendance(!openAttendance)}
+                title="Attendance"
+              />
 
               {openAttendance && (
                 <View style={{ marginTop: 10 }}>

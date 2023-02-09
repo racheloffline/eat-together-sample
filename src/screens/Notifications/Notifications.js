@@ -17,11 +17,11 @@ import moment from "moment";
 export default function (props) {
   // Current user stuff
   const user = firebase.auth().currentUser;
+  const [userData, setUserData] = useState({}); // User data
   const [unread, setUnread] = useState(false);
 
   const [notifications, setNotifications] = useState([]); // Notifications
-  const [loading, setLoading] = useState(true); // Loading state for the page
-
+  
   const [recommendation, setRecommendation] = useState({
     name: "Cafe on the Ave",
     suggestedAttendees: ["0chp0zXVEeXywPjMNUu08lC1gIY2", "c01Lzorh3EccO0aQlqa9mZeysf23"],
@@ -29,6 +29,8 @@ export default function (props) {
     endDate: moment(),
     menu: ["Ice cream", "Boba", "Coffee", "Milkshake"],
   }); // Recommendations
+
+  const [loading, setLoading] = useState(true); // Loading state for the page
 
   useEffect(() => {
     async function fetchData() {
@@ -40,6 +42,7 @@ export default function (props) {
       // Get the list of notifications from the backend
       await db.collection("Users").doc(user.uid).onSnapshot((snap) => {
         let data = snap.data();
+        setUserData(data);
         let notifications = data.notifications;
 
         //Loop through every notif and set them to read
@@ -156,6 +159,7 @@ export default function (props) {
                   case "recommendation":
                     props.navigation.navigate("Recommendation", {
                       event: recommendation,
+                      userData
                     });
                     break;
                   default:

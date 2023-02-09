@@ -1,7 +1,7 @@
 // Full recommendation page
 
 import React, { useState, useEffect } from "react";
-import { View, ScrollView, StyleSheet, Dimensions, Image } from "react-native";
+import { View, ScrollView, StyleSheet, Dimensions, Image, TouchableOpacity } from "react-native";
 import { Layout, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -14,6 +14,7 @@ import Button from "../../components/Button";
 import BorderedButton from "../../components/BorderedButton";
 import TagsList from "../../components/TagsList";
 import Link from "../../components/Link";
+import Toggle from "../../components/Toggle";
 
 import getDate from "../../getDate";
 import getTime from "../../getTime";
@@ -21,18 +22,37 @@ import getTime from "../../getTime";
 import {db, auth} from "../../provider/Firebase";
 import * as firebase from "firebase/compat";
 import openMap from "react-native-open-maps";
+import { getCommonTags } from "../../methods";
 
 const Recommendation = ({ route, navigation }) => {
+  // User and other user states
   const user = auth.currentUser;
   const [attendees, setAttendees] = useState([]);
+  const [commonTags, setCommonTags] = useState([]); // Common tags between the user and others
+
+  const [openMenu, setOpenMenu] = useState(false);
 
   useEffect(() => {
+    let existingTags = {}; // To avoid duplicates
+
     route.params.event.suggestedAttendees.forEach(attendee => {
         db.collection("Users").doc(attendee).get().then(doc => {
             setAttendees(prev => [...prev, doc.data()]);
+            const tags = getCommonTags(route.params.userData, doc.data());
+            let newTags = [];
+            tags.forEach(tag => {
+                if (!existingTags[tag.tag]) {
+                    existingTags[tag.tag] = true;
+                    newTags.push(tag);
+                }
+            });
+
+            setCommonTags(prev => prev.concat(newTags));
         });
     });
   }, []);
+
+  useEffect(() => console.log(commonTags), [commonTags]);
 
   // Confirm attendance to recommended meetup
   const attend = () => {
@@ -76,14 +96,32 @@ const Recommendation = ({ route, navigation }) => {
               style={styles.image}
               source={route.params.event.hasImage ? {uri: route.params.event.image} : require("../../../assets/stockEvent.png")}
             />
-            <View style={styles.row}>
-                <LargeText size={24} marginBottom={10}>
+            <View style={{...styles.row, "marginTop": 15}}>
+                <LargeText size={24}>
                     {route.params.event.name}
                 </LargeText>
                 <MediumText size={24}> with:</MediumText>
             </View>
 
-            {/* 3 meetup details (location, date, time} are below */}
+            <View style={styles.row}>
+              {attendees.map((attendee, index) => 
+                <TouchableOpacity style={styles.row}
+                  onPress={() => {
+                      navigation.navigate("FullProfile", {
+                        person: attendee,
+                      });
+                  }}>
+                  <NormalText size={16}>{index > 0 && " + "}</NormalText>
+                  <Image source={attendee.hasImage ? { uri: attendee.image }
+                    : require("../../../assets/logo.png")} style={styles.profileImg}/>
+                  <NormalText size={16}>{attendee.firstName + " " + attendee.lastName.substring(0, 1) + "."}</NormalText>
+                </TouchableOpacity>
+              )}
+            </View>
+
+            <TagsList tags={commonTags}/>
+
+            {/* 3 meetup details (location, date, time} + menu are below */}
 
             <View style={styles.logistics}>
                 <View style={styles.row}>
@@ -107,6 +145,13 @@ const Recommendation = ({ route, navigation }) => {
                 </NormalText>
                 </View>
             </View>
+
+            <Toggle
+              open={openMenu}
+              onPress={() => setOpenMenu(!openMenu)}
+              title="Menu"
+            />
+            {route.params.event.menu.map(item => <NormalText>{item}</NormalText>)}
           </Container>
 
           <View style={styles.buttonRow}>
@@ -140,9 +185,9 @@ const styles = StyleSheet.create({
   },
 
   profileImg: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 25,
+    height: 25,
+    borderRadius: 25,
     borderColor: "#5DB075",
     borderWidth: 1,
     backgroundColor: "white",

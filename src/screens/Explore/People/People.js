@@ -13,7 +13,7 @@ import Filter from "../../../components/Filter";
 
 import MediumText from "../../../components/MediumText";
 
-import { generateColor, randomize3 } from "../../../methods";
+import { generateColor, randomize3, getCommonTags } from "../../../methods";
 import { db, auth } from "../../../provider/Firebase";
 
 export default function ({ navigation }) {
@@ -116,20 +116,6 @@ export default function ({ navigation }) {
       });
     }
   }, [similarInterests, mutualFriends]);
-
-  // Get tags in common with current user and user being compared to
-  const getCommonTags = (currUser, otherUser) => {
-    let commonTags = [];
-    const otherTags = otherUser.tags.map((tag) => tag.tag);
-
-    currUser.tags.forEach((tag) => {
-      if (otherTags.includes(tag.tag)) {
-        commonTags.push(tag);
-      }
-    });
-
-    return commonTags;
-  };
 
   // Method to filter out people based on name, username, or tags
   const search = (newPeople, text) => {
