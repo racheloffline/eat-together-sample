@@ -167,7 +167,7 @@ const FullCard = ({ route, navigation }) => {
                 });
             }}
             disabled={route.params.event.hostID === user.uid}>
-            <Image source={route.params.event.hasHostImage ? { uri: route.params.event.hostImage}
+            <Image source={route.params.event.hasHostImage ? { uri: route.params.event.hostImage }
               : require("../../../assets/logo.png")} style={styles.profileImg}/>
             <MediumText size={18}>{route.params.event.hostID === user.uid ? "You!"
               : (route.params.event.hostFirstName ?
