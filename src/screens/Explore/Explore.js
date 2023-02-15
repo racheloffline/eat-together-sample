@@ -1,7 +1,7 @@
 //Display upcoming events to join
 
 import React, { useEffect, useState, useRef } from "react";
-import { StyleSheet, FlatList, View, ActivityIndicator } from "react-native";
+import { StyleSheet, FlatList, View } from "react-native";
 import { Layout } from "react-native-rapi-ui";
 import RBSheet from "react-native-raw-bottom-sheet";
 
@@ -11,9 +11,9 @@ import HorizontalSwitch from "../../components/HorizontalSwitch";
 import Searchbar from "../../components/Searchbar";
 import HorizontalRow from "../../components/HorizontalRow";
 import Filter from "../../components/Filter";
+import EmptyState from "../../components/EmptyState";
+import LoadingView from "../../components/LoadingView";
 import Link from "../../components/Link";
-
-import MediumText from "../../components/MediumText";
 
 import { getTimeOfDay, isAvailable, compareDates } from "../../methods";
 import { auth, db } from "../../provider/Firebase";
@@ -397,10 +397,7 @@ export default function({ navigation }) {
 
         <View style={{ flex: 1 }}>
           {loading ?
-            <View style={{ flex: 1, justifyContent: "center" }}>
-              <ActivityIndicator size={100} color="#5DB075"/>
-              <MediumText center>Hang tight ...</MediumText>
-            </View>
+            <LoadingView/>
           : filteredSearchedEvents.length > 0 ? 
             <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
               data={filteredSearchedEvents} renderItem={({item}) =>
@@ -412,9 +409,7 @@ export default function({ navigation }) {
                 }}/>
             }/>
           :
-            <View style={{ flex: 1, justifyContent: "center" }}>
-              <MediumText center>Empty 🍽️</MediumText>
-            </View>
+            <EmptyState title="No Meals" text="Organize your own, or start making new friends!"/>
           }
         </View>
       </Layout>

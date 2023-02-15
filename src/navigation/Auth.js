@@ -23,6 +23,7 @@ const Auth = () => {
   // Name.js
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [age, setAge] = useState("");
   const [pronouns, setPronouns] = useState("");
   const [bio, setBio] = useState("");
   const [image, setImage] = useState("");
@@ -135,6 +136,7 @@ const Auth = () => {
       lastName,
       username,
       email,
+      age: parseInt(age),
       hasImage: image !== "",
       image,
       tags,
@@ -222,6 +224,8 @@ const Auth = () => {
             lastName={lastName}
             setFirstName={setFirstName}
             setLastName={setLastName}
+            age={age}
+            setAge={setAge}
             bio={bio}
             setBio={setBio}
             image={image}

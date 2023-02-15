@@ -10,11 +10,12 @@ import Header from "../../../components/Header";
 import HorizontalRow from "../../../components/HorizontalRow";
 import HorizontalSwitch from "../../../components/HorizontalSwitch";
 import Filter from "../../../components/Filter";
-
-import MediumText from "../../../components/MediumText";
+import EmptyState from "../../../components/EmptyState";
+import LoadingView from "../../../components/LoadingView";
 
 import { generateColor, randomize3, getCommonTags } from "../../../methods";
 import { db, auth } from "../../../provider/Firebase";
+
 
 export default function ({ navigation }) {
   // Fetch current user
@@ -227,10 +228,7 @@ export default function ({ navigation }) {
 
       <View style={{ flex: 1, alignItems: "center" }}>
         {loading || people.length === 0 ?
-          <View style={{ flex: 1, justifyContent: "center" }}>
-            <ActivityIndicator size={100} color="#5DB075" />
-            <MediumText>Hang tight ...</MediumText>
-          </View>
+          <LoadingView/>
         : filteredSearchedPeople.length > 0 ? 
           <FlatList
             contentContainerStyle={styles.people}
@@ -248,9 +246,7 @@ export default function ({ navigation }) {
             )}
           />
         : 
-          <View style={{ flex: 1, justifyContent: "center" }}>
-            <MediumText center>Empty 🍽️</MediumText>
-          </View>
+          <EmptyState title="Empty" text="Either you're friends with everyone or no one is using the app :("/>
         }
       </View>
     </Layout>
