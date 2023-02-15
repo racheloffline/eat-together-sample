@@ -1,10 +1,27 @@
-import {db} from "./provider/Firebase";
-import firebase from "firebase/compat";
 import profaneWords from "./profaneWords";
 
 /**
+ * Get the tags in common between two users.
+ * @param {Object} currUser Current user.
+ * @param {Object} otherUser Other user.
+ * @returns Array of tags in common.
+ */
+export const getCommonTags = (currUser, otherUser) => {
+    let commonTags = [];
+    const otherTags = otherUser.tags.map((tag) => tag.tag);
+
+    currUser.tags.forEach((tag) => {
+      if (otherTags.includes(tag.tag)) {
+        commonTags.push(tag);
+      }
+    });
+
+    return commonTags;
+  };
+
+/**
  * Generates a random color.
- * Returns: Hex value of random color.
+ * @returns Hex value of random color.
  */
 export const generateColor = () => {
     const colors = ["#5DB075", "#6DE2BF", "#62E286", "#31B87F", "#71D8AC", "#3DD671"];
@@ -14,7 +31,8 @@ export const generateColor = () => {
 
 /**
  * Determines if an event is in the morning, afternoon, or evening.
- * Returns: "morning", "afternoon", or "evening".
+ * @param {Datetime Object} time Time of event.
+ * @returns Time of day ("morning", "afternoon", "evening").
  */
 export const getTimeOfDay = (time) => {
     let hour = time.getHours();
@@ -29,7 +47,8 @@ export const getTimeOfDay = (time) => {
 
 /**
  * Check whether inappropriate words are used.
- * Returns: true if inappropriate words are used, false otherwise.
+ * @param {String} word Word to check.
+ * @returns True if inappropriate words are used, false otherwise.
  */
 export const checkProfanity = word => {
     const profane = profaneWords.some(w => word.toLowerCase().includes(w));
@@ -38,6 +57,9 @@ export const checkProfanity = word => {
 
 /**
  * Determines if a user is available for a particular event/meal.
+ * @param {Object} user User to check.
+ * @param {Object} event Event/meal to check.
+ * @returns True if user is available, false otherwise.
  */
 export const isAvailable = (user, event) => {
     let startDate, endDate;
@@ -70,7 +92,10 @@ export const isAvailable = (user, event) => {
 
 /**
  * Helper function to determine if a user's schedule matches with an event/meal.
- * Returns: true if match, false if not.
+ * @param {Datetime Object} startDate Start date of event/meal.
+ * @param {Datetime Object} endDate End date of event/meal.
+ * @param {Object} availabilities User's availabilities.
+ * @returns True if match, false if not.
  */
 const isMatch = (startDate, endDate, availabilities) => {
     let match = false;
@@ -100,7 +125,8 @@ const isMatch = (startDate, endDate, availabilities) => {
 
 /**
  * Randomly chooses three elements from an array.
- * Returns: An array of three random elements.
+ * @param {Array} array Array to choose from.
+ * @returns Array of three random elements.
  */
 export const randomize3 = (array) => {
     let result = [];
@@ -116,7 +142,9 @@ export const randomize3 = (array) => {
 
 /**
  * Compares two dates.
- * Returns: an integer representing if the first date is before (-), after (+), or equal (0) to the second date.
+ * @param {Datetime Object} First date.
+ * @param {Datetime Object} Second date.
+ * @returns Integer representing if the first date is before (-), after (+), or equal (0) to the second date.
  */
 export const compareDates = (a, b) => {
     let aSeconds;
@@ -137,8 +165,9 @@ export const compareDates = (a, b) => {
 }
 
 /**
- * @param {Array} list of events
  * Given a list of events, return a list of free times for each of Monday to Sunday (multiple free times per day are possible)
+ * @param {Array} events list of events
+ * @returns {Array} list of free times
  */
 export const getFreeTimes = (events) => {
     let freeTimes = [];
