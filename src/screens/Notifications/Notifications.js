@@ -72,7 +72,7 @@ export default function (props) {
   }, []);
 
   return (
-    <Layout>
+    <Layout backgroundColor="white">
       {props.fromNav ?
         <Header name="Notifications" navigation={props.navigation} connections/> :
         <TopNav

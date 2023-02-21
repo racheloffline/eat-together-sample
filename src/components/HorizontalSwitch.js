@@ -43,7 +43,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 60,
         paddingBottom: 20,
         alignItems: "center",
-        justifyContent: "center"
+        justifyContent: "center",
+        borderBottomWidth: 1,
+        borderBottomColor: "#CACACA"
     },
 
     current: {
