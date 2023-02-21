@@ -14,6 +14,7 @@ import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
 import NormalText from "../../components/NormalText";
 import Button from '../../components/Button';
+import BorderedButton from '../../components/BorderedButton';
 import Link from "../../components/Link";
 
 import firebase from "firebase/compat";
@@ -153,7 +154,7 @@ export default function ({ route, navigation }) {
                     }} marginHorizontal={10}>
                         Accept
                     </Button>
-                    <Button onPress = {() => {
+                    <BorderedButton onPress = {() => {
                         ref.set({
                             accepted: "declined"
                         }, {merge: true}).then(() => {
@@ -176,9 +177,9 @@ export default function ({ route, navigation }) {
                                 })
                             });
                         })
-                    }} backgroundColor="red" marginHorizontal={10}>
+                    }} color="red" marginHorizontal={10}>
                         Decline
-                    </Button>
+                    </BorderedButton>
                 </View>
             </ScrollView>
         </Layout>

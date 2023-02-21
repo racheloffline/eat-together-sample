@@ -11,7 +11,9 @@ import RBSheet from "react-native-raw-bottom-sheet";
 import LargeText from "../../../components/LargeText";
 import MediumText from "../../../components/MediumText";
 import NormalText from "../../../components/NormalText";
+
 import Button from "../../../components/Button";
+import BorderedButton from "../../../components/BorderedButton";
 import SelectButton from "../../../components/SelectButton";
 import Availability from "../../../components/Availability";
 import TextInput from "../../../components/TextInput";
@@ -470,9 +472,9 @@ const Availabilities = props => {
             </View>
 
             <View style={{...styles.row, marginVertical: 20}}>
-              <Button backgroundColor="red" onPress={() => deleteTime(index, dayOfWeek)}>Delete</Button>
-              <MediumText>OR</MediumText>
               <Button onPress={saveTime}>Save</Button>
+              <MediumText>OR</MediumText>
+              <BorderedButton color="red" onPress={() => deleteTime(index, dayOfWeek)}>Delete</BorderedButton>
             </View>
         </RBSheet>
         

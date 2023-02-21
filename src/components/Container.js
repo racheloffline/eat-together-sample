@@ -3,13 +3,12 @@ import { Section } from "react-native-rapi-ui";
 
 const DarkContainer = props => {
     return (
-        <Section backgroundColor="rgba(0, 0, 0, 0.7)" style={{
+        <Section backgroundColor="#D9D9D9" style={{
             marginVertical: props.marginVertical ? props.marginVertical : 0,
             width: props.width ? props.width : "auto",
             paddingVertical: 20,
-            paddingHorizontal: 10,
-            alignItems: props.align ? props.align : "center"
-        }}>
+            paddingHorizontal: 20
+        }} borderRadius={20}>
             {props.children}
         </Section>
     );
