@@ -12,13 +12,24 @@ import Notification from "../../components/Notification";
 
 import { db } from "../../provider/Firebase";
 import firebase from "firebase/compat";
+import moment from "moment";
 
 export default function (props) {
   // Current user stuff
   const user = firebase.auth().currentUser;
+  const [userData, setUserData] = useState({}); // User data
   const [unread, setUnread] = useState(false);
 
   const [notifications, setNotifications] = useState([]); // Notifications
+  
+  const [recommendation, setRecommendation] = useState({
+    name: "Cafe on the Ave",
+    suggestedAttendees: ["0chp0zXVEeXywPjMNUu08lC1gIY2", "c01Lzorh3EccO0aQlqa9mZeysf23"],
+    startDate: moment(),
+    endDate: moment(),
+    menu: ["Ice cream", "Boba", "Coffee", "Milkshake"],
+  }); // Recommendations
+
   const [loading, setLoading] = useState(true); // Loading state for the page
 
   useEffect(() => {
@@ -31,6 +42,7 @@ export default function (props) {
       // Get the list of notifications from the backend
       await db.collection("Users").doc(user.uid).onSnapshot((snap) => {
         let data = snap.data();
+        setUserData(data);
         let notifications = data.notifications;
 
         //Loop through every notif and set them to read
@@ -40,11 +52,16 @@ export default function (props) {
           }
         });
 
-        //Replace the old notif array with the new, updated array (with read times)
+        // Replace the old notif array with the new, updated array (with read times)
         db.collection("Users").doc(user.uid).update({
           notifications: notifications
         }).then(() => {
-          setNotifications(notifications.reverse());
+          setNotifications([...notifications.reverse(), {
+            id: "aoisdjfij",
+            body: "Bruh",
+            title: "Bruh",
+            type: "recommendation",
+          }]);
         });
       });
     }
@@ -137,6 +154,12 @@ export default function (props) {
                       })
                     }).catch(() => {
                       alert("This user doesn't seem to exist :(");
+                    });
+                    break;
+                  case "recommendation":
+                    props.navigation.navigate("Recommendation", {
+                      event: recommendation,
+                      userData
                     });
                     break;
                   default:

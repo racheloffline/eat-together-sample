@@ -18,6 +18,8 @@ import TagsList from "../../../components/TagsList";
 import Button from "../../../components/Button";
 import EventCard from "../../../components/EventCard";
 import NormalText from "../../../components/NormalText";
+import WithBadge from "../../../components/WithBadge";
+
 import {
   Menu,
   MenuOption,
@@ -291,7 +293,17 @@ const FullProfile = ({ blockBack, route, navigation }) => {
       />
 
       <ScrollView contentContainerStyle={styles.page}>
-        <View style={styles.background} />
+        <View style={[styles.background, {
+          backgroundColor: route.params.person.settings.banner ? route.params.person.settings.banner : "#5DB075"
+        }]} />
+
+        <View style={styles.badge}>
+          <WithBadge
+            mealsAttended={route.params.person.attendedEventIDs.length}
+            mealsSignedUp={route.params.person.archivedEventIDs.length +
+              route.params.person.attendingEventIDs.length}/>
+        </View>
+
         <Image
           style={styles.image}
           source={
@@ -360,8 +372,7 @@ const styles = StyleSheet.create({
   background: {
     position: "absolute",
     width: Dimensions.get("screen").width,
-    height: 100,
-    backgroundColor: "#5DB075",
+    height: 100
   },
 
   image: {
@@ -371,6 +382,12 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderRadius: 125,
     backgroundColor: "white",
+  },
+
+  badge: {
+    position: "absolute",
+    left: 20,
+    top: 20,
   },
 
   name: {

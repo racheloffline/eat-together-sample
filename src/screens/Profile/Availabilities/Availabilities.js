@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { View, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
-import { Layout, TextInput } from "react-native-rapi-ui";
+import { Layout } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -11,9 +11,12 @@ import RBSheet from "react-native-raw-bottom-sheet";
 import LargeText from "../../../components/LargeText";
 import MediumText from "../../../components/MediumText";
 import NormalText from "../../../components/NormalText";
+
 import Button from "../../../components/Button";
+import BorderedButton from "../../../components/BorderedButton";
 import SelectButton from "../../../components/SelectButton";
 import Availability from "../../../components/Availability";
+import TextInput from "../../../components/TextInput";
 
 import getTime from "../../../getTime";
 import moment from "moment";
@@ -259,7 +262,7 @@ const Availabilities = props => {
     });
 
     props.route.params.updateAvailabilities(newAvailabilities);
-    props.navigation.goBack();
+    props.navigation.navigate("Me");
     alert("Saved successfully!");
   }
 
@@ -391,9 +394,8 @@ const Availabilities = props => {
                     <View pointerEvents="none">
                         <TextInput
                             value={getTime(startTime)}
-                            leftContent={
-                                <Ionicons name="time-outline" size={20}/>
-                            }
+                            iconLeft="time-outline"
+                            width="100%"
                             editable={false}
                         />
                     </View>
@@ -404,9 +406,8 @@ const Availabilities = props => {
                         <NormalText center>End time</NormalText>
                         <TextInput
                             value={getTime(endTime)}
-                            leftContent={
-                                <Ionicons name="time-outline" size={20}/>
-                            }
+                            iconLeft="time-outline"
+                            width="100%"
                             editable={false}
                         />
                     </View>
@@ -450,9 +451,8 @@ const Availabilities = props => {
                     <View pointerEvents="none">
                         <TextInput
                             value={getTime(startTime)}
-                            leftContent={
-                                <Ionicons name="time-outline" size={20}/>
-                            }
+                            iconLeft="time-outline"
+                            width="100%"
                             editable={false}
                         />
                     </View>
@@ -463,9 +463,8 @@ const Availabilities = props => {
                         <NormalText center>End time</NormalText>
                         <TextInput
                             value={getTime(endTime)}
-                            leftContent={
-                                <Ionicons name="time-outline" size={20}/>
-                            }
+                            iconLeft="time-outline"
+                            width="100%"
                             editable={false}
                         />
                     </View>
@@ -473,17 +472,19 @@ const Availabilities = props => {
             </View>
 
             <View style={{...styles.row, marginVertical: 20}}>
-              <Button backgroundColor="red" onPress={() => deleteTime(index, dayOfWeek)}>Delete</Button>
-              <MediumText>OR</MediumText>
               <Button onPress={saveTime}>Save</Button>
+              <MediumText>OR</MediumText>
+              <BorderedButton color="red" onPress={() => deleteTime(index, dayOfWeek)}>Delete</BorderedButton>
             </View>
         </RBSheet>
-
-        <DateTimePickerModal isVisible={showStartTime} date={startTime}
-            mode="time" onConfirm={changeStartTime} onCancel={() => setShowStartTime(false)}/>
-        <DateTimePickerModal isVisible={showEndTime} date={endTime}
-            mode="time" onConfirm={changeEndTime} onCancel={() => setShowEndTime(false)}/>
-
+        
+        <View>
+          <DateTimePickerModal isVisible={showStartTime} date={startTime} style={{width:'100%'}}
+              mode="time" onConfirm={changeStartTime} onCancel={() => setShowStartTime(false)}/>
+          <DateTimePickerModal isVisible={showEndTime} date={endTime} style={{width:'100%'}}
+              mode="time" onConfirm={changeEndTime} onCancel={() => setShowEndTime(false)}/>
+        </View>
+        
         <View style={styles.buttons}>
           <Button onPress={() => props.navigation.goBack()}
             marginHorizontal={10}>Cancel</Button>

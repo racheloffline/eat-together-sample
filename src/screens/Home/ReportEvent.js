@@ -1,9 +1,10 @@
 import React, {useState} from "react";
-import {View, StyleSheet, Image, Dimensions, ScrollView} from "react-native";
-import {Layout, TopNav, Button, TextInput} from "react-native-rapi-ui";
+import {View, StyleSheet, Dimensions, ScrollView} from "react-native";
+import {Layout, TopNav, Button} from "react-native-rapi-ui";
+import TextInput from "../../components/TextInput";
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
-import {FontAwesome, Ionicons} from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import admin from "firebase/compat";
 import firebase from "firebase/compat";
 
@@ -27,7 +28,15 @@ const ReportEvent = ({ route, navigation }) => {
                 <View style={styles.header}>
                     <LargeText style={{padding: 20}} center>We're sorry for your unfortunate experience. Please describe the issue.</LargeText>
                 </View>
-                <TextInput multiline={true} containerStyle={{paddingBottom: 70}} placeholder="Enter explanation here" value={report} onChangeText={val => setReport(val)}/>
+                <TextInput
+                    multiline={true}
+                    mainContainerStyle={{alignItems: "flex-start"}}
+                    width="100%"
+                    height={130}
+                    placeholder="Enter explanation here"
+                    value={report}
+                    onChangeText={(val) => setReport(val)}
+                />
                 <Button style={{marginTop: 20}} text="Report" status="danger" onPress={() => {
                     admin
                         .firestore()

@@ -3,18 +3,15 @@ import {View, StyleSheet, Image, Dimensions, ScrollView} from "react-native";
 import {
     Layout,
     TopNav,
-    Text,
-    themeColor,
-    useTheme,
-    Button, TextInput
+    Button
 } from "react-native-rapi-ui";
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
-import NormalText from "../../components/NormalText";
-import {FontAwesome, Ionicons} from "@expo/vector-icons";
-import getDate from "../../getDate";
+import {Ionicons} from "@expo/vector-icons";
 import admin from "firebase/compat";
 import firebase from "firebase/compat";
+
+import TextInput from "../../components/TextInput";
 
 const SuggestIdea = ({ route, navigation }) => {
     const [report, setReport] = useState('');
@@ -36,7 +33,7 @@ const SuggestIdea = ({ route, navigation }) => {
                 <View style={styles.header}>
                     <LargeText style={{padding: 20}} center>Please describe your new idea or feature.</LargeText>
                 </View>
-                <TextInput multiline={true} containerStyle={{paddingBottom: 70}} placeholder="Enter explanation here" value={report} onChangeText={val => setReport(val)}/>
+                <TextInput multiline={true} width={"100%"} height={130} mainContainerStyle={{alignItems: "flex-start"}} placeholder="Enter explanation here" value={report} onChangeText={val => setReport(val)}/>
                 <Button style={{marginTop: 20}} text="Submit" onPress={() => {
                     admin
                         .firestore()
