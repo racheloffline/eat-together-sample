@@ -15,6 +15,7 @@ import LoadingView from "../../../components/LoadingView";
 
 import { generateColor, randomize3, getCommonTags } from "../../../methods";
 import { db, auth } from "../../../provider/Firebase";
+import { sortBySimilarInterests } from "../../../methods";
 
 
 export default function ({ navigation }) {
@@ -99,7 +100,7 @@ export default function ({ navigation }) {
       let newPeople = [...people];
   
       if (similarInterests) {
-        newPeople = await sortBySimilarInterests(newPeople);
+        newPeople = await sortBySimilarInterests(userInfo, newPeople);
       }
   
       if (mutualFriends) {
@@ -148,46 +149,6 @@ export default function ({ navigation }) {
     const searchedPeople = search(filteredPeople, text);
     const newPeople = searchedPeople.filter(person => (person.settings.privateAccount == null || (!person.settings.privateAccount || text === person.username)))
     setFilteredSearchPeople(newPeople);
-  };
-
-  // Display people in descending order of similar tags
-  const sortBySimilarInterests = async (newPeople) => {
-    let result;
-
-    await fetch("https://eat-together-match.uw.r.appspot.com/find_similarity", {
-      method: "POST",
-      body: JSON.stringify({
-        currTags: userInfo.tags.map((t) => t.tag),
-        otherTags: getPeopleTags(newPeople),
-      }),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        let i = 0;
-        newPeople.forEach((p) => {
-          p.similarity = res[i];
-          i++;
-        });
-
-        result = newPeople.sort((a, b) => b.similarity - a.similarity);
-      })
-      .catch((e) => {
-        // If error, alert the user
-        alert("An error occured, try again later :(");
-        result = newPeople;
-      });
-
-    return result;
-  };
-
-  // Get a list of everyone's tags
-  const getPeopleTags = (newPeople) => {
-    let tags = [];
-    newPeople.forEach((p) => {
-      tags.push(p.tags.map((t) => t.tag));
-    });
-
-    return tags;
   };
 
   // Display people who are mutual friends

@@ -31,7 +31,6 @@ export default function({ navigation }) {
     const [searchQuery, setSearchQuery] = useState("");
 
     // Filters
-    const [similarInterests, setSimilarInterests] = useState(false);
     const [popularity, setPopularity] = useState(false);
     const [available, setAvailable] = useState(false);
     const [fromFriends, setFromFriends] = useState(false);
@@ -96,10 +95,6 @@ export default function({ navigation }) {
         setLoading(true);
         let newEvents = [...events];
 
-        if (similarInterests) {
-          newEvents = await sortBySimilarInterests(newEvents);
-        }
-
         if (popularity) {
           newEvents = sortByPopularity(newEvents);
         }
@@ -138,7 +133,6 @@ export default function({ navigation }) {
         filter().then(() => setLoading(false));
       }
     }, [
-      similarInterests,
       popularity,
       available,
       fromFriends,
@@ -218,53 +212,6 @@ export default function({ navigation }) {
       return newEvents;
     };
 
-    // Display events in descending order of similar tags
-    const sortBySimilarInterests = async (newEvents) => {
-      let result;
-
-      await fetch("https://eat-together-match.uw.r.appspot.com/find_similarity", {
-        method: "POST",
-        body: JSON.stringify({
-          currTags: userInfo.tags.map(t => t.tag),
-          otherTags: getEventTags(),
-        }),
-      })
-      .then((res) => res.json())
-      .then((res) => {
-        let i = 0;
-        newEvents.forEach((e) => {
-          e.similarity = res[i];
-          i++;
-        });
-
-        newEvents = newEvents.sort((a, b) => b.similarity - a.similarity);
-        result = newEvents;
-      })
-      .catch((e) => {
-        // If error, alert the user
-        alert("An error occured, try again later :(");
-        result = events;
-      });
-
-      return result;
-    }
-    
-    // Get a list of all the events' tags
-    const getEventTags = () => {
-      let tags = [];
-      events.forEach(e => {
-        tags.push(e.tags);
-      });
-
-      return tags;
-    }
-
-    // Filter events by time of day
-    const filterByTime = (time, newEvents) => {
-      newEvents = newEvents.filter(e => getTimeOfDay(e.date.toDate()) === time);
-      return newEvents;
-    }
-
     return (
       <Layout>
         <Header name="Explore" navigation={navigation} hasNotif={unread} notifs/>
@@ -287,10 +234,9 @@ export default function({ navigation }) {
               text={morning ? "Morning" : 
                 afternoon ? "Afternoon" : 
                 evening ? "Evening" : "Time of day"}/>
-            <Filter checked={similarInterests || popularity}
-              onPress={() => showSortFilterRef.current.open()}
-              text={similarInterests ? "Similar interests"
-                : popularity ? "Popularity" : "Sort by"}/>
+            <Filter checked={popularity}
+              onPress={() => setPopularity(!popularity)}
+              text="Popularity"/>
             <Filter checked={fromFriends}
               onPress={() => setFromFriends(!fromFriends)} text="From friends"/>
             <Filter checked={friendsAttending}
@@ -346,74 +292,27 @@ export default function({ navigation }) {
         >
           Clear
         </Link>
-      </RBSheet>
+      </RBSheet> 
 
-      <RBSheet
-        height={300}
-        ref={showSortFilterRef}
-        closeOnDragDown={true}
-        closeOnPressMask={false}
-        customStyles={{
-          wrapper: {
-            backgroundColor: "rgba(0,0,0,0.5)",
-          },
-          draggableIcon: {
-            backgroundColor: "black",
-          },
-          container: {
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-            padding: 10,
-          },
-        }}
-      >
-        <Filter
-          checked={similarInterests}
-          text="Similar interests"
-          marginBottom={5}
-          onPress={() => {
-            setSimilarInterests(!similarInterests);
-            setPopularity(false);
-            showSortFilterRef.current.close();
-          }}
-        />
-        <Filter
-          checked={popularity}
-          text="Popularity"
-          marginBottom={20}
-          onPress={() => {
-            setPopularity(!popularity);
-            setSimilarInterests(false);
-            showSortFilterRef.current.close();
-          }}
-        />
-        <Link
-          onPress={() => {
-            setSimilarInterests(false);
-            setPopularity(false);
-            showSortFilterRef.current.close();
-          }}>Clear</Link>
-        </RBSheet>
-
-        <View style={{ flex: 1 }}>
-          {loading ?
-            <LoadingView/>
-          : filteredSearchedEvents.length > 0 ? 
-            <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
-              data={filteredSearchedEvents} renderItem={({item}) =>
-                <EventCard event={item} click={() => {
-                    //ampInstance.logEvent('BUTTON_CLICKED'); // EXPERIMENT
-                  navigation.navigate("FullCard", {
-                    event: item
-                  });
-                }}/>
-            }/>
-          :
-            <EmptyState title="No Meals" text="Organize your own, or start making new friends!"/>
-          }
-        </View>
-      </Layout>
-    );
+      <View style={{ flex: 1 }}>
+        {loading ?
+          <LoadingView/>
+        : filteredSearchedEvents.length > 0 ? 
+          <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
+            data={filteredSearchedEvents} renderItem={({item}) =>
+              <EventCard event={item} click={() => {
+                  //ampInstance.logEvent('BUTTON_CLICKED'); // EXPERIMENT
+                navigation.navigate("FullCard", {
+                  event: item
+                });
+              }}/>
+          }/>
+        :
+          <EmptyState title="No Meals" text="Organize your own, or start making new friends!"/>
+        }
+      </View>
+    </Layout>
+  );
 }
 
 const styles = StyleSheet.create({
