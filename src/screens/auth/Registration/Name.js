@@ -12,11 +12,13 @@ import Button from "../../../components/Button";
 import KeyboardAvoidingWrapper from "../../../components/KeyboardAvoidingWrapper";
 
 import { checkProfanity } from "../../../methods";
+import NormalText from "../../../components/NormalText";
 
 const Name = props => {
   // Input fields
   const [firstName, setFirstName] = useState(props.firstName);
   const [lastName, setLastName] = useState(props.lastName);
+  const [age, setAge] = useState(props.age);
   const [pronouns, setPronouns] = useState(props.pronouns);
   const [bio, setBio] = useState(props.bio);
   const [image, setImage] = useState(props.image);
@@ -32,6 +34,7 @@ const Name = props => {
       props.setFirstName(firstName);
       props.setLastName(lastName);
       props.setPronouns(pronouns);
+      props.setAge(age);
       props.setBio(bio);
       props.setImage(image);
       props.navigation.navigate("Tags");
@@ -76,7 +79,7 @@ const Name = props => {
           </View>
 
           <View style={styles.content}>
-            <View style={styles.name}>
+            <View style={styles.row}>
               <TextInput
                 placeholder="First name"
                 value={firstName}
@@ -97,27 +100,40 @@ const Name = props => {
               />
             </View>
 
-            <TextInput
-              placeholder="Pronouns (he/him, she/her, etc.)"
-              value={pronouns}
-              marginTop="3%"
-              width="100%"
-              height="10%"
-              onChangeText={(val) => setPronouns(val)}
-              iconLeftType="FontAwesome"
-              iconLeft="quote-left"
-            />
+            <View style={styles.row}>
+              <TextInput
+                placeholder="Age"
+                value={age}
+                width="47%"
+                height="100%"
+                onChangeText={(val) => setAge(val)}
+                iconLeftType="Ionicons"
+                iconLeft="md-pencil"
+                keyboardType="numeric"
+              />
+
+              <TextInput
+                placeholder="Pronouns"
+                value={pronouns}
+                width="47%"
+                height="100%"
+                onChangeText={(val) => setPronouns(val)}
+                iconLeftType="FontAwesome"
+                iconLeft="quote-left"
+              />
+            </View>
 
             <TextInput
               placeholder="Fun fact (10 to 100 characters)"
               value={bio}
               width="100%"
-              marginTop="3%"
               height="10%"
               onChangeText={(val) => setBio(val)}
               iconLeftType="FontAwesome"
               iconLeft="exclamation"
             />
+
+            <NormalText marginTop={20}>Note: your age will not be publicly shown to others.</NormalText>
 
             <View style={styles.buttons}>
               <Button
@@ -131,6 +147,7 @@ const Name = props => {
                   firstName === "" ||
                   lastName === "" ||
                   pronouns === "" ||
+                  age === "" ||
                   bio.length < 10
                 }
                 onPress={goNext}
@@ -177,9 +194,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  name: {
+  row: {
     width:"100%",
     height: "10%",
+    marginBottom: 10,
     flexDirection: "row",
     justifyContent: "space-between",
   },

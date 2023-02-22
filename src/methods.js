@@ -1,6 +1,78 @@
 import profaneWords from "./profaneWords";
 
 /**
+ * Sorts an array of people by similarity to the current user.
+ * @param {Array} newPeople Array of people to sort.
+ * @returns Sorted array of people.
+ */
+export const sortBySimilarInterests = async (userInfo, newPeople) => {
+    let result;
+    let currTags = [[], [], []];
+    userInfo.tags.forEach((tag) => {
+        switch (tag.type) {
+            case "school":
+                currTags[0].push(tag.tag);
+                break;
+            case "hobby":
+                currTags[1].push(tag.tag);
+                break;
+            case "food":
+                currTags[2].push(tag.tag);
+                break;
+        }
+    });
+
+    await fetch("https://eat-together-match.uw.r.appspot.com/find_similarity", {
+      method: "POST",
+      body: JSON.stringify({
+        currTags: currTags,
+        otherTags: getPeopleTags(newPeople),
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        let i = 0;
+        newPeople.forEach((p) => {
+          p.similarity = res[i];
+          i++;
+        });
+
+        result = newPeople.sort((a, b) => b.similarity - a.similarity);
+      })
+      .catch((e) => {
+        // If error, alert the user
+        alert("An error occured, try again later :(");
+        result = newPeople;
+      });
+
+    return result;
+};
+
+// Helper method for sortBySimilarInterests: get a list of everyone's tags
+const getPeopleTags = (newPeople) => {
+    let tags = [];
+    newPeople.forEach((p) => {
+        let currTags = [[], [], []];
+        p.tags.forEach((tag) => {
+            switch (tag.type) {
+                case "school":
+                    currTags[0].push(tag.tag);
+                    break;
+                case "hobby":
+                    currTags[1].push(tag.tag);
+                    break;
+                case "food":
+                    currTags[2].push(tag.tag);
+                    break;
+            }
+        });
+        tags.push(currTags);
+    });
+
+    return tags;
+};
+
+/**
  * Get the tags in common between two users.
  * @param {Object} currUser Current user.
  * @param {Object} otherUser Other user.

@@ -1,10 +1,12 @@
 //Look at your connection requests
 
 import React, {useEffect, useState} from 'react';
-import { View, FlatList, StyleSheet, ActivityIndicator } from "react-native";
+import { FlatList, StyleSheet } from "react-native";
 import { Layout, TopNav } from 'react-native-rapi-ui';
 import { Ionicons } from "@expo/vector-icons";
 
+import LoadingView from '../../components/LoadingView';
+import EmptyState from '../../components/EmptyState';
 import MessageList from "../../components/MessageList";
 import MediumText from "../../components/MediumText";
 
@@ -57,10 +59,7 @@ export default function ({ back, navigation }) {
             />
 
             {loading ?
-                <View style={styles.noRequestsView}>
-                    <ActivityIndicator size={100} color="#5DB075" />
-                    <MediumText>Hang tight ...</MediumText>
-                </View>
+                <LoadingView/>
             : requests.length > 0 ?
                 <FlatList contentContainerStyle={styles.invites} keyExtractor={item => item.id}
                         data={requests} renderItem={({item}) =>
@@ -79,9 +78,7 @@ export default function ({ back, navigation }) {
                     }} delete={deleteRequest}/>
                 }/>
             :
-                <View style={styles.noRequestsView}>
-                    <MediumText center={"center"}>No requests. You look great today :)</MediumText>
-                </View>
+                <EmptyState title="No Requests" text="You look great today :)"/>
             }
         </Layout>
 
