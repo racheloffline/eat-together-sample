@@ -21,6 +21,9 @@ export default function (props) {
   const [unread, setUnread] = useState(false);
 
   const [notifications, setNotifications] = useState([]); // Notifications
+  const[readNotifs, setReadNotifs] = useState([]);
+  const[unreadNotifs, setUnreadNotifs] = useState([]);
+
   
   const [recommendation, setRecommendation] = useState({
     name: "Cafe on the Ave",
@@ -44,6 +47,21 @@ export default function (props) {
         let data = snap.data();
         setUserData(data);
         let notifications = data.notifications;
+
+        if(readNotifs.length == 0 && unreadNotifs.length == 0) {
+            notifications.forEach((notif) => {
+              if(notif.readAt && !readNotifs.includes(notif)) {
+                setReadNotifs(arr => [...arr, notif]);
+              }
+              else if(!notif.readAt && !unread.includes(notif)){
+                setUnreadNotifs(arr => [...arr, notif]);
+              }
+            })
+        }
+
+
+
+
 
         //Loop through every notif and set them to read
         notifications.forEach((notif) => {
@@ -99,11 +117,13 @@ export default function (props) {
           <ActivityIndicator size={100} color="#5DB075" />
           <MediumText>Hang tight ...</MediumText>
         </View>
-      : notifications.length > 0 ? 
+      : notifications.length > 0 ?
+      <View>
+        <MediumText> Unread </MediumText>
         <FlatList
           contentContainerStyle={styles.cards}
           keyExtractor={(item) => item.id}
-          data={notifications}
+          data={unreadNotifs}
           renderItem={({ item }) => (
             <Notification
               notif={item}
@@ -170,6 +190,78 @@ export default function (props) {
             />
           )}
         />
+        <MediumText> Read </MediumText>
+        <FlatList
+          contentContainerStyle={styles.cards}
+          keyExtractor={(item) => item.id}
+          data={readNotifs}
+          renderItem={({ item }) => (
+            <Notification
+              notif={item}
+              showButton={!(item.type) ? false : true}
+              onPress={() => {
+                switch (item.type) {
+                  case "invite":
+                    db.collection("User Invites").doc(user.uid).collection("Invites").doc(item.id).get().then((ss) => {
+                      let inviteToSend = {
+                        ...ss.data(),
+                        id: ss.id,
+                      };
+                      props.navigation.navigate("NotificationFull", {
+                        invite: inviteToSend,
+                        notif: item,
+                        hasPassed:
+                            (ss.data().endDate ? ss.data().endDate.toDate().getTime()
+                                : ss.data().date.toDate().getTime()) < new Date().getTime(),
+                      });
+                    }).catch(() => {
+                      alert("There seems to be an error fetching this invite. Please try again later.");
+                    });
+                    break;
+                  case "private event":
+                    db.collection("Private Events").doc(item.id).get().then((ss) => {
+                      props.navigation.navigate("FullCard", {
+                        event: ss.data()
+                      });
+                    }).catch(() => {
+                      alert("There seems to be an error fetching this event. Please try again later.");
+                    });
+                    break;
+                  case "public event":
+                    db.collection("Public Events").doc(item.id).get().then((ss) => {
+                      props.navigation.navigate("FullCard", {
+                        event: ss.data()
+                      });
+                    }).catch(() => {
+                      alert("There seems to be an error fetching this event. Please try again later.");
+                    });
+                    break;
+                  case "user profile":
+                    db.collection("Usernames").doc(item.id).get().then((ss) => {
+                      db.collection("Users").doc(ss.data().id).get().then((ss2) => {
+                        props.navigation.navigate("FullProfile", {
+                          person: ss2.data()
+                        })
+                      })
+                    }).catch(() => {
+                      alert("This user doesn't seem to exist :(");
+                    });
+                    break;
+                  case "recommendation":
+                    props.navigation.navigate("Recommendation", {
+                      event: recommendation,
+                      userData
+                    });
+                    break;
+                  default:
+                    alert("Sorry, an error has occurred.");
+                    break;
+                }
+              }}
+            />
+          )}
+        />
+        </View>
       : 
         <View style={styles.noInvitesView}>
           <MediumText center>No new notifications!</MediumText>

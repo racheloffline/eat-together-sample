@@ -85,8 +85,6 @@ const Notification = (props) => {
 const styles = StyleSheet.create({
     outline: {
         alignItems: "center",
-        borderBottomWidth: 1.04,
-        borderBottomColor: "#CACACA"
     },
     head: {
         width: Dimensions.get('window').width * 0.95,
