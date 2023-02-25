@@ -1,7 +1,7 @@
 // Display your events
 
 import React, { useEffect, useState, useContext, useRef } from "react";
-import { View, ActivityIndicator, StyleSheet, FlatList } from "react-native";
+import { View, StyleSheet, FlatList } from "react-native";
 import { Layout } from "react-native-rapi-ui";
 import RBSheet from "react-native-raw-bottom-sheet";
 
@@ -10,13 +10,14 @@ import Header from "../../components/Header";
 import Searchbar from "../../components/Searchbar";
 import HorizontalRow from "../../components/HorizontalRow";
 import Filter from "../../components/Filter";
-
-import MediumText from "../../components/MediumText";
+import EmptyState from "../../components/EmptyState";
+import LoadingView from "../../components/LoadingView";
 import Link from "../../components/Link";
 
 import { db, auth } from "../../provider/Firebase";
 import { AuthContext } from "../../provider/AuthProvider";
 import { compareDates } from "../../methods";
+import moment from "moment";
 
 export default function ({ navigation }) {
   // Get current user
@@ -45,7 +46,7 @@ export default function ({ navigation }) {
   const showTypeRef = useRef();
   const showFromRef = useRef();
 
-  useEffect(() => {
+  useEffect(() => {    
     // updates stuff right after React makes changes to the DOM
     async function fetchEvents() {
       await db
@@ -337,13 +338,9 @@ export default function ({ navigation }) {
           )}
         />
       :
-        <View style={{ flex: 1, justifyContent: "center" }}>
-          <MediumText center>Empty 🍽️</MediumText>
-        </View>
+        <EmptyState title="No Upcoming Meals" text="Explore different meals and start making new friends!"/>
       :
-        <View style={{ flex: 1, justifyContent: "center" }}>
-          <ActivityIndicator size={100} color="#5DB075" />
-        </View>
+        <LoadingView/>
       }
 
       <RBSheet

@@ -18,29 +18,23 @@ import { checkProfanity } from "../../methods";
 
 export default function edit({ route, navigation }) {
     // Input fields
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [pronouns, setPronouns] = useState('');
-    const [bio, setBio] = useState('');
-    const [tags, setTags] = useState([]);
+    const [firstName, setFirstName] = useState(route.params.user.firstName);
+    const [lastName, setLastName] = useState(route.params.user.lastName);
+    const [age, setAge] = useState(route.params.user.age + "");
+    const [pronouns, setPronouns] = useState(route.params.user.pronouns);
+    const [bio, setBio] = useState(route.params.user.bio);
+    const [tags, setTags] = useState(route.params.user.tags);
     const [tagText, setTagText] = useState('');
 
     // Used to check if image has been updated or not; if not, don't update the DB
-    const [oldImage, setOldImage] = useState('');
-    const [image, setImage] = useState('');
+    const [oldImage, setOldImage] = useState(route.params.user.image);
+    const [image, setImage] = useState(route.params.user.image);
 
     const [loading, setLoading] = useState(false); // Disabling button if user profile is being updated
 
     const updateProfileImg = useContext(AuthContext).updateProfileImg;
 
     useEffect(() => {
-        setFirstName(route.params.user.firstName);
-        setLastName(route.params.user.lastName);
-        setPronouns(route.params.user.pronouns);
-        setBio(route.params.user.bio);
-        setOldImage(route.params.user.image);
-        setImage(route.params.user.image);
-        setTags(route.params.user.tags);
         setTagText(displayTags(route.params.user.tags));
     }, []);
 
@@ -105,6 +99,7 @@ export default function edit({ route, navigation }) {
                         db.collection("Users").doc(route.params.user.id).update({
                             firstName,
                             lastName,
+                            age: parseInt(age),
                             pronouns,
                             bio,
                             tags,
@@ -121,6 +116,7 @@ export default function edit({ route, navigation }) {
                 await db.collection("Users").doc(route.params.user.id).update({
                     firstName,
                     lastName,
+                    age: parseInt(age),
                     pronouns,
                     bio,
                     tags
@@ -196,7 +192,7 @@ export default function edit({ route, navigation }) {
                         </TouchableOpacity>
                     </View>
 
-                    <View style={styles.name}>
+                    <View style={styles.row}>
                         <TextInput
                             placeholder="First name"
                             onChangeText={(val) => setFirstName(val)}
@@ -215,16 +211,26 @@ export default function edit({ route, navigation }) {
                         />
                     </View>
 
-                    <TextInput
-                        placeholder="Pronouns (he/him, she/her, etc.)"
-                        onChangeText={(val) => setPronouns(val)}
-                        width={"100%"}
-                        iconLeftType="FontAwesome"
-                        iconLeft="quote-left"
-                        value={pronouns}
-                        marginBottom={10}
-                    />
-
+                    <View style={styles.row}>
+                        <TextInput
+                            keyboardType="numeric"
+                            placeholder="Age"
+                            onChangeText={(val) => setAge(val)}
+                            width={"47%"}
+                            iconLeftType="Ionicons"
+                            iconLeft="md-pencil"
+                            value={age}
+                        />
+                        <TextInput
+                            placeholder="Pronouns"
+                            onChangeText={(val) => setPronouns(val)}
+                            width={"47%"}
+                            iconLeftType="FontAwesome"
+                            iconLeft="quote-left"
+                            value={pronouns}
+                        />
+                    </View>
+                    
                     <TextInput
                         placeholder="Fun fact (10 to 100 characters)"
                         onChangeText={(val) => setBio(val)}
@@ -303,7 +309,7 @@ const styles = StyleSheet.create({
         borderRadius: 100
     },
 
-    name: {
+    row: {
         width: "100%",
         flexDirection: "row",
         justifyContent: "space-between",

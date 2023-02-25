@@ -10,11 +10,13 @@ import Header from "../../../components/Header";
 import HorizontalRow from "../../../components/HorizontalRow";
 import HorizontalSwitch from "../../../components/HorizontalSwitch";
 import Filter from "../../../components/Filter";
-
-import MediumText from "../../../components/MediumText";
+import EmptyState from "../../../components/EmptyState";
+import LoadingView from "../../../components/LoadingView";
 
 import { generateColor, randomize3, getCommonTags } from "../../../methods";
 import { db, auth } from "../../../provider/Firebase";
+import { sortBySimilarInterests } from "../../../methods";
+
 
 export default function ({ navigation }) {
   // Fetch current user
@@ -98,7 +100,7 @@ export default function ({ navigation }) {
       let newPeople = [...people];
   
       if (similarInterests) {
-        newPeople = await sortBySimilarInterests(newPeople);
+        newPeople = await sortBySimilarInterests(userInfo, newPeople);
       }
   
       if (mutualFriends) {
@@ -149,46 +151,6 @@ export default function ({ navigation }) {
     setFilteredSearchPeople(newPeople);
   };
 
-  // Display people in descending order of similar tags
-  const sortBySimilarInterests = async (newPeople) => {
-    let result;
-
-    await fetch("https://eat-together-match.uw.r.appspot.com/find_similarity", {
-      method: "POST",
-      body: JSON.stringify({
-        currTags: userInfo.tags.map((t) => t.tag),
-        otherTags: getPeopleTags(newPeople),
-      }),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        let i = 0;
-        newPeople.forEach((p) => {
-          p.similarity = res[i];
-          i++;
-        });
-
-        result = newPeople.sort((a, b) => b.similarity - a.similarity);
-      })
-      .catch((e) => {
-        // If error, alert the user
-        alert("An error occured, try again later :(");
-        result = newPeople;
-      });
-
-    return result;
-  };
-
-  // Get a list of everyone's tags
-  const getPeopleTags = (newPeople) => {
-    let tags = [];
-    newPeople.forEach((p) => {
-      tags.push(p.tags.map((t) => t.tag));
-    });
-
-    return tags;
-  };
-
   // Display people who are mutual friends
   const filterByMutualFriends = (newPeople) => {
     return newPeople.filter((p) => mutuals.includes(p.id));
@@ -227,10 +189,7 @@ export default function ({ navigation }) {
 
       <View style={{ flex: 1, alignItems: "center" }}>
         {loading || people.length === 0 ?
-          <View style={{ flex: 1, justifyContent: "center" }}>
-            <ActivityIndicator size={100} color="#5DB075" />
-            <MediumText>Hang tight ...</MediumText>
-          </View>
+          <LoadingView/>
         : filteredSearchedPeople.length > 0 ? 
           <FlatList
             contentContainerStyle={styles.people}
@@ -248,9 +207,7 @@ export default function ({ navigation }) {
             )}
           />
         : 
-          <View style={{ flex: 1, justifyContent: "center" }}>
-            <MediumText center>Empty 🍽️</MediumText>
-          </View>
+          <EmptyState title="Empty" text="Either you're friends with everyone or no one is using the app :("/>
         }
       </View>
     </Layout>

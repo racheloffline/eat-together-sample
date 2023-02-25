@@ -483,6 +483,7 @@ export default function ({ navigation }) {
                                 borderTopRightRadius: 20,
                                 padding: 10
                             }
+
                         }}>
                         <NormalText center marginBottom={10}>Add as many tags as you want!</NormalText>
                         <TagsSection

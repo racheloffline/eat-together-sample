@@ -52,8 +52,6 @@ const Recommendation = ({ route, navigation }) => {
     });
   }, []);
 
-  useEffect(() => console.log(commonTags), [commonTags]);
-
   // Confirm attendance to recommended meetup
   const attend = () => {
     const storeID = {
@@ -151,7 +149,7 @@ const Recommendation = ({ route, navigation }) => {
               onPress={() => setOpenMenu(!openMenu)}
               title="Menu"
             />
-            {route.params.event.menu.map(item => <NormalText>{item}</NormalText>)}
+            {openMenu && route.params.event.menu.map(item => <NormalText>{item}</NormalText>)}
           </Container>
 
           <View style={styles.buttonRow}>
