@@ -1,6 +1,6 @@
 //View invites to private events
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { FlatList, View, StyleSheet, ActivityIndicator } from "react-native";
 import { Layout, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
@@ -13,22 +13,16 @@ import Notification from "../../components/Notification";
 import { db } from "../../provider/Firebase";
 import firebase from "firebase/compat";
 import moment from "moment";
+import { AuthContext } from "../../provider/AuthProvider";
 
 export default function (props) {
   // Current user stuff
   const user = firebase.auth().currentUser;
+  const updateHasNotif = useContext(AuthContext).updateHasNotif;
   const [userData, setUserData] = useState({}); // User data
   const [unread, setUnread] = useState(false);
 
   const [notifications, setNotifications] = useState([]); // Notifications
-  
-  const [recommendation, setRecommendation] = useState({
-    name: "Cafe on the Ave",
-    suggestedAttendees: ["0chp0zXVEeXywPjMNUu08lC1gIY2", "c01Lzorh3EccO0aQlqa9mZeysf23"],
-    startDate: moment(),
-    endDate: moment(),
-    menu: ["Ice cream", "Boba", "Coffee", "Milkshake"],
-  }); // Recommendations
 
   const [loading, setLoading] = useState(true); // Loading state for the page
 
@@ -38,6 +32,7 @@ export default function (props) {
       await db.collection("Users").doc(user.uid).update({
         hasNotif: false
       });
+      updateHasNotif(false);
 
       // Get the list of notifications from the backend
       await db.collection("Users").doc(user.uid).onSnapshot((snap) => {
@@ -57,7 +52,7 @@ export default function (props) {
           notifications: notifications
         }).then(() => {
           setNotifications([...notifications.reverse(), {
-            id: "aoisdjfij",
+            id: "1677643042655G3yPIuG9RohS3mfwj6U7mcdUfrf2",
             body: "Bruh",
             title: "Bruh",
             type: "recommendation",
@@ -157,9 +152,13 @@ export default function (props) {
                     });
                     break;
                   case "recommendation":
-                    props.navigation.navigate("Recommendation", {
-                      event: recommendation,
-                      userData
+                    db.collection("Private Events").doc(item.id).get().then((ss) => {
+                      props.navigation.navigate("Recommendation", {
+                        event: ss.data(),
+                        userData
+                      });
+                    }).catch(() => {
+                      alert("There seems to be an error fetching this event. Please try again later.");
                     });
                     break;
                   default:

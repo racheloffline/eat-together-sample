@@ -29,12 +29,15 @@ const Recommendation = ({ route, navigation }) => {
   const user = auth.currentUser;
   const [attendees, setAttendees] = useState([]);
   const [commonTags, setCommonTags] = useState([]); // Common tags between the user and others
+  const [isAttending, setIsAttending] = useState(false); // Whether the user has accepted the invite or not
 
   const [openMenu, setOpenMenu] = useState(false);
+  const [loading, setLoading] = useState(true); // Loading state for the button
 
   useEffect(() => {
     let existingTags = {}; // To avoid duplicates
 
+    // Loads the tags of all the attendees
     route.params.event.suggestedAttendees.forEach(attendee => {
         db.collection("Users").doc(attendee).get().then(doc => {
             setAttendees(prev => [...prev, doc.data()]);
@@ -50,25 +53,58 @@ const Recommendation = ({ route, navigation }) => {
             setCommonTags(prev => prev.concat(newTags));
         });
     });
+
+    // Check if the user is attending the event
+    const eventIDs = route.params.userData.attendingEventIDs.map(event => event.id);
+    setIsAttending(eventIDs.includes(route.params.event.id));
+    setLoading(false);
   }, []);
 
   // Confirm attendance to recommended meetup
   const attend = () => {
+    setLoading(true);
     const storeID = {
       type: "recommendation",
       id: route.params.event.id
     };
 
-    db.collection("Users").doc(user.uid).update({
-      attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)
+    db.collection("Private Events").doc(route.params.event.id).update({
+      attendees: firebase.firestore.FieldValue.arrayUnion(user.uid)
     }).then(() => {
-      db.collection("Recommendations").doc(route.params.event.id).update({
-        attendees: firebase.firestore.FieldValue.arrayUnion(user.uid)
+      db.collection("Users").doc(user.uid).update({
+        attendingEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID),
+        attendedEventIDs: firebase.firestore.FieldValue.arrayUnion(storeID)
       }).then(() => {
         navigation.goBack();
         alert("You are signed up :)");
       });
     });
+  }
+
+  // Decline attendance to recommended meetup
+  const withdraw = () => {
+    const storeID = {
+      type: "recommendation",
+      id: route.params.event.id,
+    };
+
+    db.collection("Users")
+      .doc(user.uid)
+      .update({
+        attendingEventIDs: firebase.firestore.FieldValue.arrayRemove(storeID),
+        attendedEventIDs: firebase.firestore.FieldValue.arrayRemove(storeID),
+      })
+      .then(() => {
+        db.collection("Private Events")
+          .doc(route.params.event.id)
+          .update({
+            attendees: firebase.firestore.FieldValue.arrayRemove(user.uid),
+          })
+          .then(() => {
+            alert("You withdrew from the meal :(");
+            navigation.goBack();
+          });
+      });
   }
 
   return (
@@ -144,17 +180,22 @@ const Recommendation = ({ route, navigation }) => {
                 </View>
             </View>
 
-            <Toggle
-              open={openMenu}
-              onPress={() => setOpenMenu(!openMenu)}
-              title="Menu"
-            />
-            {openMenu && route.params.event.menu.map(item => <NormalText>{item}</NormalText>)}
+            {route.params.event.menu && <View>
+              <Toggle
+                open={openMenu}
+                onPress={() => setOpenMenu(!openMenu)}
+                title="Menu"
+              />
+              {openMenu && route.params.event.menu.map(item => <NormalText>{item}</NormalText>)}
+            </View>}
           </Container>
 
           <View style={styles.buttonRow}>
-            <Button marginHorizontal={5}>Attend!</Button>
-            <BorderedButton color="red" marginHorizontal={5}>Remove</BorderedButton>
+            {!isAttending ? <Button onPress={attend} disabled={loading}>
+              {!loading ? "Attend!" : "Loading..."}
+            </Button> : <BorderedButton onPress={withdraw} disabled={loading} color="red">
+              {!loading ? "Withdraw :(" : "Loading..."}
+            </BorderedButton>}
           </View>
         </View>
       </ScrollView>

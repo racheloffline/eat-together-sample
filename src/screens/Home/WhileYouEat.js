@@ -57,12 +57,12 @@ const WhileYouEat = ({ route, navigation }) => {
   const [groupChat, setGroupChat] = useState(null); // Info for the group chat
 
   useEffect(() => {
-    if (route.params.event.hostID === user.uid) {
+    if (event.hostID === user.uid || event.type === "recommendation") {
       getAttendees();
     }
 
     db.collection("Users")
-      .doc(route.params.event.hostID)
+      .doc(event.hostID)
       .get()
       .then((doc) => {
         setHost(doc.data());
@@ -82,13 +82,13 @@ const WhileYouEat = ({ route, navigation }) => {
         }
       });
     
-    if (route.params.event.chatID) {
+    if (event.chatID) {
       db.collection("Groups")
-        .doc(route.params.event.chatID)
+        .doc(event.chatID)
         .get()
         .then((doc) => {
           const group = {
-            groupID: route.params.event.chatID,
+            groupID: event.chatID,
             uids: doc.data().uids,
             name: doc.data().name,
             messages: doc.data().messages,
@@ -101,7 +101,7 @@ const WhileYouEat = ({ route, navigation }) => {
 
   // Function to navigate to the chat for this event
   const goToEventChat = () => {
-    if (route.params.event.chatID) {
+    if (event.chatID) {
       navigation.navigate("ChatRoom", {
         group: groupChat
       });
@@ -117,8 +117,8 @@ const WhileYouEat = ({ route, navigation }) => {
     setAttendees(newAttendees);
 
     const storeID = {
-      type: route.params.event.type,
-      id: route.params.event.id,
+      type: event.type,
+      id: event.id,
     };
 
     db.collection("Users")
@@ -132,8 +132,8 @@ const WhileYouEat = ({ route, navigation }) => {
 
   // Fetch all attendees of this event
   const getAttendees = () => {
-    route.params.event.attendees.forEach((attendee) => {
-      if (attendee !== user.uid) {
+    event.attendees.forEach((attendee) => {
+      if (attendee !== user.uid || event.type === "recommendation") {
         db.collection("Users")
           .doc(attendee)
           .get()
@@ -142,7 +142,7 @@ const WhileYouEat = ({ route, navigation }) => {
             let attended = false;
             const ids = data.attendedEventIDs.map((e) => e.id);
 
-            if (ids.includes(route.params.event.id)) {
+            if (ids.includes(event.id)) {
               attended = true;
             }
 
@@ -157,11 +157,11 @@ const WhileYouEat = ({ route, navigation }) => {
   function withdraw() {
     if (!loading) {
       setLoading(true);
-      route.params.deleteEvent(route.params.event.id);
+      route.params.deleteEvent(event.id);
 
       const storeID = {
-        type: route.params.event.type,
-        id: route.params.event.id,
+        type: event.type,
+        id: event.id,
       };
 
       db.collection("Users")
@@ -171,9 +171,9 @@ const WhileYouEat = ({ route, navigation }) => {
           attendedEventIDs: firebase.firestore.FieldValue.arrayRemove(storeID),
         })
         .then(() => {
-          if (route.params.event.type === "private") {
-            db.collection("Private Events")
-              .doc(route.params.event.id)
+          if (event.type === "public") {
+            db.collection("Public Events")
+              .doc(event.id)
               .update({
                 attendees: firebase.firestore.FieldValue.arrayRemove(user.uid),
               })
@@ -182,8 +182,8 @@ const WhileYouEat = ({ route, navigation }) => {
                 navigation.goBack();
               });
           } else {
-            db.collection("Public Events")
-              .doc(route.params.event.id)
+            db.collection("Private Events")
+              .doc(event.id)
               .update({
                 attendees: firebase.firestore.FieldValue.arrayRemove(user.uid),
               })
@@ -233,8 +233,8 @@ const WhileYouEat = ({ route, navigation }) => {
     let friend = null;
     userInfo.friendIDs.forEach((f) => {
       if (
-        route.params.event.attendees.includes(f) &&
-        f !== route.params.event.hostID
+        event.attendees.includes(f) &&
+        f !== event.hostID
       ) {
         friend = f;
         return;
@@ -275,7 +275,7 @@ const WhileYouEat = ({ route, navigation }) => {
                     <NormalText size={18}>Report Event</NormalText>
                   </MenuOption>
                 )}
-                {event.hostID === user.uid && (
+                {event.hostID === user.uid || event.type === "recommendation" && (
                   <MenuOption
                     onSelect={() =>
                       navigation.navigate("EditEvent", {
@@ -328,36 +328,36 @@ const WhileYouEat = ({ route, navigation }) => {
           <TouchableOpacity
             style={styles.row}
             onPress={() => {
-              if (host && route.params.event.hostID !== user.uid)
+              if (host && event.hostID !== user.uid)
                 navigation.navigate("FullProfile", {
                   person: host,
                 });
             }}
-            disabled={route.params.event.hostID === user.uid}
+            disabled={event.hostID === user.uid}
           >
             <Image
               source={
-                route.params.event.hasHostImage
-                  ? { uri: route.params.event.hostImage }
+                event.hasHostImage
+                  ? { uri: event.hostImage }
                   : require("../../../assets/logo.png")
               }
               style={styles.profileImg}
             />
             <MediumText size={18}>
-              {route.params.event.hostID === user.uid
+              {event.hostID === user.uid
                 ? "You!"
-                : route.params.event.hostFirstName
-                ? route.params.event.hostFirstName +
+                : event.hostFirstName
+                ? event.hostFirstName +
                   " " +
-                  route.params.event.hostLastName
-                : route.params.event.hostName}
+                  event.hostLastName
+                : event.hostName}
             </MediumText>
           </TouchableOpacity>
 
           <View style={styles.row}>
             <NormalText>
-              {route.params.event.attendees.length} attendee
-              {route.params.event.attendees.length !== 1 && "s"}
+              {event.attendees.length} attendee
+              {event.attendees.length !== 1 && "s"}
             </NormalText>
             {friend && <NormalText>, including: </NormalText>}
             {friend && (
@@ -450,7 +450,7 @@ const WhileYouEat = ({ route, navigation }) => {
                     </NormalText>
                   ) : (
                     people.map((person, index) => {
-                      if (person.id !== user.uid) {
+                      if (person.id !== user.uid || event.type === "recommendation") {
                         return (
                           <Attendance
                             size={17}
