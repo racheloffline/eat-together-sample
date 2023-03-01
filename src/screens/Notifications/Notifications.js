@@ -1,7 +1,7 @@
 //View invites to private events
 
 import React, { useEffect, useState } from "react";
-import { FlatList, View, StyleSheet, ActivityIndicator } from "react-native";
+import { ScrollView, FlatList, View, StyleSheet, ActivityIndicator } from "react-native";
 import { Layout, TopNav } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -48,20 +48,20 @@ export default function (props) {
         setUserData(data);
         let notifications = data.notifications;
 
-        if(readNotifs.length == 0 && unreadNotifs.length == 0) {
-            notifications.forEach((notif) => {
-              if(notif.readAt && !readNotifs.includes(notif)) {
-                setReadNotifs(arr => [...arr, notif]);
-              }
-              else if(!notif.readAt && !unread.includes(notif)){
-                setUnreadNotifs(arr => [...arr, notif]);
-              }
-            })
-        }
+        let newReadNotifs = [];
+        let newUnreadNotifs = [];
 
+        notifications.forEach((notif) => {
+          if(notif.readAt && !newReadNotifs.includes(notif)) {
+            newReadNotifs.push(notif);
+          }
+          else if(!notif.readAt && !newUnreadNotifs.includes(notif)){
+            newUnreadNotifs.push(notif);
+          }
+        })
 
-
-
+        setReadNotifs(newReadNotifs);
+        setUnreadNotifs(newUnreadNotifs);
 
         //Loop through every notif and set them to read
         notifications.forEach((notif) => {
@@ -118,78 +118,81 @@ export default function (props) {
           <MediumText>Hang tight ...</MediumText>
         </View>
       : notifications.length > 0 ?
-      <View>
-        <MediumText> Unread </MediumText>
-        <FlatList
-          contentContainerStyle={styles.cards}
-          keyExtractor={(item) => item.id}
-          data={unreadNotifs}
-          renderItem={({ item }) => (
-            <Notification
-              notif={item}
-              showButton={!(item.type) ? false : true}
-              onPress={() => {
-                switch (item.type) {
-                  case "invite":
-                    db.collection("User Invites").doc(user.uid).collection("Invites").doc(item.id).get().then((ss) => {
-                      let inviteToSend = {
-                        ...ss.data(),
-                        id: ss.id,
-                      };
-                      props.navigation.navigate("NotificationFull", {
-                        invite: inviteToSend,
-                        notif: item,
-                        hasPassed:
-                            (ss.data().endDate ? ss.data().endDate.toDate().getTime()
-                                : ss.data().date.toDate().getTime()) < new Date().getTime(),
-                      });
-                    }).catch(() => {
-                      alert("There seems to be an error fetching this invite. Please try again later.");
-                    });
-                    break;
-                  case "private event":
-                    db.collection("Private Events").doc(item.id).get().then((ss) => {
-                      props.navigation.navigate("FullCard", {
-                        event: ss.data()
-                      });
-                    }).catch(() => {
-                      alert("There seems to be an error fetching this event. Please try again later.");
-                    });
-                    break;
-                  case "public event":
-                    db.collection("Public Events").doc(item.id).get().then((ss) => {
-                      props.navigation.navigate("FullCard", {
-                        event: ss.data()
-                      });
-                    }).catch(() => {
-                      alert("There seems to be an error fetching this event. Please try again later.");
-                    });
-                    break;
-                  case "user profile":
-                    db.collection("Usernames").doc(item.id).get().then((ss) => {
-                      db.collection("Users").doc(ss.data().id).get().then((ss2) => {
-                        props.navigation.navigate("FullProfile", {
-                          person: ss2.data()
-                        })
-                      })
-                    }).catch(() => {
-                      alert("This user doesn't seem to exist :(");
-                    });
-                    break;
-                  case "recommendation":
-                    props.navigation.navigate("Recommendation", {
-                      event: recommendation,
-                      userData
-                    });
-                    break;
-                  default:
-                    alert("Sorry, an error has occurred.");
-                    break;
-                }
-              }}
+      <ScrollView>
+        {unreadNotifs.length !== 0 ?
+        <View>
+            <MediumText> Unread </MediumText>
+            <FlatList
+              contentContainerStyle={styles.cards}
+              keyExtractor={(item) => item.id}
+              data={unreadNotifs}
+              renderItem={({ item }) => (
+                <Notification
+                  notif={item}
+                  showButton={!(item.type) ? false : true}
+                  onPress={() => {
+                    switch (item.type) {
+                      case "invite":
+                        db.collection("User Invites").doc(user.uid).collection("Invites").doc(item.id).get().then((ss) => {
+                          let inviteToSend = {
+                            ...ss.data(),
+                            id: ss.id,
+                          };
+                          props.navigation.navigate("NotificationFull", {
+                            invite: inviteToSend,
+                            notif: item,
+                            hasPassed:
+                                (ss.data().endDate ? ss.data().endDate.toDate().getTime()
+                                    : ss.data().date.toDate().getTime()) < new Date().getTime(),
+                          });
+                        }).catch(() => {
+                          alert("There seems to be an error fetching this invite. Please try again later.");
+                        });
+                        break;
+                      case "private event":
+                        db.collection("Private Events").doc(item.id).get().then((ss) => {
+                          props.navigation.navigate("FullCard", {
+                            event: ss.data()
+                          });
+                        }).catch(() => {
+                          alert("There seems to be an error fetching this event. Please try again later.");
+                        });
+                        break;
+                      case "public event":
+                        db.collection("Public Events").doc(item.id).get().then((ss) => {
+                          props.navigation.navigate("FullCard", {
+                            event: ss.data()
+                          });
+                        }).catch(() => {
+                          alert("There seems to be an error fetching this event. Please try again later.");
+                        });
+                        break;
+                      case "user profile":
+                        db.collection("Usernames").doc(item.id).get().then((ss) => {
+                          db.collection("Users").doc(ss.data().id).get().then((ss2) => {
+                            props.navigation.navigate("FullProfile", {
+                              person: ss2.data()
+                            })
+                          })
+                        }).catch(() => {
+                          alert("This user doesn't seem to exist :(");
+                        });
+                        break;
+                      case "recommendation":
+                        props.navigation.navigate("Recommendation", {
+                          event: recommendation,
+                          userData
+                        });
+                        break;
+                      default:
+                        alert("Sorry, an error has occurred.");
+                        break;
+                    }
+                  }}
+                />
+              )}
             />
-          )}
-        />
+        </View> : ""}
         <MediumText> Read </MediumText>
         <FlatList
           contentContainerStyle={styles.cards}
@@ -261,7 +264,7 @@ export default function (props) {
             />
           )}
         />
-        </View>
+        </ScrollView>
       : 
         <View style={styles.noInvitesView}>
           <MediumText center>No new notifications!</MediumText>
