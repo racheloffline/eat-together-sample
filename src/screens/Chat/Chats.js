@@ -13,6 +13,7 @@ import Header from "../../components/Header";
 import ChatPreview from "../../components/ChatPreview";
 import SearchableDropdown from "../../components/SearchableDropdown";
 import HorizontalSwitch from "../../components/HorizontalSwitch";
+import EmptyState from "../../components/EmptyState";
 
 import NormalText from "../../components/NormalText";
 import MediumText from "../../components/MediumText";
@@ -339,9 +340,7 @@ export default function ({ navigation }) {
             )}
           />
         :
-          <View style={styles.noChatsView}>
-            <MediumText center>No chats yet; create one above!</MediumText>
-          </View>
+          <EmptyState title="No Chats" text="Make one above, or make new friends!"/>
         }
       </View>
     </Layout>

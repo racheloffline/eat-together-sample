@@ -15,7 +15,7 @@ import Searchbar from "../../components/Searchbar";
 import HorizontalRow from "../../components/HorizontalRow";
 import Filter from "../../components/Filter";
 
-import { generateColor, isAvailable, randomize3 } from "../../methods";
+import { sortBySimilarInterests, generateColor, isAvailable, randomize3 } from "../../methods";
 import { createNewChat } from "../Chat/Chats";
 
 // Stores image in Firebase Storage
@@ -223,7 +223,7 @@ export default function ({ route, navigation }) {
       let newUsers = [...users];
   
       if (similarInterests) {
-        newUsers = await sortBySimilarInterests(newUsers);
+        newUsers = await sortBySimilarInterests(userInfo, newUsers);
       }
 
       if (available) {
@@ -296,46 +296,6 @@ export default function ({ route, navigation }) {
   const filterByFriendsOnly = (newUsers) => {
     return newUsers.filter(u => userInfo.friendIDs.includes(u.id));
   }
-
-  // Display people in descending order of similar tags
-  const sortBySimilarInterests = async (newUsers) => {
-    let result;
-
-    await fetch("https://eat-together-match.uw.r.appspot.com/find_similarity", {
-      method: "POST",
-      body: JSON.stringify({
-        currTags: userInfo.tags.map((t) => t.tag),
-        otherTags: getPeopleTags(newUsers),
-      }),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        let i = 0;
-        newUsers.forEach((p) => {
-          p.similarity = res[i];
-          i++;
-        });
-
-        result = newUsers.sort((a, b) => b.similarity - a.similarity);
-      })
-      .catch((e) => {
-        // If error, alert the user
-        alert("An error occured, try again later :(");
-        result = newUsers;
-      });
-
-    return result;
-  };
-
-  // Get a list of everyone's tags
-  const getPeopleTags = (newUsers) => {
-    let tags = [];
-    newUsers.forEach((p) => {
-      tags.push(p.tags.map((t) => t.tag));
-    });
-
-    return tags;
-  };
 
   // Display people who are mutual friends
   const filterByMutualFriends = (newUsers) => {
