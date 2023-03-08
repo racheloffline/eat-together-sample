@@ -24,6 +24,7 @@ export default function (props) {
   const[readNotifs, setReadNotifs] = useState([]);
   const[unreadNotifs, setUnreadNotifs] = useState([]);
 
+  const [recommendations, setRecommendations] = useState([]);
   
   const [recommendation, setRecommendation] = useState({
     name: "Cafe on the Ave",
@@ -50,9 +51,13 @@ export default function (props) {
 
         let newReadNotifs = [];
         let newUnreadNotifs = [];
+        let newRecommendations = [];
 
         notifications.forEach((notif) => {
-          if(notif.readAt && !newReadNotifs.includes(notif)) {
+          if(notif.type === "recommendation") {
+            newRecommendations.push(notif);
+          }
+          else if(notif.readAt && !newReadNotifs.includes(notif)) {
             newReadNotifs.push(notif);
           }
           else if(!notif.readAt && !newUnreadNotifs.includes(notif)){
@@ -62,6 +67,7 @@ export default function (props) {
 
         setReadNotifs(newReadNotifs);
         setUnreadNotifs(newUnreadNotifs);
+        setRecommendations(newRecommendations);
 
         //Loop through every notif and set them to read
         notifications.forEach((notif) => {
@@ -119,6 +125,24 @@ export default function (props) {
         </View>
       : notifications.length > 0 ?
       <ScrollView>
+        <MediumText> Recommendations </MediumText>
+            <FlatList
+              contentContainerStyle={styles.cards}
+              keyExtractor={(item) => item.id}
+              data={recommendations}
+              renderItem={({ item }) => (
+                <Notification
+                  notif={item}
+                  showButton={!(item.type) ? false : true}
+                  onPress={() => {
+                    props.navigation.navigate("Recommendation", {
+                      event: item,
+                      userData
+                    });
+                  }}
+                />
+              )}
+            />
         {unreadNotifs.length !== 0 ?
         <View>
             <MediumText> Unread </MediumText>
