@@ -3,7 +3,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { View, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import { Layout } from "react-native-rapi-ui";
-import { Ionicons } from "@expo/vector-icons";
 
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import RBSheet from "react-native-raw-bottom-sheet";
@@ -425,6 +424,13 @@ const Availabilities = props => {
             </View>
 
             <Button marginVertical={20} onPress={addTime}>Add time</Button>
+
+            <View>
+              <DateTimePickerModal isVisible={showStartTime} date={startTime} style={{width:'100%'}}
+                  mode="time" onConfirm={changeStartTime} onCancel={() => setShowStartTime(false)}/>
+              <DateTimePickerModal isVisible={showEndTime} date={endTime} style={{width:'100%'}}
+                  mode="time" onConfirm={changeEndTime} onCancel={() => setShowEndTime(false)}/>
+            </View>
         </RBSheet>
 
         <RBSheet
@@ -476,14 +482,15 @@ const Availabilities = props => {
               <MediumText>OR</MediumText>
               <BorderedButton color="red" onPress={() => deleteTime(index, dayOfWeek)}>Delete</BorderedButton>
             </View>
+
+            <View>
+              <DateTimePickerModal isVisible={showStartTime} date={startTime} style={{width:'100%'}}
+                  mode="time" onConfirm={changeStartTime} onCancel={() => setShowStartTime(false)}/>
+              <DateTimePickerModal isVisible={showEndTime} date={endTime} style={{width:'100%'}}
+                  mode="time" onConfirm={changeEndTime} onCancel={() => setShowEndTime(false)}/>
+            </View>
         </RBSheet>
         
-        <View>
-          <DateTimePickerModal isVisible={showStartTime} date={startTime} style={{width:'100%'}}
-              mode="time" onConfirm={changeStartTime} onCancel={() => setShowStartTime(false)}/>
-          <DateTimePickerModal isVisible={showEndTime} date={endTime} style={{width:'100%'}}
-              mode="time" onConfirm={changeEndTime} onCancel={() => setShowEndTime(false)}/>
-        </View>
         
         <View style={styles.buttons}>
           <Button onPress={() => props.navigation.goBack()}
