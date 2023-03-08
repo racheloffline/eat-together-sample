@@ -36,45 +36,9 @@ const Notification = (props) => {
                 <View style={styles.textContainer}>
                     <MediumText marginBottom={15} size={14}>{props.notif.title}</MediumText>
                     {props.showButton && <View style={styles.buttons}>
-                        {props.notif.type == "user profile" ?
-                            <View style={styles.response}>
-                                <CustomButton marginHorizontal={10} width={80} backgroundColor={"#D76161"} onPress={() => {
-                                    db.collection("User Invites").doc(user.uid).collection("Connections").doc(props.person.id).delete().then(() => {
-                                        alert("Request Declined");
-                                    }).catch(() => {
-                                        alert("Couldn't delete request, try again later.");
-                                    });
-                                }}>
-                                    <SmallText center color="white">Decline</SmallText>
-                                </CustomButton>
-                                <CustomButton marginHorizontal={10} width={80} backgroundColor={"#5DB075"} onPress={() => {
-                                    const user = firebase.auth().currentUser;
-                                    db.collection("Usernames").doc(props.person.username).get().then((doc) => {
-                                        // STEP 1: Add friend to current user's data
-                                        db.collection("Users").doc(user.uid).update({
-                                            friendIDs: firebase.firestore.FieldValue.arrayUnion(doc.data().id)
-                                        }).then(() => {
-                                            // STEP 2: Add current user as friend to other user's data
-                                            db.collection("Users").doc(doc.data().id).update({
-                                                friendIDs: firebase.firestore.FieldValue.arrayUnion(user.uid)
-                                            }).then(() => {
-                                                // STEP 3: Delete invite
-                                                db.collection("User Invites").doc(user.uid).collection("Connections").doc(doc.data().id).delete().then(() => {
-                                                    props.delete(props.person.id);
-                                                    alert("Taste Bud Added");
-                                                });
-                                            })
-                                        })
-                                    }).catch(() => {
-                                        alert("This user seems to no longer exist :(");
-                                    })
-                                }}>
-                                    <SmallText center color="white">Accept</SmallText>
-                                </CustomButton>
-                            </View>
-                            :  <CustomButton marginHorizontal={10} width={80} onPress={props.onPress} backgroundColor={"#BDBDBD"}>
+                        <CustomButton marginHorizontal={10} width={80} onPress={props.onPress} backgroundColor={"#BDBDBD"}>
                                     <SmallText center color="white">Details</SmallText>
-                               </CustomButton>}
+                       </CustomButton>
                     </View>}
                 </View>
             </View>
