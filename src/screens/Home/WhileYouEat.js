@@ -391,7 +391,7 @@ const WhileYouEat = ({ route, navigation }) => {
                   openMap({ query: event.location, provider: "google" })
                 }
               >
-                (view on map)
+                (map)
               </Link>
             </View>
 

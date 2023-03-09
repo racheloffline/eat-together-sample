@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { View, ScrollView, StyleSheet, Dimensions, Image, TouchableOpacity } from "react-native";
 import { Layout, TopNav } from "react-native-rapi-ui";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
@@ -131,10 +131,10 @@ const Recommendation = ({ route, navigation }) => {
               source={route.params.event.hasImage ? {uri: route.params.event.image} : require("../../../assets/stockEvent.png")}
             />
             <View style={{...styles.row, "marginTop": 15}}>
-                <LargeText size={24}>
+                <LargeText size={18}>
                     {route.params.event.name}
                 </LargeText>
-                <MediumText size={24}> with:</MediumText>
+                <MediumText size={18}> with:</MediumText>
             </View>
 
             <View style={styles.row}>
@@ -159,24 +159,46 @@ const Recommendation = ({ route, navigation }) => {
 
             <View style={styles.logistics}>
                 <View style={styles.row}>
-                    <Link onPress={() => openMap({ query: route.params.event.name, provider: "google" })}>
-                        View location on map
-                    </Link>
+                  <Ionicons name="location-sharp" size={20} />
+                  <NormalText paddingHorizontal={10} color="black">
+                    {route.params.event.location}
+                  </NormalText>
+                  <Link
+                    onPress={() =>
+                      openMap({ query: route.params.event.location, provider: "google" })
+                    }
+                  >
+                    (map)
+                  </Link>
                 </View>
 
                 <View style={styles.row}>
-                <Ionicons name="calendar-outline" size={20} />
-                <NormalText paddingHorizontal={10} color="black">
-                    {route.params.event.startDate ? getDate(route.params.event.startDate.toDate()) : getDate(route.params.event.date.toDate())}
-                </NormalText>
+                  <Ionicons name="calendar-outline" size={20} />
+                  <NormalText paddingHorizontal={10} color="black">
+                      {route.params.event.startDate ? getDate(route.params.event.startDate.toDate()) : getDate(route.params.event.date.toDate())}
+                  </NormalText>
                 </View>
 
                 <View style={styles.row}>
-                <Ionicons name="time-outline" size={20} />
-                <NormalText paddingHorizontal={10} color="black">
-                    {route.params.event.startDate ? getTime(route.params.event.startDate.toDate()) : getTime(route.params.event.date.toDate())}
-                    {route.params.event.endDate && " - ".concat(getTime(route.params.event.endDate.toDate()))}
-                </NormalText>
+                  <Ionicons name="time-outline" size={20} />
+                  <NormalText paddingHorizontal={10} color="black">
+                      {route.params.event.startDate ? getTime(route.params.event.startDate.toDate()) : getTime(route.params.event.date.toDate())}
+                      {route.params.event.endDate && " - ".concat(getTime(route.params.event.endDate.toDate()))}
+                  </NormalText>
+                </View>
+
+                <View style={styles.row}>
+                  <Ionicons name="star-outline" size={20} />
+                  <NormalText paddingHorizontal={10} color="black">
+                      Rating: {route.params.event.rating} stars
+                  </NormalText>
+                </View>
+
+                <View style={styles.row}>
+                  <FontAwesome5 name="comment-dollar" size={20} />
+                  <NormalText paddingHorizontal={10} color="black">
+                      Pricing: {route.params.event.price}
+                  </NormalText>
                 </View>
             </View>
 
@@ -219,7 +241,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 4,
+    marginVertical: 2,
     flexWrap: "wrap"
   },
 
