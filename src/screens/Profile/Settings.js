@@ -129,6 +129,14 @@ export default function ({ navigation }) {
                         db.collection("Users").doc(uid).delete();
                         db.collection("Usernames").doc(userInfo.username).delete();
 
+                        // Delete their uid from all friends in database
+                        userInfo.friendIDs.forEach(friend => {
+                            db.collection("Users").doc(friend).update({
+                                friendIDs: firebase.firestore.FieldValue.arrayRemove(uid)
+                            });
+                        });
+
+                        // Delete image from storage
                         if (userInfo.hasImage) {
                             const ref = storage.ref().child(`profilePictures/${uid}`);
                             await ref.delete();
