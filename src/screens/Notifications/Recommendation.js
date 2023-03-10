@@ -1,7 +1,7 @@
 // Full recommendation page
 
 import React, { useState, useEffect } from "react";
-import { View, ScrollView, StyleSheet, Dimensions, Image, TouchableOpacity } from "react-native";
+import { View, ScrollView, StyleSheet, Dimensions, Image, TouchableOpacity, Linking } from "react-native";
 import { Layout, TopNav } from "react-native-rapi-ui";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 
@@ -123,8 +123,6 @@ const Recommendation = ({ route, navigation }) => {
       />
       <ScrollView>
         <View style={styles.infoContainer}>
-          <NormalText size={16} center marginBottom={10}>Based on your interests and availability ...</NormalText>
-
           <Container>
             <Image
               style={styles.image}
@@ -187,7 +185,7 @@ const Recommendation = ({ route, navigation }) => {
                   </NormalText>
                 </View>
 
-                <View style={styles.row}>
+                <View style={{...styles.row, marginTop: 10}}>
                   <Ionicons name="star-outline" size={20} />
                   <NormalText paddingHorizontal={10} color="black">
                       Rating: {route.params.event.rating} stars
@@ -199,6 +197,13 @@ const Recommendation = ({ route, navigation }) => {
                   <NormalText paddingHorizontal={10} color="black">
                       Pricing: {route.params.event.price}
                   </NormalText>
+                </View>
+
+                <View style={styles.row}>
+                  <FontAwesome5 name="external-link-alt" size={20}/>
+                  <Link onPress={() => Linking.openURL(route.params.event.url)} paddingHorizontal={10}>
+                      More info
+                  </Link>
                 </View>
             </View>
 
