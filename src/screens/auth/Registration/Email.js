@@ -20,12 +20,11 @@ const Email = props => {
 
   const verifyEmail = () => {
     const isAcademic = email.split("@");
-    /*if (isAcademic[isAcademic.length-1] === "uw.edu" || isAcademic[isAcademic.length-1] === "cs.washington.edu") {
+    if (isAcademic[isAcademic.length-1] === "uw.edu" || isAcademic[isAcademic.length-1] === "cs.washington.edu") {
       setVerified(true);
     } else {
       setVerified(false);
-    }*/
-    setVerified(true);
+    }
   }
 
   return (
