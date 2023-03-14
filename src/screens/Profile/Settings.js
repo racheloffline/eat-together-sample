@@ -128,23 +128,24 @@ export default function ({ navigation }) {
                     text: "Yes",
                     onPress: async () => {
                         const uid = user.uid;
+                        const info = userInfo;
 
                         // Delete image from storage
-                        if (userInfo.hasImage) {
+                        if (info.hasImage) {
                             const ref = storage.ref().child(`profilePictures/${uid}`);
                             await ref.delete();
                         }
 
-                        db.collection("Users").doc(uid).delete();
-                        db.collection("Usernames").doc(userInfo.username).delete();
-
                         // Delete their uid from all friends in database
-                        userInfo.friendIDs.forEach(friend => {
+                        info.friendIDs.forEach(friend => {
                             db.collection("Users").doc(friend).update({
                                 friendIDs: firebase.firestore.FieldValue.arrayRemove(uid)
                             });
                         });
 
+                        db.collection("Users").doc(uid).delete();
+                        db.collection("Usernames").doc(info.username).delete();
+                        
                         await user.delete().then(() => {
                             signOut();
                             alert("Account deleted successfully. Sorry to see you go :(");
