@@ -28,7 +28,7 @@ export default function ({ navigation }) {
     useEffect(() => {
         if (user) {
             db.collection("Users").doc(user.uid).get().then(doc => {
-                if (!doc.exists) {
+                if (doc.exists) {
                     setUserInfo(doc.data());
                     setNotifs(doc.data().settings.notifications);
                     setPrivAcct(doc.data().settings.privateAccount ? doc.data().settings.privateAccount : false);
@@ -130,18 +130,18 @@ export default function ({ navigation }) {
                         const uid = user.uid;
                         const info = userInfo;
 
-                        // Delete image from storage
-                        if (info.hasImage) {
-                            const ref = storage.ref().child(`profilePictures/${uid}`);
-                            await ref.delete();
-                        }
-
                         // Delete their uid from all friends in database
                         info.friendIDs.forEach(friend => {
                             db.collection("Users").doc(friend).update({
                                 friendIDs: firebase.firestore.FieldValue.arrayRemove(uid)
                             });
                         });
+
+                        // Delete image from storage
+                        if (info.hasImage) {
+                            const ref = storage.ref().child(`profilePictures/${uid}`);
+                            await ref.delete();
+                        }                        
 
                         db.collection("Users").doc(uid).delete();
                         db.collection("Usernames").doc(info.username).delete();
