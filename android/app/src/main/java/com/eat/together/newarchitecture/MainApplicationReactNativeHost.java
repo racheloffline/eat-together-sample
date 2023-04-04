@@ -1,4 +1,4 @@
-package com.eattogether.newarchitecture;
+package com.eat.together.newarchitecture;
 
 import android.app.Application;
 import androidx.annotation.NonNull;
@@ -20,9 +20,9 @@ import com.facebook.react.fabric.EmptyReactNativeConfig;
 import com.facebook.react.fabric.FabricJSIModuleProvider;
 import com.facebook.react.fabric.ReactNativeConfig;
 import com.facebook.react.uimanager.ViewManagerRegistry;
-import com.eattogether.BuildConfig;
-import com.eattogether.newarchitecture.components.MainComponentsRegistry;
-import com.eattogether.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
+import com.eat.together.BuildConfig;
+import com.eat.together.newarchitecture.components.MainComponentsRegistry;
+import com.eat.together.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
 import java.util.ArrayList;
 import java.util.List;
 

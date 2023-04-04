@@ -1,4 +1,4 @@
-package com.eattogether.newarchitecture.modules;
+package com.eat.together.newarchitecture.modules;
 
 import com.facebook.jni.HybridData;
 import com.facebook.react.ReactPackage;

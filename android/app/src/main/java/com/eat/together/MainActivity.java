@@ -1,4 +1,4 @@
-package com.eattogether;
+package com.eat.together;
 
 import android.os.Build;
 import android.os.Bundle;
