@@ -248,7 +248,7 @@ const Availabilities = props => {
 
   return (
     <Layout style={styles.page}>
-        <LargeText center size={28}>Preferred eating times!</LargeText>
+        <LargeText center size={28}>Preferred eating times!12312</LargeText>
         <NormalText center>Click on the timeslots to edit or delete them.</NormalText>
 
         <ScrollView contentContainerStyle={styles.dates}>
