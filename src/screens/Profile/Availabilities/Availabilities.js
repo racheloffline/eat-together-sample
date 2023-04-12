@@ -1,7 +1,7 @@
 // Specify availabilities for days of the week
 
 import React, { useState, useRef, useEffect } from "react";
-import { View, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
+import { Text, View, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import { Layout } from "react-native-rapi-ui";
 
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -272,10 +272,10 @@ const Availabilities = props => {
 
         <ScrollView contentContainerStyle={styles.dates}>
           <View style={styles.day}>
-            <MediumText>Monday</MediumText>
+            <MediumText><Text onPress={() => {setDaySelected("Monday"); timeSheet.current.open()}}>Monday</Text></MediumText>
             {monday.length === 0 ? <NormalText>None</NormalText>
             : <View style={styles.timeSlots}>
-              {monday.map((time, index) =>  <Availability
+              {monday.map((time, index) => <Availability
                 time={time}
                 index={index}
                 key={index}
@@ -285,7 +285,7 @@ const Availabilities = props => {
           </View>
 
           <View style={styles.day}>
-            <MediumText>Tuesday</MediumText>
+            <MediumText><Text onPress={() => {setDaySelected("Tuesday"); timeSheet.current.open()}}>Tuesday</Text></MediumText>
             {tuesday.length === 0 ? <NormalText>None</NormalText>
             : <View style={styles.timeSlots}>
               {tuesday.map((time, index) => <Availability
@@ -298,7 +298,7 @@ const Availabilities = props => {
           </View>
             
           <View style={styles.day}>
-            <MediumText>Wednesday</MediumText>
+            <MediumText><Text onPress={() => {setDaySelected("Wednesday"); timeSheet.current.open()}}>Wednesday</Text></MediumText>
             {wednesday.length === 0 ? <NormalText>None</NormalText>
             : <View style={styles.timeSlots}>
               {wednesday.map((time, index) => <Availability
@@ -311,7 +311,7 @@ const Availabilities = props => {
           </View>
 
           <View style={styles.day}>
-            <MediumText>Thursday</MediumText>
+            <MediumText><Text onPress={() => {setDaySelected("Thursday"); timeSheet.current.open()}}>Thursday</Text></MediumText>
             {thursday.length === 0 ? <NormalText>None</NormalText>
             : <View style={styles.timeSlots}>
               {thursday.map((time, index) => <Availability
@@ -324,7 +324,7 @@ const Availabilities = props => {
           </View>
 
           <View style={styles.day}>
-            <MediumText>Friday</MediumText>
+            <MediumText><Text onPress={() => {setDaySelected("Friday"); timeSheet.current.open()}}>Friday</Text></MediumText>
             {friday.length === 0 ? <NormalText>None</NormalText>
             : <View style={styles.timeSlots}>
               {friday.map((time, index) => <Availability
@@ -337,7 +337,7 @@ const Availabilities = props => {
           </View>
 
           <View style={styles.day}>
-            <MediumText>Saturday</MediumText>
+            <MediumText><Text onPress={() => {setDaySelected("Saturday"); timeSheet.current.open()}}>Saturday</Text></MediumText>
             {saturday.length === 0 ? <NormalText>None</NormalText>
             : <View style={styles.timeSlots}>
               {saturday.map((time, index) => <Availability
@@ -350,7 +350,7 @@ const Availabilities = props => {
           </View>
 
           <View style={styles.day}>
-            <MediumText>Sunday</MediumText>
+            <MediumText><Text onPress={() => {setDaySelected("Sunday"); timeSheet.current.open()}}>Sunday</Text></MediumText>
             {sunday.length === 0 ? <NormalText>None</NormalText>
             : <View style={styles.timeSlots}>
               {sunday.map((time, index) => <Availability
