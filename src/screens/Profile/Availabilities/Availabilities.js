@@ -272,7 +272,7 @@ const Availabilities = props => {
 
         <ScrollView contentContainerStyle={styles.dates}>
           <View style={styles.day}>
-            <MediumText><Text onPress={() => {setDaySelected("Monday"); timeSheet.current.open()}}>Monday</Text></MediumText>
+            <Button onPress={() => {setDaySelected("Monday"); timeSheet.current.open()}}>Monday</Button>
             {monday.length === 0 ? <NormalText>None</NormalText>
             : <View style={styles.timeSlots}>
               {monday.map((time, index) => <Availability
@@ -285,7 +285,7 @@ const Availabilities = props => {
           </View>
 
           <View style={styles.day}>
-            <MediumText><Text onPress={() => {setDaySelected("Tuesday"); timeSheet.current.open()}}>Tuesday</Text></MediumText>
+            <Button onPress={() => {setDaySelected("Tuesday"); timeSheet.current.open()}}>Tuesday</Button>
             {tuesday.length === 0 ? <NormalText>None</NormalText>
             : <View style={styles.timeSlots}>
               {tuesday.map((time, index) => <Availability
@@ -298,7 +298,7 @@ const Availabilities = props => {
           </View>
             
           <View style={styles.day}>
-            <MediumText><Text onPress={() => {setDaySelected("Wednesday"); timeSheet.current.open()}}>Wednesday</Text></MediumText>
+            <Button onPress={() => {setDaySelected("Wednesday"); timeSheet.current.open()}}>Wednesday</Button>
             {wednesday.length === 0 ? <NormalText>None</NormalText>
             : <View style={styles.timeSlots}>
               {wednesday.map((time, index) => <Availability
@@ -311,7 +311,7 @@ const Availabilities = props => {
           </View>
 
           <View style={styles.day}>
-            <MediumText><Text onPress={() => {setDaySelected("Thursday"); timeSheet.current.open()}}>Thursday</Text></MediumText>
+            <Button onPress={() => {setDaySelected("Thursday"); timeSheet.current.open()}}>Thursday</Button>
             {thursday.length === 0 ? <NormalText>None</NormalText>
             : <View style={styles.timeSlots}>
               {thursday.map((time, index) => <Availability
@@ -324,7 +324,7 @@ const Availabilities = props => {
           </View>
 
           <View style={styles.day}>
-            <MediumText><Text onPress={() => {setDaySelected("Friday"); timeSheet.current.open()}}>Friday</Text></MediumText>
+            <Button onPress={() => {setDaySelected("Friday"); timeSheet.current.open()}}>Friday</Button>
             {friday.length === 0 ? <NormalText>None</NormalText>
             : <View style={styles.timeSlots}>
               {friday.map((time, index) => <Availability
@@ -337,7 +337,7 @@ const Availabilities = props => {
           </View>
 
           <View style={styles.day}>
-            <MediumText><Text onPress={() => {setDaySelected("Saturday"); timeSheet.current.open()}}>Saturday</Text></MediumText>
+            <Button onPress={() => {setDaySelected("Saturday"); timeSheet.current.open()}}>Saturday</Button>
             {saturday.length === 0 ? <NormalText>None</NormalText>
             : <View style={styles.timeSlots}>
               {saturday.map((time, index) => <Availability
@@ -350,7 +350,7 @@ const Availabilities = props => {
           </View>
 
           <View style={styles.day}>
-            <MediumText><Text onPress={() => {setDaySelected("Sunday"); timeSheet.current.open()}}>Sunday</Text></MediumText>
+            <Button onPress={() => {setDaySelected("Monday"); timeSheet.current.open()}}>Sunday</Button>
             {sunday.length === 0 ? <NormalText>None</NormalText>
             : <View style={styles.timeSlots}>
               {sunday.map((time, index) => <Availability
