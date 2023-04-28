@@ -14,7 +14,7 @@ import ProfilePic from "../components/ProfilePic";
 import OrganizeMain from "../screens/Organize/OrganizeMain";
 import ExploreMain from "../screens/Explore/ExploreMain";
 import HomeMain from "../screens/Home/HomeMain";
-import TryOutMain from "../screens/TryOut/TryOutMain";
+import TryOut from "../screens/TryOut";
 import ProfileMain from "../screens/Profile/ProfileMain";
 import NotificationsMain from "../screens/Notifications/NotificationsMain";
 import Loading from "../screens/utils/Loading";
@@ -112,7 +112,7 @@ const MainTabs = () => {
     >
       <Tabs.Screen
         name="Home"
-        component={user.uid == tryoutId ? TryOutMain : HomeMain}
+        component={user.uid == tryoutId ? TryOut : HomeMain}
         options={{
           tabBarIcon: ({ focused }) => (
             <TabBarIcon focused={focused} icon={"home-outline"} title="Home" />
@@ -134,7 +134,7 @@ const MainTabs = () => {
       />
       <Tabs.Screen
         name="Organize"
-        component={user.uid == tryoutId ? TryOutMain : OrganizeMain}
+        component={user.uid == tryoutId ? TryOut : OrganizeMain}
         options={{
           tabBarIcon: ({ focused }) => (
             <TabBarIcon
@@ -147,7 +147,7 @@ const MainTabs = () => {
       />
       <Tabs.Screen
         name="Notifs"
-        component={user.uid == tryoutId ? TryOutMain : NotificationsMain}
+        component={user.uid == tryoutId ? TryOut : NotificationsMain}
         options={{
           tabBarLabel: ({ focused }) => (
             <TabBarText focused={focused} title="Inbox" />
@@ -163,7 +163,7 @@ const MainTabs = () => {
       />
       <Tabs.Screen
         name="Profile"
-        component={user.uid == tryoutId ? TryOutMain : ProfileMain}
+        component={user.uid == tryoutId ? TryOut : ProfileMain}
         options={{
           tabBarIcon: () => <ProfilePic size={38} uri={profileImageUri} />,
         }}

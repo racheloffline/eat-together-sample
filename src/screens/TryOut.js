@@ -6,13 +6,16 @@ import {
   View,
   KeyboardAvoidingView
 } from "react-native";
+import firebase from "firebase/compat";
 import { Layout } from "react-native-rapi-ui";
 
-import Button from "../../components/Button";
-import LargeText from "../../components/LargeText";
-import Name from "../auth/Registration/Name";
+import Button from "../components/Button";
+import LargeText from "../components/LargeText";
 
-export default function ({ navigation }) {
+export default function () {
+  async function signOut () {
+    await firebase.auth().signOut();
+  }
   return (
     <Layout>
       <KeyboardAvoidingView behavior="height" enabled style={{ flex: 1 }}>
@@ -41,7 +44,7 @@ export default function ({ navigation }) {
             }}
           >
             <Button onPress={() => {
-              navigation.navigate("Name");
+              signOut();
             }} marginVertical={10} backgroundColor="white" color="#5DB075">
               Create an account!
             </Button>
