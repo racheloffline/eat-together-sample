@@ -98,6 +98,7 @@ const MainTabs = () => {
 
   return (
     <Tabs.Navigator
+      initialRouteName={user.uid === tryoutId ? "Explore" : "Home"}
       screenOptions={{
         headerShown: false,
         animationEnabled: false,

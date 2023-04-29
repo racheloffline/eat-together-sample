@@ -7,8 +7,8 @@ import {
   View,
   KeyboardAvoidingView,
   Image,
+  TouchableOpacity
 } from "react-native";
-
 
 import {
   Layout,
@@ -16,6 +16,7 @@ import {
 
 import Button from "../../components/Button";
 import LargeText from "../../components/LargeText";
+import MediumText from "../../components/MediumText";
 
 async function loginTryOut() {
   await firebase.auth().signInWithEmailAndPassword('calebcile@gmail.com', 'tryout123');
@@ -57,21 +58,21 @@ export default function ({ navigation }) {
               backgroundColor: "white",
             }}
           >
-            <Button onPress={loginTryOut} marginVertical={10} backgroundColor="white" color="#5DB075">
-              Try Out the App
-            </Button>
-
             <Button onPress={() => {
               navigation.navigate("Name");
-            }} marginVertical={10} backgroundColor="white" color="#5DB075">
+            }} marginVertical={10}>
               Sign Up
             </Button>
 
             <Button onPress={() => {
               navigation.navigate("Login");
-            }} marginVertical={10}>
+            }} marginVertical={10} backgroundColor="white" color="#5DB075">
               Login
             </Button>
+
+            <TouchableOpacity onPress={loginTryOut} style={{ marginTop: 20 }}>
+              <MediumText center color="grey">Explore as a guest!</MediumText>
+            </TouchableOpacity>
           </View>
         </ScrollView>
     </KeyboardAvoidingView>
