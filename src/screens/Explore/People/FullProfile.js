@@ -29,7 +29,8 @@ import {
 
 import { db, auth } from "../../../provider/Firebase";
 import firebase from "firebase/compat";
-
+const user = auth.currentUser;
+const tryoutId = 'knVtYe1mtpaZ9D8XLDrS7FCImtm2';
 const blockPerson = (uid, navigation, back) => {
   Alert.alert("Block", "Are you sure you want to block this user? This can't be undone.", [
     {
@@ -319,8 +320,8 @@ const FullProfile = ({ blockBack, route, navigation }) => {
           </LargeText>
           <NormalText marginBottom={5}>({route.params.person.pronouns})</NormalText>
           <MediumText size={16}>@{route.params.person.username}</MediumText>
-
-          <View style={{ flexDirection: "row", marginVertical: 10 }}>
+          {tryoutId != user.uid && (
+            <View style={{ flexDirection: "row", marginVertical: 10 }}>
             <Button
               disabled={disabled}
               onPress={connect}
@@ -332,6 +333,7 @@ const FullProfile = ({ blockBack, route, navigation }) => {
               {status}
             </Button>
           </View>
+          )}
 
           <NormalText>
             {route.params.person.attendedEventIDs.length +

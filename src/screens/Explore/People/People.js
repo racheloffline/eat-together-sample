@@ -21,7 +21,6 @@ import { sortBySimilarInterests } from "../../../methods";
 export default function ({ navigation }) {
   // Fetch current user
   const user = auth.currentUser;
-  const tryoutId = 'knVtYe1mtpaZ9D8XLDrS7FCImtm2';
   const [userInfo, setUserInfo] = useState({});
   const [unread, setUnread] = useState(false); // See if we need to display unread notif icon
 
@@ -200,13 +199,9 @@ export default function ({ navigation }) {
               <ProfileBubble
                 person={item}
                 click={() => {
-                  if (user.uid === tryoutId) {
-                    alert('Please log in to use this feature!');
-                  } else {
-                    navigation.navigate("FullProfile", {
-                      person: item,
-                    });
-                  }
+                  navigation.navigate("FullProfile", {
+                    person: item,
+                  });
                 }}
               />
             )}

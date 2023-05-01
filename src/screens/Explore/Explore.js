@@ -21,7 +21,6 @@ import { auth, db } from "../../provider/Firebase";
 export default function({ navigation }) {
     // Fetch current user
     const user = auth.currentUser;
-    const tryoutId = 'knVtYe1mtpaZ9D8XLDrS7FCImtm2';
     const [userInfo, setUserInfo] = useState({});
     const [unread, setUnread] = useState(false); // See if we need to display unread notif icon
 
@@ -304,14 +303,10 @@ export default function({ navigation }) {
           <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
             data={filteredSearchedEvents} renderItem={({item}) =>
               <EventCard event={item} click={() => {
-                  //ampInstance.logEvent('BUTTON_CLICKED'); // EXPERIMENT
-                if (user.uid === tryoutId) {
-                  alert('Please log in to use this feature!');
-                } else {
-                  navigation.navigate("FullCard", {
-                    event: item
-                  });
-                }
+                //ampInstance.logEvent('BUTTON_CLICKED'); // EXPERIMENT
+                navigation.navigate("FullCard", {
+                  event: item
+                });
               }}/>
           }/>
         :
