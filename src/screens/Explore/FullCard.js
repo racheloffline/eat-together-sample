@@ -34,7 +34,7 @@ import {Menu, MenuOption, MenuOptions, MenuTrigger} from "react-native-popup-men
 
 const FullCard = ({ route, navigation }) => {
   const user = auth.currentUser;
-  const tryoutId = 'knVtYe1mtpaZ9D8XLDrS7FCImtm2';
+  const tryoutId = 'knVtYe1mtpaZ9D8XLDrS7FCImtm2'; // ID of test user
 
   const [friend, setFriend] = useState(null); // Display a friend who is also attending the event
   const [attending, setAttending] = useState(false);
@@ -275,11 +275,11 @@ const FullCard = ({ route, navigation }) => {
           </NormalText>
 
           {/* Attendance dropdown */}
-          <Toggle 
+          {user.uid !== tryoutId && <Toggle 
             open={openAttendance}
             onPress={() => setOpenAttendance(!openAttendance)}
             title="Attendance"
-          />
+          />}
 
           {openAttendance && (
             <View style={{ marginTop: 10 }}>
@@ -308,7 +308,8 @@ const FullCard = ({ route, navigation }) => {
               )}
             </View>
           )}
-          {user.uid != tryoutId && (          
+
+          {user.uid !== tryoutId && (          
             <Button onPress={attending ? withdraw : attend} disabled={route.params.event.hostID === user.uid}
               marginVertical={20} backgroundColor={loading ? "grey" : attending && 
                 route.params.event.hostID !== user.uid ? "red" : false}>
