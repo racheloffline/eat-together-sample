@@ -19,9 +19,10 @@ import { getTimeOfDay, isAvailable, compareDates } from "../../methods";
 import { auth, db } from "../../provider/Firebase";
 
 export default function({ navigation }) {
+    const tryoutId = 'knVtYe1mtpaZ9D8XLDrS7FCImtm2'; // ID of test user
+
     // Fetch current user
     const user = auth.currentUser;
-    const tryoutId = 'knVtYe1mtpaZ9D8XLDrS7FCImtm2';
     const [userInfo, setUserInfo] = useState({});
     const [unread, setUnread] = useState(false); // See if we need to display unread notif icon
 
@@ -229,7 +230,7 @@ export default function({ navigation }) {
           <Searchbar placeholder="Search by name, tags, or host name"
             value={searchQuery} onChangeText={onChangeText}/>
           
-          <HorizontalRow>
+          {user.uid !== tryoutId && <HorizontalRow>
             <Filter checked={available}
               onPress={() => setAvailable(!available)} text="Fits schedule"/>
             <Filter checked={morning || afternoon || evening}
@@ -244,7 +245,7 @@ export default function({ navigation }) {
               onPress={() => setFromFriends(!fromFriends)} text="From friends"/>
             <Filter checked={friendsAttending}
               onPress={() => setFriendsAttending(!friendsAttending)} text="Friends attending"/>
-          </HorizontalRow>
+          </HorizontalRow>}
         </View>
 
         <RBSheet
@@ -304,14 +305,9 @@ export default function({ navigation }) {
           <FlatList contentContainerStyle={styles.cards} keyExtractor={item => item.id}
             data={filteredSearchedEvents} renderItem={({item}) =>
               <EventCard event={item} click={() => {
-                  //ampInstance.logEvent('BUTTON_CLICKED'); // EXPERIMENT
-                if (user.uid === tryoutId) {
-                  alert('Please log in to use this feature!');
-                } else {
-                  navigation.navigate("FullCard", {
-                    event: item
-                  });
-                }
+                navigation.navigate("FullCard", {
+                  event: item
+                });
               }}/>
           }/>
         :

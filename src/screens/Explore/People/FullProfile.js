@@ -29,7 +29,8 @@ import {
 
 import { db, auth } from "../../../provider/Firebase";
 import firebase from "firebase/compat";
-
+const user = auth.currentUser;
+const tryoutId = 'knVtYe1mtpaZ9D8XLDrS7FCImtm2';
 const blockPerson = (uid, navigation, back) => {
   Alert.alert("Block", "Are you sure you want to block this user? This can't be undone.", [
     {
@@ -42,7 +43,6 @@ const blockPerson = (uid, navigation, back) => {
 
 const databaseStoreBlockAction = (uid, navigation, back) => {
   alert("This user has been blocked.");
-  const user = auth.currentUser;
 
   // Update user's blacklist & remove from friends
   db.collection("Users")
@@ -115,7 +115,6 @@ function removeFriend(uid, navigation) {
 
 function databaseRemoveFriend(uid, navigation) {
   alert("Friend removed.");
-  const user = auth.currentUser;
   // update user's blacklist & remove from friends
   db.collection("Users")
       .doc(user.uid)
@@ -147,7 +146,6 @@ const FullProfile = ({ blockBack, route, navigation }) => {
 
   useEffect(() => {
     // updates stuff right after React makes changes to the DOM
-    const user = firebase.auth().currentUser;
     // STEP 1: Check if user is on your connections list.
     let thisUser = db.collection("Users").doc(user.uid);
     thisUser
@@ -223,7 +221,6 @@ const FullProfile = ({ blockBack, route, navigation }) => {
 
   // Method for sending a connection request
   const connect = () => {
-    const user = firebase.auth().currentUser;
     let requestedUser = db
       .collection("Usernames")
       .doc(route.params.person.username);
@@ -319,8 +316,8 @@ const FullProfile = ({ blockBack, route, navigation }) => {
           </LargeText>
           <NormalText marginBottom={5}>({route.params.person.pronouns})</NormalText>
           <MediumText size={16}>@{route.params.person.username}</MediumText>
-
-          <View style={{ flexDirection: "row", marginVertical: 10 }}>
+          {tryoutId != user.uid && (
+            <View style={{ flexDirection: "row", marginVertical: 10 }}>
             <Button
               disabled={disabled}
               onPress={connect}
@@ -332,6 +329,7 @@ const FullProfile = ({ blockBack, route, navigation }) => {
               {status}
             </Button>
           </View>
+          )}
 
           <NormalText>
             {route.params.person.attendedEventIDs.length +

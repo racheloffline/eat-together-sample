@@ -19,9 +19,10 @@ import { sortBySimilarInterests } from "../../../methods";
 
 
 export default function ({ navigation }) {
+  const tryoutId = 'knVtYe1mtpaZ9D8XLDrS7FCImtm2'; // ID of test user
+
   // Fetch current user
   const user = auth.currentUser;
-  const tryoutId = 'knVtYe1mtpaZ9D8XLDrS7FCImtm2';
   const [userInfo, setUserInfo] = useState({});
   const [unread, setUnread] = useState(false); // See if we need to display unread notif icon
 
@@ -174,7 +175,7 @@ export default function ({ navigation }) {
           onChangeText={onChangeText}
         />
 
-        <HorizontalRow>
+        {user.uid !== tryoutId && <HorizontalRow>
           <Filter
             checked={similarInterests}
             onPress={() => setSimilarInterests(!similarInterests)}
@@ -185,7 +186,7 @@ export default function ({ navigation }) {
             onPress={() => setMutualFriends(!mutualFriends)}
             text="Mutual friends"
           />
-        </HorizontalRow>
+        </HorizontalRow>}
       </View>
 
       <View style={{ flex: 1, alignItems: "center" }}>
@@ -200,13 +201,9 @@ export default function ({ navigation }) {
               <ProfileBubble
                 person={item}
                 click={() => {
-                  if (user.uid === tryoutId) {
-                    alert('Please log in to use this feature!');
-                  } else {
-                    navigation.navigate("FullProfile", {
-                      person: item,
-                    });
-                  }
+                  navigation.navigate("FullProfile", {
+                    person: item,
+                  });
                 }}
               />
             )}
