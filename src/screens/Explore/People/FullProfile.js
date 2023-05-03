@@ -29,8 +29,7 @@ import {
 
 import { db, auth } from "../../../provider/Firebase";
 import firebase from "firebase/compat";
-const user = auth.currentUser;
-const tryoutId = 'knVtYe1mtpaZ9D8XLDrS7FCImtm2';
+
 const blockPerson = (uid, navigation, back) => {
   Alert.alert("Block", "Are you sure you want to block this user? This can't be undone.", [
     {
@@ -43,6 +42,7 @@ const blockPerson = (uid, navigation, back) => {
 
 const databaseStoreBlockAction = (uid, navigation, back) => {
   alert("This user has been blocked.");
+  const user = auth.currentUser;
 
   // Update user's blacklist & remove from friends
   db.collection("Users")
@@ -115,6 +115,8 @@ function removeFriend(uid, navigation) {
 
 function databaseRemoveFriend(uid, navigation) {
   alert("Friend removed.");
+  const user = auth.currentUser;
+
   // update user's blacklist & remove from friends
   db.collection("Users")
       .doc(user.uid)
@@ -130,10 +132,13 @@ function databaseRemoveFriend(uid, navigation) {
 }
 
 const FullProfile = ({ blockBack, route, navigation }) => {
-  const [status, setStatus] = useState("Loading");
-  const [disabled, setDisabled] = useState(true);
-  const [color, setColor] = useState("grey");
-  const [events, setEvents] = useState([]);
+  const user = auth.currentUser; // Current user
+  const tryoutId = 'knVtYe1mtpaZ9D8XLDrS7FCImtm2'; // ID of the test user
+
+  const [status, setStatus] = useState("Loading"); // Status of connection
+  const [disabled, setDisabled] = useState(true); // Disable button if already connected
+  const [color, setColor] = useState("grey"); // Color of button
+  const [events, setEvents] = useState([]); // Events that this user has hosted
   const [inviterImage, setInviterImage] = useState(
     "https://static.wixstatic.com/media/d58e38_29c96d2ee659418489aec2315803f5f8~mv2.png"
   );
@@ -255,7 +260,7 @@ const FullProfile = ({ blockBack, route, navigation }) => {
         middleContent={<MediumText center>View Profile</MediumText>}
         leftContent={<Ionicons name="chevron-back" size={20} />}
         leftAction={() => navigation.goBack()}
-        rightContent={
+        rightContent={user.uid !== tryoutId &&
           <View>
             <Menu>
               <MenuTrigger>

@@ -175,7 +175,7 @@ const FullCard = ({ route, navigation }) => {
           />
         }
         leftAction={() => navigation.goBack()}
-        rightContent={
+        rightContent={user.uid !== tryoutId &&
           <View>
             <Menu>
               <MenuTrigger>
