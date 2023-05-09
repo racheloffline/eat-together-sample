@@ -368,7 +368,10 @@ export default function ({ route, navigation }) {
         disabled={disabled || loading}
         onPress={() => {
           setLoading(true);
-          const id = Date.now() + user.uid; // Generate a unique ID for the event
+          let id = route.params.id;
+          if (!id) {
+            id = Date.now() + user.uid; // Generate a unique ID for the event
+          }
 
           if (route.params.hasImage) {
             storeImage(route.params.image, id).then(() => {
