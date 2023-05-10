@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     StyleSheet,
     Dimensions,
     ScrollView,
     ImageBackground,
-    Image
+    Image,
+    Linking
 } from "react-native";
-import {Layout, TopNav} from "react-native-rapi-ui";
-import {Ionicons} from "@expo/vector-icons";
+import { Layout, TopNav } from "react-native-rapi-ui";
+import { Ionicons } from "@expo/vector-icons";
 
 import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
@@ -25,15 +26,72 @@ import getTime from '../../getTime';
 import openMap from "react-native-open-maps";
 
 export default function ({ route, navigation }) {
-    //Save the invite as a shorter name
+    // Save the invite as a shorter name
     let invite = route.params.invite;
 
-    //Get the current user and firebase ref path
+    const [friend, setFriend] = useState(null); // Display a friend who is also attending the event
+
+    // Get the current user and firebase ref path
     const user = firebase.auth().currentUser;
     const ref = db.collection("User Invites").doc(user.uid).collection("Invites").doc(invite.id);
 
-    function chooseColor() {
-        return route.params.hasPassed ? "red" : "black";
+    useEffect(() => {
+        db.collection("Users").doc(user.uid).get().then(doc => {
+            const friend = friendAttending(doc.data());
+            if (friend) {
+                db.collection("Users").doc(friend).get().then(doc => {
+                    setFriend(doc.data());
+                });
+            }
+        }).then(() => {
+            getAttendees();
+        });
+    }, []);
+
+    // Fetch all attendees of this event
+    const getAttendees = () => {
+        invite.attendees.forEach((attendee) => {
+            if (attendee !== user.uid) {
+                db.collection("Users")
+                .doc(attendee)
+                .get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        setPeople((people) => [...people, doc.data()]);
+                    }
+                });
+            }
+        });
+    };
+
+    // Adds event to Google Calendar
+    const addToCalendar = async () => {
+        const details = {
+            start: invite.startDate.toDate().toISOString().replace(/[:\-]|\.\d{3}/g, ''),
+            end: invite.endDate.toDate().toISOString().replace(/[:\-]|\.\d{3}/g, ''),
+            name: invite.name,
+            location: invite.location,
+            additionalInfo: invite.additionalInfo
+        };
+
+        const calendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=
+            ${details.name.trim()}&details=${details.additionalInfo}&location=${details.location}
+            &dates=${details.start}/${details.end}`;
+
+        Linking.openURL(calendarUrl);
+    }
+
+    // Determine if a friend is attending the event or not, and return them
+    const friendAttending = (userInfo) => {
+        let friend = null;
+        userInfo.friendIDs.forEach(f => {
+            if (route.params.event.attendees.includes(f) && f !== route.params.event.hostID) {
+                friend = f;
+                return;
+            }
+        });
+
+        return friend;
     }
 
     function reportInvite() {
@@ -90,6 +148,13 @@ export default function ({ route, navigation }) {
                             : invite.hostFirstName + " " + invite.hostLastName}
                         </MediumText>
                     </View>
+
+                    <View style={styles.row}>
+                        <NormalText>{invite.attendees.length} attendee{invite.attendees.length !== 1 && "s"}</NormalText>
+                        {friend && <NormalText>, including: </NormalText>}
+                        {friend && <Image source={friend.hasImage ? { uri: friend.image } : require("../../../assets/logo.png")} style={styles.profileImg}/>}
+                        {friend && <NormalText>{friend.firstName + " " + friend.lastName.substring(0, 1) + "."}</NormalText>}
+                    </View>
                     
                     <View style={styles.logistics}>
                         <View style={styles.row}>
@@ -107,6 +172,9 @@ export default function ({ route, navigation }) {
                             <NormalText paddingHorizontal={10} color={route.params.hasPassed ? "red" : "black"}>
                                 {invite.startDate ? getDate(invite.startDate.toDate()) : getDate(invite.date.toDate())}
                             </NormalText>
+                            <Link onPress={() => addToCalendar()}>
+                                (add to calendar)
+                            </Link>
                         </View>
 
                         <View style={styles.row}>
