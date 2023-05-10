@@ -130,7 +130,7 @@ export default function ({ route, navigation }) {
                         let data = doc.data()
                         let currentAttendees = data.attendees
                             currentAttendees.push(user.uid)
-                            inviteRef.set({
+                            inviteRef.update({
                                 attendees: currentAttendees
                             }, {merge: true}).then(() => {
                                 const storeID = {
