@@ -9,6 +9,7 @@ import {
     Linking
 } from "react-native";
 import { Layout, TopNav } from "react-native-rapi-ui";
+import { Menu, MenuOption, MenuOptions, MenuTrigger } from "react-native-popup-menu";
 import { Ionicons } from "@expo/vector-icons";
 
 import LargeText from "../../components/LargeText";
@@ -18,9 +19,11 @@ import Button from '../../components/Button';
 import BorderedButton from '../../components/BorderedButton';
 import Link from "../../components/Link";
 
+import Toggle from '../../components/Toggle';
+import PeopleList from '../../components/PeopleList';
+
 import firebase from "firebase/compat";
-import { db } from "../../provider/Firebase";
-import { Menu, MenuOption, MenuOptions, MenuTrigger } from "react-native-popup-menu";
+import { db, auth } from "../../provider/Firebase";
 import getDate from '../../getDate';
 import getTime from '../../getTime';
 import openMap from "react-native-open-maps";
@@ -31,36 +34,45 @@ export default function ({ route, navigation }) {
 
     const [friend, setFriend] = useState(null); // Display a friend who is also attending the event
 
+    // See all attendees
+    const [people, setPeople] = useState([]);
+    const [openAttendance, setOpenAttendance] = useState(false);
+
     // Get the current user and firebase ref path
-    const user = firebase.auth().currentUser;
+    const user = auth.currentUser;
     const ref = db.collection("User Invites").doc(user.uid).collection("Invites").doc(invite.id);
 
     useEffect(() => {
-        db.collection("Users").doc(user.uid).get().then(doc => {
-            const friend = friendAttending(doc.data());
-            if (friend) {
-                db.collection("Users").doc(friend).get().then(doc => {
-                    setFriend(doc.data());
-                });
-            }
-        }).then(() => {
-            getAttendees();
-        });
+        getAttendees();
     }, []);
 
     // Fetch all attendees of this event
-    const getAttendees = () => {
-        invite.attendees.forEach((attendee) => {
-            if (attendee !== user.uid) {
-                db.collection("Users")
-                .doc(attendee)
-                .get()
-                .then((doc) => {
-                    if (doc.exists) {
-                        setPeople((people) => [...people, doc.data()]);
-                    }
-                });
-            }
+    const getAttendees = async () => {
+        let table = "Private Events";
+        if (invite.type === "public") {
+            table = "Public Events";
+        }
+
+        await db.collection(table).doc(invite.inviteID).get().then(doc => {
+            const inviteData = doc.data();
+            inviteData.attendees.forEach((attendee) => {
+                if (attendee !== user.uid) {
+                    db.collection("Users").doc(attendee).get().then((doc) => {
+                        if (doc.exists) {
+                            setPeople((people) => [...people, doc.data()]);
+                        }
+                    });
+                }
+            });
+            
+            db.collection("Users").doc(user.uid).get().then((doc) => {
+                const friend = friendAttending(doc.data(), inviteData.attendees);
+                if (friend) {
+                    db.collection("Users").doc(friend).get().then(doc => {
+                        setFriend(doc.data());
+                    });
+                }
+            });
         });
     };
 
@@ -82,10 +94,10 @@ export default function ({ route, navigation }) {
     }
 
     // Determine if a friend is attending the event or not, and return them
-    const friendAttending = (userInfo) => {
+    const friendAttending = (userInfo, attendees) => {
         let friend = null;
         userInfo.friendIDs.forEach(f => {
-            if (route.params.event.attendees.includes(f) && f !== route.params.event.hostID) {
+            if (attendees.includes(f) && f !== invite.hostID) {
                 friend = f;
                 return;
             }
@@ -104,7 +116,7 @@ export default function ({ route, navigation }) {
         <Layout>
             <TopNav
                 middleContent={
-                <MediumText>View Invite</MediumText>
+                    <MediumText>You're Invited To:</MediumText>
                 }
                 leftContent={
                     <Ionicons
@@ -139,7 +151,7 @@ export default function ({ route, navigation }) {
                 />
 
                 <View style={styles.infoContainer}>
-                    <LargeText size={24} marginBottom={10}>You've been invited to: {invite.name}!</LargeText>
+                    <LargeText size={24} marginBottom={10}>{invite.name}</LargeText>
 
                     <View style={{ flexDirection: "row", alignItems: "center" }}>
                         <Image source={invite.hasHostImage ? {uri: invite.hostImage}
@@ -150,7 +162,7 @@ export default function ({ route, navigation }) {
                     </View>
 
                     <View style={styles.row}>
-                        <NormalText>{invite.attendees.length} attendee{invite.attendees.length !== 1 && "s"}</NormalText>
+                        <NormalText>{people.length} attendee{people.length !== 1 && "s"}</NormalText>
                         {friend && <NormalText>, including: </NormalText>}
                         {friend && <Image source={friend.hasImage ? { uri: friend.image } : require("../../../assets/logo.png")} style={styles.profileImg}/>}
                         {friend && <NormalText>{friend.firstName + " " + friend.lastName.substring(0, 1) + "."}</NormalText>}
@@ -186,9 +198,44 @@ export default function ({ route, navigation }) {
                         </View>
                     </View>
 
-                    <View style = {styles.text}>
-                        <NormalText>{invite.description}</NormalText>
-                    </View>
+                    <NormalText marginBottom={20} color="black">
+                        {invite.description}
+                    </NormalText>
+
+                    {/* Attendance dropdown */}
+                    <Toggle 
+                        open={openAttendance}
+                        onPress={() => setOpenAttendance(!openAttendance)}
+                        title="Attendance"
+                    />
+
+                    {openAttendance && (
+                        <View style={{ marginTop: 10 }}>
+                            {people.length === 0 ? (
+                                <NormalText paddingHorizontal={25} size={17} color="black">
+                                    {"Just yourself"}
+                                </NormalText>
+                            ) : (
+                                people.map(person => {
+                                    if (person.id !== user.uid) {
+                                        return (
+                                            <PeopleList
+                                                person={person}
+                                                key={person.id}
+                                                color="white"
+                                                width="100%"
+                                                click={() => {
+                                                    navigation.navigate("FullProfile", {
+                                                        person: person
+                                                    });
+                                                }}
+                                            />
+                                        );
+                                    }
+                                })
+                            )}
+                        </View>
+                    )}
                 </View>
 
                 <View style = {styles.buttonView}>
