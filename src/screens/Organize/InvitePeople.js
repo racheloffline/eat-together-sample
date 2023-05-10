@@ -200,7 +200,7 @@ export default function ({ route, navigation }) {
         const list = [];
         query.forEach((doc) => {
           let data = doc.data();
-          if (data.verified && data.id !== user.uid && !currUser.blockedIDs.includes(data.id) && !data.blockedIDs.includes(user.uid) && (!data.settings.privateAccount || currUser.friendIDs.includes(data.id))) { // Only show verified + unblocked + nonprivate users
+          if (data.verified && data.id !== user.uid && !route.params.attendees.includes(data.id) && !currUser.blockedIDs.includes(data.id) && !data.blockedIDs.includes(user.uid) && (!data.settings.privateAccount || currUser.friendIDs.includes(data.id))) { // Only show verified + unblocked + nonprivate users
             data.invited = false;
             data.color = generateColor();
             data.selectedTags = randomize3(data.tags);
@@ -255,6 +255,8 @@ export default function ({ route, navigation }) {
     const invitedUsers = users.filter((user) => user.invited);
     setDisabled(invitedUsers.length === 0);
   }, [users]);
+
+
 
   // Toggle a user's invite status
   const toggleInvite = (id) => {
@@ -331,7 +333,7 @@ export default function ({ route, navigation }) {
           <Filter
             checked={similarInterests}
             onPress={() => setSimilarInterests(!similarInterests)}
-            text="Sort by similar interests"
+            text={"Sort by similar interests"}
           />
           <Filter
             checked={mutualFriends}
@@ -366,7 +368,10 @@ export default function ({ route, navigation }) {
         disabled={disabled || loading}
         onPress={() => {
           setLoading(true);
-          const id = Date.now() + user.uid; // Generate a unique ID for the event
+          let id = route.params.id;
+          if (!id) {
+            id = Date.now() + user.uid; // Generate a unique ID for the event
+          }
 
           if (route.params.hasImage) {
             storeImage(route.params.image, id).then(() => {

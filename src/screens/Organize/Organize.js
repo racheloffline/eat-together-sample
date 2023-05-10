@@ -460,6 +460,7 @@ export default function ({ navigation }) {
                                     hasImage: hasImage,
                                     image: hasImage ? photo : "",
                                     icebreakers,
+                                    attendees: [],
                                     clearAll
                                 });
                             }
