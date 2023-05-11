@@ -20,6 +20,7 @@ import { compareDates } from "../../methods";
 import moment from "moment";
 import MediumText from "../../components/MediumText";
 import Me from "../Profile/Me";
+import RecommendationsCard from "../../components/RecommendationsCard";
 
 export default function ({ navigation }) {
   // Get current user
@@ -124,6 +125,7 @@ export default function ({ navigation }) {
         }
 
         let recEvents = [];
+        let asyncCounter = 0; // Counter to see how many events have been fetched
         recIDs.forEach(async id => {
           await db.collection("Private Events").doc(id).onSnapshot(recDoc => {
             let recDocData = recDoc.data();
@@ -131,15 +133,19 @@ export default function ({ navigation }) {
             recDocData.hostFirstName = "Eat Together Team!";
             recDocData.hostLastName = "";
             recEvents.push(recDocData);
+
+            asyncCounter++;
+            if(asyncCounter === recIDs.length) {
+              recEvents.sort((a, b) => {
+                return compareDates(a, b);
+              });
+
+              setHasRec(true)
+              setRecommendations(recEvents);
+              setLoading(false);
+            }
           });
         });
-        recEvents.sort((a, b) => {
-          return compareDates(a, b);
-        });
-
-        setHasRec(true)
-        setRecommendations(recEvents);
-        setLoading(false);
       })
     }
 
@@ -335,10 +341,10 @@ export default function ({ navigation }) {
 
   const renderItem = ({ item }) => {
     if(typeof item === "string") {
-      return <MediumText marginBottom={5} textAlign={"auto"}>{item}</MediumText>
+      return <MediumText marginBottom={10} textAlign={"auto"}>{item}</MediumText>
     } else if(item.isARec) {
       return(
-        <EventCard
+        <RecommendationsCard
           event={item}
           click={() => {
             navigation.navigate("Recommendation", {
@@ -418,7 +424,15 @@ export default function ({ navigation }) {
           )}
         />
       :
-        <EmptyState title="No Upcoming Meals" text="Explore different meals, or organize one on your own!"/>
+          (searchQuery === "" && hasRec) ?
+              <FlatList
+                  contentContainerStyle={styles.cards}
+                  keyExtractor={(item) => item.id}
+                  data={["Recommendations"].concat(recommendations)}
+                  renderItem={renderItem}
+              />
+              :
+              <EmptyState title="No Upcoming Meals" text="Explore different meals, or organize one on your own!"/>
       :
         <LoadingView/>
       }
