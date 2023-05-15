@@ -10,6 +10,7 @@ import FullCard from "../Explore/FullCard";
 import ReportPerson from "../Explore/People/ReportPerson";
 import ChatRoom from "../Chat/ChatRoom";
 import Recommendation from "../Notifications/Recommendation";
+import InvitePeople from "../Organize/InvitePeople";
 
 const Stack = createStackNavigator();
 
@@ -33,6 +34,7 @@ export default function () {
       <Stack.Screen name="ReportPerson" component={ReportPerson} />
       <Stack.Screen name="ChatRoom" component={ChatRoom} />
       <Stack.Screen name="Recommendation" component={Recommendation} />
+      <Stack.Screen name="InvitePeople" component={InvitePeople} />
     </Stack.Navigator>
   );
 }

@@ -59,9 +59,7 @@ const WhileYouEat = ({ route, navigation }) => {
 
   // Fetch meetup data on page load
   useEffect(() => {
-    if (event.hostID === user.uid || event.type === "recommendation") {
-      getAttendees();
-    }
+    getAttendees();
 
     db.collection("Users")
       .doc(event.hostID)
@@ -312,6 +310,29 @@ const WhileYouEat = ({ route, navigation }) => {
                     style={styles.option}
                   >
                     <NormalText size={18}>Report Event</NormalText>
+                  </MenuOption>
+                )}
+                {event.hostID === user.uid && (
+                  <MenuOption
+                    onSelect={() =>
+                      navigation.navigate("InvitePeople", {
+                        name: event.name,
+                        type: event.type === "public" ? "public" : "private",
+                        location: event.location,
+                        startDate: event.startDate,
+                        endDate: event.endDate,
+                        attendees: event.attendees,
+                        additionalInfo: event.additionalInfo,
+                        hasImage: event.hasImage,
+                        image: event.hasImage ? event.image : "",
+                        icebreakers: event.ice,
+                        id: event.id,
+                        from: "WhileYouEat"
+                      })
+                    }
+                    style={styles.option}
+                  >
+                    <NormalText size={18}>Invite People</NormalText>
                   </MenuOption>
                 )}
                 {event.hostID === user.uid && (
