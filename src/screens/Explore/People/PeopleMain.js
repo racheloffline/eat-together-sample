@@ -5,7 +5,6 @@ import People from "./People";
 import ReportPerson from "./ReportPerson";
 import FullProfile from "./FullProfile";
 import FullCard from '../FullCard';
-import ReportEvent from "../../Home/ReportEvent";
 
 const Stack = createStackNavigator();
 
@@ -24,7 +23,6 @@ export default function () {
       </Stack.Screen>
       <Stack.Screen name="ReportPerson" component={ReportPerson} />
       <Stack.Screen name="FullCard" component={FullCard}/>
-      <Stack.Screen name="ReportEvent" component={ReportEvent}/>
     </Stack.Navigator>
   );
 }

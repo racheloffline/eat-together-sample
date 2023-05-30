@@ -24,7 +24,7 @@ export default function({ navigation }) {
     // Fetch current user
     const user = auth.currentUser;
     const [userInfo, setUserInfo] = useState({});
-    const [unread, setUnread] = useState(false); // See if we need to display unread notif icon
+    const [unread, setUnread] = useState(false);
 
     const [events, setEvents] = useState([]); // All public events
     const [filteredEvents, setFilteredEvents] = useState([]); // Filtered events
@@ -67,13 +67,11 @@ export default function({ navigation }) {
                     }
 
                     if (doc.data().startDate) { // Same logic as else statement, but for different data structure
-                      if (doc.data().startDate.toDate() > new Date() && 
-                        !userData.blockedIDs.includes(doc.data().hostID)) {
+                      if (doc.data().startDate.toDate() > new Date()) {
                           newEvents.push(doc.data());
                       }
                     } else {
-                      if (doc.data().date.toDate() > new Date() && 
-                        !userData.blockedIDs.includes(doc.data().hostID)) {
+                      if (doc.data().date.toDate() > new Date()) {
                           newEvents.push(doc.data());
                       }
                     }

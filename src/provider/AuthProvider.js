@@ -11,7 +11,6 @@ const AuthProvider = (props) => {
   const [profileImageUri, setProfileImageUri] = useState(
     "https://static.wixstatic.com/media/d58e38_29c96d2ee659418489aec2315803f5f8~mv2.png"
   );
-  const [hasNotif, setHasNotif] = useState(false);
 
   useEffect(() => {
     checkLogin();
@@ -26,7 +25,6 @@ const AuthProvider = (props) => {
           setProfileImageUri(doc.data().image);
         }
 
-        setHasNotif(doc.data().hasNotif);
       });
   }
   function checkLogin() {
@@ -49,9 +47,7 @@ const AuthProvider = (props) => {
         user,
         currUser,
 		    profileImageUri,
-        hasNotif,
         updateProfileImg: image => setProfileImageUri(image),
-        updateHasNotif: notif => setHasNotif(notif),
       }}
     >
       {props.children}

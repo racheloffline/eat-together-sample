@@ -6,7 +6,6 @@ import FullCard from "./FullCard";
 import PeopleMain from "./People/PeopleMain";
 import FullProfile from "./People/FullProfile";
 import ReportPerson from "../Explore/People/ReportPerson";
-import ReportEvent from "../Home/ReportEvent";
 
 const Stack = createStackNavigator();
 
@@ -28,7 +27,6 @@ export default function () {
         {props => <FullProfile {...props} blockBack="Explore" />}
       </Stack.Screen>
       <Stack.Screen name="ReportPerson" component={ReportPerson} />
-      <Stack.Screen name="ReportEvent" component={ReportEvent}/>
     </Stack.Navigator>
   );
 }

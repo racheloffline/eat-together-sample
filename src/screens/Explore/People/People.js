@@ -75,7 +75,7 @@ export default function ({ navigation }) {
         let users = [];
         query.forEach((doc) => {
           let data = doc.data();
-          if (data.id !== user.uid && data.verified && !userData.blockedIDs.includes(doc.data().id)
+          if (data.id !== user.uid && data.verified
             && !doc.data().blockedIDs.includes(user.uid) && !userData.friendIDs.includes(doc.data().id)) { // Only show verified + unblocked + non-friend users + non-private accounts
             data.inCommon = getCommonTags(userData, data);
             data.color = generateColor();
@@ -189,8 +189,8 @@ export default function ({ navigation }) {
         </HorizontalRow>}
       </View>
 
-      <View style={{ flex: 1, alignItems: "center" }}>
-        {loading || people.length === 0 ?
+      <View style={{ flex: 1, alignItems: "center", padding: 10 }}>
+        {loading ?
           <LoadingView/>
         : filteredSearchedPeople.length > 0 ? 
           <FlatList

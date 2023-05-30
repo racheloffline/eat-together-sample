@@ -141,14 +141,6 @@ const FullCard = ({ route, navigation }) => {
     });
   }
 
-  // Report an event that the user feels is offensive in some way
-  //Reporting event function
-  function reportEvent() {
-    navigation.navigate("ReportEvent", {
-      eventID: route.params.event.id,
-    });
-  }
-
   // Determine if a friend is attending the event or not, and return them
   const friendAttending = (userInfo) => {
     let friend = null;
@@ -186,7 +178,7 @@ const FullCard = ({ route, navigation }) => {
                 />
               </MenuTrigger>
               <MenuOptions>
-                <MenuOption onSelect={() => reportEvent()}  style={styles.option}>
+                <MenuOption onSelect={() => {}}  style={styles.option}>
                   <NormalText size={18} color="red">
                     Report
                   </NormalText>

@@ -162,13 +162,10 @@ const Auth = () => {
         saturday: newTimes[5],
         sunday: newTimes[6],
       },
-      notifications: [],
       metWith: [],
       metAt: [],
       settings: {
-        notifications: true,
       },
-      hasNotif: true,
       pushTokens: [],
       verified: false,
     };

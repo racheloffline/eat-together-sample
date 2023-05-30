@@ -253,12 +253,6 @@ export default function ({ navigation }) {
   return (
     <Layout>
       <Header name="Messages" navigation={navigation} connections/>
-      <HorizontalSwitch
-        left="Notifications"
-        right="Messages"
-        current="right"
-        press={(val) => navigation.navigate("Notifications")}
-      />
 
       <View style={styles.content}>
         <View style={styles.searchArea}>

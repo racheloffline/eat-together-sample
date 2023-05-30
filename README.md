@@ -1,6 +1,8 @@
 # About
 
-Connecting students through shared meals. Our app allows you to create and join food meetups with ease.
+This is a sample version of the Eat Together App (https://www.eat-together.tech/) for display purposes. It does not correspond to the code for the full app for security reasons and is connected to a different firestore database. Thus, this sample has limited functionality but still showcases the core features of Eat Together.
+
+The purpose of Eat Together is to connect students through food. We have built an app that matches students based on their schedules and interests to spontaneously share meals. We hope that by bringing people together over something that is so universal, we can spark all kinds of meaningful conversations.
 
 # Getting Started ✨✨✨
 
@@ -26,7 +28,7 @@ Other (less but kinda) important files/folders to know:
 4. `package.json` + `yarn.lock`: contains information about libraries/dependencies the app needs to run (`npm install` and `yarn.lock` rely on this file).
 
 
-## React Native Expo Installation
+## How to Run this App Locally 🚀
 
 1. Install [node.js](https://nodejs.org/en/). To ensure that you properly downloaded it, type `npm -v` in the terminal. This will diplsay the currently installed version, if any.
 2. Install Expo:
@@ -62,64 +64,3 @@ Other (less but kinda) important files/folders to know:
    ```
    
 7. Get the expo mobile app (https://expo.dev/client) and scan the generated QR code with the app.
-
-### Firebase Backend Setup (Ignore this section if you used the `.env` file)
-
-- Fill this firebase config to your config inside `./src/provider/Firebase.js`
-- Check out the Eat Together Google Drive for how to fill this out!
-
-```jsx
-// Better put your these secret keys in .env file
-const firebaseConfig = {
-	apiKey: '',
-	authDomain: '',
-	databaseURL: '',
-	projectId: '',
-	storageBucket: '',
-	messagingSenderId: '',
-	appId: '',
-};
-```
-
-and you are good to go!
-
-Check out https://console.firebase.google.com/u/0/ to look at our database.
-
-
-### How React Navigation Auth Flow Works
-
-The checking logged users process is inside `./src/provider/AuthProvider`.
-
-Inside the navigator `./src/navigation/AppNavigator.js`
-There are 2 stack navigators:
-
-- `<Auth/>` → for not logged in users stack
-- `<Main/>` → for logged in users stack
-- `<Loading/>` → when checking if the user is logged in or not loading screen
-
-```jsx
-export default () => {
-	const auth = useContext(AuthContext);
-	const user = auth.user;
-	return (
-		<NavigationContainer>
-			{user == null && <Loading />}
-			{user == false && <Auth />}
-			{user == true && <Main />}
-		</NavigationContainer>
-	);
-};
-```
-
-## Common Bugs & Fixes 🐛
-While there are many bugs that can arise while setting up the project, here are a few of the most common ones. Note that this list is not comprehensive nor final.
-- Mac users: if `npm install` does not work and displays a long series of errors, it is often because of your computer's security permissions. Try `sudo npm install`, which will prompt you for your password. This will run the install as admin, which should work.
-- Mac users: if attempting to launch via simulator and you get the error `Error: xcrun exited with non-zero code: 2
-An error was encountered processing the command (domain=NSPOSIXErrorDomain, code=2):
-Unable to boot device because we cannot determine the runtime bundle.
-No such file or directory`, run the following command in Terminal:
-
-	```
-	open -a simulator 
-	```
-	Once the simulator boots up, immediately quit the simulator app. Run `npm start` or `yarn start` again from the project directory, and open 		simulator. It should then be resolved.

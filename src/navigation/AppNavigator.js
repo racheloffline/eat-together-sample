@@ -13,10 +13,8 @@ import ProfilePic from "../components/ProfilePic";
 //Screens (Make sure to import if ever adding new screen!)
 import OrganizeMain from "../screens/Organize/OrganizeMain";
 import ExploreMain from "../screens/Explore/ExploreMain";
-import HomeMain from "../screens/Home/HomeMain";
 import TryOut from "../screens/TryOut";
 import ProfileMain from "../screens/Profile/ProfileMain";
-import NotificationsMain from "../screens/Notifications/NotificationsMain";
 import Loading from "../screens/utils/Loading";
 
 //Auth screens
@@ -28,49 +26,6 @@ import VerifyEmail from "../screens/VerifyEmail";
 import firebase from "firebase/compat";
 import { db, auth} from "../provider/Firebase";
 
-//Push notifications functions and imports
-import * as NotificationFunctions from "expo-notifications";
-
-import DeviceToken from "../screens/utils/DeviceToken";
-import {Alert, Linking} from "react-native";
-
-async function registerForPushNotificationsAsync() {
-  let token;
-
-  const { status: existingStatus } =
-    await NotificationFunctions.getPermissionsAsync();
-  let finalStatus = existingStatus;
-
-  if (existingStatus !== "granted") {
-    const { status } = await NotificationFunctions.requestPermissionsAsync();
-    finalStatus = status;
-  }
-
-  if (finalStatus !== "granted") {
-      Alert.alert(
-          "Push Notification Disabled",
-          "Push notifications for Eat Together have been disabled in Settings. Would you like to open settings and enable them now?",
-          [
-              {
-                  text: "Yes",
-                  onPress:() => {
-                      Linking.openSettings();
-                  },
-                  style: "cancel"
-              },
-              {
-                  text: "No",
-                  onPress: () => {}
-              }
-          ]
-      );
-    return;
-  }
-
-  token = (await NotificationFunctions.getExpoPushTokenAsync()).data;
-
-  return token;
-}
 
 //The experience of logged in user!!
 const MainStack = createStackNavigator();
@@ -83,7 +38,6 @@ const Main = () => {
       }}
     >
       <MainStack.Screen name="MainTabs">{() => <MainTabs />}</MainStack.Screen>
-      <MainStack.Screen name="Notifications" component={NotificationsMain} />
     </MainStack.Navigator>
   );
 };
@@ -92,13 +46,12 @@ const Main = () => {
 const Tabs = createBottomTabNavigator();
 const MainTabs = () => {
   const profileImageUri = useContext(AuthContext).profileImageUri;
-  const hasNotif = useContext(AuthContext).hasNotif;
   const user = auth.currentUser;
   const tryoutId = 'knVtYe1mtpaZ9D8XLDrS7FCImtm2';
 
   return (
     <Tabs.Navigator
-      initialRouteName={user.uid === tryoutId ? "Explore" : "Home"}
+      initialRouteName={"Explore"}
       screenOptions={{
         headerShown: false,
         animationEnabled: false,
@@ -111,15 +64,6 @@ const MainTabs = () => {
         ]
       }}
     >
-      <Tabs.Screen
-        name="Home"
-        component={user.uid == tryoutId ? TryOut : HomeMain}
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <TabBarIcon focused={focused} icon={"home-outline"} title="Home" />
-          ),
-        }}
-      />
       <Tabs.Screen
         name="Explore"
         component={ExploreMain}
@@ -147,22 +91,6 @@ const MainTabs = () => {
         }}
       />
       <Tabs.Screen
-        name="Notifs"
-        component={user.uid == tryoutId ? TryOut : NotificationsMain}
-        options={{
-          tabBarLabel: ({ focused }) => (
-            <TabBarText focused={focused} title="Inbox" />
-          ),
-          tabBarIcon: ({ focused }) => (
-            <TabBarIcon
-              focused={focused}
-              icon={hasNotif ? "mail-unread-outline" : "mail-outline"}
-              title="Inbox"
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="Profile"
         component={user.uid == tryoutId ? TryOut : ProfileMain}
         options={{
@@ -179,15 +107,10 @@ export default () => {
   const currUser = auth.currUser;
 
   async function getUser() {
-    const token = await registerForPushNotificationsAsync();
-    DeviceToken.setToken(token);
 
     if (
       currUser &&
-      (currUser.emailVerified ||
-        currUser.email === "rachelhu@uw.edu" ||
-        currUser.email === "argharib@uw.edu")
-    ) {
+      currUser.emailVerified) {
       await db
         .collection("Users")
         .doc(currUser.uid)
@@ -197,13 +120,6 @@ export default () => {
         });
     }
 
-    //Register the push token by storing it in firebase, so cloud functions can use it
-    await db
-      .collection("Users")
-      .doc(firebase.auth().currentUser.uid)
-      .update({
-        pushTokens: firebase.firestore.FieldValue.arrayUnion(token),
-      });
   }
 
   // Prevent unecessary reloads of data
@@ -217,9 +133,7 @@ export default () => {
       {user === false && <Auth />}
       {user === true &&
       currUser &&
-      !currUser.emailVerified &&
-      currUser.email !== "rachelhu@uw.edu" &&
-      currUser.email !== "argharib@uw.edu" ? (
+      !currUser.emailVerified ? (
         <VerifyEmail />
       ) : (
         user === true && <Main />

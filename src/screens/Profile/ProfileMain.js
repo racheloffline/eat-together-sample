@@ -12,9 +12,6 @@ import ReportBug from "./ReportBug";
 import SuggestIdea from "./SuggestIdea";
 import FullProfile from "../Explore/People/FullProfile";
 import ReportPerson from "../Explore/People/ReportPerson";
-
-import AvailabilitiesHome from "./Availabilities/AvailabilitiesHome";
-import Availabilities from "./Availabilities/Availabilities";
 import Colorpicker from "./ColorPicker";
 
 const Stack = createStackNavigator();
@@ -44,9 +41,6 @@ export default function () {
         {props => <FullProfile {...props} blockBack="Me" />}
       </Stack.Screen>
       <Stack.Screen name="ReportPerson" component={ReportPerson} />
-
-      <Stack.Screen name="AvailabilitiesHome" component={AvailabilitiesHome} />
-      <Stack.Screen name="Availabilities" component={Availabilities} />
       <Stack.Screen name="ColorPicker" component={Colorpicker} />
     </Stack.Navigator>
   );

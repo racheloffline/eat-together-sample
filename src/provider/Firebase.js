@@ -6,26 +6,15 @@ import "firebase/compat/storage";
 import { initializeAuth, getReactNativePersistence} from "firebase/auth/react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import {
-    FIREBASE_API_KEY,
-    FIREBASE_AUTH_DOMAIN,
-    FIREBASE_DATABASE_URL,
-    FIREBASE_PROJECT_ID,
-    FIREBASE_STORAGE_BUCKET,
-    FIREBASE_MESSAGING_SENDER_ID,
-    FIREBASE_APP_ID,
-} from "@env"; //Enviroment variables
-
-//Better put your these secret keys in .env file
-//Connect to firebase
+// This is a sample so it uses an empty database that is ok to share.
+// Normally this would be configured with a .env
 const firebaseConfig = {
-    apiKey: FIREBASE_API_KEY,
-    authDomain: FIREBASE_AUTH_DOMAIN,
-    databaseURL: FIREBASE_DATABASE_URL,
-    projectId: FIREBASE_PROJECT_ID,
-    storageBucket: FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,
-    appId: FIREBASE_APP_ID,
+  apiKey: "AIzaSyAfhnwUKt0-vMT0Y_YfJORIGLuI8Uqg0lg",
+  authDomain: "eat-together-sample.firebaseapp.com",
+  projectId: "eat-together-sample",
+  storageBucket: "eat-together-sample.appspot.com",
+  messagingSenderId: "109775466326",
+  appId: "1:109775466326:web:ccd8d1218203926d5ef0f7",
 };
 
 let app;

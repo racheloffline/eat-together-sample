@@ -19,7 +19,7 @@ import LargeText from "../../components/LargeText";
 import MediumText from "../../components/MediumText";
 
 async function loginTryOut() {
-  await firebase.auth().signInWithEmailAndPassword('calebcile@gmail.com', 'tryout123');
+  await firebase.auth().signInWithEmailAndPassword('rachehu@uw.edu', '12345678');
 }
 
 export default function ({ navigation }) {
